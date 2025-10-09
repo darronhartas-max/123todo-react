@@ -1,70 +1,287 @@
-# Getting Started with Create React App
+# 123 ToDo - User Guide
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**A sophisticated task management Progressive Web App with offline support**
 
-## Available Scripts
+Version 0.1.0 | © Darron Hartas 2025
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Quick Start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### For End Users
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. **Access the App**: Visit https://www.123todo.com in your web browser
+2. **Install on Mobile** (Optional but Recommended):
+   - **iPhone/iPad**: Tap Share → "Add to Home Screen" → "Add"
+   - **Android**: Tap Menu (⋮) → "Add to Home screen" or "Install app" → "Install"
+3. **Start Managing Tasks**: Add your first task using the ➕ button!
 
-### `npm test`
+### For Developers
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# Clone and install dependencies
+npm install
 
-### `npm run build`
+# Run development server
+npm start
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Build for production
+npm run build
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📱 Features
 
-### `npm run eject`
+### Task Management
+- **4 Priority Levels**: Must Do, Should Do, Could Do, On Hold
+- **Quick Actions**: Complete (✓), Edit, Archive, Delete, Restore
+- **Drag & Drop**: Reorder tasks within each priority level
+- **Character Limit**: 200 characters per task for concise task descriptions
+- **Auto-Expanding Editor**: Task editor automatically adjusts to show all text
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Priority System
+1. **Must Do** (Red) - Critical, urgent tasks
+2. **Should Do** (Orange) - Important but not critical
+3. **Could Do** (Gray) - Nice to have, lower priority
+4. **On Hold** (Purple) - Paused or waiting tasks
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Data Management
+- **Local Storage**: All data stored in your browser (no server required)
+- **Export/Import**: JSON backup and restore functionality
+- **Archive System**: Completed tasks saved with timestamps
+- **Restore Feature**: Bring archived tasks back with new priority
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Achievement System
+- **Milestone Celebrations**: Unlock achievements at 5, 10, and 15 daily completed tasks
+- **Daily Tracking**: Resets each day to encourage consistent productivity
+- **Motivational Messages**: Encouraging feedback on achievements
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### PWA Features
+- **Offline Support**: Works without internet connection
+- **Home Screen Install**: Add to mobile home screen like a native app
+- **Fast Loading**: Cached resources for quick startup
+- **Auto-Updates**: Service worker automatically updates the app
 
-## Learn More
+### Smart Reminders
+- **Weekly Backup Reminder**: Prompts you to export data every 7 days
+- **Install Prompts**: Gentle reminders to install as PWA (dismissible)
+- **Welcome Screen**: First-time user guide with installation instructions
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🎯 How to Use
 
-### Code Splitting
+### Adding Tasks
+1. Click the ➕ button in the header
+2. Type your task (max 200 characters)
+3. Select priority: Must Do, Should Do, or Could Do
+4. Click "ADD TASK" or press Enter
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Managing Tasks
+- **Complete**: Click the ✓ button to move task to archive
+- **Edit**: Click anywhere on the task text to edit content or change priority
+- **Reorder**: Drag and drop tasks within the same priority section
+- **View Archive**: Click "Show Archive" at the bottom to see completed tasks
 
-### Analyzing the Bundle Size
+### Editing Tasks
+1. Click on any task to open the edit modal
+2. Text area auto-expands to show all content
+3. Change the task text (auto-saves as you type)
+4. Change priority using the dropdown
+5. Click "Save" to apply changes or "Cancel" to discard
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Archive Management
+- **View**: Toggle "Show/Hide Archive" button to see completed tasks
+- **Restore**: Click the ↻ button and select a new priority
+- **Delete**: Click the 🗑️ button to permanently remove
 
-### Making a Progressive Web App
+### Backup & Restore
+- **Export**: Click "Export" in the footer to download a JSON file
+- **Import**: Click "Import" and select a previously exported JSON file
+- **Frequency**: Recommended to backup weekly (app will remind you)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 💡 Tips & Best Practices
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. **Use Priorities Wisely**
+   - Must Do: Only for truly urgent tasks (keeps list focused)
+   - Should Do: Important tasks you'll do today/this week
+   - Could Do: Future tasks or low-priority items
+   - On Hold: Tasks waiting on external factors
 
-### Deployment
+2. **Keep Tasks Concise**
+   - Use the 200-character limit to stay focused
+   - One task = one action
+   - Break large projects into smaller tasks
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+3. **Regular Backups**
+   - Export your data weekly (the app will remind you)
+   - Store backups in cloud storage (Dropbox, Google Drive, etc.)
+   - Use descriptive filenames: `123todo-2025-10-09.json`
 
-### `npm run build` fails to minify
+4. **Archive Hygiene**
+   - Review archive monthly
+   - Delete old completed tasks you no longer need
+   - Restore tasks if they become relevant again
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+5. **Daily Workflow**
+   - Start day by reviewing Must Do tasks
+   - Move tasks from Should Do → Must Do as needed
+   - Complete tasks throughout the day
+   - Archive or update uncompleted tasks at day's end
+
+---
+
+## 🔧 Technical Details
+
+### Browser Compatibility
+- **Recommended**: Chrome, Safari, Firefox, Edge (latest versions)
+- **Mobile**: iOS Safari 11+, Android Chrome 60+
+- **PWA Support**: Best on Chrome/Edge and Safari
+
+### Data Storage
+- **Method**: Browser localStorage
+- **Limit**: ~5-10MB (hundreds of tasks)
+- **Persistence**: Data survives browser restarts
+- **Privacy**: All data stays on your device (no server, no tracking)
+
+### System Requirements
+- Modern web browser with JavaScript enabled
+- ~2MB available localStorage space
+- Internet connection for initial load (then works offline)
+
+---
+
+## ⚠️ Important Notices
+
+### Data Responsibility
+- **You are responsible for backing up your data**
+- Data stored only in your browser's localStorage
+- Can be lost if:
+  - Browser cache/data is cleared
+  - Browser is uninstalled
+  - Device is reset/reformatted
+  - Browser updates cause issues
+
+### Terms of Use
+- This app is provided "as is" without warranties
+- Use entirely at your own risk
+- No data is collected or transmitted to servers
+- Full terms: https://www.123todo.com/terms
+
+### Browser Storage Warnings
+- Do not clear browser data/cache if you want to keep tasks
+- Add browser to "don't clear" exceptions if possible
+- Export data regularly as a safety measure
+
+---
+
+## 🐛 Troubleshooting
+
+### Tasks Not Saving
+- Check browser localStorage is enabled
+- Ensure you're not in Private/Incognito mode
+- Try refreshing the page
+- Export and re-import data if issues persist
+
+### App Not Loading
+- Clear browser cache and refresh
+- Check internet connection (for first load)
+- Try a different browser
+- Disable browser extensions temporarily
+
+### Lost Data
+- Check if you have a backup JSON file
+- Use Import feature to restore from backup
+- If no backup exists, data cannot be recovered
+
+### PWA Installation Issues
+- Ensure you're using HTTPS (required for PWA)
+- Try a different browser
+- Check that browser supports PWA installation
+- Dismiss and retry install prompt
+
+---
+
+## 📞 Support & Feedback
+
+- **Website**: https://www.123todo.com
+- **Terms**: https://www.123todo.com/terms
+- **Issues**: Check browser console for error messages
+
+---
+
+## 🛠️ Development
+
+### Project Structure
+```
+123todo-react/
+├── public/              # Static assets
+│   ├── 123-logo-500px.jpg
+│   ├── manifest.json    # PWA configuration
+│   └── index.html
+├── src/
+│   ├── App.js          # Main application component
+│   └── index.js        # Entry point
+├── CLAUDE.md           # Deployment documentation
+└── README.md           # This file
+```
+
+### Available Scripts
+
+**Development**
+```bash
+npm start               # Start dev server at localhost:3000
+npm test                # Run tests
+npm run build          # Build production bundle
+```
+
+**Deployment**
+```bash
+# Build generates static files in /build directory
+npm run build
+
+# Deploy /build directory to any web server
+# Requires HTTPS for PWA features
+```
+
+### Environment
+- **React**: 19.1.1
+- **Create React App**: Latest
+- **Icons**: lucide-react
+- **State**: React Hooks (useState, useEffect, useCallback)
+- **Storage**: localStorage API
+
+---
+
+## 📄 License & Credits
+
+**Copyright © Darron Hartas 2025**
+
+Built with [Create React App](https://github.com/facebook/create-react-app)
+
+🤖 Developed with assistance from [Claude Code](https://claude.com/claude-code)
+
+---
+
+## 🔄 Version History
+
+### v0.1.0 (Current)
+- Initial release
+- 4-level priority system
+- Drag-and-drop task reordering
+- Archive system with restore
+- Export/Import JSON backup
+- Milestone achievements (5, 10, 15 tasks/day)
+- PWA installation support
+- Offline functionality
+- Weekly backup reminders
+- Auto-expanding task editor
+- Mobile-first responsive design
+- Sticky footer advertisement panel
+
+---
+
+**Made with ❤️ for productivity enthusiasts**
