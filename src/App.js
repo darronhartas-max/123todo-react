@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Trash2, RotateCcw, Check, Plus, Minus } from 'lucide-react';
+import { Trash2, RotateCcw, Check } from 'lucide-react';
 
 const TodoApp = () => {
   // State management
@@ -29,7 +29,7 @@ const TodoApp = () => {
       minHeight: '100vh',
       margin: 0,
       padding: 0,
-      fontSize: '14px'
+      fontSize: '15px'
     },
     appContainer: {
       maxWidth: '800px',
@@ -64,7 +64,7 @@ const TodoApp = () => {
       color: '#667eea'
     },
     taskCounter: {
-      fontSize: '0.75rem',
+      fontSize: '0.9rem',
       opacity: 0.8,
       color: '#6b7280',
       margin: '0 auto'
@@ -90,7 +90,7 @@ const TodoApp = () => {
     taskInput: {
       width: '100%',
       padding: '10px 12px',
-      fontSize: '0.95rem',
+      fontSize: '1rem',
       border: '2px solid #e5e7eb',
       borderRadius: '6px',
       resize: 'none',
@@ -109,14 +109,14 @@ const TodoApp = () => {
       fontWeight: '500'
     },
     prioritySelector: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: '6px',
-      margin: '10px 0'
+      display: 'flex',
+      gap: '8px',
+      margin: '10px 0',
+      justifyContent: 'center'
     },
     priorityBtn: {
-      padding: '6px 8px',
-      fontSize: '0.7rem',
+      padding: '8px 16px',
+      fontSize: '0.75rem',
       fontWeight: '600',
       border: '2px solid transparent',
       borderRadius: '5px',
@@ -125,12 +125,13 @@ const TodoApp = () => {
       background: '#f9fafb',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       textTransform: 'uppercase',
-      letterSpacing: '0.5px'
+      letterSpacing: '0.5px',
+      flex: '0 1 auto',
+      whiteSpace: 'nowrap'
     },
     addBtn: {
       marginTop: '8px',
-      width: '100%',
-      padding: '10px 16px',
+      padding: '10px 24px',
       background: '#e0e7ff',
       color: '#4338ca',
       border: '1px solid #c7d2fe',
@@ -140,7 +141,9 @@ const TodoApp = () => {
       fontWeight: '600',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      display: 'block',
+      margin: '8px auto 0'
     },
     sectionsContainer: {
       flex: 1,
@@ -182,7 +185,7 @@ const TodoApp = () => {
       flex: 1,
       border: 'none',
       background: 'transparent',
-      fontSize: '0.95rem',
+      fontSize: '1rem',
       cursor: 'pointer',
       fontFamily: 'Inter, sans-serif',
       wordWrap: 'break-word',
@@ -229,11 +232,37 @@ const TodoApp = () => {
     footer: {
       flexShrink: 0,
       padding: '12px',
+      paddingBottom: '72px',
       background: '#f9fafb',
       textAlign: 'center',
       fontSize: '0.8rem',
       borderTop: '1px solid #e5e7eb',
       color: '#6b7280'
+    },
+    adPanel: {
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white',
+      padding: '12px 16px',
+      textAlign: 'center',
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+      zIndex: 999,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    adPanelMobile: {
+      minHeight: '50px',
+      maxWidth: '100%'
+    },
+    adPanelDesktop: {
+      minHeight: '60px',
+      maxWidth: '100%'
     },
     footerButton: {
       background: 'transparent',
@@ -335,7 +364,7 @@ const TodoApp = () => {
       if (savedTasks) setTasks(JSON.parse(savedTasks));
       if (savedArchived) setArchived(JSON.parse(savedArchived));
       if (savedCounter) setCounter(parseInt(savedCounter));
-      
+
       if (savedMilestones) {
         const milestoneData = JSON.parse(savedMilestones);
         setAchievedMilestones(milestoneData.achievedMilestones || []);
@@ -350,19 +379,20 @@ const TodoApp = () => {
 
       // Check backup reminder
       checkBackupReminder();
-      
+
       // Add sample tasks if new user
       if (!savedTasks && !savedArchived) {
         initializeSampleTasks();
       }
-      
+
       // Check install prompt
       setTimeout(() => checkInstallPrompt(), 2000);
-      
+
     } catch (error) {
       console.error('Error loading data from localStorage:', error);
       initializeSampleTasks();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Initialize sample tasks for new users
@@ -427,19 +457,19 @@ const TodoApp = () => {
   };
 
   // Check backup reminder
-  const checkBackupReminder = () => {
+  const checkBackupReminder = useCallback(() => {
     const lastBackup = localStorage.getItem('123TodoLastBackup');
     const lastReminderDismiss = localStorage.getItem('123TodoReminderDismissed');
     const now = Date.now();
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
-    
+
     const shouldShowReminder = (!lastBackup || (now - parseInt(lastBackup)) > sevenDays) &&
                               (!lastReminderDismiss || (now - parseInt(lastReminderDismiss)) > sevenDays);
-    
+
     if (shouldShowReminder && tasks.length > 0) {
       setShowBackupReminder(true);
     }
-  };
+  }, [tasks.length]);
 
   // Check install prompt
   const checkInstallPrompt = () => {
@@ -666,12 +696,12 @@ const TodoApp = () => {
         <div style={styles.container}>
           {/* Header */}
           <header style={styles.header}>
-            <a href="https://www.123todo.com" target="_blank" style={{ display: 'block' }}>
-             <img 
-  src="/123-logo-500px.jpg" 
-  alt="123 ToDo logo" 
+            <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block' }}>
+             <img
+  src="/123-logo-500px.jpg"
+  alt="123 ToDo logo"
   style={{
-    width: '160px',
+    width: '200px',
     height: 'auto',
     cursor: 'pointer'
   }}
@@ -865,7 +895,7 @@ const TodoApp = () => {
               onChange={importTasks}
             />
             <br />
-            © Darron Hartas 2025.
+            Copyright © Darron Hartas 2025
           </footer>
         </div>
 
@@ -876,20 +906,31 @@ const TodoApp = () => {
               <textarea
                 value={editingTask.text}
                 onChange={(e) => setEditingTask({...editingTask, text: e.target.value})}
-                style={{ 
-                  width: '100%', 
-                  padding: '8px', 
-                  fontSize: '0.95rem', 
-                  border: '1px solid #d1d5db', 
-                  borderRadius: '4px', 
-                  resize: 'none', 
-                  overflow: 'hidden', 
-                  marginBottom: '12px', 
-                  height: '48px', 
+                onInput={(e) => {
+                  e.target.style.height = 'auto';
+                  e.target.style.height = e.target.scrollHeight + 'px';
+                }}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  fontSize: '1rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  resize: 'none',
+                  overflow: 'hidden',
+                  marginBottom: '12px',
+                  minHeight: '60px',
+                  maxHeight: '300px',
                   fontFamily: 'Inter, sans-serif',
                   boxSizing: 'border-box'
                 }}
                 maxLength="200"
+                ref={(textarea) => {
+                  if (textarea) {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                  }
+                }}
               />
               <select 
                 value={editingTask.priority}
@@ -1009,23 +1050,22 @@ const TodoApp = () => {
                   <strong>Local Storage:</strong> Your data is stored locally in your browser and may be lost due to browser settings, updates, or other factors beyond our control.
                 </p>
                 <p style={{ margin: '0', color: '#4b5563' }}>
-                  For complete terms: <a href="https://www.123todo.com/terms" target="_blank" style={{ color: '#667eea', textDecoration: 'none' }}>www.123todo.com/terms</a>
+                  For complete terms: <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none' }}>www.123todo.com/terms</a>
                 </p>
               </div>
               
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                <button 
+                <button
                   onClick={() => window.open('https://www.123todo.com/terms', '_blank')}
-                  style={{ 
-                    padding: '12px 24px', 
-                    border: 'none', 
-                    borderRadius: '8px', 
-                    fontSize: '0.9rem', 
-                    fontWeight: '600', 
-                    cursor: 'pointer', 
-                    background: '#f3f4f6', 
-                    color: '#374151', 
-                    border: '1px solid #d1d5db' 
+                  style={{
+                    padding: '12px 24px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    background: '#f3f4f6',
+                    color: '#374151'
                   }}
                 >
                   View Terms First
@@ -1095,6 +1135,16 @@ const TodoApp = () => {
             </div>
           </div>
         )}
+
+        {/* Advertisement Panel - Sticky Footer */}
+        <div
+          style={{
+            ...styles.adPanel,
+            ...(window.innerWidth < 768 ? styles.adPanelMobile : styles.adPanelDesktop)
+          }}
+        >
+          <strong>EasiPanel</strong>  : all your management apps in one place
+        </div>
       </div>
     </div>
   );
