@@ -54,7 +54,11 @@
 
 ## Deployment Process - VERIFIED WORKING (2025-10-10)
 
-### Quick Deploy (For Updates)
+### Current Deployments
+- **Primary (NEW)**: https://app.123todo.com - Subdomain deployment
+- **Legacy**: https://123todo.com - Original deployment (kept for backward compatibility)
+
+### Quick Deploy to app.123todo.com (Primary)
 
 **IMPORTANT:** The app uses Docker with a build step. Files must be uploaded, then the Docker image rebuilt.
 
@@ -72,24 +76,31 @@
    - Password: [your password]
    - **IMPORTANT**: Turn off VPN if connection refused
    - **Local path**: `/Users/darronhartas/Desktop/123todo-react/build/`
-   - **Remote path**: `/home/debian/wordpress-docker/todo-app/`
+   - **Remote path**: `/home/debian/wordpress-docker/app-123todo/`
    - Action: Delete all old files, upload all new files (including static/ folder)
 
 3. **Rebuild and restart container (via SSH):**
    ```bash
    ssh -p 9947 debian@51.195.136.55
    cd /home/debian/wordpress-docker
-   docker compose build todo-app
-   docker compose up -d
+   docker compose build app-123todo
+   docker compose up -d app-123todo
    ```
 
-   **Note:** Don't run `docker network connect` - it's already configured
+   **Note:** Container is already on traefik_proxy network
 
 4. **Verify deployment:**
-   - Visit: https://123todo.com in Incognito mode (to bypass cache)
+   - Visit: https://app.123todo.com in Incognito mode (to bypass cache)
    - Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
    - Check browser console for errors
    - Test PWA functionality
+
+### Deploy to 123todo.com (Legacy - Optional)
+
+Follow the same steps but use:
+- **Remote path**: `/home/debian/wordpress-docker/todo-app/`
+- **Container name**: `todo-app` (instead of `app-123todo`)
+- **URL**: https://123todo.com
 
 ### VPS Architecture (Discovered 2025-10-10)
 
@@ -99,18 +110,26 @@
 - Networks: `traefik_proxy` (connects all services)
 
 **Key Directories:**
-- App files: `/home/debian/wordpress-docker/todo-app/`
+- **Primary app files**: `/home/debian/wordpress-docker/app-123todo/`
+- **Legacy app files**: `/home/debian/wordpress-docker/todo-app/`
 - Traefik config: `/srv/traefik/docker-compose.yml`
-- Dynamic routing: `/etc/traefik/dynamic/123todo.yaml`
+- Dynamic routing (primary): `/etc/traefik/dynamic/app-123todo.yaml`
+- Dynamic routing (legacy): `/etc/traefik/dynamic/123todo.yaml`
 - Compose file: `/home/debian/wordpress-docker/docker-compose.yml`
+- Dockerfiles: `/home/debian/wordpress-docker/Dockerfile.app` and `Dockerfile.todo`
 
 **Container Details:**
-- Container name: `todo-app`
-- Network: `traefik_proxy` (bridged to `wordpress-docker_web`)
-- Routing: Traefik handles SSL via Let's Encrypt
-- Image: Built from Dockerfile in `/home/debian/wordpress-docker/todo-app/`
-- Base: `nginx:alpine` serving static files
-- **Important**: Container uses built image, so changes require rebuild
+- **Primary Container**: `app-123todo` → https://app.123todo.com
+  - Built from: `Dockerfile.app`
+  - Upload to: `/home/debian/wordpress-docker/app-123todo/`
+  - Network: `traefik_proxy`
+- **Legacy Container**: `todo-app` → https://123todo.com
+  - Built from: `Dockerfile.todo`
+  - Upload to: `/home/debian/wordpress-docker/todo-app/`
+  - Network: `traefik_proxy`
+- Base image: `nginx:alpine` serving static files
+- Routing: Traefik handles SSL via Let's Encrypt (certResolver: letsencrypt)
+- **Important**: Containers use built images, so changes require rebuild
 
 ### Troubleshooting
 
@@ -248,10 +267,12 @@ npm test
 
 ---
 
-**Last Updated**: 2025-10-10 (Deployment process finalized - v1.0.2 deployed successfully)
+**Last Updated**: 2025-10-10 (Subdomain deployment completed)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2025
-**Live URL**: https://123todo.com
+**Live URLs**:
+- **Primary**: https://app.123todo.com (NEW)
+- **Legacy**: https://123todo.com
 
 ## Deployment Lessons Learned (2025-10-10)
 
