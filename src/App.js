@@ -895,7 +895,7 @@ const TodoApp = () => {
               onChange={importTasks}
             />
             <br />
-            Copyright © Darron Hartas 2025
+            Copyright © Darron Hartas 2025 | v1.0.3
           </footer>
         </div>
 
