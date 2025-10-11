@@ -232,7 +232,7 @@ const TodoApp = () => {
     footer: {
       flexShrink: 0,
       padding: '12px',
-      paddingBottom: '72px',
+      paddingBottom: window.innerWidth < 768 ? '100px' : '72px',
       background: '#f9fafb',
       textAlign: 'center',
       fontSize: '0.8rem',
@@ -257,12 +257,16 @@ const TodoApp = () => {
       justifyContent: 'center'
     },
     adPanelMobile: {
-      minHeight: '50px',
-      maxWidth: '100%'
+      minHeight: '80px',
+      maxWidth: '100%',
+      flexDirection: 'column',
+      gap: '8px',
+      padding: '10px 16px'
     },
     adPanelDesktop: {
       minHeight: '60px',
-      maxWidth: '100%'
+      maxWidth: '100%',
+      flexDirection: 'row'
     },
     footerButton: {
       background: 'transparent',
@@ -895,7 +899,7 @@ const TodoApp = () => {
               onChange={importTasks}
             />
             <br />
-            Copyright © Darron Hartas 2025 | v1.0.5
+            Copyright © Darron Hartas 2025 | v1.0.6
             <br />
             <div style={{ marginTop: '8px', fontSize: '0.85rem' }}>
               <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '16px' }}>
@@ -1152,8 +1156,10 @@ const TodoApp = () => {
             ...(window.innerWidth < 768 ? styles.adPanelMobile : styles.adPanelDesktop)
           }}
         >
-          <span style={{ marginRight: '12px', fontSize: '0.95rem' }}>Please SHARE this FREE app if you like it</span>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span style={{ fontSize: window.innerWidth < 768 ? '0.9rem' : '0.95rem', marginRight: window.innerWidth < 768 ? '0' : '12px' }}>
+            Please SHARE this FREE app if you like it
+          </span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
             {/* X (Twitter) Share */}
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out 123 ToDo - Simple, FREE powerful task management with offline support!')}&url=${encodeURIComponent('https://app.123todo.com')}`}
