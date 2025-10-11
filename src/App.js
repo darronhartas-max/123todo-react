@@ -896,6 +896,15 @@ const TodoApp = () => {
             />
             <br />
             Copyright © Darron Hartas 2025 | v1.0.5
+            <br />
+            <div style={{ marginTop: '8px', fontSize: '0.85rem' }}>
+              <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '16px' }}>
+                Terms of Service
+              </a>
+              <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none' }}>
+                Privacy Policy
+              </a>
+            </div>
           </footer>
         </div>
 
