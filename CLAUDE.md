@@ -4,9 +4,9 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: 0.1.0
+- **Version**: v1.0.4
 - **Tech Stack**: React 19.1.1, Create React App, lucide-react
-- **State**: Development complete, ready for deployment
+- **State**: Production deployed
 - **Data Storage**: Browser localStorage (client-side only)
 - **Git**: All changes committed to `main` branch
 
@@ -28,6 +28,7 @@
    - Weekly backup reminders
    - PWA installation prompts
    - Welcome screen with terms of use
+   - Social sharing widget in footer (X, Facebook, LinkedIn, Email)
 
 4. **Data Management**
    - JSON export/import for backup
@@ -267,12 +268,35 @@ npm test
 
 ---
 
-**Last Updated**: 2025-10-10 (Subdomain deployment completed)
+**Last Updated**: 2025-10-11 (Social sharing widget added - v1.0.4)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2025
 **Live URLs**:
-- **Primary**: https://app.123todo.com (NEW)
+- **Primary**: https://app.123todo.com
 - **Legacy**: https://123todo.com
+
+## Version History
+
+### v1.0.4 (2025-10-11)
+- Added social sharing widget to sticky footer panel
+- Replaced "EasiPanel" placeholder with share buttons
+- Share platforms: X (Twitter), Facebook, LinkedIn, Email
+- Message: "Please SHARE this FREE app if you like it"
+- Semi-transparent button styling with hover effects
+- All share links point to https://app.123todo.com
+
+### v1.0.3 (2025-10-10)
+- Finalized deployment process and documentation
+- Established working deployment workflow with Docker and Traefik
+
+### v1.0.2 (2025-10-06)
+- Improved mobile UX with increased font sizes
+- Added sticky footer advertisement panel
+- Enhanced edit modal with auto-expanding textarea
+
+### v1.0.1 (2025-10-06)
+- Initial production release
+- Complete 123 ToDo task management application
 
 ## Deployment Lessons Learned (2025-10-10)
 
