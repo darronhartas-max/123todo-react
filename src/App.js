@@ -1143,7 +1143,7 @@ const TodoApp = () => {
             ...(window.innerWidth < 768 ? styles.adPanelMobile : styles.adPanelDesktop)
           }}
         >
-          <span style={{ marginRight: '12px', fontSize: '0.95rem' }}>Please SHARE if you like</span>
+          <span style={{ marginRight: '12px', fontSize: '0.95rem' }}>Please SHARE this FREE app if you like it</span>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {/* X (Twitter) Share */}
             <a
