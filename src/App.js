@@ -895,7 +895,7 @@ const TodoApp = () => {
               onChange={importTasks}
             />
             <br />
-            Copyright © Darron Hartas 2025 | v1.0.4
+            Copyright © Darron Hartas 2025 | v1.0.5
           </footer>
         </div>
 
@@ -1147,7 +1147,7 @@ const TodoApp = () => {
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {/* X (Twitter) Share */}
             <a
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out 123 ToDo - Simple, powerful task management with offline support!')}&url=${encodeURIComponent('https://app.123todo.com')}`}
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out 123 ToDo - Simple, FREE powerful task management with offline support!')}&url=${encodeURIComponent('https://app.123todo.com')}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -1234,7 +1234,7 @@ const TodoApp = () => {
 
             {/* Email Share */}
             <a
-              href={`mailto:?subject=${encodeURIComponent('Check out 123 ToDo')}&body=${encodeURIComponent('I found this great task management app: https://app.123todo.com - Simple, powerful task management with offline support!')}`}
+              href={`mailto:?subject=${encodeURIComponent('Check out 123 ToDo - FREE Task Management')}&body=${encodeURIComponent('I found this great FREE task management app: https://app.123todo.com - Simple, powerful task management with offline support!')}`}
               style={{
                 background: 'rgba(255, 255, 255, 0.2)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
