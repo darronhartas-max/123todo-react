@@ -4,11 +4,12 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v1.0.4
+- **Version**: v1.0.5
 - **Tech Stack**: React 19.1.1, Create React App, lucide-react
-- **State**: Production deployed
+- **State**: Production deployed (2025-10-11)
 - **Data Storage**: Browser localStorage (client-side only)
 - **Git**: All changes committed to `main` branch
+- **Live URL**: https://app.123todo.com
 
 ## Key Features
 1. **4-Level Priority System**
@@ -264,7 +265,7 @@ npm test
 
 ---
 
-**Last Updated**: 2025-10-11 (Social sharing widget added - v1.0.4)
+**Last Updated**: 2025-10-11 (v1.0.5 deployed - Social sharing + meta tags + footer links)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2025
 **Live URLs**:
@@ -272,6 +273,13 @@ npm test
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v1.0.5 (2025-10-11)
+- Added Terms of Service and Privacy Policy links to footer
+- Updated meta tags to emphasize "FREE" for social sharing
+- Added social-share.svg (1200x630px) for optimal LinkedIn/Facebook display
+- Improved Open Graph and Twitter Card metadata
+- All social share text now clearly states "FREE"
 
 ### v1.0.4 (2025-10-11)
 - Added social sharing widget to sticky footer panel
