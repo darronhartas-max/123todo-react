@@ -242,22 +242,18 @@ npm test
 - **Browser storage limits**: ~5-10MB localStorage limit
 - **HTTPS required**: PWA features won't work over HTTP
 
-## Future Improvements
+## Deployment Process Notes
 
-**Current deploy script:**
+**Standard deployment workflow:**
 - `deploy.sh` provides an interactive checklist that builds locally
-- Pauses for manual FileZilla upload and SSH commands
+- Manual FileZilla upload is the standard process (SSH key auth not configured)
+- SSH commands for Docker rebuild require password entry
 - Run with: `./deploy.sh`
 
-**To fully automate (requires SSH key setup):**
-1. Fix SSH key authentication (currently blocked by server config)
-2. Use `scp` for file transfer instead of FileZilla
-3. SSH commands execute without password prompts
-
-**Alternative: Git-based deployment:**
-- Set up git on VPS in `/home/debian/wordpress-docker/todo-app/`
-- Add deploy script on VPS to pull and rebuild
-- Trigger via webhook or manual SSH command
+**Current process is intentionally manual:**
+- FileZilla upload provides visual confirmation of file transfer
+- Password-protected SSH ensures security
+- Process is reliable and well-documented
 
 ## Notes
 - App works 100% client-side (no API calls)
