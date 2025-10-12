@@ -19,6 +19,7 @@ const TodoApp = () => {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [draggedId, setDraggedId] = useState(null);
+  const taskInputRef = React.useRef(null);
 
   // Styles object
   const styles = {
@@ -110,13 +111,14 @@ const TodoApp = () => {
     },
     prioritySelector: {
       display: 'flex',
-      gap: '8px',
+      gap: '6px',
       margin: '10px 0',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      alignItems: 'center'
     },
     priorityBtn: {
-      padding: '8px 16px',
-      fontSize: '0.75rem',
+      padding: '6px 8px',
+      fontSize: '0.6rem',
       fontWeight: '600',
       border: '2px solid transparent',
       borderRadius: '5px',
@@ -125,25 +127,24 @@ const TodoApp = () => {
       background: '#f9fafb',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       textTransform: 'uppercase',
-      letterSpacing: '0.5px',
+      letterSpacing: '0.2px',
       flex: '0 1 auto',
       whiteSpace: 'nowrap'
     },
     addBtn: {
-      marginTop: '8px',
-      padding: '10px 24px',
+      padding: '7px 16px',
       background: '#e0e7ff',
       color: '#4338ca',
-      border: '1px solid #c7d2fe',
+      border: '2px solid #c7d2fe',
       borderRadius: '6px',
       cursor: 'pointer',
-      fontSize: '0.85rem',
-      fontWeight: '600',
+      fontSize: '0.65rem',
+      fontWeight: '700',
       textTransform: 'uppercase',
-      letterSpacing: '0.5px',
+      letterSpacing: '0.3px',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      display: 'block',
-      margin: '8px auto 0'
+      flex: '0 1 auto',
+      whiteSpace: 'nowrap'
     },
     sectionsContainer: {
       flex: 1,
@@ -215,7 +216,9 @@ const TodoApp = () => {
       background: '#f9fafb',
       borderTop: '1px solid #e5e7eb',
       borderRadius: '8px 8px 0 0',
-      margin: '0 8px 8px 8px'
+      margin: '0 8px 8px 8px',
+      display: 'block',
+      visibility: 'visible'
     },
     toggleBtn: {
       background: 'transparent',
@@ -232,7 +235,7 @@ const TodoApp = () => {
     footer: {
       flexShrink: 0,
       padding: '12px',
-      paddingBottom: window.innerWidth < 768 ? '100px' : '72px',
+      paddingBottom: window.innerWidth < 768 ? '50px' : '36px',
       background: '#f9fafb',
       textAlign: 'center',
       fontSize: '0.8rem',
@@ -246,9 +249,9 @@ const TodoApp = () => {
       right: 0,
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       color: 'white',
-      padding: '12px 16px',
+      padding: '6px 12px',
       textAlign: 'center',
-      fontSize: '0.9rem',
+      fontSize: '0.7rem',
       fontWeight: '600',
       boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
       zIndex: 999,
@@ -257,14 +260,14 @@ const TodoApp = () => {
       justifyContent: 'center'
     },
     adPanelMobile: {
-      minHeight: '80px',
+      minHeight: '40px',
       maxWidth: '100%',
       flexDirection: 'column',
-      gap: '8px',
-      padding: '10px 16px'
+      gap: '4px',
+      padding: '4px 8px'
     },
     adPanelDesktop: {
-      minHeight: '60px',
+      minHeight: '30px',
       maxWidth: '100%',
       flexDirection: 'row'
     },
@@ -712,8 +715,13 @@ const TodoApp = () => {
 />
             </a>
             <div style={styles.taskCounter}>{activeTasks.length} task{activeTasks.length !== 1 ? 's' : ''}</div>
-            <button 
-              onClick={() => setShowAddSection(!showAddSection)}
+            <button
+              onClick={() => {
+                setShowAddSection(!showAddSection);
+                if (!showAddSection) {
+                  setTimeout(() => taskInputRef.current?.focus(), 100);
+                }
+              }}
               style={styles.addTaskToggle}
             >
               {showAddSection ? '➖' : '➕'}
@@ -723,6 +731,7 @@ const TodoApp = () => {
           {/* Add Task Section */}
           <div style={styles.addSection}>
             <textarea
+              ref={taskInputRef}
               value={newTaskText}
               onChange={(e) => setNewTaskText(e.target.value)}
               onKeyPress={(e) => {
@@ -748,14 +757,13 @@ const TodoApp = () => {
                   {priorities[priority].label}
                 </button>
               ))}
+              <button
+                onClick={addTask}
+                style={styles.addBtn}
+              >
+                ADD
+              </button>
             </div>
-            
-            <button 
-              onClick={addTask}
-              style={styles.addBtn}
-            >
-              Add Task
-            </button>
           </div>
 
           {/* Install App Prompt */}
@@ -899,7 +907,7 @@ const TodoApp = () => {
               onChange={importTasks}
             />
             <br />
-            Copyright © Darron Hartas 2025 | v1.0.6
+            Copyright © Darron Hartas 2025 | v1.0.7
             <br />
             <div style={{ marginTop: '8px', fontSize: '0.85rem' }}>
               <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '16px' }}>
@@ -1156,20 +1164,20 @@ const TodoApp = () => {
             ...(window.innerWidth < 768 ? styles.adPanelMobile : styles.adPanelDesktop)
           }}
         >
-          <span style={{ fontSize: window.innerWidth < 768 ? '0.9rem' : '0.95rem', marginRight: window.innerWidth < 768 ? '0' : '12px' }}>
-            Please SHARE this FREE app if you like it
+          <span style={{ fontSize: window.innerWidth < 768 ? '0.7rem' : '0.75rem', marginRight: window.innerWidth < 768 ? '0' : '8px' }}>
+            Keep this App free - please SHARE!
           </span>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
             {/* X (Twitter) Share */}
             <a
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out 123 ToDo - Simple, FREE powerful task management with offline support!')}&url=${encodeURIComponent('https://app.123todo.com')}`}
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out 123 ToDo - Simple, FREE powerful task management with offline support!')}&url=${encodeURIComponent('https://123todo.com')}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 background: 'rgba(255, 255, 255, 0.2)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '6px',
-                padding: '8px',
+                borderRadius: '4px',
+                padding: '4px',
                 color: 'white',
                 textDecoration: 'none',
                 display: 'flex',
@@ -1181,21 +1189,21 @@ const TodoApp = () => {
               onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
               title="Share on X (Twitter)"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
 
             {/* Facebook Share */}
             <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://app.123todo.com')}`}
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://123todo.com')}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 background: 'rgba(255, 255, 255, 0.2)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '6px',
-                padding: '8px',
+                borderRadius: '4px',
+                padding: '4px',
                 color: 'white',
                 textDecoration: 'none',
                 display: 'flex',
@@ -1207,21 +1215,21 @@ const TodoApp = () => {
               onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
               title="Share on Facebook"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
 
             {/* LinkedIn Share */}
             <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://app.123todo.com')}`}
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://123todo.com')}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 background: 'rgba(255, 255, 255, 0.2)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '6px',
-                padding: '8px',
+                borderRadius: '4px',
+                padding: '4px',
                 color: 'white',
                 textDecoration: 'none',
                 display: 'flex',
@@ -1233,19 +1241,19 @@ const TodoApp = () => {
               onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
               title="Share on LinkedIn"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
             </a>
 
             {/* Email Share */}
             <a
-              href={`mailto:?subject=${encodeURIComponent('Check out 123 ToDo - FREE Task Management')}&body=${encodeURIComponent('I found this great FREE task management app: https://app.123todo.com - Simple, powerful task management with offline support!')}`}
+              href={`mailto:?subject=${encodeURIComponent('Check out 123 ToDo - FREE Task Management')}&body=${encodeURIComponent('I found this great FREE task management app: https://123todo.com - Simple, powerful task management with offline support!')}`}
               style={{
                 background: 'rgba(255, 255, 255, 0.2)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '6px',
-                padding: '8px',
+                borderRadius: '4px',
+                padding: '4px',
                 color: 'white',
                 textDecoration: 'none',
                 display: 'flex',
@@ -1257,7 +1265,7 @@ const TodoApp = () => {
               onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
               title="Share via Email"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                 <polyline points="22,6 12,13 2,6"/>
               </svg>
