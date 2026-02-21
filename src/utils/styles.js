@@ -24,7 +24,7 @@ export const COMMON_STYLES = {
         backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'flex-start',
-        paddingTop: '10vh',
+        paddingTop: '20px',
         justifyContent: 'center',
         zIndex: 1000
     },
