@@ -5,25 +5,25 @@ This document outlines the planned refinements for the 123 ToDo application to i
 ## 🏗️ Phase 1: Architecture & Refactoring
 *Objective: Improve code health and modularity by breaking down the "Fat Component" (App.js).*
 
-- [ ] **Componentization**
-    - [ ] Create `src/components/` directory.
-    - [ ] Extract `TaskItem` component.
-    - [ ] Extract `PrioritySection` component.
-    - [ ] Extract `ActionModals` (Edit, Achievements).
-    - [ ] Extract `FooterControls` (Backup, Social Share).
-- [ ] **State & Logic Extraction**
-    - [ ] Create `src/hooks/useTasks.js` to manage task state and localStorage persistence.
-    - [ ] Create `src/utils/constants.js` for priorities, colors, and limits.
+- [x] **Componentization**
+    - [x] Create `src/components/` directory.
+    - [x] Extract `TaskItem` component.
+    - [x] Extract `PrioritySection` component.
+    - [x] Extract `ActionModals` (Edit, Achievements).
+    - [x] Extract `FooterControls` (Backup, Social Share).
+- [x] **State & Logic Extraction**
+    - [x] Create `src/hooks/useTasks.js` to manage task state and localStorage persistence.
+    - [x] Create `src/utils/constants.js` for priorities, colors, and limits.
 
 ## 🎨 Phase 2: UI/UX Excellence
 *Objective: Elevate the "premium" feel of the application.*
 
-- [ ] **Animations**
-    - [ ] Add smooth transitions for completing tasks.
-    - [ ] Add micro-animations for priority changes.
-- [ ] **Dark Mode**
-    - [ ] Implement system-aware dark mode support.
-    - [ ] Define a refined dark color palette.
+- [x] **Animations**
+    - [x] Add smooth transitions for completing tasks.
+    - [x] Add micro-animations for priority changes.
+- [x] **Dark Mode**
+    - [x] Implement system-aware dark mode support.
+    - [x] Define a refined dark color palette.
 - [ ] **Improved Feedback**
     - [ ] Better visual cues during Drag & Drop operations.
     - [ ] Haptic feedback (where supported on mobile).
@@ -31,8 +31,8 @@ This document outlines the planned refinements for the 123 ToDo application to i
 ## 🚀 Phase 3: Enhanced Functionality
 *Objective: Add features that improve productivity without adding bloat.*
 
-- [ ] **Search & Filter**
-    - [ ] Add a quick search bar to find tasks in large lists.
+- [x] **Search & Filter**
+    - [x] Add a quick search bar to find tasks in large lists.
 - [ ] **Bulk Actions**
     - [ ] "Clear All Archived" button.
     - [ ] "Move all On Hold to Must Do" (or similar).
