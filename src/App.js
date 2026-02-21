@@ -7,6 +7,7 @@ import AddTask from './components/tasks/AddTask';
 import PrioritySection from './components/tasks/PrioritySection';
 import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
+import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
@@ -16,8 +17,8 @@ import { useAppSystem } from './hooks/useAppSystem';
 
 const TodoApp = () => {
   const {
-    tasks, archived, addTask, completeTask, deleteArchivedTask,
-    restoreTask, updateTask, reorderTasks, importData
+    tasks, archived, projects, addTask, completeTask, deleteArchivedTask,
+    restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, importData
   } = useTasks();
 
   const {
@@ -33,15 +34,19 @@ const TodoApp = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentProjectId, setCurrentProjectId] = useState('all');
 
   // Filtering
-  const filteredTasks = tasks.filter(t =>
+  const filteredBySearch = (list) => list.filter(t =>
     t.text.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredArchived = archived.filter(t =>
-    t.text.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredByProject = (list) => list.filter(t =>
+    currentProjectId === 'all' || t.projectId === currentProjectId
   );
+
+  const filteredTasks = filteredByProject(filteredBySearch(tasks));
+  const filteredArchived = filteredByProject(filteredBySearch(archived));
 
   const activeTasksCount = tasks.filter(t => t.priority <= 3).length;
   const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
@@ -81,7 +86,8 @@ const TodoApp = () => {
   const handleExport = () => {
     const data = JSON.stringify({
       tasks,
-      archived
+      archived,
+      projects
     }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -177,6 +183,8 @@ const TodoApp = () => {
           isOpen={showAddSection}
           onAdd={addTask}
           onClose={() => setShowAddSection(false)}
+          projects={projects}
+          defaultProjectId={currentProjectId}
         />
 
         {showInstallPrompt && (
@@ -193,12 +201,22 @@ const TodoApp = () => {
           onClear={() => setSearchTerm('')}
         />
 
+        <ProjectTabs
+          projects={projects}
+          currentProjectId={currentProjectId}
+          onSelect={setCurrentProjectId}
+          onAdd={addProject}
+          onUpdate={updateProject}
+          onDelete={deleteProject}
+        />
+
         <div style={styles.sectionsContainer}>
           {[1, 2, 3].map(priority => (
             <PrioritySection
               key={priority}
               priority={priority}
               tasks={filteredTasks}
+              projects={projects}
               onComplete={completeTask}
               onEdit={setEditingTask}
               handleDragStart={handleDragStart}
@@ -220,14 +238,18 @@ const TodoApp = () => {
             {showOnHold && (
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 <AnimatePresence mode="popLayout">
-                  {onHoldTasksFiltered.map(task => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onComplete={completeTask}
-                      onEdit={setEditingTask}
-                    />
-                  ))}
+                  {onHoldTasksFiltered.map(task => {
+                    const project = projects.find(p => p.id === task.projectId);
+                    return (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        projectColor={project?.color}
+                        onComplete={completeTask}
+                        onEdit={setEditingTask}
+                      />
+                    );
+                  })}
                 </AnimatePresence>
               </ul>
             )}
@@ -244,15 +266,19 @@ const TodoApp = () => {
           {showArchive && (
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
               <AnimatePresence mode="popLayout">
-                {filteredArchived.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    isArchived={true}
-                    onRestore={onRestoreRequest}
-                    onDelete={deleteArchivedTask}
-                  />
-                ))}
+                {filteredArchived.map(task => {
+                  const project = projects.find(p => p.id === task.projectId);
+                  return (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      projectColor={project?.color}
+                      isArchived={true}
+                      onRestore={onRestoreRequest}
+                      onDelete={deleteArchivedTask}
+                    />
+                  );
+                })}
               </AnimatePresence>
             </ul>
           )}
@@ -276,6 +302,7 @@ const TodoApp = () => {
       {editingTask && (
         <EditModal
           task={editingTask}
+          projects={projects}
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
         />

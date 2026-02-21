@@ -6,6 +6,7 @@ import { PRIORITIES } from '../../utils/constants';
 const PrioritySection = ({
     priority,
     tasks,
+    projects,
     onComplete,
     onEdit,
     handleDragStart,
@@ -34,20 +35,24 @@ const PrioritySection = ({
             </h3>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 <AnimatePresence mode="popLayout">
-                    {sectionTasks.map(task => (
-                        <TaskItem
-                            key={task.id}
-                            task={task}
-                            onComplete={onComplete}
-                            onEdit={onEdit}
-                            dragHandlers={{
-                                onDragStart: (e) => handleDragStart(e, task.id),
-                                onDragOver: handleDragOver,
-                                onDrop: (e) => handleDrop(e, task.id),
-                                onDragEnd: handleDragEnd
-                            }}
-                        />
-                    ))}
+                    {sectionTasks.map(task => {
+                        const project = projects.find(p => p.id === task.projectId);
+                        return (
+                            <TaskItem
+                                key={task.id}
+                                task={task}
+                                projectColor={project?.color}
+                                onComplete={onComplete}
+                                onEdit={onEdit}
+                                dragHandlers={{
+                                    onDragStart: (e) => handleDragStart(e, task.id),
+                                    onDragOver: handleDragOver,
+                                    onDrop: (e) => handleDrop(e, task.id),
+                                    onDragEnd: handleDragEnd
+                                }}
+                            />
+                        );
+                    })}
                 </AnimatePresence>
             </ul>
         </div>

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { STORAGE_KEYS } from '../utils/constants';
+import { STORAGE_KEYS, DEFAULT_PROJECTS } from '../utils/constants';
 
 export const useTasks = () => {
     const [tasks, setTasks] = useState([]);
     const [archived, setArchived] = useState([]);
+    const [projects, setProjects] = useState([]);
     const [counter, setCounter] = useState(0);
 
     const initializeSampleTasks = useCallback(() => {
@@ -16,13 +17,13 @@ export const useTasks = () => {
 
         if (userDataKeys.length === 0) {
             const sampleTasks = [
-                { id: 1, text: "🎯 Complete this task to mark it as done! (Tap the ✓ button)", priority: 1, isSample: true },
-                { id: 2, text: "📝 Click on any task to edit its text and priority level", priority: 1, isSample: true },
-                { id: 3, text: "📝 Try the + button to add your own tasks", priority: 2, isSample: true },
-                { id: 4, text: "🏆 Complete 5 tasks to unlock your first achievement!", priority: 2, isSample: true },
-                { id: 5, text: "💡 Drag and drop tasks to reorder them within each priority", priority: 3, isSample: true },
-                { id: 6, text: "📱 Install this app on your home screen for quick access", priority: 3, isSample: true },
-                { id: 7, text: "📊 Check the Archive section to see completed tasks", priority: 3, isSample: true }
+                { id: 1, text: "🎯 Complete this task to mark it as done! (Tap the ✓ button)", priority: 1, isSample: true, projectId: 'general' },
+                { id: 2, text: "📝 Click on any task to edit its text and priority level", priority: 1, isSample: true, projectId: 'general' },
+                { id: 3, text: "📝 Try the + button to add your own tasks", priority: 2, isSample: true, projectId: 'general' },
+                { id: 4, text: "🏆 Complete 5 tasks to unlock your first achievement!", priority: 2, isSample: true, projectId: 'general' },
+                { id: 5, text: "💡 Drag and drop tasks to reorder them within each priority", priority: 3, isSample: true, projectId: 'general' },
+                { id: 6, text: "📱 Install this app on your home screen for quick access", priority: 3, isSample: true, projectId: 'general' },
+                { id: 7, text: "📊 Check the Archive section to see completed tasks", priority: 3, isSample: true, projectId: 'general' }
             ];
             setTasks(sampleTasks);
             setCounter(7);
@@ -34,10 +35,18 @@ export const useTasks = () => {
         try {
             const savedTasks = localStorage.getItem(STORAGE_KEYS.TASKS);
             const savedArchived = localStorage.getItem(STORAGE_KEYS.ARCHIVE);
+            const savedProjects = localStorage.getItem(STORAGE_KEYS.PROJECTS);
             const savedCounter = localStorage.getItem(STORAGE_KEYS.COUNTER);
 
             if (savedTasks) setTasks(JSON.parse(savedTasks));
             if (savedArchived) setArchived(JSON.parse(savedArchived));
+
+            if (savedProjects) {
+                setProjects(JSON.parse(savedProjects));
+            } else {
+                setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
+            }
+
             if (savedCounter) setCounter(parseInt(savedCounter));
 
             // Add sample tasks if new user
@@ -47,6 +56,7 @@ export const useTasks = () => {
         } catch (error) {
             console.error('Error loading data from localStorage:', error);
             initializeSampleTasks();
+            setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
         }
     }, [initializeSampleTasks]);
 
@@ -54,16 +64,18 @@ export const useTasks = () => {
     useEffect(() => {
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
+        localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
-    }, [tasks, archived, counter]);
+    }, [tasks, archived, projects, counter]);
 
-    const addTask = useCallback((text, priority) => {
+    const addTask = useCallback((text, priority, projectId = 'general') => {
         if (!text.trim()) return;
 
         const newTask = {
             id: counter + 1,
             text: text.trim(),
             priority,
+            projectId,
             isSample: false
         };
 
@@ -131,15 +143,38 @@ export const useTasks = () => {
         });
     }, []);
 
+    const addProject = useCallback((name, color) => {
+        const id = name.toLowerCase().replace(/\s+/g, '-');
+        if (projects.some(p => p.id === id)) return;
+
+        const newProject = { id, name, color };
+        setProjects(prev => [...prev, newProject]);
+        return id;
+    }, [projects]);
+
+    const updateProject = useCallback((id, updates) => {
+        setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    }, []);
+
+    const deleteProject = useCallback((id) => {
+        if (id === 'general') return; // Cannot delete General
+        setProjects(prev => prev.filter(p => p.id !== id));
+        // Reset tasks in this project to general
+        setTasks(prev => prev.map(t => t.projectId === id ? { ...t, projectId: 'general' } : t));
+        setArchived(prev => prev.map(t => t.projectId === id ? { ...t, projectId: 'general' } : t));
+    }, []);
+
     const importData = useCallback((data) => {
         setTasks(data.tasks || []);
         setArchived(data.archived || []);
+        setProjects(data.projects || DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
         setCounter(data.counter || 0);
     }, []);
 
     return {
         tasks,
         archived,
+        projects,
         counter,
         addTask,
         completeTask,
@@ -147,6 +182,9 @@ export const useTasks = () => {
         restoreTask,
         updateTask,
         reorderTasks,
+        addProject,
+        updateProject,
+        deleteProject,
         importData
     };
 };

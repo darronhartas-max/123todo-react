@@ -1,20 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 
-const AddTask = ({ isOpen, onAdd, onClose }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const [text, setText] = useState('');
     const [priority, setPriority] = useState(1);
+    const [projectId, setProjectId] = useState(defaultProjectId || 'general');
     const inputRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
+            if (defaultProjectId && defaultProjectId !== 'all') {
+                setProjectId(defaultProjectId);
+            } else if (defaultProjectId === 'all' && projectId === 'all') {
+                setProjectId('general');
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, defaultProjectId, projectId]);
 
     const handleSubmit = () => {
         if (!text.trim()) return;
-        onAdd(text, priority);
+        onAdd(text, priority, projectId === 'all' ? 'general' : projectId);
         setText('');
         onClose();
     };
@@ -45,7 +51,7 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
         addSection: {
             padding: isOpen ? '12px' : '0',
             background: 'var(--surface-color)',
-            maxHeight: isOpen ? '280px' : '0',
+            maxHeight: isOpen ? '320px' : '0',
             overflow: 'hidden',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
@@ -65,11 +71,40 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
             color: 'var(--text-color)',
             transition: 'all 0.3s ease',
             boxSizing: 'border-box'
+        },
+        projectSelect: {
+            padding: '4px 8px',
+            fontSize: '0.8rem',
+            borderRadius: '6px',
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-color)',
+            color: 'var(--text-color)',
+            outline: 'none',
+            marginBottom: '8px'
         }
     };
 
     return (
         <div style={styles.addSection}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <select
+                    value={projectId}
+                    onChange={(e) => setProjectId(e.target.value)}
+                    style={styles.projectSelect}
+                >
+                    {projects.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                </select>
+                <div style={{
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    fontWeight: '500'
+                }}>
+                    {text.length}/{MAX_TASK_LENGTH}
+                </div>
+            </div>
+
             <textarea
                 ref={inputRef}
                 value={text}
@@ -84,15 +119,6 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
                 style={styles.taskInput}
                 maxLength={MAX_TASK_LENGTH}
             />
-            <div style={{
-                fontSize: '0.75rem',
-                textAlign: 'right',
-                marginTop: '4px',
-                color: '#6b7280',
-                fontWeight: '500'
-            }}>
-                {text.length}/{MAX_TASK_LENGTH}
-            </div>
 
             <div style={{
                 display: 'flex',

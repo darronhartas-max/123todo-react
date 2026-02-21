@@ -14,8 +14,24 @@ export const STORAGE_KEYS = {
   LAST_BACKUP: '123TodoLastBackup',
   REMINDER_DISMISSED: '123TodoReminderDismissed',
   INSTALL_DISMISSED: '123TodoInstallDismissed',
-  LAST_INSTALL_PROMPT: '123TodoLastInstallPrompt'
+  LAST_INSTALL_PROMPT: '123TodoLastInstallPrompt',
+  PROJECTS: '123TodoProjects'
 };
+
+export const PROJECT_COLORS = [
+  '#3b82f6', // Blue
+  '#10b981', // Green
+  '#f59e0b', // Amber
+  '#ec4899', // Pink
+  '#8b5cf6', // Violet
+  '#06b6d4', // Cyan
+  '#f43f5e', // Rose
+];
+
+export const DEFAULT_PROJECTS = [
+  { id: 'all', name: 'All Tasks', color: '#6b7280' },
+  { id: 'general', name: 'General', color: '#3b82f6' }
+];
 
 export const MAX_TASK_LENGTH = 200;
 export const BACKUP_REMINDER_DAYS = 7;

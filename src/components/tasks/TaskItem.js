@@ -3,7 +3,7 @@ import { Trash2, RotateCcw, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
     const styles = {
         taskItem: {
             display: 'flex',
@@ -11,11 +11,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             padding: '10px 12px',
             borderBottom: '1px solid var(--border-color)',
             background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
-            borderLeft: task.isSample ? '4px solid #0ea5e9' : 'none',
+            borderLeft: projectColor ? `4px solid ${projectColor}` : (task.isSample ? '4px solid #0ea5e9' : 'none'),
             cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
             marginBottom: '2px',
-            transition: 'background 0.2s ease, border-color 0.2s ease'
+            transition: 'background 0.2s ease, border-color 0.2s ease',
+            position: 'relative'
         },
         taskPriorityDot: {
             width: '8px',

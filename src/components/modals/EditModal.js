@@ -2,7 +2,7 @@ import React from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 
-const EditModal = ({ task, onSave, onClose }) => {
+const EditModal = ({ task, onSave, onClose, projects }) => {
     const [editingTask, setEditingTask] = React.useState({ ...task });
 
     const handleInput = (e) => {
@@ -11,7 +11,11 @@ const EditModal = ({ task, onSave, onClose }) => {
     };
 
     const handleSave = () => {
-        onSave(editingTask.id, { text: editingTask.text, priority: editingTask.priority });
+        onSave(editingTask.id, {
+            text: editingTask.text,
+            priority: editingTask.priority,
+            projectId: editingTask.projectId
+        });
         onClose();
     };
 
@@ -58,6 +62,7 @@ const EditModal = ({ task, onSave, onClose }) => {
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
             <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <textarea
+                    autoFocus
                     value={editingTask.text}
                     onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                     onInput={handleInput}
@@ -70,18 +75,37 @@ const EditModal = ({ task, onSave, onClose }) => {
                         }
                     }}
                 />
-                <select
-                    value={editingTask.priority}
-                    onChange={(e) => setEditingTask({ ...editingTask, priority: parseInt(e.target.value) })}
-                    style={styles.select}
-                >
-                    {Object.entries(PRIORITIES).map(([value, config]) => (
-                        <option key={value} value={value}>{config.label}</option>
-                    ))}
-                </select>
+
+                <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Priority</label>
+                    <select
+                        value={editingTask.priority}
+                        onChange={(e) => setEditingTask({ ...editingTask, priority: parseInt(e.target.value) })}
+                        style={styles.select}
+                    >
+                        {Object.entries(PRIORITIES).map(([value, config]) => (
+                            <option key={value} value={value}>{config.label}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Project</label>
+                    <select
+                        value={editingTask.projectId || 'general'}
+                        onChange={(e) => setEditingTask({ ...editingTask, projectId: e.target.value })}
+                        style={styles.select}
+                    >
+                        {projects.map(p => (
+                            <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                    </select>
+                </div>
+
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '12px' }}>
                     {editingTask.text.length}/{MAX_TASK_LENGTH}
                 </div>
+
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                     <button
                         onClick={onClose}
