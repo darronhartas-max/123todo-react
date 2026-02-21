@@ -38,8 +38,17 @@ export const useTasks = () => {
             const savedProjects = localStorage.getItem(STORAGE_KEYS.PROJECTS);
             const savedCounter = localStorage.getItem(STORAGE_KEYS.COUNTER);
 
-            if (savedTasks) setTasks(JSON.parse(savedTasks));
-            if (savedArchived) setArchived(JSON.parse(savedArchived));
+            if (savedTasks) {
+                const parsed = JSON.parse(savedTasks);
+                // MIGRATION: Ensure every task has a projectId
+                setTasks(parsed.map(t => ({ ...t, projectId: t.projectId || 'general' })));
+            }
+
+            if (savedArchived) {
+                const parsed = JSON.parse(savedArchived);
+                // MIGRATION: Ensure every archived task has a projectId
+                setArchived(parsed.map(t => ({ ...t, projectId: t.projectId || 'general' })));
+            }
 
             if (savedProjects) {
                 setProjects(JSON.parse(savedProjects));
@@ -75,7 +84,7 @@ export const useTasks = () => {
             id: counter + 1,
             text: text.trim(),
             priority,
-            projectId,
+            projectId: projectId || 'general',
             isSample: false
         };
 
