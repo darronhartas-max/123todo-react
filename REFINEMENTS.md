@@ -36,8 +36,19 @@ This document outlines the planned refinements for the 123 ToDo application to i
 - [ ] **Bulk Actions**
     - [ ] "Clear All Archived" button.
     - [ ] "Move all On Hold to Must Do" (or similar).
-- [ ] **Multi-Category (Optional)**
-    - [ ] Allow users to switch between "Personal" and "Work" lists.
+- [x] **Project Layer (Multi-Category)**
+    - [x] User-configurable projects with custom names and colors.
+    - [x] Horizontal tab filtering system.
+    - [x] Context-aware task assignment.
+
+## 💎 Version 1.1 Revisions (Completed)
+- [x] **UI Scaling**: 10% increase in text sizes across all components for better readability.
+- [x] **Layout Refinements**: 
+    - [x] Larger header logo (240px).
+    - [x] Social footer icons increased to 18px with double spacing.
+    - [x] Modals moved high up the screen (20px top padding) for mobile accessibility.
+- [x] **Dynamic Copyright**: Footers now auto-update the current year.
+- [x] **Developer Experience**: Implementation of `post-commit` Git hooks for automatic backup to GitHub.
 
 ---
-*Created: 2026-02-21*
+*Last Updated: 2026-02-21*
