@@ -44,7 +44,6 @@ const TodoApp = () => {
   );
 
   const activeTasksCount = tasks.filter(t => t.priority <= 3).length;
-  const activeTasksFiltered = filteredTasks.filter(t => t.priority <= 3);
   const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
 
   // Sync milestones when archived items change

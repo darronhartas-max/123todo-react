@@ -28,7 +28,7 @@ const EditModal = ({ task, onSave, onClose }) => {
         textarea: {
             width: '100%',
             padding: '8px',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '4px',
             resize: 'none',
@@ -44,7 +44,7 @@ const EditModal = ({ task, onSave, onClose }) => {
         select: {
             width: '100%',
             padding: '6px',
-            fontSize: '0.875rem',
+            fontSize: '1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '4px',
             marginBottom: '12px',
@@ -87,7 +87,7 @@ const EditModal = ({ task, onSave, onClose }) => {
                         onClick={onClose}
                         style={{
                             padding: '6px 12px',
-                            fontSize: '0.875rem',
+                            fontSize: '1rem',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
@@ -101,7 +101,7 @@ const EditModal = ({ task, onSave, onClose }) => {
                         onClick={handleSave}
                         style={{
                             padding: '6px 12px',
-                            fontSize: '0.875rem',
+                            fontSize: '1rem',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',

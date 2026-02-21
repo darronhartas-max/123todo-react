@@ -12,7 +12,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
             boxSizing: 'border-box'
         },
         taskCounter: {
-            fontSize: '0.9rem',
+            fontSize: '1rem',
             opacity: 0.8,
             color: 'var(--muted-text)',
             margin: '0 auto'
@@ -35,7 +35,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
                     src="/123-logo-500px.jpg"
                     alt="123 ToDo logo"
                     style={{
-                        width: '200px',
+                        width: '240px',
                         height: 'auto',
                         cursor: 'pointer',
                         display: 'block'

@@ -29,7 +29,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             flex: 1,
             border: 'none',
             background: 'transparent',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             color: 'var(--text-color)',
             cursor: isArchived ? 'default' : 'pointer',
             fontFamily: 'Inter, sans-serif',

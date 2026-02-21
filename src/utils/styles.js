@@ -23,7 +23,8 @@ export const COMMON_STYLES = {
         background: 'rgba(0,0,0,0.5)',
         backdropFilter: 'blur(4px)',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        paddingTop: '10vh',
         justifyContent: 'center',
         zIndex: 1000
     },

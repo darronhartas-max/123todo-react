@@ -24,7 +24,7 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
         const isActive = priority === p;
         return {
             padding: '6px 8px',
-            fontSize: '0.6rem',
+            fontSize: '0.7rem',
             fontWeight: '600',
             border: '2px solid',
             borderRadius: '5px',
@@ -54,7 +54,7 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
         taskInput: {
             width: '100%',
             padding: '10px 12px',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             border: '2px solid var(--border-color)',
             borderRadius: '6px',
             resize: 'none',
@@ -119,7 +119,7 @@ const AddTask = ({ isOpen, onAdd, onClose }) => {
                         border: '2px solid #c7d2fe',
                         borderRadius: '6px',
                         cursor: 'pointer',
-                        fontSize: '0.65rem',
+                        fontSize: '0.75rem',
                         fontWeight: '700',
                         textTransform: 'uppercase',
                         letterSpacing: '0.3px',

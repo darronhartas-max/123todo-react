@@ -13,7 +13,7 @@ const SearchBar = ({ value, onChange, onClear }) => {
         input: {
             width: '100%',
             padding: '8px 12px 8px 36px',
-            fontSize: '0.9rem',
+            fontSize: '1.1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '20px',
             background: 'var(--item-bg)',
