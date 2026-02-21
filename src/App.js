@@ -130,7 +130,10 @@ const TodoApp = () => {
     appContainer: {
       maxWidth: '800px',
       margin: '0 auto',
-      paddingBottom: '80px'
+      paddingBottom: '80px',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
     },
     container: {
       width: '100%',
@@ -141,11 +144,11 @@ const TodoApp = () => {
       borderRadius: '8px',
       overflow: 'hidden',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-      marginTop: '20px'
+      marginTop: '20px',
+      flex: 1
     },
     sectionsContainer: {
       flex: 1,
-      overflowY: 'auto',
       padding: '0 12px 8px 12px'
     },
     toggleSection: {
@@ -225,6 +228,12 @@ const TodoApp = () => {
               handleDragEnd={handleDragEnd}
             />
           ))}
+
+          {filteredTasks.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
+              {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : 'No tasks in this project.')}
+            </div>
+          )}
         </div>
 
         {onHoldTasksFiltered.length > 0 && (
