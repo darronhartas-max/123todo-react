@@ -5,6 +5,17 @@ import { PRIORITIES } from '../../utils/constants';
 
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isClicked, setIsClicked] = useState(false);
+
+    const handleComplete = (e) => {
+        e.stopPropagation();
+        if (isClicked) return;
+        setIsClicked(true);
+        // Small delay to let the user see the "completed" state before it disappears
+        setTimeout(() => {
+            onComplete(task.id);
+        }, 250);
+    };
 
     const styles = {
         taskItem: {
@@ -57,6 +68,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
         }
     };
 
+    const showCheck = isHovered || isClicked;
+
     return (
         <motion.li
             layout
@@ -93,18 +106,18 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                     </>
                 ) : (
                     <motion.button
-                        onClick={(e) => { e.stopPropagation(); onComplete(task.id); }}
+                        onClick={handleComplete}
                         style={{
                             ...styles.actionBtn,
-                            color: isHovered ? '#10b981' : 'var(--muted-text)',
-                            background: isHovered ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                            color: showCheck ? '#10b981' : 'var(--muted-text)',
+                            background: showCheck ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
                         }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
                         title="Complete Task"
                     >
                         <AnimatePresence mode="wait" initial={false}>
-                            {isHovered ? (
+                            {showCheck ? (
                                 <motion.div
                                     key="check"
                                     initial={{ opacity: 0, scale: 0.5 }}
