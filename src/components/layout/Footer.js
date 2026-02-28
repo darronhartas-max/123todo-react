@@ -40,10 +40,10 @@ const Footer = ({ onExport, onImportClick, version = '1.1.0' }) => {
             </div>
 
             <div style={{ marginTop: '8px', fontSize: '0.9rem' }}>
-                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '20px' }}>
+                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', marginRight: '20px' }}>
                     Terms of Service
                 </a>
-                <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none' }}>
+                <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
                     Privacy Policy
                 </a>
             </div>

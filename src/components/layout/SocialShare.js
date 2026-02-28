@@ -9,7 +9,7 @@ const SocialShare = () => {
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #285a82 0%, #1a3a54 100%)',
             color: 'white',
             padding: '8px 16px',
             textAlign: 'center',

@@ -29,9 +29,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         const config = PRIORITIES[p];
         const isActive = priority === p;
         return {
-            padding: '6px 8px',
+            padding: '7px 4px',
             fontSize: '0.7rem',
-            fontWeight: '600',
+            fontWeight: '700',
             border: '2px solid',
             borderRadius: '5px',
             textAlign: 'center',
@@ -39,7 +39,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             textTransform: 'uppercase',
             letterSpacing: '0.2px',
-            flex: '0 1 auto',
+            flex: '1',
+            minWidth: '0',
             whiteSpace: 'nowrap',
             color: isActive ? 'white' : config.color,
             backgroundColor: isActive ? config.color : 'var(--bg-color)',
@@ -61,7 +62,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             width: '100%',
             padding: '10px 12px',
             fontSize: '1.1rem',
-            border: '2px solid var(--border-color)',
+            border: '1px solid var(--accent-color)',
             borderRadius: '6px',
             resize: 'none',
             height: '40px',
@@ -70,7 +71,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
             transition: 'all 0.3s ease',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            outline: 'none'
         },
         projectSelect: {
             padding: '4px 8px',
@@ -139,19 +141,31 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                 <button
                     onClick={handleSubmit}
                     style={{
-                        padding: '7px 16px',
-                        background: '#e0e7ff',
-                        color: '#4338ca',
-                        border: '2px solid #c7d2fe',
+                        padding: '7px 4px',
+                        background: '#10b981',
+                        color: 'white',
+                        border: '2px solid #059669',
                         borderRadius: '6px',
                         cursor: 'pointer',
                         fontSize: '0.75rem',
-                        fontWeight: '700',
+                        fontWeight: '800',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.3px',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        flex: '0 1 auto',
-                        whiteSpace: 'nowrap'
+                        letterSpacing: '0.5px',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        flex: '1',
+                        minWidth: '0',
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#059669';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#10b981';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(16, 185, 129, 0.2)';
                     }}
                 >
                     ADD

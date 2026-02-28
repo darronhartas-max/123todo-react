@@ -19,7 +19,7 @@ export const STORAGE_KEYS = {
 };
 
 export const PROJECT_COLORS = [
-  '#3b82f6', // Blue
+  '#285a82', // Blue (Logo matched)
   '#10b981', // Green
   '#f59e0b', // Amber
   '#ec4899', // Pink
@@ -30,7 +30,7 @@ export const PROJECT_COLORS = [
 
 export const DEFAULT_PROJECTS = [
   { id: 'all', name: 'All Tasks', color: '#6b7280' },
-  { id: 'general', name: 'General', color: '#3b82f6' }
+  { id: 'general', name: 'General', color: '#285a82' }
 ];
 
 export const MAX_TASK_LENGTH = 200;

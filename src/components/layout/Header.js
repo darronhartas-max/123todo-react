@@ -1,4 +1,5 @@
 import React from 'react';
+import { PlusCircle, MinusCircle } from 'lucide-react';
 
 const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
     const styles = {
@@ -20,11 +21,13 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
         addTaskToggle: {
             background: 'none',
             border: 'none',
-            color: 'var(--text-color)',
-            fontSize: '1.2rem',
+            color: 'var(--accent-color)',
             cursor: 'pointer',
             padding: '4px',
-            lineHeight: 1
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.2s ease'
         }
     };
 
@@ -50,7 +53,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
                 style={styles.addTaskToggle}
                 aria-label={isAddOpen ? "Close add task" : "Open add task"}
             >
-                {isAddOpen ? '➖' : '➕'}
+                {isAddOpen ? <MinusCircle size={24} /> : <PlusCircle size={24} />}
             </button>
         </header>
     );
