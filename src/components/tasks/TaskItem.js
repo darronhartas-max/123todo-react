@@ -1,9 +1,11 @@
-import React from 'react';
-import { Trash2, RotateCcw, Check } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Trash2, RotateCcw, Check, Circle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     const styles = {
         taskItem: {
             display: 'flex',
@@ -44,12 +46,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             fontSize: '1.1rem',
             cursor: 'pointer',
             marginLeft: '8px',
-            borderRadius: '4px',
-            padding: '4px',
+            borderRadius: '50%',
+            padding: '6px',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            width: '32px',
+            height: '32px'
         }
     };
 
@@ -63,6 +67,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             draggable={!isArchived}
             {...(dragHandlers || {})}
             onClick={() => !isArchived && onEdit && onEdit(task)}
+            onMouseEnter={() => !isArchived && setIsHovered(true)}
+            onMouseLeave={() => !isArchived && setIsHovered(false)}
         >
             <div style={styles.taskPriorityDot}></div>
             <span style={styles.taskText}>{task.text}</span>
@@ -86,13 +92,41 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                         </button>
                     </>
                 ) : (
-                    <button
+                    <motion.button
                         onClick={(e) => { e.stopPropagation(); onComplete(task.id); }}
-                        style={{ ...styles.actionBtn, color: '#10b981' }}
+                        style={{
+                            ...styles.actionBtn,
+                            color: isHovered ? '#10b981' : 'var(--muted-text)',
+                            background: isHovered ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
                         title="Complete Task"
                     >
-                        <Check size={16} />
-                    </button>
+                        <AnimatePresence mode="wait" initial={false}>
+                            {isHovered ? (
+                                <motion.div
+                                    key="check"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.5 }}
+                                    transition={{ duration: 0.1 }}
+                                >
+                                    <Check size={18} strokeWidth={3} />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="circle"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.1 }}
+                                >
+                                    <Circle size={18} opacity={0.5} />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
                 )}
             </div>
         </motion.li>
