@@ -2,25 +2,28 @@ import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
+    const fallbackProjectId = projects[0]?.id || 'general';
+    const [projectId, setProjectId] = useState(defaultProjectId === 'all' ? fallbackProjectId : (defaultProjectId || fallbackProjectId));
     const [text, setText] = useState('');
     const [priority, setPriority] = useState(1);
-    const [projectId, setProjectId] = useState(defaultProjectId || 'general');
     const inputRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
+            const currentFallback = projects[0]?.id || 'general';
             if (defaultProjectId && defaultProjectId !== 'all') {
                 setProjectId(defaultProjectId);
-            } else if (defaultProjectId === 'all' && projectId === 'all') {
-                setProjectId('general');
+            } else if (defaultProjectId === 'all') {
+                setProjectId(currentFallback);
             }
         }
-    }, [isOpen, defaultProjectId, projectId]);
+    }, [isOpen, defaultProjectId, projects]);
 
     const handleSubmit = () => {
         if (!text.trim()) return;
-        onAdd(text, priority, projectId === 'all' ? 'general' : projectId);
+        const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
+        onAdd(text, priority, finalProjectId);
         setText('');
         onClose();
     };

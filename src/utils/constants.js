@@ -29,7 +29,7 @@ export const PROJECT_COLORS = [
 ];
 
 export const DEFAULT_PROJECTS = [
-  { id: 'all', name: 'All Tasks', color: '#6b7280' },
+  { id: 'all', name: 'All', color: '#6b7280' },
   { id: 'general', name: 'General', color: '#285a82' }
 ];
 

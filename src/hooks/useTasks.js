@@ -51,7 +51,13 @@ export const useTasks = () => {
             }
 
             if (savedProjects) {
-                setProjects(JSON.parse(savedProjects));
+                let parsed = JSON.parse(savedProjects);
+                // Ensure 'general' exists and 'all' is excluded from storage state
+                parsed = parsed.filter(p => p.id !== 'all');
+                if (!parsed.some(p => p.id === 'general')) {
+                    parsed.unshift(DEFAULT_PROJECTS.find(p => p.id === 'general'));
+                }
+                setProjects(parsed);
             } else {
                 setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
             }
@@ -165,12 +171,12 @@ export const useTasks = () => {
         setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
     }, []);
 
-    const deleteProject = useCallback((id) => {
-        if (id === 'general') return; // Cannot delete General
+    const deleteProject = useCallback((id, targetProjectId = 'general') => {
+        if (id === 'all') return; // Only 'all' is protected now
         setProjects(prev => prev.filter(p => p.id !== id));
-        // Reset tasks in this project to general
-        setTasks(prev => prev.map(t => t.projectId === id ? { ...t, projectId: 'general' } : t));
-        setArchived(prev => prev.map(t => t.projectId === id ? { ...t, projectId: 'general' } : t));
+        // Reset tasks in this project to the target project (defaults to general)
+        setTasks(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
+        setArchived(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
     }, []);
 
     const importData = useCallback((data) => {

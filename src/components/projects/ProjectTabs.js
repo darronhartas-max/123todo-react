@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Edit2, Check, ChevronDown } from 'lucide-react';
+import { Plus, X, Edit2, Check, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
 import { PROJECT_COLORS, DEFAULT_PROJECTS } from '../../utils/constants';
+import ManageCategoriesModal from '../modals/ManageCategoriesModal';
 
-const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, onDelete }) => {
-    const [isAdding, setIsAdding] = useState(false);
-    const [newName, setNewName] = useState('');
-    const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
+const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, onDelete, showSearch, onToggleSearch }) => {
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState('');
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [showManage, setShowManage] = useState(false);
+    const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -20,24 +20,19 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         self.findIndex(t => t.id === p.id) === i
     );
 
-    const handleAdd = () => {
-        if (newName.trim()) {
-            onAdd(newName.trim(), selectedColor);
-            setNewName('');
-            setIsAdding(false);
-        }
-    };
+
 
     const startEdit = (e, project) => {
         e.stopPropagation();
         setEditingId(project.id);
         setEditName(project.name);
+        setSelectedColor(project.color);
     };
 
     const handleUpdate = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         if (editName.trim()) {
-            onUpdate(editingId, { name: editName.trim() });
+            onUpdate(editingId, { name: editName.trim(), color: selectedColor });
             setEditingId(null);
         }
     };
@@ -70,6 +65,18 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             color: isActive ? color : 'var(--muted-text)',
             boxShadow: isActive ? `0 2px 6px ${color}22` : 'none'
         }),
+        actionBtn: {
+            padding: '6px',
+            borderRadius: '50%',
+            background: 'var(--bg-color)',
+            border: '1.5px solid var(--border-color)',
+            color: 'var(--accent-color)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease'
+        },
         addBtn: {
             padding: '5px 10px',
             borderRadius: '16px',
@@ -83,6 +90,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             fontSize: '0.8rem',
             fontWeight: '600'
         },
+
         addForm: {
             display: 'flex',
             flexDirection: 'column',
@@ -140,24 +148,39 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
     return (
         <div style={styles.mainWrapper}>
             <div style={styles.tabContainer}>
+                <button
+                    onClick={onToggleSearch}
+                    style={{
+                        ...styles.actionBtn,
+                        borderColor: showSearch ? 'var(--accent-color)' : 'var(--border-color)',
+                        background: showSearch ? 'var(--accent-bg)' : 'var(--bg-color)'
+                    }}
+                    title={showSearch ? "Hide Search" : "Show Search"}
+                >
+                    {showSearch ? <X size={16} /> : <SearchIcon size={16} />}
+                </button>
+
                 {useDropdown ? (
-                    <div style={styles.dropdownContainer}>
-                        <select
-                            style={styles.select}
-                            value={currentProjectId}
-                            onChange={(e) => onSelect(e.target.value)}
-                        >
-                            {allProjects.map(p => (
-                                <option key={p.id} value={p.id}>
-                                    {p.name}
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown size={18} style={{ position: 'absolute', right: '55px', pointerEvents: 'none', color: 'var(--muted-text)' }} />
-                        <button onClick={() => setIsAdding(!isAdding)} style={styles.addBtn}>
-                            {isAdding ? <X size={16} /> : <Plus size={16} />}
-                        </button>
-                    </div>
+                    <>
+                        <div style={styles.dropdownContainer}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>CATEGORY:</span>
+                            <select
+                                style={styles.select}
+                                value={currentProjectId}
+                                onChange={(e) => onSelect(e.target.value)}
+                            >
+                                {allProjects.map(p => (
+                                    <option key={p.id} value={p.id}>
+                                        {p.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown size={18} style={{ position: 'absolute', right: '55px', pointerEvents: 'none', color: 'var(--muted-text)' }} />
+                            <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
+                                <Settings size={16} />
+                            </button>
+                        </div>
+                    </>
                 ) : (
                     <>
                         {allProjects.map(project => (
@@ -168,49 +191,63 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                             >
                                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: project.color }}></div>
                                 {editingId === project.id ? (
-                                    <input
-                                        autoFocus
-                                        value={editName}
-                                        onChange={(e) => setEditName(e.target.value)}
-                                        onBlur={handleUpdate}
-                                        onKeyPress={(e) => e.key === 'Enter' && handleUpdate(e)}
-                                        onClick={(e) => e.stopPropagation()}
-                                        style={{ ...styles.input, padding: '2px 4px', width: '80px' }}
-                                    />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <input
+                                            autoFocus
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleUpdate()}
+                                            onClick={(e) => e.stopPropagation()}
+                                            style={{ ...styles.input, padding: '2px 4px', width: '80px' }}
+                                        />
+                                        <Check size={14} onClick={handleUpdate} style={{ color: '#10b981', cursor: 'pointer' }} />
+                                    </div>
                                 ) : (
                                     <span>{project.name}</span>
                                 )}
-
-                                {currentProjectId === project.id && project.id !== 'all' && project.id !== 'general' && (
-                                    <div style={{ display: 'flex', gap: '4px' }}>
-                                        <Edit2 size={12} onClick={(e) => startEdit(e, project)} style={{ opacity: 0.7 }} />
-                                        <X size={12} onClick={(e) => { e.stopPropagation(); onDelete(project.id); }} style={{ opacity: 0.7 }} />
-                                    </div>
-                                )}
                             </div>
                         ))}
-                        <button onClick={() => setIsAdding(!isAdding)} style={styles.addBtn}>
-                            <Plus size={14} /> Add
+                        <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
+                            <Settings size={14} /> Manage
                         </button>
                     </>
                 )}
             </div>
 
-            {isAdding && (
+            {showManage && (
+                <ManageCategoriesModal
+                    projects={projects}
+                    onAdd={onAdd}
+                    onEdit={(p) => {
+                        setShowManage(false);
+                        startEdit({ stopPropagation: () => { } }, p);
+                    }}
+                    onDelete={(id) => {
+                        setShowManage(false);
+                        onDelete(id);
+                    }}
+                    onClose={() => setShowManage(false)}
+                />
+            )}
+
+            {editingId && (
                 <div style={styles.addForm}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <input
                             autoFocus
-                            placeholder="Category name..."
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+                            placeholder="Edit name..."
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleUpdate()}
                             style={styles.input}
                         />
-                        <button onClick={handleAdd} style={{ ...styles.addBtn, background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px' }}>
-                            Save
+                        <button
+                            onClick={handleUpdate}
+                            style={{ ...styles.addBtn, background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px' }}
+                        >
+                            Update
                         </button>
-                        <button onClick={() => setIsAdding(false)} style={{ ...styles.addBtn, padding: '8px' }}>
+                        <button onClick={() => setEditingId(null)} style={{ ...styles.addBtn, padding: '8px' }}>
                             <X size={18} />
                         </button>
                     </div>
