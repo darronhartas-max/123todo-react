@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 0.1.0 | © Darron Hartas 2025
+Version 1.2.0 | © Darron Hartas 2026
 
 ---
 
@@ -39,6 +39,9 @@ npm run build
 - **Drag & Drop**: Reorder tasks within each priority level
 - **Character Limit**: 200 characters per task for concise task descriptions
 - **Auto-Expanding Editor**: Task editor automatically adjusts to show all text
+- **Search System**: Powerful search bar to filter tasks by text across any category
+- **Category Management**: Create, edit, and delete custom categories with color coding
+- **Consolidated "Manage" Hub**: Centralized modal for all category maintenance tasks
 
 ### Priority System
 1. **Must Do** (Red) - Critical, urgent tasks
@@ -119,7 +122,7 @@ npm run build
 3. **Regular Backups**
    - Export your data weekly (the app will remind you)
    - Store backups in cloud storage (Dropbox, Google Drive, etc.)
-   - Use descriptive filenames: `123todo-2025-10-09.json`
+   - Use descriptive filenames: `123todo-2026-02-28.json`
 
 4. **Archive Hygiene**
    - Review archive monthly
@@ -258,7 +261,7 @@ npm run build
 
 ## 📄 License & Credits
 
-**Copyright © Darron Hartas 2025**
+**Copyright © Darron Hartas 2026**
 
 Built with [Create React App](https://github.com/facebook/create-react-app)
 
@@ -268,7 +271,22 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v0.1.0 (Current)
+### v1.2.0 (Current)
+- **Centralized Category Management**: New "Manage" hub for creating, editing, and deleting categories.
+- **Enhanced Search**: Toggleable search bar for finding tasks across all categories.
+- **Dynamic Categories**: Support for renaming and recoloring all categories, including "General".
+- **Intelligent Task Reassignment**: Automatic prompt to move tasks when a category is deleted.
+- **UI Refinement**: Responsive category tabs with automatic dropdown conversion for many categories.
+- **UX Improvements**: Instant visual feedback (green check) when completing tasks on mobile.
+- **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
+
+### v1.1.0
+- Added PrioritySection component refactoring
+- Enhanced mobile responsiveness
+- Fixed minor layout issues in task items
+- Added Framer Motion for smoother animations
+
+### v0.1.0
 - Initial release
 - 4-level priority system
 - Drag-and-drop task reordering
