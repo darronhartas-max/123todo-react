@@ -130,7 +130,7 @@ const TodoApp = () => {
     appContainer: {
       maxWidth: '800px',
       margin: '0 auto',
-      paddingBottom: '80px',
+      paddingBottom: window.innerWidth < 768 ? '60px' : '50px',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column'

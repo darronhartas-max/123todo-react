@@ -4,38 +4,43 @@ const Footer = ({ onExport, onImportClick, version = '1.1.0' }) => {
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '16px',
-            paddingBottom: window.innerWidth < 768 ? '60px' : '40px',
+            padding: '16px 16px 12px 16px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
-            fontSize: '1.1rem',
+            fontSize: '1rem',
             borderTop: '1px solid var(--border-color)',
             color: 'var(--muted-text)'
         },
         footerButton: {
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--accent-color)',
+            background: 'var(--item-bg)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-color)',
             cursor: 'pointer',
-            fontSize: '1.1rem',
-            margin: '0 4px',
-            fontWeight: '600',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            transition: 'all 0.2s ease'
+            fontSize: '0.85rem',
+            margin: '0 8px',
+            fontWeight: '700',
+            padding: '6px 14px',
+            borderRadius: '6px',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
         }
     };
 
     return (
         <footer style={styles.footer}>
-            <button onClick={onExport} style={styles.footerButton}>Export</button>
-            <span> | </span>
-            <button onClick={onImportClick} style={styles.footerButton}>Import</button>
-            <br />
-            Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
-            <br />
-            <div style={{ marginTop: '12px', fontSize: '1rem' }}>
-                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '24px' }}>
+            <div>
+                <button onClick={onExport} style={styles.footerButton}>Export</button>
+                <button onClick={onImportClick} style={styles.footerButton}>Import</button>
+            </div>
+
+            <div style={{ fontSize: '0.8rem', margin: '8px 0', opacity: 0.8 }}>
+                Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
+            </div>
+
+            <div style={{ marginTop: '8px', fontSize: '0.9rem' }}>
+                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none', marginRight: '20px' }}>
                     Terms of Service
                 </a>
                 <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: '#667eea', textDecoration: 'none' }}>
