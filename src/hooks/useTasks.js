@@ -52,11 +52,8 @@ export const useTasks = () => {
 
             if (savedProjects) {
                 let parsed = JSON.parse(savedProjects);
-                // Ensure 'general' exists and 'all' is excluded from storage state
+                // Ensure 'all' is excluded from storage state
                 parsed = parsed.filter(p => p.id !== 'all');
-                if (!parsed.some(p => p.id === 'general')) {
-                    parsed.unshift(DEFAULT_PROJECTS.find(p => p.id === 'general'));
-                }
                 setProjects(parsed);
             } else {
                 setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));

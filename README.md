@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 1.2.0 | © Darron Hartas 2026
+Version 1.3.0 | © Darron Hartas 2026
 
 ---
 
@@ -271,14 +271,17 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v1.2.0 (Current)
-- **Centralized Category Management**: New "Manage" hub for creating, editing, and deleting categories.
-- **Enhanced Search**: Toggleable search bar for finding tasks across all categories.
-- **Dynamic Categories**: Support for renaming and recoloring all categories, including "General".
-- **Intelligent Task Reassignment**: Automatic prompt to move tasks when a category is deleted.
-- **UI Refinement**: Responsive category tabs with automatic dropdown conversion for many categories.
-- **UX Improvements**: Instant visual feedback (green check) when completing tasks on mobile.
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
+
+### v1.3.0 (Current)
+- **Advanced PWA Auto-Updates**: Implementation of active service worker refreshes on app launch and focus.
+- **"Safety First" Update Notifications**: New backup-before-update workflow to protect user data.
+- **Adaptive Mobile UI**: Synchronized status bar color with brand blue, supporting light and dark modes.
+- **Refined Category Management**: Streamlined tabs with brand-tinted backgrounds and simplified icons.
+- **Robust Persistence**: Fixed issues where default categories would revert names on page reload.
+- **Enhanced Typography**: Improved readability with optimized font sizes in navigation components.
+
+### v1.2.0
 
 ### v1.1.0
 - Added PrioritySection component refactoring

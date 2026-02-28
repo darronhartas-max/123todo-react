@@ -98,3 +98,71 @@ export const BackupReminder = ({ onBackup, onDismiss }) => (
         </div>
     </div>
 );
+export const UpdateReadyPrompt = ({ onUpdate, onBackup, onDismiss }) => (
+    <div style={{
+        background: 'linear-gradient(135deg, #2b6cb0, #2c5282)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '6px',
+        padding: '12px 16px',
+        margin: '8px 12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        fontSize: '0.85rem',
+        boxShadow: '0 4px 12px rgba(44, 82, 130, 0.4)',
+        borderLeft: '4px solid #f6e05e'
+    }}>
+        <div style={{ fontWeight: '600', lineHeight: '1.4' }}>
+            🚀 A new version of 123 To Do is ready!
+            <p style={{ margin: '4px 0 0 0', fontWeight: '400', opacity: 0.9 }}>
+                To keep your tasks safe, we recommend backing them up before updating.
+            </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+                onClick={onBackup}
+                style={{
+                    background: '#f6e05e',
+                    color: '#2c5282',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                }}
+            >
+                1. Backup Tasks
+            </button>
+            <button
+                onClick={onUpdate}
+                style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                }}
+            >
+                2. Update Now
+            </button>
+            <button
+                onClick={onDismiss}
+                style={{
+                    background: 'transparent',
+                    color: 'rgba(255,255,255,0.7)',
+                    border: 'none',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    marginLeft: 'auto'
+                }}
+            >
+                Later
+            </button>
+        </div>
+    </div>
+);

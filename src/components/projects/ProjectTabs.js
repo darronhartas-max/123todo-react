@@ -16,9 +16,10 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const allProjects = [...DEFAULT_PROJECTS, ...projects].filter((p, i, self) =>
-        self.findIndex(t => t.id === p.id) === i
-    );
+    const allProjects = [
+        DEFAULT_PROJECTS.find(p => p.id === 'all'),
+        ...projects
+    ].filter(Boolean);
 
 
 
@@ -41,7 +42,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         mainWrapper: {
             padding: '4px 12px 8px 12px',
             borderBottom: '1px solid var(--border-color)',
-            background: 'var(--surface-color)'
+            background: 'var(--accent-bg)'
         },
         tabContainer: {
             display: 'flex',
@@ -52,7 +53,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         tab: (isActive, color) => ({
             padding: '5px 10px',
             borderRadius: '16px',
-            fontSize: '0.8rem',
+            fontSize: '1rem',
             fontWeight: '600',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
@@ -87,7 +88,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            fontSize: '0.8rem',
+            fontSize: '1rem',
             fontWeight: '600'
         },
 
@@ -125,7 +126,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             border: '1px solid var(--border-color)',
             background: 'var(--bg-color)',
             color: 'var(--text-color)',
-            fontSize: '0.9rem',
+            fontSize: '1rem',
             fontWeight: '600',
             appearance: 'none',
             cursor: 'pointer',
@@ -207,8 +208,8 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                 )}
                             </div>
                         ))}
-                        <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
-                            <Settings size={14} /> Manage
+                        <button onClick={() => setShowManage(true)} style={{ ...styles.addBtn, padding: '5px' }} title="Manage Categories">
+                            <Settings size={18} />
                         </button>
                     </>
                 )}

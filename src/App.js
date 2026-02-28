@@ -12,7 +12,7 @@ import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
-import { InstallPrompt, BackupReminder } from './components/layout/NotificationBar';
+import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 
@@ -24,7 +24,8 @@ const TodoApp = () => {
 
   const {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
-    setShowCongrats, checkMilestones, dismissWelcome, dismissInstallPrompt,
+    showUpdateReady, swRegistration,
+    setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
     dismissBackupReminder, recordBackup
   } = useAppSystem(archived.length, tasks.length);
 
@@ -138,9 +139,16 @@ const TodoApp = () => {
   const handleDeleteCategoryConfirm = (id, targetProjectId) => {
     deleteProject(id, targetProjectId);
     if (currentProjectId === id) {
-      setCurrentProjectId('general');
+      setCurrentProjectId(targetProjectId || 'all');
     }
     setCategoryToDelete(null);
+  };
+
+  const handleApplyUpdate = () => {
+    if (swRegistration && swRegistration.waiting) {
+      swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+    window.location.reload();
   };
 
   const styles = {
@@ -209,6 +217,17 @@ const TodoApp = () => {
 
         {showInstallPrompt && (
           <InstallPrompt onInstall={() => { }} onDismiss={dismissInstallPrompt} />
+        )}
+
+        {showUpdateReady && (
+          <UpdateReadyPrompt
+            onBackup={() => {
+              handleExport();
+              // Keep showing update prompt so they can click 'Update Now' next
+            }}
+            onUpdate={handleApplyUpdate}
+            onDismiss={() => setShowUpdateReady(false)}
+          />
         )}
 
         {showBackupReminder && (

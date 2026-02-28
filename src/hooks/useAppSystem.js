@@ -8,6 +8,17 @@ export const useAppSystem = (archivedCount, tasksCount) => {
     const [showCongrats, setShowCongrats] = useState(false);
     const [achievedMilestones, setAchievedMilestones] = useState([]);
     const [lastMilestoneDate, setLastMilestoneDate] = useState(null);
+    const [showUpdateReady, setShowUpdateReady] = useState(false);
+    const [swRegistration, setSwRegistration] = useState(null);
+
+    useEffect(() => {
+        const handleUpdate = (event) => {
+            setSwRegistration(event.detail);
+            setShowUpdateReady(true);
+        };
+        window.addEventListener('swUpdateAvailable', handleUpdate);
+        return () => window.removeEventListener('swUpdateAvailable', handleUpdate);
+    }, []);
 
     const checkBackupReminder = useCallback((count) => {
         const lastBackup = localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
@@ -117,7 +128,10 @@ export const useAppSystem = (archivedCount, tasksCount) => {
         showInstallPrompt,
         showBackupReminder,
         showCongrats,
+        showUpdateReady,
+        swRegistration,
         setShowCongrats,
+        setShowUpdateReady,
         checkMilestones,
         dismissWelcome,
         dismissInstallPrompt,
