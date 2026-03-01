@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 1.3.0 | © Darron Hartas 2026
+Version 1.4.0 | © Darron Hartas 2026
 
 ---
 
@@ -42,6 +42,8 @@ npm run build
 - **Search System**: Powerful search bar to filter tasks by text across any category
 - **Category Management**: Create, edit, and delete custom categories with color coding
 - **Consolidated "Manage" Hub**: Centralized modal for all category maintenance tasks
+- **Note Management**: Add detailed descriptions to tasks (up to 2,048 characters)
+- **Compact View**: Notes are hidden by default with a `+` toggle to save space
 
 ### Priority System
 1. **Must Do** (Red) - Critical, urgent tasks
@@ -52,6 +54,7 @@ npm run build
 ### Data Management
 - **Local Storage**: All data stored in your browser (no server required)
 - **Export/Import**: JSON backup and restore functionality
+- **Todoist Import**: Direct CSV import support for Todoist projects (multi-file)
 - **Archive System**: Completed tasks saved with timestamps
 - **Restore Feature**: Bring archived tasks back with new priority
 
@@ -273,7 +276,15 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v1.3.0 (Current)
+### v1.4.0 (Current)
+- **Todoist CSV Import**: New robust importer for Todoist projects with multi-file support and automatic mapping.
+- **Task Notes & Descriptions**: Added support for long-form task notes (up to 2,048 chars) with a toggleable UI.
+- **Atomic ID Generation**: Completely refactored task ID system to be atomic, preventing collisions during bulk operations.
+- **Improved Task Editor**: Notes field in the edit modal now auto-grows for better visibility.
+- **Production Build Polish**: Resolved all ESLint warnings for a perfectly clean deployment bundle.
+- **UI Enhancements**: Added extra breathing room in the footer for better aesthetic balance.
+
+### v1.3.0
 - **Advanced PWA Auto-Updates**: Implementation of active service worker refreshes on app launch and focus.
 - **"Safety First" Update Notifications**: New backup-before-update workflow to protect user data.
 - **Adaptive Mobile UI**: Synchronized status bar color with brand blue, supporting light and dark modes.
