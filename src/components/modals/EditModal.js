@@ -1,5 +1,5 @@
 import React from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
+import { PRIORITIES, MAX_TASK_LENGTH, MAX_NOTES_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 
 const EditModal = ({ task, onSave, onClose, projects }) => {
@@ -14,7 +14,8 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
         onSave(editingTask.id, {
             text: editingTask.text,
             priority: editingTask.priority,
-            projectId: editingTask.projectId
+            projectId: editingTask.projectId,
+            notes: editingTask.notes
         });
         onClose();
     };
@@ -100,6 +101,27 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                             <option key={p.id} value={p.id}>{p.name}</option>
                         ))}
                     </select>
+                </div>
+
+                <div style={{ marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Notes</label>
+                    <textarea
+                        value={editingTask.notes || ''}
+                        onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
+                        onInput={handleInput}
+                        placeholder="Add notes or descriptions here..."
+                        style={{ ...styles.textarea, minHeight: '80px', fontSize: '0.95rem' }}
+                        maxLength={MAX_NOTES_LENGTH}
+                        ref={(textarea) => {
+                            if (textarea) {
+                                textarea.style.height = 'auto';
+                                textarea.style.height = textarea.scrollHeight + 'px';
+                            }
+                        }}
+                    />
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', textAlign: 'right', marginTop: '-8px', marginBottom: '12px' }}>
+                        {(editingTask.notes || '').length}/{MAX_NOTES_LENGTH}
+                    </div>
                 </div>
 
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '12px' }}>

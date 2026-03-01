@@ -34,5 +34,6 @@ export const DEFAULT_PROJECTS = [
 ];
 
 export const MAX_TASK_LENGTH = 200;
+export const MAX_NOTES_LENGTH = 2048;
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;

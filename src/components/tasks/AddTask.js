@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
+import { PRIORITIES, MAX_TASK_LENGTH, MAX_NOTES_LENGTH } from '../../utils/constants';
+import { Plus, Minus } from 'lucide-react';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const fallbackProjectId = projects[0]?.id || 'general';
     const [projectId, setProjectId] = useState(defaultProjectId === 'all' ? fallbackProjectId : (defaultProjectId || fallbackProjectId));
     const [text, setText] = useState('');
+    const [notes, setNotes] = useState('');
+    const [showNotes, setShowNotes] = useState(false);
     const [priority, setPriority] = useState(1);
     const inputRef = useRef(null);
 
@@ -23,8 +26,10 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const handleSubmit = () => {
         if (!text.trim()) return;
         const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
-        onAdd(text, priority, finalProjectId);
+        onAdd(text, priority, finalProjectId, notes.trim());
         setText('');
+        setNotes('');
+        setShowNotes(false);
         onClose();
     };
 
@@ -55,7 +60,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         addSection: {
             padding: isOpen ? '12px' : '0',
             background: 'var(--surface-color)',
-            maxHeight: isOpen ? '320px' : '0',
+            maxHeight: isOpen ? '600px' : '0',
             overflow: 'hidden',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
@@ -102,11 +107,38 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     ))}
                 </select>
                 <div style={{
-                    fontSize: '0.75rem',
-                    color: '#6b7280',
-                    fontWeight: '500'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
                 }}>
-                    {text.length}/{MAX_TASK_LENGTH}
+                    {text.length > 0 && (
+                        <button
+                            onClick={() => setShowNotes(!showNotes)}
+                            style={{
+                                border: 'none',
+                                color: 'var(--accent-color)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                background: 'rgba(37, 99, 235, 0.05)'
+                            }}
+                        >
+                            {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                            {showNotes ? 'Hide Notes' : 'Add Notes'}
+                        </button>
+                    )}
+                    <div style={{
+                        fontSize: '0.75rem',
+                        color: '#6b7280',
+                        fontWeight: '500'
+                    }}>
+                        {text.length}/{MAX_TASK_LENGTH}
+                    </div>
                 </div>
             </div>
 
@@ -124,6 +156,32 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                 style={styles.taskInput}
                 maxLength={MAX_TASK_LENGTH}
             />
+
+            {showNotes && (
+                <div style={{ marginTop: '10px' }}>
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Add details/notes..."
+                        style={{
+                            ...styles.taskInput,
+                            height: '80px',
+                            fontSize: '0.95rem',
+                            borderColor: 'var(--border-color)',
+                            overflowY: 'auto'
+                        }}
+                        maxLength={MAX_NOTES_LENGTH}
+                    />
+                    <div style={{
+                        fontSize: '0.7rem',
+                        color: '#6b7280',
+                        textAlign: 'right',
+                        marginTop: '2px'
+                    }}>
+                        {notes.length}/{MAX_NOTES_LENGTH}
+                    </div>
+                </div>
+            )}
 
             <div style={{
                 display: 'flex',

@@ -80,20 +80,24 @@ export const useTasks = () => {
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
     }, [tasks, archived, projects, counter]);
 
-    const addTask = useCallback((text, priority, projectId = 'general') => {
+    const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
         if (!text.trim()) return;
 
-        const newTask = {
-            id: counter + 1,
-            text: text.trim(),
-            priority,
-            projectId: projectId || 'general',
-            isSample: false
-        };
+        setCounter(prevCounter => {
+            const newId = prevCounter + 1;
+            const newTask = {
+                id: newId,
+                text: text.trim(),
+                priority,
+                projectId: projectId || 'general',
+                notes: (notes || '').trim(),
+                isSample: false
+            };
 
-        setTasks(prev => [newTask, ...prev]);
-        setCounter(prev => prev + 1);
-    }, [counter]);
+            setTasks(prev => [newTask, ...prev]);
+            return newId;
+        });
+    }, []);
 
     const completeTask = useCallback((id) => {
         setTasks(prev => {
@@ -183,6 +187,25 @@ export const useTasks = () => {
         setCounter(data.counter || 0);
     }, []);
 
+    const bulkAddTasks = useCallback((tasksToAdd) => {
+        if (tasksToAdd.length === 0) return;
+
+        setCounter(prevCounter => {
+            let currentId = prevCounter;
+            const tasksWithIds = tasksToAdd.map(t => {
+                currentId++;
+                return {
+                    ...t,
+                    id: currentId,
+                    isSample: false
+                };
+            });
+
+            setTasks(prev => [...tasksWithIds, ...prev]);
+            return currentId;
+        });
+    }, []);
+
     return {
         tasks,
         archived,
@@ -197,6 +220,7 @@ export const useTasks = () => {
         addProject,
         updateProject,
         deleteProject,
-        importData
+        importData,
+        bulkAddTasks
     };
 };

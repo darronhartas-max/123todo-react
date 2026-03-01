@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Check, Circle } from 'lucide-react';
+import { Trash2, RotateCcw, Check, Circle, Plus, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isClicked, setIsClicked] = useState(false);
+    const [showNotes, setShowNotes] = useState(false);
 
     const handleComplete = (e) => {
         e.stopPropagation();
@@ -20,16 +21,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
     const styles = {
         taskItem: {
             display: 'flex',
-            alignItems: 'center',
             padding: '10px 12px',
             borderBottom: '1px solid var(--border-color)',
             background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
             borderLeft: projectColor ? `4px solid ${projectColor}` : (task.isSample ? '4px solid #0ea5e9' : 'none'),
             cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
-            marginBottom: '2px',
+            marginBottom: '4px',
             transition: 'background 0.2s ease, border-color 0.2s ease',
-            position: 'relative'
+            position: 'relative',
+            alignItems: 'flex-start',
+            paddingTop: '12px'
         },
         taskPriorityDot: {
             width: '8px',
@@ -84,7 +86,52 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             onMouseLeave={() => !isArchived && setIsHovered(false)}
         >
             <div style={styles.taskPriorityDot}></div>
-            <span style={styles.taskText}>{task.text}</span>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    {task.notes && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowNotes(!showNotes); }}
+                            style={{
+                                ...styles.actionBtn,
+                                marginLeft: '0',
+                                marginRight: '4px',
+                                color: 'var(--accent-color)',
+                                width: '24px',
+                                height: '24px',
+                                minWidth: '24px',
+                                background: 'rgba(37, 99, 235, 0.05)'
+                            }}
+                            title={showNotes ? "Hide Notes" : "Show Notes"}
+                        >
+                            {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                        </button>
+                    )}
+                    <span style={styles.taskText}>{task.text}</span>
+                </div>
+                {showNotes && task.notes && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        style={{
+                            fontSize: '0.9rem',
+                            color: 'var(--muted-text)',
+                            marginTop: '8px',
+                            padding: '10px 12px',
+                            background: 'rgba(0,0,0,0.03)',
+                            borderRadius: '6px',
+                            borderLeft: '3px solid var(--accent-color)',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            lineHeight: '1.4',
+                            overflow: 'visible'
+                        }}
+                    >
+                        {task.notes}
+                    </motion.div>
+                )}
+            </div>
 
             <div style={{ display: 'flex' }}>
                 {isArchived ? (

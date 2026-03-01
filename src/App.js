@@ -12,14 +12,16 @@ import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
+import TodoistImportModal from './components/modals/TodoistImportModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
+import { PROJECT_COLORS } from './utils/constants';
 
 const TodoApp = () => {
   const {
     tasks, archived, projects, addTask, completeTask, deleteArchivedTask,
-    restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, importData
+    restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, importData, bulkAddTasks
   } = useTasks();
 
   const {
@@ -39,6 +41,7 @@ const TodoApp = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState('all');
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [showTodoistImport, setShowTodoistImport] = useState(false);
 
   // Filtering
   const filteredBySearch = (list) => list.filter(t =>
@@ -118,6 +121,31 @@ const TodoApp = () => {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleTodoistImportData = (importedProjects) => {
+    const allTasksToImport = [];
+
+    importedProjects.forEach(ip => {
+      // Create project or get existing if name matches (though addProject handles uniqueness)
+      const projectId = addProject(ip.name, PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)]);
+
+      const projectTasks = ip.tasks.map(t => ({
+        text: t.text,
+        priority: t.priority,
+        projectId: projectId,
+        notes: t.notes
+      }));
+
+      allTasksToImport.push(...projectTasks);
+    });
+
+    if (allTasksToImport.length > 0) {
+      bulkAddTasks(allTasksToImport);
+    }
+
+    setShowAddSection(false);
+    setShowTodoistImport(false);
   };
 
   const onRestoreRequest = (id) => {
@@ -346,6 +374,7 @@ const TodoApp = () => {
         <Footer
           onExport={handleExport}
           onImportClick={() => document.getElementById('fileInput').click()}
+          onTodoistImport={() => setShowTodoistImport(true)}
         />
         <input
           type="file"
@@ -377,6 +406,14 @@ const TodoApp = () => {
           todayCompleted={showCongrats.todayCompleted}
           totalArchived={archived.length}
           onContinue={() => setShowCongrats(false)}
+        />
+      )}
+
+      {showTodoistImport && (
+        <TodoistImportModal
+          projects={projects}
+          onClose={() => setShowTodoistImport(false)}
+          onImport={handleTodoistImportData}
         />
       )}
     </div>

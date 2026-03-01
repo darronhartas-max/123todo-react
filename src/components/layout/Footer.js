@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Footer = ({ onExport, onImportClick, version = '1.3.0' }) => {
+const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.3.0' }) => {
     const styles = {
         footer: {
             flexShrink: 0,
@@ -33,6 +33,7 @@ const Footer = ({ onExport, onImportClick, version = '1.3.0' }) => {
             <div>
                 <button onClick={onExport} style={styles.footerButton}>Export</button>
                 <button onClick={onImportClick} style={styles.footerButton}>Import</button>
+                <button onClick={onTodoistImport} style={{ ...styles.footerButton, borderColor: '#e44332', color: '#e44332' }}>Todoist Import</button>
             </div>
 
             <div style={{ fontSize: '0.8rem', margin: '8px 0', opacity: 0.8 }}>

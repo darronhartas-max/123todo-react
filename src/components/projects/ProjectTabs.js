@@ -1,20 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, X, Edit2, Check, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Check, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
 import { PROJECT_COLORS, DEFAULT_PROJECTS } from '../../utils/constants';
 import ManageCategoriesModal from '../modals/ManageCategoriesModal';
 
 const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, onDelete, showSearch, onToggleSearch }) => {
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState('');
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [showManage, setShowManage] = useState(false);
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
-
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     const allProjects = [
         DEFAULT_PROJECTS.find(p => p.id === 'all'),
