@@ -4,7 +4,7 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.3.0' })
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '16px 16px 12px 16px',
+            padding: '16px 16px 40px 16px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
             fontSize: '1rem',
