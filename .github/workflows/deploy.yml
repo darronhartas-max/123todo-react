@@ -41,24 +41,8 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           source: "build/"
-          target: "/home/debian/wordpress-docker/todo-app/"
+          target: "/home/debian/wordpress-docker/app-123todo/"
           strip_components: 1
-
-      - name: Diagnose VPS structure
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            echo "=== Dockerfile.todo ==="
-            cat /home/debian/wordpress-docker/Dockerfile.todo
-            echo "=== todo-app directory ==="
-            ls -la /home/debian/wordpress-docker/todo-app/
-            echo "=== docker-compose snippet for todo-app ==="
-            grep -A 20 "todo-app" /home/debian/wordpress-docker/docker-compose.yml
 
       - name: Rebuild and restart Docker container
         uses: appleboy/ssh-action@master
@@ -70,7 +54,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /home/debian/wordpress-docker
-            cp todo-app/Dockerfile Dockerfile.todo
-            docker compose build --no-cache todo-app
-            docker compose up -d todo-app
-            docker network connect traefik_proxy todo-app || true
+            cp app-123todo/Dockerfile Dockerfile.app
+            docker compose build --no-cache app-123todo
+            docker compose up -d app-123todo
+            docker network connect traefik_proxy app-123todo || true
