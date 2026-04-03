@@ -4,9 +4,10 @@ This plan outlines the architecture for moving from a local-first application to
 
 ## 🏗️ Architecture Overview
 
-The system will transition to a **Synchronization** model rather than a simple save/load model. The goal is to ensure that "Last Update Wins" for any given task, while keeping the main data store on the device.
+The system will transition to a **Synchronization** model rather than a simple save/load model. The goal is to ensure that "Last Update Wins" for any given task, while keeping the main data store on the device. **On mobile, the local device is the primary authoritative source (the 'Shadow Base') until a verified sync occurs.**
 
 ### 🛡️ Privacy & Encryption
+*   **Mobile-First Storage**: Native `localStorage` and `IndexedDB` will remain the primary storage, with the **Storage Manager API** used to prevent automatic OS cleanup.
 *   **Zero-Knowledge Architecture**: The server will never see the task content.
 *   **Client-Side Encryption**:
     *   **Algorithm**: AES-256-GCM.

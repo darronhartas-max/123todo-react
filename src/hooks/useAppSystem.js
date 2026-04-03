@@ -17,6 +17,18 @@ export const useAppSystem = (archivedCount, tasksCount) => {
             setShowUpdateReady(true);
         };
         window.addEventListener('swUpdateAvailable', handleUpdate);
+
+        // MOBILE-FIRST PERSISTENCE: 
+        // Request persistent storage to prevent the browser from automatically 
+        // clearing localStorage/IndexedDB on mobile devices when space is low.
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(persistent => {
+                if (persistent) {
+                    console.log('💾 Data storage is persistent.');
+                }
+            }).catch(err => console.error('Persistence request failed:', err));
+        }
+
         return () => window.removeEventListener('swUpdateAvailable', handleUpdate);
     }, []);
 
