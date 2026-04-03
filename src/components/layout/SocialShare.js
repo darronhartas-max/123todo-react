@@ -11,7 +11,7 @@ const SocialShare = () => {
             right: 0,
             background: 'linear-gradient(135deg, #285a82 0%, #1a3a54 100%)',
             color: 'white',
-            padding: '8px 16px',
+            padding: '16px 20px',
             textAlign: 'center',
             fontSize: '0.85rem',
             fontWeight: '600',
@@ -22,7 +22,7 @@ const SocialShare = () => {
             justifyContent: 'center',
             flexDirection: isMobile ? 'column' : 'row',
             gap: isMobile ? '8px' : '16px',
-            minHeight: isMobile ? '50px' : '40px'
+            minHeight: isMobile ? '100px' : '60px'
         },
         shareBtn: {
             background: 'rgba(255, 255, 255, 0.2)',
