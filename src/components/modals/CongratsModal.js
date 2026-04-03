@@ -45,7 +45,7 @@ const CongratsModal = ({ milestone, todayCompleted, totalArchived, onContinue })
                         color: 'white',
                         padding: '12px 30px',
                         borderRadius: '25px',
-                        fontSize: '1rem',
+                        fontSize: '1.1rem',
                         fontWeight: '600',
                         cursor: 'pointer',
                         marginTop: '10px'

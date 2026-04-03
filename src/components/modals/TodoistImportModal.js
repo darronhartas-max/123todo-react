@@ -168,8 +168,9 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
             background: 'var(--accent-color)',
             color: '#fff',
             border: 'none',
-            padding: '10px 20px',
+            padding: '12px 20px',
             borderRadius: '6px',
+            fontSize: '1.1rem',
             fontWeight: '600',
             cursor: 'pointer',
             marginTop: '16px',
@@ -179,7 +180,8 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
             background: 'transparent',
             border: '1px solid var(--border-color)',
             color: 'var(--text-color)',
-            padding: '8px 16px',
+            padding: '10px 16px',
+            fontSize: '1.1rem',
             borderRadius: '6px',
             cursor: 'pointer'
         }
@@ -195,7 +197,7 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
 
                 {!files.length ? (
                     <>
-                        <p style={{ color: 'var(--muted-text)', marginBottom: '24px', fontSize: '0.95rem' }}>
+                        <p style={{ color: 'var(--muted-text)', marginBottom: '24px', fontSize: '1.1rem' }}>
                             Select one or more Todoist CSV export files. Each file will be imported as a separate project.
                         </p>
                         <div
@@ -205,8 +207,8 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
                             onMouseOut={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
                         >
                             <FileText size={48} style={{ color: 'var(--muted-text)', marginBottom: '12px' }} />
-                            <div style={{ fontWeight: '600', marginBottom: '4px' }}>Choose CSV Files</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>or drag and drop them here</div>
+                            <div style={{ fontWeight: '600', marginBottom: '4px', fontSize: '1.1rem' }}>Choose CSV Files</div>
+                            <div style={{ fontSize: '1rem', color: 'var(--muted-text)' }}>or drag and drop them here</div>
                         </div>
                         <input
                             type="file"
@@ -217,7 +219,7 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
                             onChange={handleFileChange}
                         />
                         {error && (
-                            <div style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', marginTop: '12px' }}>
+                            <div style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', marginTop: '12px' }}>
                                 <AlertCircle size={16} />
                                 {error}
                             </div>
@@ -233,8 +235,8 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
                             {files.map((project, idx) => (
                                 <div key={idx} style={styles.fileItem}>
                                     <div>
-                                        <div style={{ fontWeight: '500', fontSize: '0.95rem' }}>{project.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>{project.tasks.length} tasks</div>
+                                        <div style={{ fontWeight: '500', fontSize: '1.1rem' }}>{project.name}</div>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>{project.tasks.length} tasks</div>
                                     </div>
                                 </div>
                             ))}
@@ -252,7 +254,7 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
                         </button>
                         <button
                             onClick={() => setFiles([])}
-                            style={{ ...styles.btnReset, color: 'var(--muted-text)', fontSize: '0.85rem', marginTop: '12px', width: '100%' }}
+                            style={{ ...styles.btnReset, color: 'var(--muted-text)', fontSize: '1.1rem', marginTop: '12px', width: '100%' }}
                         >
                             Select different files
                         </button>

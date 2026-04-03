@@ -13,7 +13,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
             boxSizing: 'border-box'
         },
         taskCounter: {
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             opacity: 0.8,
             color: 'var(--muted-text)',
             margin: '0 auto'

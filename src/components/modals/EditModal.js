@@ -48,8 +48,8 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
         },
         select: {
             width: '100%',
-            padding: '6px',
-            fontSize: '1rem',
+            padding: '8px',
+            fontSize: '1.1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '4px',
             marginBottom: '12px',
@@ -78,7 +78,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 />
 
                 <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Priority</label>
+                    <label style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Priority</label>
                     <select
                         value={editingTask.priority}
                         onChange={(e) => setEditingTask({ ...editingTask, priority: parseInt(e.target.value) })}
@@ -91,7 +91,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 </div>
 
                 <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Project</label>
+                    <label style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Project</label>
                     <select
                         value={editingTask.projectId || 'general'}
                         onChange={(e) => setEditingTask({ ...editingTask, projectId: e.target.value })}
@@ -104,13 +104,13 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 </div>
 
                 <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Notes</label>
+                    <label style={{ fontSize: '1rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Notes</label>
                     <textarea
                         value={editingTask.notes || ''}
                         onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                         onInput={handleInput}
                         placeholder="Add notes or descriptions here..."
-                        style={{ ...styles.textarea, minHeight: '80px', fontSize: '0.95rem' }}
+                        style={{ ...styles.textarea, minHeight: '80px', fontSize: '1.1rem' }}
                         maxLength={MAX_NOTES_LENGTH}
                         ref={(textarea) => {
                             if (textarea) {
@@ -119,12 +119,12 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                             }
                         }}
                     />
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', textAlign: 'right', marginTop: '-8px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#6b7280', textAlign: 'right', marginTop: '-8px', marginBottom: '12px' }}>
                         {(editingTask.notes || '').length}/{MAX_NOTES_LENGTH}
                     </div>
                 </div>
 
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '12px' }}>
+                <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '12px' }}>
                     {editingTask.text.length}/{MAX_TASK_LENGTH}
                 </div>
 
@@ -132,8 +132,8 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                     <button
                         onClick={onClose}
                         style={{
-                            padding: '6px 12px',
-                            fontSize: '1rem',
+                            padding: '8px 16px',
+                            fontSize: '1.1rem',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
@@ -146,8 +146,8 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                     <button
                         onClick={handleSave}
                         style={{
-                            padding: '6px 12px',
-                            fontSize: '1rem',
+                            padding: '8px 16px',
+                            fontSize: '1.1rem',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',

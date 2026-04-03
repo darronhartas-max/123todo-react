@@ -99,7 +99,7 @@ const ManageCategoriesModal = ({ projects, onAdd, onEdit, onDelete, onClose }) =
             border: '1px solid var(--border-color)',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             outline: 'none',
             flex: 1
         },

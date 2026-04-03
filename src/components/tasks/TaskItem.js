@@ -115,7 +115,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         style={{
-                            fontSize: '0.9rem',
+                            fontSize: '1.1rem',
                             color: 'var(--muted-text)',
                             marginTop: '8px',
                             padding: '10px 12px',

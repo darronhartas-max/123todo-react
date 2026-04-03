@@ -37,8 +37,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         const config = PRIORITIES[p];
         const isActive = priority === p;
         return {
-            padding: '7px 4px',
-            fontSize: '0.7rem',
+            padding: '8px 4px',
+            fontSize: '0.9rem',
             fontWeight: '700',
             border: '2px solid',
             borderRadius: '5px',
@@ -83,8 +83,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             outline: 'none'
         },
         projectSelect: {
-            padding: '4px 8px',
-            fontSize: '0.8rem',
+            padding: '6px 8px',
+            fontSize: '1rem',
             borderRadius: '6px',
             border: '1px solid var(--border-color)',
             background: 'var(--bg-color)',
@@ -121,7 +121,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '4px',
-                                fontSize: '0.75rem',
+                                fontSize: '0.9rem',
                                 fontWeight: '600',
                                 padding: '4px 8px',
                                 borderRadius: '4px',
@@ -133,7 +133,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         </button>
                     )}
                     <div style={{
-                        fontSize: '0.75rem',
+                        fontSize: '0.85rem',
                         color: '#6b7280',
                         fontWeight: '500'
                     }}>
@@ -166,14 +166,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         style={{
                             ...styles.taskInput,
                             height: '80px',
-                            fontSize: '0.95rem',
+                            fontSize: '1.1rem',
                             borderColor: 'var(--border-color)',
                             overflowY: 'auto'
                         }}
                         maxLength={MAX_NOTES_LENGTH}
                     />
                     <div style={{
-                        fontSize: '0.7rem',
+                        fontSize: '0.85rem',
                         color: '#6b7280',
                         textAlign: 'right',
                         marginTop: '2px'
@@ -208,7 +208,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         border: '2px solid #059669',
                         borderRadius: '6px',
                         cursor: 'pointer',
-                        fontSize: '0.75rem',
+                        fontSize: '1rem',
                         fontWeight: '800',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',

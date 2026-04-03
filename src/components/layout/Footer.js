@@ -4,10 +4,10 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.3.0' })
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '16px 16px 40px 16px',
+            padding: '30px 20px 60px 20px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             borderTop: '1px solid var(--border-color)',
             color: 'var(--muted-text)'
         },
@@ -16,10 +16,10 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.3.0' })
             border: '1px solid var(--border-color)',
             color: 'var(--text-color)',
             cursor: 'pointer',
-            fontSize: '0.85rem',
+            fontSize: '1rem',
             margin: '0 8px',
             fontWeight: '700',
-            padding: '6px 14px',
+            padding: '8px 16px',
             borderRadius: '6px',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
@@ -33,14 +33,13 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.3.0' })
             <div>
                 <button onClick={onExport} style={styles.footerButton}>Export</button>
                 <button onClick={onImportClick} style={styles.footerButton}>Import</button>
-                <button onClick={onTodoistImport} style={{ ...styles.footerButton, borderColor: '#e44332', color: '#e44332' }}>Todoist Import</button>
             </div>
 
-            <div style={{ fontSize: '0.8rem', margin: '8px 0', opacity: 0.8 }}>
+            <div style={{ fontSize: '0.9rem', margin: '8px 0', opacity: 0.8 }}>
                 Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
             </div>
 
-            <div style={{ marginTop: '8px', fontSize: '0.9rem' }}>
+            <div style={{ marginTop: '8px', fontSize: '1rem' }}>
                 <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', marginRight: '20px' }}>
                     Terms of Service
                 </a>

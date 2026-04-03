@@ -13,6 +13,7 @@ import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
+import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -42,6 +43,7 @@ const TodoApp = () => {
   const [currentProjectId, setCurrentProjectId] = useState('all');
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [showTodoistImport, setShowTodoistImport] = useState(false);
+  const [showImportSelection, setShowImportSelection] = useState(false);
 
   // Filtering
   const filteredBySearch = (list) => list.filter(t =>
@@ -214,7 +216,7 @@ const TodoApp = () => {
       background: 'transparent',
       border: 'none',
       cursor: 'pointer',
-      fontSize: '0.8rem',
+      fontSize: '1.1rem',
       fontWeight: '600',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',
@@ -373,8 +375,7 @@ const TodoApp = () => {
 
         <Footer
           onExport={handleExport}
-          onImportClick={() => document.getElementById('fileInput').click()}
-          onTodoistImport={() => setShowTodoistImport(true)}
+          onImportClick={() => setShowImportSelection(true)}
         />
         <input
           type="file"
@@ -414,6 +415,14 @@ const TodoApp = () => {
           projects={projects}
           onClose={() => setShowTodoistImport(false)}
           onImport={handleTodoistImportData}
+        />
+      )}
+
+      {showImportSelection && (
+        <ImportSelectionModal
+          onJSONImport={() => document.getElementById('fileInput').click()}
+          onTodoistImport={() => setShowTodoistImport(true)}
+          onClose={() => setShowImportSelection(false)}
         />
       )}
     </div>

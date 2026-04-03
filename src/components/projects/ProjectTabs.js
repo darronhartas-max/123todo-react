@@ -44,9 +44,9 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             alignItems: 'center'
         },
         tab: (isActive, color) => ({
-            padding: '5px 10px',
+            padding: '6px 12px',
             borderRadius: '16px',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             fontWeight: '600',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
@@ -81,7 +81,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             fontWeight: '600'
         },
 
@@ -101,7 +101,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             border: '1px solid var(--border-color)',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            fontSize: '0.9rem',
+            fontSize: '1.1rem',
             outline: 'none',
             flex: 1
         },
@@ -119,7 +119,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             border: '1px solid var(--border-color)',
             background: 'var(--bg-color)',
             color: 'var(--text-color)',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             fontWeight: '600',
             appearance: 'none',
             cursor: 'pointer',
@@ -157,7 +157,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                 {useDropdown ? (
                     <>
                         <div style={styles.dropdownContainer}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>CATEGORY:</span>
+                            <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>CATEGORY:</span>
                             <select
                                 style={styles.select}
                                 value={currentProjectId}

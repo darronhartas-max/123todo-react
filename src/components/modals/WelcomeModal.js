@@ -23,7 +23,7 @@ const WelcomeModal = ({ onAccept }) => {
                 <h2 style={{ margin: '0 0 20px 0', color: '#1f2937', fontSize: '1.5rem', fontWeight: '700' }}>
                     Welcome to 123 To Do!
                 </h2>
-                <div style={{ margin: '0 0 24px 0', color: '#6b7280', fontSize: '1rem' }}>
+                <div style={{ margin: '0 0 24px 0', color: '#6b7280', fontSize: '1.1rem' }}>
                     A sophisticated task management app with offline support
                 </div>
 
@@ -33,10 +33,10 @@ const WelcomeModal = ({ onAccept }) => {
                     borderRadius: '8px',
                     padding: '16px',
                     margin: '16px 0',
-                    fontSize: '0.85rem',
+                    fontSize: '1rem',
                     textAlign: 'left'
                 }}>
-                    <h4 style={{ margin: '0 0 12px 0', color: 'var(--accent-color)', fontSize: '0.9rem' }}>
+                    <h4 style={{ margin: '0 0 12px 0', color: 'var(--accent-color)', fontSize: '1.1rem' }}>
                         For mobile use - Install as Home Screen App
                     </h4>
                     <div style={{ marginBottom: '12px' }}>
@@ -65,10 +65,10 @@ const WelcomeModal = ({ onAccept }) => {
                     padding: '20px',
                     margin: '20px 0',
                     textAlign: 'left',
-                    fontSize: '0.85rem',
+                    fontSize: '1rem',
                     lineHeight: '1.5'
                 }}>
-                    <h4 style={{ margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '0.9rem', fontWeight: '600' }}>
+                    <h4 style={{ margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '1.1rem', fontWeight: '600' }}>
                         🛡️ Important Notice - Terms of Use
                     </h4>
                     <p style={{ margin: '0 0 8px 0', color: 'var(--muted-text)' }}>
@@ -92,7 +92,7 @@ const WelcomeModal = ({ onAccept }) => {
                             padding: '12px 24px',
                             border: '1px solid var(--border-color)',
                             borderRadius: '8px',
-                            fontSize: '0.9rem',
+                            fontSize: '1.1rem',
                             fontWeight: '600',
                             cursor: 'pointer',
                             background: 'var(--item-bg)',
@@ -107,7 +107,7 @@ const WelcomeModal = ({ onAccept }) => {
                             padding: '12px 24px',
                             border: 'none',
                             borderRadius: '8px',
-                            fontSize: '0.9rem',
+                            fontSize: '1.1rem',
                             fontWeight: '600',
                             cursor: 'pointer',
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

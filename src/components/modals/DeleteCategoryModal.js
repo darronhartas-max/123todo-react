@@ -23,14 +23,14 @@ const DeleteCategoryModal = ({ category, projects, taskCount, onConfirm, onClose
             color: '#dc2626'
         },
         text: {
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             lineHeight: '1.5',
             marginBottom: '16px',
             color: 'var(--text-color)'
         },
         label: {
             display: 'block',
-            fontSize: '0.85rem',
+            fontSize: '1rem',
             fontWeight: '600',
             marginBottom: '6px',
             color: 'var(--muted-text)'
@@ -38,7 +38,7 @@ const DeleteCategoryModal = ({ category, projects, taskCount, onConfirm, onClose
         select: {
             width: '100%',
             padding: '10px',
-            fontSize: '1rem',
+            fontSize: '1.1rem',
             border: '1.5px solid var(--border-color)',
             borderRadius: '8px',
             marginBottom: '20px',
@@ -53,8 +53,8 @@ const DeleteCategoryModal = ({ category, projects, taskCount, onConfirm, onClose
             gap: '10px'
         },
         button: (isDelete) => ({
-            padding: '8px 16px',
-            fontSize: '0.9rem',
+            padding: '10px 20px',
+            fontSize: '1.1rem',
             fontWeight: '600',
             border: 'none',
             borderRadius: '6px',
