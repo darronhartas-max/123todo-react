@@ -78,6 +78,30 @@ export const useTasks = () => {
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
         localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
+
+        // SHADOW BACKUP STRATEGY: 
+        // Automatically create an internal snapshot every 24 hours
+        // This acts as a 'last known good state' internal to the browser.
+        const lastShadow = localStorage.getItem(STORAGE_KEYS.LAST_SHADOW_TIME);
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (!lastShadow || (now - parseInt(lastShadow)) > oneDay) {
+            const snapshot = {
+                tasks,
+                archived,
+                projects,
+                counter,
+                timestamp: now
+            };
+            try {
+                localStorage.setItem(STORAGE_KEYS.SHADOW_BACKUP, JSON.stringify(snapshot));
+                localStorage.setItem(STORAGE_KEYS.LAST_SHADOW_TIME, now.toString());
+                console.log('📦 Shadow backup created successfully.');
+            } catch (err) {
+                console.warn('⚠️ Could not save shadow backup (likely storage quota):', err);
+            }
+        }
     }, [tasks, archived, projects, counter]);
 
     const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
@@ -185,7 +209,36 @@ export const useTasks = () => {
         setArchived(data.archived || []);
         setProjects(data.projects || DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
         setCounter(data.counter || 0);
+
+        // Also update shadow backup upon successful manual import
+        try {
+            const now = Date.now();
+            const snapshot = {
+                tasks: data.tasks || [],
+                archived: data.archived || [],
+                projects: data.projects || [],
+                counter: data.counter || 0,
+                timestamp: now
+            };
+            localStorage.setItem(STORAGE_KEYS.SHADOW_BACKUP, JSON.stringify(snapshot));
+            localStorage.setItem(STORAGE_KEYS.LAST_SHADOW_TIME, now.toString());
+        } catch (e) {
+            console.error('Shadow update on import failed:', e);
+        }
     }, []);
+
+    const recoverFromShadow = useCallback(() => {
+        const shadowRaw = localStorage.getItem(STORAGE_KEYS.SHADOW_BACKUP);
+        if (!shadowRaw) return false;
+        try {
+            const data = JSON.parse(shadowRaw);
+            importData(data);
+            return true;
+        } catch (e) {
+            console.error('Failed to recover from shadow backup:', e);
+            return false;
+        }
+    }, [importData]);
 
     const bulkAddTasks = useCallback((tasksToAdd) => {
         if (tasksToAdd.length === 0) return;
@@ -221,6 +274,7 @@ export const useTasks = () => {
         updateProject,
         deleteProject,
         importData,
-        bulkAddTasks
+        bulkAddTasks,
+        recoverFromShadow
     };
 };
