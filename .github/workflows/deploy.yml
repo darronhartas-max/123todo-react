@@ -54,6 +54,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /home/debian/wordpress-docker
+            cp todo-app/Dockerfile Dockerfile.todo
             docker compose build --no-cache todo-app
             docker compose up -d todo-app
             docker network connect traefik_proxy todo-app || true
