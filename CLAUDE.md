@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v1.1.0
+- **Version**: v1.4.2
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21)
 - **Data Storage**: Browser localStorage (client-side only)
@@ -59,7 +59,7 @@
 │   ├── utils/                 # Shared constants & global styles
 │   ├── App.js                 # Orchestration component (Cleaned)
 │   └── index.js               # Entry point
-└── package.json               # v1.1.0
+└── package.json               # v1.4.2
 ```
 
 ## Deployment Process - VERIFIED WORKING (2025-10-10)
@@ -135,7 +135,7 @@
 
 ---
 
-**Last Updated**: 2026-02-21 (v1.1.0 Refactor - Project Layer & UI Scale)
+**Last Updated**: 2026-07-06 (v1.4.2 - Global Text Scale, Delayed Completion & Wider Modal)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2026
 **Live URLs**:
@@ -143,6 +143,13 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v1.4.2 (2026-07-06)
+- **UI**: Scaled up all text sizes by 1pt globally via base HTML font-size of 17px.
+- **UI**: Widened edit task modal to 500px (max-width 95% on mobile) for better screen utilization.
+- **UI**: Enlarged social share footer icons by 20% (to 22px) and added line break spacing.
+- **UX**: Replaced completion circle with checkbox; added 2s archive delay with cancel capability.
+- **UX**: Added centered modal confirmation toast ("Moved to Archive") displaying for 2 seconds.
 
 ### v1.1.0 (2026-02-21)
 - **Feature**: Implemented **Project Layer** with custom names and 7-color palette

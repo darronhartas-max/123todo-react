@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 1.4.0 | © Darron Hartas 2026
+Version 1.4.2 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,14 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v1.4.0 (Current)
+### v1.4.2 (Current)
+- **Global Text Scaling**: Increased all text sizes by 1pt globally via a base HTML font-size of 17px.
+- **Wider Task Editor**: Widened the edit modal to 500px (max-width 95% on mobile) to utilize screen real estate better.
+- **Checkbox Completion & Delayed Archiving**: Replaced the circle complete button with a checkbox (Square/CheckSquare), which ticks green and waits 2 seconds before archiving, giving the user a chance to undo.
+- **Archive Modal Confirmation**: Shows a centered "Moved to Archive" notification toast for 2 seconds after archiving a task.
+- **Social Sharing Spacing & Icon Size**: Enlarged share icons by 20% to 22px and added breathing space in the footer.
+
+### v1.4.0
 - **Todoist CSV Import**: New robust importer for Todoist projects with multi-file support and automatic mapping.
 - **Task Notes & Descriptions**: Added support for long-form task notes (up to 2,048 chars) with a toggleable UI.
 - **Atomic ID Generation**: Completely refactored task ID system to be atomic, preventing collisions during bulk operations.
