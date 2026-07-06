@@ -156,14 +156,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                             style={{ ...styles.actionBtn, color: '#3b82f6' }}
                             title="Restore Task"
                         >
-                            <RotateCcw size={16} />
+                            <RotateCcw size={20} />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
                             style={{ ...styles.actionBtn, color: '#dc2626' }}
                             title="Delete Task"
                         >
-                            <Trash2 size={16} />
+                            <Trash2 size={20} />
                         </button>
                     </>
                 ) : (
