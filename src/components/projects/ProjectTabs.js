@@ -14,6 +14,9 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         ...projects
     ].filter(Boolean);
 
+    const activeProject = allProjects.find(p => p.id === currentProjectId) || allProjects[0];
+    const activeColor = activeProject?.color || '#6b7280';
+
 
 
     const startEdit = (e, project) => {
@@ -112,19 +115,20 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             alignItems: 'center',
             gap: '8px'
         },
-        select: {
+        select: (color) => ({
             flex: 1,
             padding: '8px 36px 8px 12px',
             borderRadius: '8px',
-            border: '1px solid var(--border-color)',
+            border: `1.5px solid ${color}`,
             background: 'var(--bg-color)',
-            color: 'var(--text-color)',
+            color: color,
             fontSize: '1.1rem',
             fontWeight: '600',
             appearance: 'none',
             cursor: 'pointer',
-            outline: 'none'
-        },
+            outline: 'none',
+            transition: 'all 0.2s ease'
+        }),
         colorBtn: (color, isSelected) => ({
             width: '24px',
             height: '24px',
@@ -158,18 +162,26 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                     <>
                         <div style={styles.dropdownContainer}>
                             <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>CATEGORY:</span>
+                            <div style={{
+                                width: '6px',
+                                height: '24px',
+                                borderRadius: '3px',
+                                backgroundColor: activeColor,
+                                flexShrink: 0,
+                                transition: 'background-color 0.2s ease'
+                            }} />
                             <select
-                                style={styles.select}
+                                style={styles.select(activeColor)}
                                 value={currentProjectId}
                                 onChange={(e) => onSelect(e.target.value)}
                             >
                                 {allProjects.map(p => (
-                                    <option key={p.id} value={p.id}>
+                                    <option key={p.id} value={p.id} style={{ color: p.color, background: 'var(--surface-color)' }}>
                                         {p.name}
                                     </option>
                                 ))}
                             </select>
-                            <ChevronDown size={18} style={{ position: 'absolute', right: '55px', pointerEvents: 'none', color: 'var(--muted-text)' }} />
+                            <ChevronDown size={18} style={{ position: 'absolute', right: '55px', pointerEvents: 'none', color: activeColor, transition: 'color 0.2s ease' }} />
                             <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
                                 <Settings size={16} />
                             </button>
