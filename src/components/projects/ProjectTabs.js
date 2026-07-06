@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
 import { PROJECT_COLORS, DEFAULT_PROJECTS } from '../../utils/constants';
-import ManageCategoriesModal from '../modals/ManageCategoriesModal';
+import ManageProjectsModal from '../modals/ManageProjectsModal';
 
 const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, onDelete, showSearch, onToggleSearch }) => {
     const [editingId, setEditingId] = useState(null);
@@ -183,7 +183,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
         })
     };
 
-    // Threshold for dropdown: if more than 7 categories
+    // Threshold for dropdown: if more than 7 projects
     const useDropdown = allProjects.length > 7;
 
     return (
@@ -204,7 +204,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                 {useDropdown ? (
                     <>
                         <div style={styles.dropdownContainer}>
-                            <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>CATEGORY:</span>
+                            <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>PROJECT:</span>
                             <div style={{
                                 width: '6px',
                                 height: '24px',
@@ -260,7 +260,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                     </>
                                 )}
                             </div>
-                            <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
+                            <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Projects">
                                 <Settings size={20} />
                             </button>
                         </div>
@@ -291,7 +291,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                 )}
                             </div>
                         ))}
-                        <button onClick={() => setShowManage(true)} style={{ ...styles.addBtn, padding: '5px' }} title="Manage Categories">
+                        <button onClick={() => setShowManage(true)} style={{ ...styles.addBtn, padding: '5px' }} title="Manage Projects">
                             <Settings size={22} />
                         </button>
                     </>
@@ -299,7 +299,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             </div>
 
             {showManage && (
-                <ManageCategoriesModal
+                <ManageProjectsModal
                     projects={projects}
                     onAdd={onAdd}
                     onEdit={(p) => {

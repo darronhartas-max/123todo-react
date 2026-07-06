@@ -8,7 +8,7 @@ import AddTask from './components/tasks/AddTask';
 import PrioritySection from './components/tasks/PrioritySection';
 import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
-import DeleteCategoryModal from './components/modals/DeleteCategoryModal';
+import DeleteProjectModal from './components/modals/DeleteProjectModal';
 import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
@@ -21,7 +21,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/l
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS } from './utils/constants';
 
 const TodoApp = () => {
   const {
@@ -50,7 +50,7 @@ const TodoApp = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState('all');
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [showTodoistImport, setShowTodoistImport] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
   const [showArchiveToast, setShowArchiveToast] = useState(false);
@@ -209,18 +209,18 @@ const TodoApp = () => {
     }
   };
 
-  const handleDeleteCategoryRequest = (id) => {
-    const category = projects.find(p => p.id === id);
-    if (!category) return;
-    setCategoryToDelete(category);
+  const handleDeleteProjectRequest = (id) => {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    setProjectToDelete(project);
   };
 
-  const handleDeleteCategoryConfirm = (id, targetProjectId) => {
+  const handleDeleteProjectConfirm = (id, targetProjectId) => {
     deleteProject(id, targetProjectId);
     if (currentProjectId === id) {
       setCurrentProjectId(targetProjectId || 'all');
     }
-    setCategoryToDelete(null);
+    setProjectToDelete(null);
   };
 
   const handleApplyUpdate = () => {
@@ -327,18 +327,18 @@ const TodoApp = () => {
           onSelect={setCurrentProjectId}
           onAdd={addProject}
           onUpdate={updateProject}
-          onDelete={handleDeleteCategoryRequest}
+          onDelete={handleDeleteProjectRequest}
           showSearch={showSearch}
           onToggleSearch={() => setShowSearch(!showSearch)}
         />
 
-        {categoryToDelete && (
-          <DeleteCategoryModal
-            category={categoryToDelete}
+        {projectToDelete && (
+          <DeleteProjectModal
+            project={projectToDelete}
             projects={projects}
-            taskCount={tasks.filter(t => t.projectId === categoryToDelete.id).length + archived.filter(t => t.projectId === categoryToDelete.id).length}
-            onConfirm={handleDeleteCategoryConfirm}
-            onClose={() => setCategoryToDelete(null)}
+            taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
+            onConfirm={handleDeleteProjectConfirm}
+            onClose={() => setProjectToDelete(null)}
           />
         )}
 
@@ -348,7 +348,7 @@ const TodoApp = () => {
               key={priority}
               priority={priority}
               tasks={filteredTasks}
-              projects={projects}
+              projects={[...DEFAULT_PROJECTS, ...projects]}
               onComplete={handleCompleteTask}
               onEdit={setEditingTask}
               handleDragStart={handleDragStart}
@@ -362,7 +362,7 @@ const TodoApp = () => {
 
           {filteredTasks.length === 0 && (
             <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
-              {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this category.`)}
+              {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
             </div>
           )}
         </div>
@@ -379,7 +379,7 @@ const TodoApp = () => {
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 <AnimatePresence mode="popLayout">
                   {onHoldTasksFiltered.map(task => {
-                    const project = projects.find(p => p.id === task.projectId);
+                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
                     return (
                       <TaskItem
                         key={task.id}
@@ -407,7 +407,7 @@ const TodoApp = () => {
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
               <AnimatePresence mode="popLayout">
                 {filteredArchived.map(task => {
-                  const project = projects.find(p => p.id === task.projectId);
+                  const project = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
                   return (
                     <TaskItem
                       key={task.id}

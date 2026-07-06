@@ -6,8 +6,8 @@ const RestoreShadowModal = ({ backupData, onConfirm, onClose }) => {
     const dateStr = new Date(backupData.timestamp).toLocaleString();
     const activeCount = backupData.tasks?.length || 0;
     const archivedCount = backupData.archived?.length || 0;
-    const categoriesCount = backupData.projects?.length || 0;
-    const categoriesList = backupData.projects?.map(p => p.name).join(', ') || 'General';
+    const projectsCount = backupData.projects?.length || 0;
+    const projectsList = backupData.projects?.map(p => p.name).join(', ') || 'General';
 
     const styles = {
         modalContent: {
@@ -150,7 +150,7 @@ const RestoreShadowModal = ({ backupData, onConfirm, onClose }) => {
                 <div style={styles.warningBanner}>
                     <AlertTriangle size={24} style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                        <strong>Warning:</strong> This will overwrite all of your current tasks, archived entries, and categories with the backup data.
+                        <strong>Warning:</strong> This will overwrite all of your current tasks, archived entries, and projects with the backup data.
                     </div>
                 </div>
 
@@ -172,14 +172,14 @@ const RestoreShadowModal = ({ backupData, onConfirm, onClose }) => {
                     </div>
                     <div style={styles.metaCard}>
                         <Layers size={18} style={{ color: '#8b5cf6' }} />
-                        <span style={styles.metaVal}>{categoriesCount}</span>
-                        <span style={styles.metaLbl}>Categories</span>
+                        <span style={styles.metaVal}>{projectsCount}</span>
+                        <span style={styles.metaLbl}>Projects</span>
                     </div>
                 </div>
 
-                {categoriesCount > 0 && (
+                {projectsCount > 0 && (
                     <div style={{ fontSize: '0.95rem', color: 'var(--muted-text)', marginBottom: '16px', textAlign: 'left', lineHeight: '1.4' }}>
-                        📂 <strong>Categories:</strong> {categoriesList}
+                        📂 <strong>Projects:</strong> {projectsList}
                     </div>
                 )}
 
