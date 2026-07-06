@@ -3,7 +3,7 @@ import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare } from 'lucide-reac
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor, isDragging, isDragOver }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
@@ -43,10 +43,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
             marginBottom: '4px',
-            transition: 'background 0.2s ease, border-color 0.2s ease',
+            transition: 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
             position: 'relative',
             alignItems: 'flex-start',
-            paddingTop: '12px'
+            paddingTop: '12px',
+            opacity: isDragging ? 0.35 : 1,
+            border: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
+            boxShadow: isDragging ? 'none' : 'none'
         },
         taskPriorityDot: {
             width: '8px',
@@ -100,6 +103,31 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             onMouseEnter={() => !isArchived && setIsHovered(true)}
             onMouseLeave={() => !isArchived && setIsHovered(false)}
         >
+            {isDragOver && (
+                <div style={{
+                    position: 'absolute',
+                    top: '-4px',
+                    left: '8px',
+                    right: '8px',
+                    height: '3px',
+                    background: 'var(--accent-color)',
+                    borderRadius: '1.5px',
+                    boxShadow: '0 0 8px var(--accent-color)',
+                    zIndex: 100,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}>
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: 'var(--accent-color)',
+                        marginLeft: '-4px',
+                        boxShadow: '0 0 6px var(--accent-color)'
+                    }} />
+                </div>
+            )}
             <div style={styles.taskPriorityDot}></div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>

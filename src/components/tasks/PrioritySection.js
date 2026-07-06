@@ -12,7 +12,9 @@ const PrioritySection = ({
     handleDragStart,
     handleDragOver,
     handleDrop,
-    handleDragEnd
+    handleDragEnd,
+    draggedId,
+    dragOverId
 }) => {
     const config = PRIORITIES[priority];
     const sectionTasks = tasks.filter(t => t.priority === priority);
@@ -44,9 +46,11 @@ const PrioritySection = ({
                                 projectColor={project?.color}
                                 onComplete={onComplete}
                                 onEdit={onEdit}
+                                isDragging={draggedId === task.id}
+                                isDragOver={dragOverId === task.id}
                                 dragHandlers={{
                                     onDragStart: (e) => handleDragStart(e, task.id),
-                                    onDragOver: handleDragOver,
+                                    onDragOver: (e) => handleDragOver(e, task.id),
                                     onDrop: (e) => handleDrop(e, task.id),
                                     onDragEnd: handleDragEnd
                                 }}

@@ -40,6 +40,7 @@ const TodoApp = () => {
   const [showOnHold, setShowOnHold] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState('all');
@@ -109,13 +110,15 @@ const TodoApp = () => {
   // Drag and drop handlers
   const handleDragStart = (e, taskId) => {
     setDraggedId(taskId);
-    e.currentTarget.style.opacity = '0.5';
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e, targetId) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    if (draggedId && draggedId !== targetId) {
+      setDragOverId(targetId);
+    }
   };
 
   const handleDrop = (e, targetId) => {
@@ -123,11 +126,12 @@ const TodoApp = () => {
     if (draggedId && draggedId !== targetId) {
       reorderTasks(draggedId, targetId);
     }
+    setDragOverId(null);
   };
 
   const handleDragEnd = (e) => {
-    e.currentTarget.style.opacity = '1';
     setDraggedId(null);
+    setDragOverId(null);
   };
 
   const handleExport = () => {
@@ -344,6 +348,8 @@ const TodoApp = () => {
               handleDragOver={handleDragOver}
               handleDrop={handleDrop}
               handleDragEnd={handleDragEnd}
+              draggedId={draggedId}
+              dragOverId={dragOverId}
             />
           ))}
 
