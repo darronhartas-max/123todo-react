@@ -46,7 +46,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
                 />
             </a>
             <div style={styles.taskCounter}>
-                {taskCount} task{taskCount !== 1 ? 's' : ''}
+                {taskCount} active
             </div>
             <button
                 onClick={onToggleAdd}
