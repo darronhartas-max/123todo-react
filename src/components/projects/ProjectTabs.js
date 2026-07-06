@@ -261,7 +261,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                 )}
                             </div>
                             <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
-                                <Settings size={16} />
+                                <Settings size={20} />
                             </button>
                         </div>
                     </>
@@ -292,7 +292,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                             </div>
                         ))}
                         <button onClick={() => setShowManage(true)} style={{ ...styles.addBtn, padding: '5px' }} title="Manage Categories">
-                            <Settings size={18} />
+                            <Settings size={22} />
                         </button>
                     </>
                 )}
