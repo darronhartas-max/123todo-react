@@ -1,8 +1,8 @@
 import React from 'react';
 import { COMMON_STYLES } from '../../utils/styles';
-import { FileJson, FileType, X } from 'lucide-react';
+import { FileJson, FileType, X, Database } from 'lucide-react';
 
-const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onClose }) => {
+const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onRestoreShadow, onClose }) => {
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
@@ -115,6 +115,30 @@ const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onClose }) => {
                         <div>
                             <div style={{ fontWeight: '700' }}>Todoist Export</div>
                             <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>Import from Todoist .csv files</div>
+                        </div>
+                    </button>
+
+                    <button 
+                        style={styles.optionBtn}
+                        onClick={() => {
+                            onRestoreShadow();
+                            onClose();
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--accent-color)';
+                            e.currentTarget.style.background = 'var(--accent-bg)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--border-color)';
+                            e.currentTarget.style.background = 'var(--bg-color)';
+                        }}
+                    >
+                        <div style={{ background: 'rgba(37, 99, 235, 0.1)', padding: '10px', borderRadius: '8px', color: 'var(--accent-color)' }}>
+                            <Database size={24} />
+                        </div>
+                        <div>
+                            <div style={{ fontWeight: '700' }}>Shadow Backup</div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>Restore from the last 24h auto-snapshot</div>
                         </div>
                     </button>
                 </div>

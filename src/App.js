@@ -15,6 +15,7 @@ import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
+import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -46,6 +47,33 @@ const TodoApp = () => {
   const [showTodoistImport, setShowTodoistImport] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
   const [showArchiveToast, setShowArchiveToast] = useState(false);
+  const [shadowBackupData, setShadowBackupData] = useState(null);
+  const [showRestoreToast, setShowRestoreToast] = useState(false);
+
+  const handleOpenRestoreShadow = () => {
+    const shadowRaw = localStorage.getItem('123TodoShadowBackup');
+    if (!shadowRaw) {
+      alert("No shadow backup found on this browser.");
+      return;
+    }
+    try {
+      const data = JSON.parse(shadowRaw);
+      setShadowBackupData(data);
+    } catch (e) {
+      alert("Shadow backup is corrupted or invalid.");
+    }
+  };
+
+  const handleConfirmRestoreShadow = () => {
+    if (shadowBackupData) {
+      importData(shadowBackupData);
+      setShadowBackupData(null);
+      setShowRestoreToast(true);
+      setTimeout(() => {
+        setShowRestoreToast(false);
+      }, 2000);
+    }
+  };
 
   const handleCompleteTask = (id) => {
     completeTask(id);
@@ -432,7 +460,16 @@ const TodoApp = () => {
         <ImportSelectionModal
           onJSONImport={() => document.getElementById('fileInput').click()}
           onTodoistImport={() => setShowTodoistImport(true)}
+          onRestoreShadow={handleOpenRestoreShadow}
           onClose={() => setShowImportSelection(false)}
+        />
+      )}
+
+      {shadowBackupData && (
+        <RestoreShadowModal
+          backupData={shadowBackupData}
+          onConfirm={handleConfirmRestoreShadow}
+          onClose={() => setShadowBackupData(null)}
         />
       )}
 
@@ -482,6 +519,57 @@ const TodoApp = () => {
                 <Check size={18} strokeWidth={3} />
               </div>
               <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>Moved to Archive</span>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRestoreToast && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(1px)',
+            zIndex: 10000,
+            pointerEvents: 'none'
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                background: 'var(--surface-color)',
+                border: '1px solid var(--border-color)',
+                padding: '16px 28px',
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: 'var(--text-color)'
+              }}
+            >
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                borderRadius: '50%',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Check size={18} strokeWidth={3} />
+              </div>
+              <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>Data Restored successfully</span>
             </motion.div>
           </div>
         )}
