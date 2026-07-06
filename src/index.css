@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+html {
+  font-size: 17px; /* Increases default base size to scale all text (using rem) by ~1pt */
+}
+
 :root {
   --bg-color: #fafafa;
   --text-color: #333;

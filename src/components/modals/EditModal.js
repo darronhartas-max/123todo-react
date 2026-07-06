@@ -23,10 +23,10 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
-            padding: '16px',
+            padding: '20px',
             borderRadius: '8px',
-            maxWidth: '90%',
-            width: '320px',
+            maxWidth: '95%',
+            width: '500px',
             boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
             color: 'var(--text-color)'
         },
