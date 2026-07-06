@@ -146,6 +146,12 @@
 
 ### v1.4.3 (2026-07-06)
 - **UI**: Enlarged social share footer icons by another 20% (to 31px).
+- **UI**: Changed header active task counter text from "tasks" to "active" (e.g. "5 active") for clean mobile spacing.
+- **UI**: Replaced native HTML select with a custom React dropdown select, showing a vertical color band next to each category option.
+- **UI**: Increased custom dropdown maxHeight constraint to 480px to display up to 12 categories without scrolling.
+- **UI**: Enlarged Settings icons in category tabs and dropdowns by 20% (to 22px / 20px).
+- **UI**: Enlarged task restore and delete icons in Archive list by 20% (to 20px) for easier tapping.
+- **UI**: Enlarged task Notes expand/collapse button (to 36px) and Plus/Minus icons (by 50% to 21px) to prevent accidental edit triggers.
 - **UX**: Implemented "Restore from Shadow Backup" button in Import options with confirmation/review modal showing data details and active task list preview.
 
 ### v1.4.2 (2026-07-06)

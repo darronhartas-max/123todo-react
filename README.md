@@ -279,6 +279,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 ### v1.4.3 (Current)
 - **Shadow Backup Restore**: Added a "Restore from Shadow Backup" button to the Import options. Users can preview backup details (date, task count, category list, and active task preview) before confirming to overwrite the live data.
 - **Footer Social Icon Enlargement**: Enlarged social share icons by another 20% to 31px for improved visibility and easy touch target selection on mobile devices.
+- **Custom Dropdown Selector**: Replaced the native select component with a custom dropdown select featuring category-coded vertical color bands next to option choices, dynamic active border/text highlights, and click-away dismissal.
+- **Adjusted Select Max Height**: Raised dropdown z-height limit to 480px to display up to 12 categories on-screen without requiring scrolling.
+- **Scaled Touch Targets**: Increased Archive restore/delete icons by 20% (to 20px), Settings buttons by 20% (to 20px/22px), and task Notes expand/collapse button/icons by 50% (to 36px / 21px) to prevent accidental misclicks.
+- **Header Label Adjustment**: Changed header active task count text from "tasks" to "active" (e.g. "5 active") for clean mobile presentation.
 
 ### v1.4.2
 - **Global Text Scaling**: Increased all text sizes by 1pt globally via a base HTML font-size of 17px.
