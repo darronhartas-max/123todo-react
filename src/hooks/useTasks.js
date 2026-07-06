@@ -112,7 +112,7 @@ export const useTasks = () => {
                 console.warn('⚠️ Could not save shadow backup (likely storage quota):', err);
             }
         }
-    }, [tasks, archived, projects, counter]);
+    }, [tasks, archived, projects, counter, isLoaded]);
 
     const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
         if (!text.trim()) return;
