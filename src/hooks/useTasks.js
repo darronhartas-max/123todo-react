@@ -81,20 +81,18 @@ export const useTasks = () => {
     // Save data to localStorage whenever state changes
     useEffect(() => {
         if (!isLoaded) return;
-        
-        const now = Date.now();
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
         localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
-        localStorage.setItem(STORAGE_KEYS.TIMESTAMP, now.toString());
-        setTimestamp(now);
+        localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
 
         // SHADOW BACKUP STRATEGY: 
         // Automatically create an internal snapshot every 24 hours
         // This acts as a 'last known good state' internal to the browser.
         const lastShadow = localStorage.getItem(STORAGE_KEYS.LAST_SHADOW_TIME);
         const oneDay = 24 * 60 * 60 * 1000;
+        const now = Date.now();
 
         if (!lastShadow || (now - parseInt(lastShadow)) > oneDay) {
             const snapshot = {
@@ -129,6 +127,7 @@ export const useTasks = () => {
 
         setCounter(newId);
         setTasks(prev => [newTask, ...prev]);
+        setTimestamp(Date.now());
     }, [counter]);
 
     const completeTask = useCallback((id) => {
@@ -146,10 +145,12 @@ export const useTasks = () => {
             setArchived(arch => [completedTask, ...arch]);
             return newTasks;
         });
+        setTimestamp(Date.now());
     }, []);
 
     const deleteArchivedTask = useCallback((id) => {
         setArchived(prev => prev.filter(t => t.id !== id));
+        setTimestamp(Date.now());
     }, []);
 
     const restoreTask = useCallback((id, priority) => {
@@ -168,12 +169,14 @@ export const useTasks = () => {
             setTasks(current => [restoredTask, ...current]);
             return newArchived;
         });
+        setTimestamp(Date.now());
     }, []);
 
     const updateTask = useCallback((id, updates) => {
         setTasks(prev => prev.map(task =>
             task.id === id ? { ...task, ...updates, isSample: false } : task
         ));
+        setTimestamp(Date.now());
     }, []);
 
     const reorderTasks = useCallback((draggedId, targetId) => {
@@ -189,6 +192,7 @@ export const useTasks = () => {
             }
             return prev;
         });
+        setTimestamp(Date.now());
     }, []);
 
     const addProject = useCallback((name, color) => {
@@ -197,11 +201,13 @@ export const useTasks = () => {
 
         const newProject = { id, name, color };
         setProjects(prev => [...prev, newProject]);
+        setTimestamp(Date.now());
         return id;
     }, [projects]);
 
     const updateProject = useCallback((id, updates) => {
         setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+        setTimestamp(Date.now());
     }, []);
 
     const deleteProject = useCallback((id, targetProjectId = 'general') => {
@@ -210,6 +216,7 @@ export const useTasks = () => {
         // Reset tasks in this project to the target project (defaults to general)
         setTasks(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
         setArchived(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
+        setTimestamp(Date.now());
     }, []);
 
     const importData = useCallback((data) => {
@@ -217,6 +224,7 @@ export const useTasks = () => {
         setArchived(data.archived || []);
         setProjects(data.projects || DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
         setCounter(data.counter || 0);
+        if (data.timestamp) setTimestamp(data.timestamp);
 
         // Also update shadow backup upon successful manual import
         try {
@@ -263,6 +271,7 @@ export const useTasks = () => {
 
         setCounter(currentId);
         setTasks(prev => [...tasksWithIds, ...prev]);
+        setTimestamp(Date.now());
     }, [counter]);
 
     return {
