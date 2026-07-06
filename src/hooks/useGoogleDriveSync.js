@@ -178,6 +178,40 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         }
     }, [localData.timestamp, isAuthed, passphrase, performSync]);
 
+    // Smart Sync: Focus Listener & Gentle Polling
+    useEffect(() => {
+        if (!isAuthed || !passphrase) return;
+
+        let intervalId;
+
+        const startPolling = () => {
+            if (intervalId) clearInterval(intervalId);
+            intervalId = setInterval(() => {
+                // Only poll if the tab is visible
+                if (document.visibilityState === 'visible') {
+                    performSync(false);
+                }
+            }, 60000); // 60 seconds
+        };
+        startPolling();
+
+        const handleFocusOrVisible = () => {
+            if (document.visibilityState === 'visible') {
+                performSync(false);
+                startPolling(); // Reset timer
+            }
+        };
+
+        window.addEventListener('focus', handleFocusOrVisible);
+        document.addEventListener('visibilitychange', handleFocusOrVisible);
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+            window.removeEventListener('focus', handleFocusOrVisible);
+            document.removeEventListener('visibilitychange', handleFocusOrVisible);
+        };
+    }, [isAuthed, passphrase, performSync]);
+
     return {
         isAuthed,
         syncStatus,
