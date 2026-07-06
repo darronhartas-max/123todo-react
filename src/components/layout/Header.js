@@ -21,7 +21,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
         addTaskToggle: {
             background: 'none',
             border: 'none',
-            color: 'var(--accent-color)',
+            color: '#dc2626',
             cursor: 'pointer',
             padding: '4px',
             display: 'flex',
@@ -53,7 +53,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
                 style={styles.addTaskToggle}
                 aria-label={isAddOpen ? "Close add task" : "Open add task"}
             >
-                {isAddOpen ? <MinusCircle size={24} /> : <PlusCircle size={24} />}
+                {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
             </button>
         </header>
     );

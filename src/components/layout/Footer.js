@@ -4,7 +4,7 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.4.2' })
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '30px 20px 60px 20px',
+            padding: '30px 20px 40px 20px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
             fontSize: '1.1rem',
@@ -35,11 +35,11 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.4.2' })
                 <button onClick={onImportClick} style={styles.footerButton}>Import</button>
             </div>
 
+            <br />
+
             <div style={{ fontSize: '0.9rem', margin: '8px 0', opacity: 0.8 }}>
                 Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
             </div>
-
-            <br />
 
             <div style={{ marginTop: '8px', fontSize: '1rem' }}>
                 <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', marginRight: '20px' }}>
