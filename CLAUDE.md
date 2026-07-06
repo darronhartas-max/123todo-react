@@ -4,9 +4,9 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v1.4.3
+- **Version**: v2.0.0
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
-- **State**: Production Refactor Complete (2026-02-21)
+- **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
 - **Git**: Automated backup to GitHub via `post-commit` hook
 - **Live URL**: https://app.123todo.com
@@ -59,7 +59,7 @@
 │   ├── utils/                 # Shared constants & global styles
 │   ├── App.js                 # Orchestration component (Cleaned)
 │   └── index.js               # Entry point
-└── package.json               # v1.4.3
+└── package.json               # v2.0.0
 ```
 
 ## Deployment Process - VERIFIED WORKING (2025-10-10)
@@ -135,7 +135,7 @@
 
 ---
 
-**Last Updated**: 2026-07-06 (v1.4.3 - Social Share & Shadow Restore UI)
+**Last Updated**: 2026-07-06 (v2.0.0 - Google Drive Sync)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2026
 **Live URLs**:
@@ -143,6 +143,13 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.0.0 (2026-07-06)
+- **Feature**: Implemented **Google Drive Sync** for seamless, free, cross-device synchronization.
+- **Security**: Added zero-knowledge AES-256-GCM client-side encryption for user data before upload.
+- **Integration**: Utilized Google Identity Services for OAuth and Google Drive v3 REST API (appDataFolder).
+- **UX**: Persistent authentication state across sessions with silent sign-in.
+- **UX**: Dynamic sync button in footer (green for active, red for inactive, invisible background syncing).
 
 ### v1.4.3 (2026-07-06)
 - **UI**: Enlarged social share footer icons by another 20% (to 31px).

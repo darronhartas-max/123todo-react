@@ -16,14 +16,16 @@ import CongratsModal from './components/modals/CongratsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
+import SyncModal from './components/modals/SyncModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
+import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS } from './utils/constants';
 
 const TodoApp = () => {
   const {
-    tasks, archived, projects, addTask, completeTask, deleteArchivedTask,
+    tasks, archived, projects, counter, timestamp, addTask, completeTask, deleteArchivedTask,
     restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, importData, bulkAddTasks
   } = useTasks();
 
@@ -33,6 +35,10 @@ const TodoApp = () => {
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
     dismissBackupReminder, recordBackup
   } = useAppSystem(archived.length, tasks.length);
+
+  const {
+    isAuthed, syncStatus, passphrase, setPassphrase, signIn, signOut, performSync
+  } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
 
   // UI State
   const [showAddSection, setShowAddSection] = useState(false);
@@ -50,6 +56,7 @@ const TodoApp = () => {
   const [showArchiveToast, setShowArchiveToast] = useState(false);
   const [shadowBackupData, setShadowBackupData] = useState(null);
   const [showRestoreToast, setShowRestoreToast] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
 
   const handleOpenRestoreShadow = () => {
     const shadowRaw = localStorage.getItem('123TodoShadowBackup');
@@ -420,6 +427,9 @@ const TodoApp = () => {
         <Footer
           onExport={handleExport}
           onImportClick={() => setShowImportSelection(true)}
+          onSyncClick={() => setShowSyncModal(true)}
+          syncStatus={syncStatus}
+          isAuthed={isAuthed}
         />
         <input
           type="file"
@@ -478,6 +488,18 @@ const TodoApp = () => {
           onClose={() => setShadowBackupData(null)}
         />
       )}
+
+      <SyncModal
+        isOpen={showSyncModal}
+        onClose={() => setShowSyncModal(false)}
+        isAuthed={isAuthed}
+        syncStatus={syncStatus}
+        passphrase={passphrase}
+        setPassphrase={setPassphrase}
+        signIn={signIn}
+        signOut={signOut}
+        performSync={performSync}
+      />
 
       <AnimatePresence>
         {showArchiveToast && (

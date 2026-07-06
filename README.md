@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 1.4.3 | © Darron Hartas 2026
+Version 2.0.0 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,13 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v1.4.3 (Current)
+### v2.0.0 (Current)
+- **Google Drive Sync**: Seamless, free, cross-device synchronization using Google Identity Services.
+- **Client-Side Encryption**: Zero-knowledge AES-256-GCM encryption ensures data remains completely private.
+- **Silent Authentication**: Persistent, silent sign-in means you stay logged in across sessions.
+- **Invisible Syncing**: Background push/pull architecture ensures your data is always up to date without distracting visual indicators.
+
+### v1.4.3
 - **Shadow Backup Restore**: Added a "Restore from Shadow Backup" button to the Import options. Users can preview backup details (date, task count, category list, and active task preview) before confirming to overwrite the live data.
 - **Footer Social Icon Enlargement**: Enlarged social share icons by another 20% to 31px for improved visibility and easy touch target selection on mobile devices.
 - **Custom Dropdown Selector**: Replaced the native select component with a custom dropdown select featuring category-coded vertical color bands next to option choices, dynamic active border/text highlights, and click-away dismissal.

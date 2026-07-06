@@ -6,6 +6,8 @@ export const useTasks = () => {
     const [archived, setArchived] = useState([]);
     const [projects, setProjects] = useState([]);
     const [counter, setCounter] = useState(0);
+    const [timestamp, setTimestamp] = useState(Date.now());
+    const [isLoaded, setIsLoaded] = useState(false);
 
     const initializeSampleTasks = useCallback(() => {
         const userDataKeys = Object.keys(localStorage).filter(key =>
@@ -60,30 +62,38 @@ export const useTasks = () => {
             }
 
             if (savedCounter) setCounter(parseInt(savedCounter));
+            const savedTimestamp = localStorage.getItem(STORAGE_KEYS.TIMESTAMP);
+            if (savedTimestamp) setTimestamp(parseInt(savedTimestamp));
 
             // Add sample tasks if new user
             if (!savedTasks && !savedArchived) {
                 initializeSampleTasks();
             }
+            setIsLoaded(true);
         } catch (error) {
             console.error('Error loading data from localStorage:', error);
             initializeSampleTasks();
             setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
+            setIsLoaded(true);
         }
     }, [initializeSampleTasks]);
 
     // Save data to localStorage whenever state changes
     useEffect(() => {
+        if (!isLoaded) return;
+        
+        const now = Date.now();
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
         localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
+        localStorage.setItem(STORAGE_KEYS.TIMESTAMP, now.toString());
+        setTimestamp(now);
 
         // SHADOW BACKUP STRATEGY: 
         // Automatically create an internal snapshot every 24 hours
         // This acts as a 'last known good state' internal to the browser.
         const lastShadow = localStorage.getItem(STORAGE_KEYS.LAST_SHADOW_TIME);
-        const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
 
         if (!lastShadow || (now - parseInt(lastShadow)) > oneDay) {
@@ -107,21 +117,19 @@ export const useTasks = () => {
     const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
         if (!text.trim()) return;
 
-        setCounter(prevCounter => {
-            const newId = prevCounter + 1;
-            const newTask = {
-                id: newId,
-                text: text.trim(),
-                priority,
-                projectId: projectId || 'general',
-                notes: (notes || '').trim(),
-                isSample: false
-            };
+        const newId = counter + 1;
+        const newTask = {
+            id: newId,
+            text: text.trim(),
+            priority,
+            projectId: projectId || 'general',
+            notes: (notes || '').trim(),
+            isSample: false
+        };
 
-            setTasks(prev => [newTask, ...prev]);
-            return newId;
-        });
-    }, []);
+        setCounter(newId);
+        setTasks(prev => [newTask, ...prev]);
+    }, [counter]);
 
     const completeTask = useCallback((id) => {
         setTasks(prev => {
@@ -243,27 +251,26 @@ export const useTasks = () => {
     const bulkAddTasks = useCallback((tasksToAdd) => {
         if (tasksToAdd.length === 0) return;
 
-        setCounter(prevCounter => {
-            let currentId = prevCounter;
-            const tasksWithIds = tasksToAdd.map(t => {
-                currentId++;
-                return {
-                    ...t,
-                    id: currentId,
-                    isSample: false
-                };
-            });
-
-            setTasks(prev => [...tasksWithIds, ...prev]);
-            return currentId;
+        let currentId = counter;
+        const tasksWithIds = tasksToAdd.map(t => {
+            currentId++;
+            return {
+                ...t,
+                id: currentId,
+                isSample: false
+            };
         });
-    }, []);
+
+        setCounter(currentId);
+        setTasks(prev => [...tasksWithIds, ...prev]);
+    }, [counter]);
 
     return {
         tasks,
         archived,
         projects,
         counter,
+        timestamp,
         addTask,
         completeTask,
         deleteArchivedTask,

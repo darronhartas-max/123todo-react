@@ -17,7 +17,8 @@ export const STORAGE_KEYS = {
   LAST_INSTALL_PROMPT: '123TodoLastInstallPrompt',
   PROJECTS: '123TodoProjects',
   SHADOW_BACKUP: '123TodoShadowBackup',
-  LAST_SHADOW_TIME: '123TodoLastShadowTime'
+  LAST_SHADOW_TIME: '123TodoLastShadowTime',
+  TIMESTAMP: '123TodoTimestamp'
 };
 
 export const PROJECT_COLORS = [

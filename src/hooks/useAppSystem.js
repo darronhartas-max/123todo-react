@@ -33,12 +33,20 @@ export const useAppSystem = (archivedCount, tasksCount) => {
     }, []);
 
     const checkBackupReminder = useCallback((count) => {
-        const lastBackup = localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
+        let lastBackup = localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
+        
+        // If it's a new user or they've never backed up, start the timer from today
+        if (!lastBackup) {
+            lastBackup = Date.now().toString();
+            localStorage.setItem(STORAGE_KEYS.LAST_BACKUP, lastBackup);
+            return;
+        }
+
         const lastReminderDismiss = localStorage.getItem(STORAGE_KEYS.REMINDER_DISMISSED);
         const now = Date.now();
         const reminderPeriod = BACKUP_REMINDER_DAYS * 24 * 60 * 60 * 1000;
 
-        const shouldShowReminder = (!lastBackup || (now - parseInt(lastBackup)) > reminderPeriod) &&
+        const shouldShowReminder = ((now - parseInt(lastBackup)) > reminderPeriod) &&
             (!lastReminderDismiss || (now - parseInt(lastReminderDismiss)) > reminderPeriod);
 
         if (shouldShowReminder && count > 0) {

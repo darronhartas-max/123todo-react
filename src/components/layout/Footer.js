@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.4.3' }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = '2.0.0' }) => {
     const styles = {
         footer: {
             flexShrink: 0,
@@ -28,8 +28,25 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.4.3' })
         }
     };
 
+    const getSyncStatusText = () => {
+        if (syncStatus === 'error') return '⚠️ Sync Error';
+        if (isAuthed) return '☁️ Google Drive Sync';
+        return '❌ Sync Offline';
+    };
+
+    const getSyncButtonStyle = () => {
+        if (syncStatus === 'error') return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' };
+        if (isAuthed) return { ...styles.footerButton, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
+        return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
+    };
+
     return (
         <footer style={styles.footer}>
+            <div style={{ marginBottom: '16px' }}>
+                <button onClick={onSyncClick} style={getSyncButtonStyle()}>
+                    {getSyncStatusText()}
+                </button>
+            </div>
             <div>
                 <button onClick={onExport} style={styles.footerButton}>Export</button>
                 <button onClick={onImportClick} style={styles.footerButton}>Import</button>
