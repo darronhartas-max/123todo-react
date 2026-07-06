@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 1.4.2 | © Darron Hartas 2026
+Version 1.4.3 | © Darron Hartas 2026
 
 ---
 
@@ -276,12 +276,17 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v1.4.2 (Current)
+### v1.4.3 (Current)
+- **Shadow Backup Restore**: Added a "Restore from Shadow Backup" button to the Import options. Users can preview backup details (date, task count, category list, and active task preview) before confirming to overwrite the live data.
+- **Footer Social Icon Enlargement**: Enlarged social share icons by another 20% to 31px for improved visibility and easy touch target selection on mobile devices.
+
+### v1.4.2
 - **Global Text Scaling**: Increased all text sizes by 1pt globally via a base HTML font-size of 17px.
 - **Wider Task Editor**: Widened the edit modal to 500px (max-width 95% on mobile) to utilize screen real estate better.
 - **Checkbox Completion & Delayed Archiving**: Replaced the circle complete button with a checkbox (Square/CheckSquare), which ticks green and waits 2 seconds before archiving, giving the user a chance to undo.
 - **Archive Modal Confirmation**: Shows a centered "Moved to Archive" notification toast for 2 seconds after archiving a task.
-- **Social Sharing Spacing & Icon Size**: Enlarged share icons by 20% to 22px and added breathing space in the footer.
+- **Header Add Task Button**: Enlarged the add task header icon by 15% (to 28px) and colored it brand red (#dc2626).
+- **Social Sharing Spacing & Icon Size**: Enlarged share icons by 20% to 26px and restructured footer margins/padding to save height.
 
 ### v1.4.0
 - **Todoist CSV Import**: New robust importer for Todoist projects with multi-file support and automatic mapping.
