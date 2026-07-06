@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.0.1 | © Darron Hartas 2026
+Version 2.0.2 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,7 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.0.1 (Current)
+### v2.0.2 (Current)
 - **Google Drive Sync**: Seamless, free, cross-device synchronization using Google Identity Services.
 - **Client-Side Encryption**: Zero-knowledge AES-256-GCM encryption ensures data remains completely private.
 - **Silent Authentication**: Persistent, silent sign-in means you stay logged in across sessions.

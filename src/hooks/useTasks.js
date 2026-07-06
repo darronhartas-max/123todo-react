@@ -110,6 +110,7 @@ export const useTasks = () => {
                 console.warn('⚠️ Could not save shadow backup (likely storage quota):', err);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tasks, archived, projects, counter, isLoaded]);
 
     const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
