@@ -111,14 +111,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                                 marginLeft: '0',
                                 marginRight: '4px',
                                 color: 'var(--accent-color)',
-                                width: '24px',
-                                height: '24px',
-                                minWidth: '24px',
+                                width: '36px',
+                                height: '36px',
+                                minWidth: '36px',
                                 background: 'rgba(37, 99, 235, 0.05)'
                             }}
                             title={showNotes ? "Hide Notes" : "Show Notes"}
                         >
-                            {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                            {showNotes ? <Minus size={21} /> : <Plus size={21} />}
                         </button>
                     )}
                     <span style={styles.taskText}>{task.text}</span>
