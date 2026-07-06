@@ -8,6 +8,8 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
     const [editName, setEditName] = useState('');
     const [showManage, setShowManage] = useState(false);
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
+    const [isOpen, setIsOpen] = useState(false);
+    const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
     const allProjects = [
         DEFAULT_PROJECTS.find(p => p.id === 'all'),
@@ -115,19 +117,60 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             alignItems: 'center',
             gap: '8px'
         },
-        select: (color) => ({
+        customSelectWrapper: {
+            position: 'relative',
             flex: 1,
-            padding: '8px 36px 8px 12px',
+            display: 'flex',
+            flexDirection: 'column'
+        },
+        customSelectTrigger: (color) => ({
+            width: '100%',
+            padding: '8px 12px',
             borderRadius: '8px',
             border: `1.5px solid ${color}`,
-            background: 'var(--bg-color)',
+            background: 'var(--item-bg)',
             color: color,
             fontSize: '1.1rem',
             fontWeight: '600',
-            appearance: 'none',
             cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             outline: 'none',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            textAlign: 'left'
+        }),
+        customSelectDropdown: {
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            right: 0,
+            background: 'var(--surface-color)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            zIndex: 100,
+            maxHeight: '240px',
+            overflowY: 'auto',
+            padding: '4px 0'
+        },
+        customOption: (isActive, color) => ({
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            cursor: 'pointer',
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            color: isActive ? color : 'var(--text-color)',
+            transition: 'all 0.15s ease'
+        }),
+        customOptionBand: (color) => ({
+            width: '4px',
+            height: '18px',
+            borderRadius: '2px',
+            backgroundColor: color,
+            flexShrink: 0
         }),
         colorBtn: (color, isSelected) => ({
             width: '24px',
@@ -170,18 +213,53 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                 flexShrink: 0,
                                 transition: 'background-color 0.2s ease'
                             }} />
-                            <select
-                                style={styles.select(activeColor)}
-                                value={currentProjectId}
-                                onChange={(e) => onSelect(e.target.value)}
-                            >
-                                {allProjects.map(p => (
-                                    <option key={p.id} value={p.id} style={{ color: p.color, background: 'var(--surface-color)' }}>
-                                        {p.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown size={18} style={{ position: 'absolute', right: '55px', pointerEvents: 'none', color: activeColor, transition: 'color 0.2s ease' }} />
+                            <div style={styles.customSelectWrapper}>
+                                <button
+                                    onClick={() => setIsOpen(!isOpen)}
+                                    style={styles.customSelectTrigger(activeColor)}
+                                >
+                                    <span>{activeProject?.name}</span>
+                                    <ChevronDown size={18} style={{ color: activeColor, transition: 'color 0.2s ease' }} />
+                                </button>
+                                {isOpen && (
+                                    <>
+                                        <div 
+                                            onClick={() => setIsOpen(false)}
+                                            style={{
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                zIndex: 99,
+                                                background: 'transparent'
+                                            }}
+                                        />
+                                        <div style={styles.customSelectDropdown}>
+                                            {allProjects.map(p => (
+                                                <div
+                                                    key={p.id}
+                                                    onClick={() => {
+                                                        onSelect(p.id);
+                                                        setIsOpen(false);
+                                                    }}
+                                                    onMouseEnter={() => setHoveredOptionId(p.id)}
+                                                    onMouseLeave={() => setHoveredOptionId(null)}
+                                                    style={{
+                                                        ...styles.customOption(p.id === currentProjectId, p.color),
+                                                        background: p.id === currentProjectId
+                                                            ? `${p.color}15`
+                                                            : (hoveredOptionId === p.id ? 'var(--bg-color)' : 'transparent')
+                                                    }}
+                                                >
+                                                    <div style={styles.customOptionBand(p.color)} />
+                                                    <span>{p.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                             <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Categories">
                                 <Settings size={16} />
                             </button>
