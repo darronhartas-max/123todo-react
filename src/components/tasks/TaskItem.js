@@ -1,22 +1,37 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Check, Circle, Plus, Minus } from 'lucide-react';
+import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [isClicked, setIsClicked] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
+    const archiveTimeoutRef = React.useRef(null);
 
     const handleComplete = (e) => {
         e.stopPropagation();
-        if (isClicked) return;
-        setIsClicked(true);
-        // Small delay to let the user see the "completed" state before it disappears
-        setTimeout(() => {
-            onComplete(task.id);
-        }, 250);
+        if (isChecked) {
+            setIsChecked(false);
+            if (archiveTimeoutRef.current) {
+                clearTimeout(archiveTimeoutRef.current);
+                archiveTimeoutRef.current = null;
+            }
+        } else {
+            setIsChecked(true);
+            archiveTimeoutRef.current = setTimeout(() => {
+                onComplete(task.id);
+            }, 2000);
+        }
     };
+
+    React.useEffect(() => {
+        return () => {
+            if (archiveTimeoutRef.current) {
+                clearTimeout(archiveTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const styles = {
         taskItem: {
@@ -70,7 +85,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
         }
     };
 
-    const showCheck = isHovered || isClicked;
+
 
     return (
         <motion.li
@@ -156,15 +171,15 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                         onClick={handleComplete}
                         style={{
                             ...styles.actionBtn,
-                            color: showCheck ? '#10b981' : 'var(--muted-text)',
-                            background: showCheck ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                            color: isChecked ? '#10b981' : 'var(--muted-text)',
+                            background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
                         }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
-                        title="Complete Task"
+                        title={isChecked ? "Cancel completion" : "Complete Task"}
                     >
                         <AnimatePresence mode="wait" initial={false}>
-                            {showCheck ? (
+                            {isChecked ? (
                                 <motion.div
                                     key="check"
                                     initial={{ opacity: 0, scale: 0.5 }}
@@ -172,17 +187,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                                     exit={{ opacity: 0, scale: 0.5 }}
                                     transition={{ duration: 0.1 }}
                                 >
-                                    <Check size={18} strokeWidth={3} />
+                                    <CheckSquare size={18} strokeWidth={2.5} />
                                 </motion.div>
                             ) : (
                                 <motion.div
-                                    key="circle"
+                                    key="square"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.1 }}
                                 >
-                                    <Circle size={18} opacity={0.5} />
+                                    <Square size={18} opacity={isHovered ? 1.0 : 0.6} />
                                 </motion.div>
                             )}
                         </AnimatePresence>

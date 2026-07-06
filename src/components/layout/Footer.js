@@ -39,6 +39,8 @@ const Footer = ({ onExport, onImportClick, onTodoistImport, version = '1.4.1' })
                 Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
             </div>
 
+            <br />
+
             <div style={{ marginTop: '8px', fontSize: '1rem' }}>
                 <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', marginRight: '20px' }}>
                     Terms of Service

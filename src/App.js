@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import SocialShare from './components/layout/SocialShare';
@@ -44,6 +45,15 @@ const TodoApp = () => {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [showTodoistImport, setShowTodoistImport] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
+  const [showArchiveToast, setShowArchiveToast] = useState(false);
+
+  const handleCompleteTask = (id) => {
+    completeTask(id);
+    setShowArchiveToast(true);
+    setTimeout(() => {
+      setShowArchiveToast(false);
+    }, 2000);
+  };
 
   // Filtering
   const filteredBySearch = (list) => list.filter(t =>
@@ -300,7 +310,7 @@ const TodoApp = () => {
               priority={priority}
               tasks={filteredTasks}
               projects={projects}
-              onComplete={completeTask}
+              onComplete={handleCompleteTask}
               onEdit={setEditingTask}
               handleDragStart={handleDragStart}
               handleDragOver={handleDragOver}
@@ -334,7 +344,7 @@ const TodoApp = () => {
                         key={task.id}
                         task={task}
                         projectColor={project?.color}
-                        onComplete={completeTask}
+                        onComplete={handleCompleteTask}
                         onEdit={setEditingTask}
                       />
                     );
@@ -425,6 +435,57 @@ const TodoApp = () => {
           onClose={() => setShowImportSelection(false)}
         />
       )}
+
+      <AnimatePresence>
+        {showArchiveToast && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(1px)',
+            zIndex: 10000,
+            pointerEvents: 'none'
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                background: 'var(--surface-color)',
+                border: '1px solid var(--border-color)',
+                padding: '16px 28px',
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: 'var(--text-color)'
+              }}
+            >
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                borderRadius: '50%',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Check size={18} strokeWidth={3} />
+              </div>
+              <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>Moved to Archive</span>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
