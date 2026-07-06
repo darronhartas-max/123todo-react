@@ -150,7 +150,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
             borderRadius: '8px',
             boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
             zIndex: 100,
-            maxHeight: '240px',
+            maxHeight: '480px',
             overflowY: 'auto',
             padding: '4px 0'
         },
