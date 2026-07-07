@@ -401,6 +401,9 @@ const SettingsModal = ({
                                         </div>
                                     ))}
                                 </div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', margin: '8px 0', textAlign: 'left' }}>
+                                    Debug Projects List: {projects.map(p => `${p.name} (${p.id})`).join(', ')}
+                                </div>
 
                                 <div style={styles.addSection}>
                                     <div style={{ fontWeight: '600', marginBottom: '10px', fontSize: '0.95rem', display: 'flex', alignItems: 'center' }}>

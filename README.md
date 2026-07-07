@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.3 | © Darron Hartas 2026
+Version 2.1.4 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.3 (Current)
+### v2.1.4 (Current)
+- **Debugging Enhancements**: Added loaded projects list printing under Settings modal for state verification.
+
+### v2.1.3
 - **Point-Based Typography Scale**: Switched font-size scaling to points (`pt`), setting a slider range of `8pt` to `20pt` with `12pt` default (equivalent to standard `16px`). Included auto-migration for existing users.
 - **Optimized Layout Width Constraint**: Adjusted the smallest layout width to `480px` (standard phone size) and removed the oversized `1200px` option to prevent overly stretched single-column layouts on wide monitors.
 
