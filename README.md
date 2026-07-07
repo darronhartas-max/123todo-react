@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.6 | © Darron Hartas 2026
+Version 2.1.7 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.6 (Current)
+### v2.1.7 (Current)
+- **Dynamic Dark Theme Logo**: Generated transparent light/dark logo PNG variants from the original asset, and connected the logo `src` to dynamic dark theme changes (switching text to white in dark mode for optimal contrast).
+- **Test Suite Polyfills**: Added JSDOM test suite polyfills for `TextEncoder`, `TextDecoder`, and `window.matchMedia` in `setupTests.js` to restore passing status on test runs.
+
+### v2.1.6
 - **Settings Form Fix**: Corrected a parameter mismatch in the Settings modal where new project creation was passing an object instead of separate name and color parameters, preventing new project additions.
 
 ### v2.1.5

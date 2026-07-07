@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.6
+- **Version**: v2.1.7
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,11 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.7 (2026-07-07)
+- **Feature**: Added transparent light and dark theme logo variants (`123-logo-500px-light.png` and `123-logo-500px-dark.png`) generated dynamically from the original.
+- **UX**: Hooked up logo to dynamic theme changes, rendering the dark theme white-text logo when dark mode is active.
+- **Testing**: Fixed Jest test suite execution by adding polyfills for `TextEncoder`, `TextDecoder`, and `window.matchMedia` in `setupTests.js`.
 
 ### v2.1.6 (2026-07-07)
 - **Fix**: Resolved parameter mismatch bug in SettingsModal project creation where dynamic onAddProject was passed an object instead of separate name and color parameters.

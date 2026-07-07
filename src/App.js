@@ -77,6 +77,7 @@ const TodoApp = () => {
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
+  const [isDark, setIsDark] = useState(false);
 
   const setFontSize = (size) => {
     setFontSizeState(size);
@@ -116,11 +117,32 @@ const TodoApp = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('theme-light', 'theme-dark');
-    if (themeMode === 'light') {
-      root.classList.add('theme-light');
-    } else if (themeMode === 'dark') {
-      root.classList.add('theme-dark');
+    
+    const updateTheme = () => {
+      let darkActive = false;
+      if (themeMode === 'system') {
+        darkActive = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } else {
+        darkActive = themeMode === 'dark';
+      }
+      
+      root.classList.remove('theme-light', 'theme-dark');
+      if (themeMode === 'light') {
+        root.classList.add('theme-light');
+      } else if (themeMode === 'dark') {
+        root.classList.add('theme-dark');
+      }
+      
+      setIsDark(darkActive);
+    };
+
+    updateTheme();
+
+    if (themeMode === 'system') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => updateTheme();
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
     }
   }, [themeMode]);
 
@@ -355,6 +377,7 @@ const TodoApp = () => {
           taskCount={activeTasksCount}
           onToggleAdd={() => setShowAddSection(!showAddSection)}
           isAddOpen={showAddSection}
+          isDark={isDark}
         />
 
         <AddTask

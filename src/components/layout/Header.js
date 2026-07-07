@@ -1,7 +1,7 @@
 import React from 'react';
 import { PlusCircle, MinusCircle } from 'lucide-react';
 
-const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
+const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -35,7 +35,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen }) => {
         <header style={styles.header}>
             <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block' }}>
                 <img
-                    src="/123-logo-500px.jpg"
+                    src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                     alt="123 ToDo logo"
                     style={{
                         width: '240px',
