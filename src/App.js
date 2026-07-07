@@ -9,6 +9,7 @@ import PrioritySection from './components/tasks/PrioritySection';
 import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
 import DeleteProjectModal from './components/modals/DeleteProjectModal';
+import SettingsModal from './components/modals/SettingsModal';
 import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
@@ -57,6 +58,67 @@ const TodoApp = () => {
   const [shadowBackupData, setShadowBackupData] = useState(null);
   const [showRestoreToast, setShowRestoreToast] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Preference state loaded from localStorage or default
+  const [fontSize, setFontSizeState] = useState(() => {
+    return parseInt(localStorage.getItem('123TodoFontSize')) || 17;
+  });
+  const [density, setDensityState] = useState(() => {
+    return localStorage.getItem('123TodoDensity') || 'cozy';
+  });
+  const [layoutWidth, setLayoutWidthState] = useState(() => {
+    return localStorage.getItem('123TodoLayoutWidth') || '800px';
+  });
+  const [themeMode, setThemeModeState] = useState(() => {
+    return localStorage.getItem('123TodoThemeMode') || 'system';
+  });
+
+  const setFontSize = (size) => {
+    setFontSizeState(size);
+    localStorage.setItem('123TodoFontSize', size.toString());
+  };
+  const setDensity = (val) => {
+    setDensityState(val);
+    localStorage.setItem('123TodoDensity', val);
+  };
+  const setLayoutWidth = (val) => {
+    setLayoutWidthState(val);
+    localStorage.setItem('123TodoLayoutWidth', val);
+  };
+  const setThemeMode = (val) => {
+    setThemeModeState(val);
+    localStorage.setItem('123TodoThemeMode', val);
+  };
+
+  // Apply visual styling settings to root element
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontSize]);
+
+  useEffect(() => {
+    if (density === 'compact') {
+      document.documentElement.style.setProperty('--task-padding', '6px 12px');
+      document.documentElement.style.setProperty('--task-padding-top', '8px');
+      document.documentElement.style.setProperty('--task-margin', '2px');
+      document.documentElement.style.setProperty('--section-margin', '10px');
+    } else {
+      document.documentElement.style.removeProperty('--task-padding');
+      document.documentElement.style.removeProperty('--task-padding-top');
+      document.documentElement.style.removeProperty('--task-margin');
+      document.documentElement.style.removeProperty('--section-margin');
+    }
+  }, [density]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('theme-light', 'theme-dark');
+    if (themeMode === 'light') {
+      root.classList.add('theme-light');
+    } else if (themeMode === 'dark') {
+      root.classList.add('theme-dark');
+    }
+  }, [themeMode]);
 
   const handleOpenRestoreShadow = () => {
     const shadowRaw = localStorage.getItem('123TodoShadowBackup');
@@ -232,12 +294,13 @@ const TodoApp = () => {
 
   const styles = {
     appContainer: {
-      maxWidth: '800px',
+      maxWidth: layoutWidth,
       margin: '0 auto',
       paddingBottom: window.innerWidth < 768 ? '120px' : '80px',
       minHeight: '100vh',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      transition: 'max-width 0.3s ease'
     },
     container: {
       width: '100%',
@@ -253,7 +316,11 @@ const TodoApp = () => {
     },
     sectionsContainer: {
       flex: 1,
-      padding: '0 12px 8px 12px'
+      padding: '0 12px 8px 12px',
+      display: 'flex',
+      flexDirection: window.innerWidth > 768 && layoutWidth !== '800px' ? 'row' : 'column',
+      gap: window.innerWidth > 768 && layoutWidth !== '800px' ? '20px' : '0px',
+      alignItems: 'stretch'
     },
     toggleSection: {
       padding: '12px',
@@ -330,6 +397,7 @@ const TodoApp = () => {
           onDelete={handleDeleteProjectRequest}
           showSearch={showSearch}
           onToggleSearch={() => setShowSearch(!showSearch)}
+          onOpenSettings={() => setShowSettings(true)}
         />
 
         {projectToDelete && (
@@ -499,6 +567,23 @@ const TodoApp = () => {
         signIn={signIn}
         signOut={signOut}
         performSync={performSync}
+      />
+
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        projects={projects}
+        onAddProject={addProject}
+        onEditProject={updateProject}
+        onDeleteProject={handleDeleteProjectRequest}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        density={density}
+        setDensity={setDensity}
+        layoutWidth={layoutWidth}
+        setLayoutWidth={setLayoutWidth}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
       />
 
       <AnimatePresence>

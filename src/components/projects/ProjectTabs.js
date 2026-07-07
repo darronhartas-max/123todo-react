@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
-import { X, Check, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
-import { PROJECT_COLORS, DEFAULT_PROJECTS } from '../../utils/constants';
-import ManageProjectsModal from '../modals/ManageProjectsModal';
+import { X, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
+import { DEFAULT_PROJECTS } from '../../utils/constants';
 
-const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, onDelete, showSearch, onToggleSearch }) => {
-    const [editingId, setEditingId] = useState(null);
-    const [editName, setEditName] = useState('');
-    const [showManage, setShowManage] = useState(false);
-    const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
+const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
@@ -18,23 +13,6 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
 
     const activeProject = allProjects.find(p => p.id === currentProjectId) || allProjects[0];
     const activeColor = activeProject?.color || '#6b7280';
-
-
-
-    const startEdit = (e, project) => {
-        e.stopPropagation();
-        setEditingId(project.id);
-        setEditName(project.name);
-        setSelectedColor(project.color);
-    };
-
-    const handleUpdate = (e) => {
-        if (e) e.stopPropagation();
-        if (editName.trim()) {
-            onUpdate(editingId, { name: editName.trim(), color: selectedColor });
-            setEditingId(null);
-        }
-    };
 
     const styles = {
         mainWrapper: {
@@ -260,7 +238,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                     </>
                                 )}
                             </div>
-                            <button onClick={() => setShowManage(true)} style={styles.addBtn} title="Manage Projects">
+                            <button onClick={onOpenSettings} style={styles.addBtn} title="Settings">
                                 <Settings size={20} />
                             </button>
                         </div>
@@ -274,78 +252,19 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, onAdd, onUpdate, on
                                 style={styles.tab(currentProjectId === project.id, project.color)}
                             >
                                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: project.color }}></div>
-                                {editingId === project.id ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <input
-                                            autoFocus
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                            onKeyPress={(e) => e.key === 'Enter' && handleUpdate()}
-                                            onClick={(e) => e.stopPropagation()}
-                                            style={{ ...styles.input, padding: '2px 4px', width: '80px' }}
-                                        />
-                                        <Check size={14} onClick={handleUpdate} style={{ color: '#10b981', cursor: 'pointer' }} />
-                                    </div>
-                                ) : (
-                                    <span>{project.name}</span>
-                                )}
+                                <span>{project.name}</span>
                             </div>
                         ))}
-                        <button onClick={() => setShowManage(true)} style={{ ...styles.addBtn, padding: '5px' }} title="Manage Projects">
+                        <button onClick={onOpenSettings} style={{ ...styles.addBtn, padding: '5px' }} title="Settings">
                             <Settings size={22} />
                         </button>
                     </>
                 )}
             </div>
 
-            {showManage && (
-                <ManageProjectsModal
-                    projects={projects}
-                    onAdd={onAdd}
-                    onEdit={(p) => {
-                        setShowManage(false);
-                        startEdit({ stopPropagation: () => { } }, p);
-                    }}
-                    onDelete={(id) => {
-                        setShowManage(false);
-                        onDelete(id);
-                    }}
-                    onClose={() => setShowManage(false)}
-                />
-            )}
 
-            {editingId && (
-                <div style={styles.addForm}>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input
-                            autoFocus
-                            placeholder="Edit name..."
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleUpdate()}
-                            style={styles.input}
-                        />
-                        <button
-                            onClick={handleUpdate}
-                            style={{ ...styles.addBtn, background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px' }}
-                        >
-                            Update
-                        </button>
-                        <button onClick={() => setEditingId(null)} style={{ ...styles.addBtn, padding: '8px' }}>
-                            <X size={18} />
-                        </button>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', padding: '4px 0', overflowX: 'auto' }}>
-                        {PROJECT_COLORS.map(c => (
-                            <div
-                                key={c}
-                                style={styles.colorBtn(c, selectedColor === c)}
-                                onClick={() => setSelectedColor(c)}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+
+
         </div>
     );
 };

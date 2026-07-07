@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.0.2 | © Darron Hartas 2026
+Version 2.1.0 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,14 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.0.2 (Current)
+### v2.1.0 (Current)
+- **Appearance & Styling Preferences**: Added base text size customization (font size slider) that scales all text proportionally.
+- **Density Spacing Options**: Introduced choice of "Cozy" (comfortable spacing) vs. "Compact" (tighter list items and margins) to reduce clunkiness on desktop.
+- **Desktop Kanban Columns**: Automatically transitions layout to side-by-side columns (Kanban-style) on wider view modes (1000px/1200px) on desktop, rather than a single stretched column.
+- **Unified Settings Modal**: Replaced the project management modal with a unified settings panel containing both Projects and Appearance tabs.
+- **Theme Selection**: Explicit theme selector (System, Light, Dark) with custom override classes on the document root.
+
+### v2.0.2
 - **Google Drive Sync**: Seamless, free, cross-device synchronization using Google Identity Services.
 - **Client-Side Encryption**: Zero-knowledge AES-256-GCM encryption ensures data remains completely private.
 - **Silent Authentication**: Persistent, silent sign-in means you stay logged in across sessions.

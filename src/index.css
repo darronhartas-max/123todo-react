@@ -16,10 +16,17 @@ html {
   --item-bg: #ffffff;
   --accent-bg: #f0f7ff;
   --archive-bg: #f9fafb;
+  
+  /* Density Default Spacing */
+  --task-padding: 10px 12px;
+  --task-padding-top: 12px;
+  --task-margin: 4px;
+  --section-margin: 16px;
 }
 
+/* System Dark Mode: Apply unless light theme is explicitly forced */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.theme-light) {
     --bg-color: #111827;
     --text-color: #f3f4f6;
     --surface-color: #1f2937;
@@ -32,6 +39,21 @@ html {
     --accent-bg: #1a3245;
     --archive-bg: #111827;
   }
+}
+
+/* Explicit Dark Theme override */
+:root.theme-dark {
+  --bg-color: #111827;
+  --text-color: #f3f4f6;
+  --surface-color: #1f2937;
+  --border-color: #374151;
+  --header-bg: #1f2937;
+  --footer-bg: #111827;
+  --accent-color: #5289b4;
+  --muted-text: #9ca3af;
+  --item-bg: #1f2937;
+  --accent-bg: #1a3245;
+  --archive-bg: #111827;
 }
 
 body {

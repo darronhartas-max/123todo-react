@@ -22,7 +22,7 @@ const PrioritySection = ({
     if (sectionTasks.length === 0 && priority === 4) return null; // Hide On Hold if empty
 
     return (
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: 'var(--section-margin, 16px)', flex: 1, minWidth: 0 }}>
             <h3 style={{
                 fontSize: '0.85rem',
                 fontWeight: '800',
