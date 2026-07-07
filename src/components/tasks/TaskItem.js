@@ -39,7 +39,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             padding: 'var(--task-padding, 10px 12px)',
             border: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             borderBottom: '1px solid var(--border-color)',
-            borderLeft: projectColor ? `4px solid ${projectColor}` : (task.isSample ? '4px solid #0ea5e9' : 'none'),
+            borderLeft: projectColor ? `6px solid ${projectColor}` : (task.isSample ? '6px solid #0ea5e9' : 'none'),
             background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
             cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
