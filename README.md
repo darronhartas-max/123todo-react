@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.8 | © Darron Hartas 2026
+Version 2.1.9 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.8 (Current)
+### v2.1.9 (Current)
+- **PWA Launcher Cache-Busting**: Added cache-busting version query parameters (`?v=2.1.8`) to the icon links in `index.html` and `manifest.json`. This forces mobile operating systems and browsers (like iOS Safari and Android Chrome) to bypass their persistent internal icon caches and fetch the newly cropped layouts immediately when re-adding to the home screen.
+
+### v2.1.8
 - **App Icons & Favicon Crop**: Cropped excess white margin padding (60px-150px) around all favicon and mobile PWA system app icon files (`logo512.png`, `logo192.png`, `favicon.ico`, `favicon.png`, and `icon.jpg`), maximizing their visual checkmark size when added to phone home screens.
 
 ### v2.1.7
