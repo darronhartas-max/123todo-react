@@ -22,13 +22,24 @@ export const STORAGE_KEYS = {
 };
 
 export const PROJECT_COLORS = [
-  '#285a82', // Blue (Logo matched)
-  '#10b981', // Green
-  '#f59e0b', // Amber
-  '#ec4899', // Pink
-  '#8b5cf6', // Violet
-  '#06b6d4', // Cyan
-  '#f43f5e', // Rose
+  '#285a82', // Ocean Blue
+  '#10b981', // Emerald Green
+  '#f59e0b', // Amber Orange
+  '#ec4899', // Sweet Pink
+  '#8b5cf6', // Royal Violet
+  '#06b6d4', // Bright Cyan
+  '#f43f5e', // Ruby Rose
+  '#14b8a6', // Teal Green
+  '#3b82f6', // Sky Blue
+  '#eab308', // Sunflower Yellow
+  '#d946ef', // Fuchsia Purple
+  '#84cc16', // Lime Green
+  '#f97316', // Mandarin Orange
+  '#6366f1', // Indigo Blue
+  '#a855f7', // Amethyst Purple
+  '#065f46', // Forest Green
+  '#b91c1c', // Crimson Red
+  '#78716c', // Slate Gray
 ];
 
 export const DEFAULT_PROJECTS = [
