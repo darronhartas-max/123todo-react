@@ -37,19 +37,30 @@ export const useTasks = () => {
         try {
             const savedTasks = localStorage.getItem(STORAGE_KEYS.TASKS);
             const savedArchived = localStorage.getItem(STORAGE_KEYS.ARCHIVE);
-            const savedProjects = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+            let savedProjects = localStorage.getItem(STORAGE_KEYS.PROJECTS);
             const savedCounter = localStorage.getItem(STORAGE_KEYS.COUNTER);
+
+            // Legacy migration: support reading from 123TodoCategories if 123TodoProjects doesn't exist yet
+            if (!savedProjects) {
+                const legacyCategories = localStorage.getItem('123TodoCategories');
+                if (legacyCategories) {
+                    savedProjects = legacyCategories;
+                    localStorage.setItem(STORAGE_KEYS.PROJECTS, legacyCategories);
+                    localStorage.removeItem('123TodoCategories');
+                    console.log('🔄 Migrated legacy categories to projects in LocalStorage');
+                }
+            }
 
             if (savedTasks) {
                 const parsed = JSON.parse(savedTasks);
-                // MIGRATION: Ensure every task has a projectId
-                setTasks(parsed.map(t => ({ ...t, projectId: t.projectId || 'general' })));
+                // MIGRATION: Ensure every task has a projectId, support fallback from legacy categoryId
+                setTasks(parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' })));
             }
 
             if (savedArchived) {
                 const parsed = JSON.parse(savedArchived);
-                // MIGRATION: Ensure every archived task has a projectId
-                setArchived(parsed.map(t => ({ ...t, projectId: t.projectId || 'general' })));
+                // MIGRATION: Ensure every archived task has a projectId, support fallback from legacy categoryId
+                setArchived(parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' })));
             }
 
             if (savedProjects) {
@@ -221,9 +232,14 @@ export const useTasks = () => {
     }, []);
 
     const importData = useCallback((data) => {
-        setTasks(data.tasks || []);
-        setArchived(data.archived || []);
-        setProjects(data.projects || DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
+        // Map tasks and fallback legacy categoryId to projectId
+        const mappedTasks = (data.tasks || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
+        const mappedArchived = (data.archived || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
+        const mappedProjects = data.projects || data.categories || DEFAULT_PROJECTS.filter(p => p.id !== 'all');
+
+        setTasks(mappedTasks);
+        setArchived(mappedArchived);
+        setProjects(mappedProjects);
         setCounter(data.counter || 0);
         if (data.timestamp) setTimestamp(data.timestamp);
 
@@ -231,9 +247,9 @@ export const useTasks = () => {
         try {
             const now = Date.now();
             const snapshot = {
-                tasks: data.tasks || [],
-                archived: data.archived || [],
-                projects: data.projects || [],
+                tasks: mappedTasks,
+                archived: mappedArchived,
+                projects: mappedProjects,
                 counter: data.counter || 0,
                 timestamp: now
             };
