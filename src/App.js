@@ -62,13 +62,17 @@ const TodoApp = () => {
 
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
-    return parseInt(localStorage.getItem('123TodoFontSize')) || 17;
+    const saved = localStorage.getItem('123TodoFontSize');
+    if (saved && parseInt(saved) >= 14) return 12; // Migrate px to pt default
+    return saved ? parseInt(saved) : 12;
   });
   const [density, setDensityState] = useState(() => {
     return localStorage.getItem('123TodoDensity') || 'cozy';
   });
   const [layoutWidth, setLayoutWidthState] = useState(() => {
-    return localStorage.getItem('123TodoLayoutWidth') || '800px';
+    const saved = localStorage.getItem('123TodoLayoutWidth');
+    if (saved === '800px' || saved === '1200px') return '480px';
+    return saved || '480px';
   });
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
@@ -93,7 +97,7 @@ const TodoApp = () => {
 
   // Apply visual styling settings to root element
   useEffect(() => {
-    document.documentElement.style.fontSize = `${fontSize}px`;
+    document.documentElement.style.fontSize = `${fontSize}pt`;
   }, [fontSize]);
 
   useEffect(() => {
@@ -318,8 +322,8 @@ const TodoApp = () => {
       flex: 1,
       padding: '0 12px 8px 12px',
       display: 'flex',
-      flexDirection: window.innerWidth > 768 && layoutWidth !== '800px' ? 'row' : 'column',
-      gap: window.innerWidth > 768 && layoutWidth !== '800px' ? '20px' : '0px',
+      flexDirection: window.innerWidth > 768 && layoutWidth !== '480px' ? 'row' : 'column',
+      gap: window.innerWidth > 768 && layoutWidth !== '480px' ? '20px' : '0px',
       alignItems: 'stretch'
     },
     toggleSection: {

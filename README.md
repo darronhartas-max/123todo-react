@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.2 | © Darron Hartas 2026
+Version 2.1.3 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.2 (Current)
+### v2.1.3 (Current)
+- **Point-Based Typography Scale**: Switched font-size scaling to points (`pt`), setting a slider range of `8pt` to `20pt` with `12pt` default (equivalent to standard `16px`). Included auto-migration for existing users.
+- **Optimized Layout Width Constraint**: Adjusted the smallest layout width to `480px` (standard phone size) and removed the oversized `1200px` option to prevent overly stretched single-column layouts on wide monitors.
+
+### v2.1.2
 - **Fallback Project Customization**: Converted the default "General" project from a hardcoded constant into a dynamic user-owned project. It is now listed inside the Settings modal under "Manage Projects," enabling users to rename it (e.g. to "In Box") or customize its color.
 - **Auto-Injection Migration**: Added code to auto-inject the "General" project on load or sync import if it is missing, preserving it as a reliable catch-all fallback.
 

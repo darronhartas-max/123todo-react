@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.2
+- **Version**: v2.1.3
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.3 (2026-07-07)
+- **Feature**: Switched font-size scaling to points (`pt`), setting a slider range of `8pt` to `20pt` with `12pt` default (equivalent to `16px`). Added auto-migration to map previous `px` values.
+- **Feature**: Rescaled layout widths: set the smallest option to `480px` (matching mobile phone dimensions) and removed the oversized `1200px` option. Added auto-migration to map previous widths.
 
 ### v2.1.2 (2026-07-07)
 - **UX**: Shifted the fallback "General" project from a hardcoded default constant to a dynamic project in the database. This allows it to show up in the Settings modal, enabling users to rename it (e.g., to "In Box") and change its color.

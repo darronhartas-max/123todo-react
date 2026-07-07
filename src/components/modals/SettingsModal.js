@@ -445,20 +445,20 @@ const SettingsModal = ({
                                     <div style={styles.settingLabel}>
                                         <span>Text Size</span>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
-                                            {fontSize}px ({fontSize === 17 ? 'Default' : fontSize < 17 ? 'Smaller' : 'Larger'})
+                                            {fontSize}pt ({fontSize === 12 ? 'Default' : fontSize < 12 ? 'Smaller' : 'Larger'})
                                         </span>
                                     </div>
                                     <div style={styles.sliderContainer}>
-                                        <span style={{ fontSize: '14px', color: 'var(--muted-text)' }}>A</span>
+                                        <span style={{ fontSize: '8pt', color: 'var(--muted-text)' }}>A</span>
                                         <input
                                             type="range"
-                                            min="14"
-                                            max="22"
+                                            min="8"
+                                            max="20"
                                             value={fontSize}
                                             onChange={(e) => setFontSize(parseInt(e.target.value))}
                                             style={styles.slider}
                                         />
-                                        <span style={{ fontSize: '22px', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>
+                                        <span style={{ fontSize: '20pt', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>
                                     </div>
                                 </div>
 
@@ -511,22 +511,16 @@ const SettingsModal = ({
                                     <div style={styles.settingLabel}>Desktop Layout Width</div>
                                     <div style={styles.segmentContainer}>
                                         <button
-                                            style={styles.segmentBtn(layoutWidth === '800px')}
-                                            onClick={() => setLayoutWidth('800px')}
+                                            style={styles.segmentBtn(layoutWidth === '480px')}
+                                            onClick={() => setLayoutWidth('480px')}
                                         >
-                                            Single Column (800px)
+                                            Single Column (480px)
                                         </button>
                                         <button
                                             style={styles.segmentBtn(layoutWidth === '1000px')}
                                             onClick={() => setLayoutWidth('1000px')}
                                         >
-                                            Kanban Wide (1000px)
-                                        </button>
-                                        <button
-                                            style={styles.segmentBtn(layoutWidth === '1200px')}
-                                            onClick={() => setLayoutWidth('1200px')}
-                                        >
-                                            Kanban Dashboard (1200px)
+                                            Kanban Columns (1000px)
                                         </button>
                                     </div>
                                 </div>
