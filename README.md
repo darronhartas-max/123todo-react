@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.7 | © Darron Hartas 2026
+Version 2.1.8 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.7 (Current)
+### v2.1.8 (Current)
+- **App Icons & Favicon Crop**: Cropped excess white margin padding (60px-150px) around all favicon and mobile PWA system app icon files (`logo512.png`, `logo192.png`, `favicon.ico`, `favicon.png`, and `icon.jpg`), maximizing their visual checkmark size when added to phone home screens.
+
+### v2.1.7
 - **Dynamic Dark Theme Logo**: Generated transparent light/dark logo PNG variants from the original asset, and connected the logo `src` to dynamic dark theme changes (switching text to white in dark mode for optimal contrast).
 - **Test Suite Polyfills**: Added JSDOM test suite polyfills for `TextEncoder`, `TextDecoder`, and `window.matchMedia` in `setupTests.js` to restore passing status on test runs.
 

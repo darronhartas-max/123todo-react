@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.7
+- **Version**: v2.1.8
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,9 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.8 (2026-07-07)
+- **Feature**: Cropped excess white margins (60px-150px) around favicons and PWA system app icons (`logo512.png`, `logo192.png`, `favicon.ico`, `favicon.png`, and `icon.jpg`), maximizing their screen space and visual size on mobile devices.
 
 ### v2.1.7 (2026-07-07)
 - **Feature**: Added transparent light and dark theme logo variants (`123-logo-500px-light.png` and `123-logo-500px-dark.png`) generated dynamically from the original.
