@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.0
+- **Version**: v2.1.1
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,15 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.1 (2026-07-07)
+- **Fix**: Added legacy migration layer to automatically transfer custom `categories` from older local storage data or Google Drive sync payloads to new `projects` storage.
+- **Fix**: Resolved casing and name discrepancies in project lookups, making matches case-insensitive.
+- **Fix**: Resolved Todoist CSV import bug where tasks under pre-existing projects defaulted to "General" (returned `undefined` instead of ID).
+- **Fix**: Restructured CSS rendering order in `TaskItem` so shorthand `border` properties do not overwrite the color-coding of `borderLeft`.
+- **UI**: Widened vertical color border on tasks from 4px to 6px for improved readability.
+- **UI**: Enlarged and spaced out edit/delete buttons in settings modal to prevent accidental project deletions.
+- **UI**: Expanded the default project color palette to 18 premium options.
 
 ### v2.1.0 (2026-07-07)
 - **Feature**: Added custom **Appearance Preferences** (font size slider, cozy vs. compact density, theme overrides).

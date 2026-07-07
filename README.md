@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.0 | © Darron Hartas 2026
+Version 2.1.1 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,16 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.0 (Current)
+### v2.1.1 (Current)
+- **Legacy Migration Safeguards**: Automatically transfers custom `categories` from older local storage data or Google Drive sync payloads to new `projects` storage key, and maps legacy `categoryId` properties to `projectId` on tasks.
+- **Robust Matching**: Resolved casing and name discrepancies in project lookups, making matches case-insensitive.
+- **Todoist Importer Hotfix**: Fixed a bug where tasks under pre-existing projects defaulted to "General" during Todoist CSV import.
+- **CSS Render Order Polish**: Swapped the border layout evaluation order in `TaskItem` so the PWA drag-and-drop indicator's `border` property doesn't overwrite the left color bar.
+- **Color Coding Visibility**: Widened vertical task color indicator strips by 50% (from 4px to 6px) to make projects easier to identify.
+- **Improved Spacing & Target Sizing**: Enlarged project action buttons (Edit, Delete) in the settings modal and added a wider gap (12px) to prevent accidental project deletions.
+- **Expanded Palette**: Added 11 new curated project colors, expanding the total choice list to 18 premium options.
+
+### v2.1.0
 - **Appearance & Styling Preferences**: Added base text size customization (font size slider) that scales all text proportionally.
 - **Density Spacing Options**: Introduced choice of "Cozy" (comfortable spacing) vs. "Compact" (tighter list items and margins) to reduce clunkiness on desktop.
 - **Desktop Kanban Columns**: Automatically transitions layout to side-by-side columns (Kanban-style) on wider view modes (1000px/1200px) on desktop, rather than a single stretched column.
