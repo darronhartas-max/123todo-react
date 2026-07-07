@@ -33,7 +33,7 @@ const SettingsModal = ({
     const handleAddProject = (e) => {
         e.preventDefault();
         if (projectName.trim()) {
-            onAddProject({ name: projectName.trim(), color: selectedColor });
+            onAddProject(projectName.trim(), selectedColor);
             setProjectName('');
             setSelectedColor(PROJECT_COLORS[0]);
         }

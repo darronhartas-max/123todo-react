@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.5
+- **Version**: v2.1.6
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,9 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.6 (2026-07-07)
+- **Fix**: Resolved parameter mismatch bug in SettingsModal project creation where dynamic onAddProject was passed an object instead of separate name and color parameters.
 
 ### v2.1.5 (2026-07-07)
 - **UX**: Cleaned up the projects list debug print from SettingsModal after verifying state and renaming.

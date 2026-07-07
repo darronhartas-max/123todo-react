@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.5 | © Darron Hartas 2026
+Version 2.1.6 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.5 (Current)
+### v2.1.6 (Current)
+- **Settings Form Fix**: Corrected a parameter mismatch in the Settings modal where new project creation was passing an object instead of separate name and color parameters, preventing new project additions.
+
+### v2.1.5
 - **Production Cleanup**: Removed the settings modal projects debug printing after verification was completed.
 
 ### v2.1.4
