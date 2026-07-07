@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.12 | © Darron Hartas 2026
+Version 2.1.13 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.12 (Current)
+### v2.1.13 (Current)
+- **Maskable PWA Icons**: Added `"purpose": "any maskable"` property to PWA icons in `manifest.json` to tell Google Pixel/Android launchers that the icon can be rendered full-bleed, preventing the launcher from automatically wrapping the icon inside an ugly double-padded white circular badge.
+
+### v2.1.12
 - **Manifest Cache-Busting**: Added the cache-busting query parameter (`?v=2.1.11`) to the `manifest.json` link inside `index.html`. This forces Chrome/Google Play's WebAPK minting server to pull the new manifest and register the fresh cropped icons without waiting for their standard 24-hour cache expiry.
 
 ### v2.1.11
