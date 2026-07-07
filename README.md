@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.1 | © Darron Hartas 2026
+Version 2.1.2 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.1 (Current)
+### v2.1.2 (Current)
+- **Fallback Project Customization**: Converted the default "General" project from a hardcoded constant into a dynamic user-owned project. It is now listed inside the Settings modal under "Manage Projects," enabling users to rename it (e.g. to "In Box") or customize its color.
+- **Auto-Injection Migration**: Added code to auto-inject the "General" project on load or sync import if it is missing, preserving it as a reliable catch-all fallback.
+
+### v2.1.1
 - **Legacy Migration Safeguards**: Automatically transfers custom `categories` from older local storage data or Google Drive sync payloads to new `projects` storage key, and maps legacy `categoryId` properties to `projectId` on tasks.
 - **Robust Matching**: Resolved casing and name discrepancies in project lookups, making matches case-insensitive.
 - **Todoist Importer Hotfix**: Fixed a bug where tasks under pre-existing projects defaulted to "General" during Todoist CSV import.

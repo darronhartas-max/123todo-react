@@ -67,9 +67,14 @@ export const useTasks = () => {
                 let parsed = JSON.parse(savedProjects);
                 // Ensure 'all' is excluded from storage state
                 parsed = parsed.filter(p => p.id !== 'all');
+                
+                // MIGRATION: Ensure General project exists dynamically so it can be edited/renamed by user
+                if (!parsed.some(p => p.id === 'general')) {
+                    parsed.unshift({ id: 'general', name: 'General', color: '#285a82' });
+                }
                 setProjects(parsed);
             } else {
-                setProjects(DEFAULT_PROJECTS.filter(p => p.id !== 'all'));
+                setProjects([{ id: 'general', name: 'General', color: '#285a82' }]);
             }
 
             if (savedCounter) setCounter(parseInt(savedCounter));
@@ -235,7 +240,12 @@ export const useTasks = () => {
         // Map tasks and fallback legacy categoryId to projectId
         const mappedTasks = (data.tasks || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
         const mappedArchived = (data.archived || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
-        const mappedProjects = data.projects || data.categories || DEFAULT_PROJECTS.filter(p => p.id !== 'all');
+        let mappedProjects = data.projects || data.categories || [{ id: 'general', name: 'General', color: '#285a82' }];
+        
+        // MIGRATION: Ensure General project exists dynamically in imported projects
+        if (!mappedProjects.some(p => p.id === 'general')) {
+            mappedProjects.unshift({ id: 'general', name: 'General', color: '#285a82' });
+        }
 
         setTasks(mappedTasks);
         setArchived(mappedArchived);

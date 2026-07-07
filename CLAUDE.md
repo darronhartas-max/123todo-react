@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.1
+- **Version**: v2.1.2
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.1.2 (2026-07-07)
+- **UX**: Shifted the fallback "General" project from a hardcoded default constant to a dynamic project in the database. This allows it to show up in the Settings modal, enabling users to rename it (e.g., to "In Box") and change its color.
+- **Fix**: Added dynamic data migration to automatically inject the "General" project into the user's project list on load or sync import if it is missing.
 
 ### v2.1.1 (2026-07-07)
 - **Fix**: Added legacy migration layer to automatically transfer custom `categories` from older local storage data or Google Drive sync payloads to new `projects` storage.
