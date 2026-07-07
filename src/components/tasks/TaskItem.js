@@ -37,9 +37,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
         taskItem: {
             display: 'flex',
             padding: 'var(--task-padding, 10px 12px)',
+            border: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             borderBottom: '1px solid var(--border-color)',
-            background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
             borderLeft: projectColor ? `4px solid ${projectColor}` : (task.isSample ? '4px solid #0ea5e9' : 'none'),
+            background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
             cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
             marginBottom: 'var(--task-margin, 4px)',
@@ -48,7 +49,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             alignItems: 'flex-start',
             paddingTop: 'var(--task-padding-top, 12px)',
             opacity: isDragging ? 0.35 : 1,
-            border: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             boxShadow: isDragging ? 'none' : 'none'
         },
         taskPriorityDot: {
