@@ -209,7 +209,7 @@ export const useTasks = () => {
 
     const addProject = useCallback((name, color) => {
         const id = name.toLowerCase().replace(/\s+/g, '-');
-        if (projects.some(p => p.id === id)) return;
+        if (projects.some(p => p.id === id)) return id;
 
         const newProject = { id, name, color };
         setProjects(prev => [...prev, newProject]);

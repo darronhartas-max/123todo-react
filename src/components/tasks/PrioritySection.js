@@ -38,7 +38,10 @@ const PrioritySection = ({
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 <AnimatePresence mode="popLayout">
                     {sectionTasks.map(task => {
-                        const project = projects.find(p => p.id === task.projectId);
+                        const project = projects.find(p => 
+                            p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                            p.name.toLowerCase() === task.projectId?.toLowerCase()
+                        );
                         return (
                             <TaskItem
                                 key={task.id}
