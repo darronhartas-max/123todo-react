@@ -156,11 +156,12 @@ const SettingsModal = ({
         }),
         actions: {
             display: 'flex',
-            gap: '6px'
+            gap: '12px',
+            alignItems: 'center'
         },
         actionBtn: {
-            padding: '6px',
-            borderRadius: '6px',
+            padding: '8px 10px',
+            borderRadius: '8px',
             background: 'var(--bg-color)',
             border: '1px solid var(--border-color)',
             cursor: 'pointer',
@@ -168,7 +169,9 @@ const SettingsModal = ({
             alignItems: 'center',
             justifyContent: 'center',
             color: 'var(--muted-text)',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.15s ease',
+            minWidth: '36px',
+            minHeight: '36px'
         },
         addSection: {
             marginTop: '20px',
@@ -367,32 +370,32 @@ const SettingsModal = ({
                                                         <div style={styles.colorDot(project.color)} />
                                                         {project.name}
                                                     </div>
-                                                    <div style={styles.actions}>
-                                                        <button
-                                                            style={styles.actionBtn}
-                                                            onClick={() => {
-                                                                setEditingProjectId(project.id);
-                                                                setEditName(project.name);
-                                                                setEditColor(project.color);
-                                                            }}
-                                                            title="Edit project"
-                                                        >
-                                                            <Edit2 size={14} />
-                                                        </button>
-                                                        <button
-                                                            style={{ ...styles.actionBtn, color: '#dc2626' }}
-                                                            onClick={() => {
-                                                                if (projects.length === 1) {
-                                                                    alert("You must have at least one project remaining.");
-                                                                    return;
-                                                                }
-                                                                onDeleteProject(project.id);
-                                                            }}
-                                                            title="Delete project"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                    </div>
+                                                     <div style={styles.actions}>
+                                                         <button
+                                                             style={styles.actionBtn}
+                                                             onClick={() => {
+                                                                 setEditingProjectId(project.id);
+                                                                 setEditName(project.name);
+                                                                 setEditColor(project.color);
+                                                             }}
+                                                             title="Edit project"
+                                                         >
+                                                             <Edit2 size={18} />
+                                                         </button>
+                                                         <button
+                                                             style={{ ...styles.actionBtn, color: '#dc2626', borderColor: '#fee2e2' }}
+                                                             onClick={() => {
+                                                                 if (projects.length === 1) {
+                                                                     alert("You must have at least one project remaining.");
+                                                                     return;
+                                                                 }
+                                                                 onDeleteProject(project.id);
+                                                             }}
+                                                             title="Delete project"
+                                                         >
+                                                             <Trash2 size={18} />
+                                                         </button>
+                                                     </div>
                                                 </>
                                             )}
                                         </div>
