@@ -357,7 +357,7 @@ const TodoApp = () => {
           isOpen={showAddSection}
           onAdd={addTask}
           onClose={() => setShowAddSection(false)}
-          projects={projects}
+          projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
           defaultProjectId={currentProjectId}
         />
 
@@ -519,7 +519,7 @@ const TodoApp = () => {
       {editingTask && (
         <EditModal
           task={editingTask}
-          projects={projects}
+          projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
         />
