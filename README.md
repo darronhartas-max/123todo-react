@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.10 | © Darron Hartas 2026
+Version 2.1.11 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.10 (Current)
+### v2.1.11 (Current)
+- **Asset Cleanup**: Deleted the temporary verification preview logo file to clean up public assets.
+
+### v2.1.10
 - **Refined Dark Theme Logo**: Updated the dark theme logo to render both the text and the entire checkmark icon (ring and tick path) in solid white against a completely transparent background for a premium, highly legible dark mode aesthetic.
 
 ### v2.1.9
