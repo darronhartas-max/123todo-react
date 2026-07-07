@@ -3,18 +3,18 @@
   "name": "123 ToDo - Simple Task Management",
   "icons": [
     {
-      "src": "favicon.ico?v=2.1.8",
+      "src": "favicon.ico?v=2.1.14",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png?v=2.1.8",
+      "src": "logo192.png?v=2.1.14",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo512.png?v=2.1.8",
+      "src": "logo512.png?v=2.1.14",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = '2.1.13' }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = '2.1.14' }) => {
     const styles = {
         footer: {
             flexShrink: 0,
