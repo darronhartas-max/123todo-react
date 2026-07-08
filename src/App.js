@@ -266,14 +266,28 @@ const TodoApp = () => {
     const allTasksToImport = [];
 
     importedProjects.forEach(ip => {
-      // Create project or get existing if name matches (though addProject handles uniqueness)
-      const projectId = addProject(ip.name, PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)]);
+      let projectId;
+
+      if (ip.targetProjectId) {
+        // Phase 2: user mapped this CSV to an existing project — use it directly
+        projectId = ip.targetProjectId;
+      } else {
+        // Phase 1 fix: case-insensitive duplicate guard before creating a new project
+        const existingMatch = projects.find(
+          p => p.name.toLowerCase() === ip.name.toLowerCase()
+        );
+        if (existingMatch) {
+          projectId = existingMatch.id;
+        } else {
+          projectId = addProject(ip.name, ip.color || PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)]);
+        }
+      }
 
       const projectTasks = ip.tasks.map(t => ({
         text: t.text,
         priority: t.priority,
         projectId: projectId,
-        notes: t.notes
+        notes: t.notes || ''
       }));
 
       allTasksToImport.push(...projectTasks);
