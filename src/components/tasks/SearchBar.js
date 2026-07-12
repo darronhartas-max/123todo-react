@@ -48,6 +48,7 @@ const SearchBar = ({ value, onChange, onClear }) => {
                 <Search size={16} />
             </div>
             <input
+                id="searchInput"
                 type="text"
                 placeholder="Search tasks..."
                 value={value}

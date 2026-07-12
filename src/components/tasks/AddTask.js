@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH, MAX_NOTES_LENGTH } from '../../utils/constants';
+import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { Plus, Minus } from 'lucide-react';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
@@ -170,7 +170,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                             borderColor: 'var(--border-color)',
                             overflowY: 'auto'
                         }}
-                        maxLength={MAX_NOTES_LENGTH}
                     />
                     <div style={{
                         fontSize: '0.85rem',
@@ -178,7 +177,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         textAlign: 'right',
                         marginTop: '2px'
                     }}>
-                        {notes.length}/{MAX_NOTES_LENGTH}
+                        {notes.length} chars
                     </div>
                 </div>
             )}

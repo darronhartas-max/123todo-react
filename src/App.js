@@ -115,6 +115,61 @@ const TodoApp = () => {
     }
   }, [density]);
 
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore shortcut keys if user is typing in an input, select, or textarea
+      const activeEl = document.activeElement;
+      if (activeEl && (
+        activeEl.tagName === 'INPUT' ||
+        activeEl.tagName === 'TEXTAREA' ||
+        activeEl.tagName === 'SELECT' ||
+        activeEl.isContentEditable
+      )) {
+        // Allow Escape to blur the input/textarea (unfocus it)
+        if (e.key === 'Escape') {
+          activeEl.blur();
+        }
+        return;
+      }
+
+      // 1. "a" or "q" to toggle Add Task Panel
+      if (e.key === 'a' || e.key === 'q') {
+        e.preventDefault();
+        setShowAddSection(prev => !prev);
+      }
+
+      // 2. "/" to focus Search Bar
+      if (e.key === '/') {
+        e.preventDefault();
+        setShowSearch(true);
+        setTimeout(() => {
+          document.getElementById('searchInput')?.focus();
+        }, 50);
+      }
+
+      // 3. "s" to open Settings
+      if (e.key === 's') {
+        e.preventDefault();
+        setShowSettings(true);
+      }
+
+      // 4. "Esc" to close active modal or Add Task Panel
+      if (e.key === 'Escape') {
+        if (editingTask) {
+          setEditingTask(null);
+        } else if (showSettings) {
+          setShowSettings(false);
+        } else if (showAddSection) {
+          setShowAddSection(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [editingTask, showSettings, showAddSection]);
+
   useEffect(() => {
     const root = document.documentElement;
     

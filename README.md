@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.2.1 | © Darron Hartas 2026
+Version 2.2.2 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.2.1 (Current)
+### v2.2.2 (Current)
+- **Keyboard Shortcuts**: Added support for common task shortcuts (`a`/`q` to toggle add task input, `/` to focus search, `s` to open settings, and `Esc` to close modals or cancel actions). Includes input focus detection to avoid clashes while typing.
+
+### v2.2.1
 - **Cross-Priority Dragging**: Enabled drag-and-drop task movements across priority sections (automatically reassigns task priorities upon drop).
 - **Section Drop Targets**: Transformed priority section headers and background areas into drop targets, making it easy to sort a task to the very top of a category (especially useful for touchscreens on mobile).
 - **Visual Drop Helpers**: Added a dashed border section indicator and a default minimum drop-zone height for empty lists to enhance dragging usability.

@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.2.1
+- **Version**: v2.2.2
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,9 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.2.2 (2026-07-12)
+- **Feature**: Added global keyboard shortcuts for power users: `a`/`q` (toggle task input), `/` (search focus), `s` (settings), and `Esc` (unfocus/close). Added strict focus checks to prevent triggering shortcuts while typing inside form inputs.
 
 ### v2.2.1 (2026-07-12)
 - **UX**: Enhanced drag-and-drop to support moving tasks across different priority sections (automatically updates task priority on drop).
