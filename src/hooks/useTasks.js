@@ -199,15 +199,39 @@ export const useTasks = () => {
     const reorderTasks = useCallback((draggedId, targetId) => {
         setTasks(prev => {
             const fromIndex = prev.findIndex(t => t.id === draggedId);
-            const toIndex = prev.findIndex(t => t.id === targetId);
+            if (fromIndex === -1) return prev;
 
-            if (fromIndex > -1 && toIndex > -1) {
-                const newTasks = [...prev];
-                const [movedTask] = newTasks.splice(fromIndex, 1);
-                newTasks.splice(toIndex, 0, movedTask);
+            const newTasks = [...prev];
+            const [movedTask] = newTasks.splice(fromIndex, 1);
+
+            // Handle dropping directly onto a priority section header or background
+            if (typeof targetId === 'string' && targetId.startsWith('priority-')) {
+                const newPriority = parseInt(targetId.split('-')[1]);
+                if ([1, 2, 3, 4].includes(newPriority)) {
+                    movedTask.priority = newPriority;
+                }
+                const targetIdx = newTasks.findIndex(t => t.priority === movedTask.priority);
+                if (targetIdx > -1) {
+                    newTasks.splice(targetIdx, 0, movedTask);
+                } else {
+                    newTasks.unshift(movedTask);
+                }
                 return newTasks;
             }
-            return prev;
+
+            // Handle standard task-to-task sorting
+            const toIndex = newTasks.findIndex(t => t.id === targetId);
+            if (toIndex > -1) {
+                const targetTask = newTasks[toIndex];
+                // Update priority to match the target task's section
+                movedTask.priority = targetTask.priority;
+                newTasks.splice(toIndex, 0, movedTask);
+                return newTasks;
+            } else {
+                // Fallback: put it back where it was
+                newTasks.splice(fromIndex, 0, movedTask);
+                return newTasks;
+            }
         });
         setTimestamp(Date.now());
     }, []);

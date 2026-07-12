@@ -22,7 +22,11 @@ const PrioritySection = ({
     if (sectionTasks.length === 0 && priority === 4) return null; // Hide On Hold if empty
 
     return (
-        <div style={{ marginBottom: 'var(--section-margin, 16px)', flex: 1, minWidth: 0 }}>
+        <div 
+            style={{ marginBottom: 'var(--section-margin, 16px)', flex: 1, minWidth: 0 }}
+            onDragOver={(e) => handleDragOver(e, `priority-${priority}`)}
+            onDrop={(e) => handleDrop(e, `priority-${priority}`)}
+        >
             <h3 style={{
                 fontSize: '0.85rem',
                 fontWeight: '800',
@@ -35,7 +39,18 @@ const PrioritySection = ({
             }}>
                 {config.label}
             </h3>
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <ul 
+                style={{ 
+                    listStyle: 'none', 
+                    margin: 0, 
+                    minHeight: (dragOverId === `priority-${priority}` || sectionTasks.length === 0) ? '60px' : 'auto',
+                    border: dragOverId === `priority-${priority}` ? '2px dashed var(--accent-color)' : '2px dashed transparent',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box',
+                    padding: dragOverId === `priority-${priority}` ? '4px 0' : '0'
+                }}
+            >
                 <AnimatePresence mode="popLayout">
                     {sectionTasks.map(task => {
                         const project = projects.find(p => 
@@ -53,8 +68,14 @@ const PrioritySection = ({
                                 isDragOver={dragOverId === task.id}
                                 dragHandlers={{
                                     onDragStart: (e) => handleDragStart(e, task.id),
-                                    onDragOver: (e) => handleDragOver(e, task.id),
-                                    onDrop: (e) => handleDrop(e, task.id),
+                                    onDragOver: (e) => {
+                                        e.stopPropagation();
+                                        handleDragOver(e, task.id);
+                                    },
+                                    onDrop: (e) => {
+                                        e.stopPropagation();
+                                        handleDrop(e, task.id);
+                                    },
                                     onDragEnd: handleDragEnd
                                 }}
                             />

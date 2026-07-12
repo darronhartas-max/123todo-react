@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.1.13
+- **Version**: v2.2.1
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -143,6 +143,16 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.2.1 (2026-07-12)
+- **UX**: Enhanced drag-and-drop to support moving tasks across different priority sections (automatically updates task priority on drop).
+- **UX**: Added section-level drop zones (dropping on section header or background places the task at the very top of that priority).
+- **UX**: Added dynamic dashed border drop-zone helper and expanded empty section heights to make dragging targets intuitive on mobile.
+- **Fix**: Resolved React inline style reconciliation bug in TaskItem where drag state updates clobbered the custom project left border color.
+- **Fix**: Resolved Notes textarea height-clipping bug in EditModal by changing `overflow: 'hidden'` to `overflowY: 'auto'` to prevent text from cutting off after ~500 characters.
+
+### v2.2.0 (2026-07-08)
+- **Feature**: Added Todoist CSV import wizard supporting project mapping (Phase 1 + 2).
 
 ### v2.1.13 (2026-07-07)
 - **Feature**: Added `purpose: "any maskable"` to PWA icons in `manifest.json` to prevent Android/Pixel devices from displaying the launcher icon inside a double-padded white circle badge (enabling full-bleed adaptive icons).

@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.1.13 | © Darron Hartas 2026
+Version 2.2.1 | © Darron Hartas 2026
 
 ---
 
@@ -276,7 +276,17 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.1.13 (Current)
+### v2.2.1 (Current)
+- **Cross-Priority Dragging**: Enabled drag-and-drop task movements across priority sections (automatically reassigns task priorities upon drop).
+- **Section Drop Targets**: Transformed priority section headers and background areas into drop targets, making it easy to sort a task to the very top of a category (especially useful for touchscreens on mobile).
+- **Visual Drop Helpers**: Added a dashed border section indicator and a default minimum drop-zone height for empty lists to enhance dragging usability.
+- **Project Color Reconciliation Fix**: Stopped drag-and-drop state switches from erasing the color-coded project indicator bar on task items.
+- **Task Notes Cutoff Fix**: Changed notes textarea styling from `overflow: 'hidden'` to `overflowY: 'auto'` in `EditModal` to resolve a bug where notes longer than 500 characters were visually clipped.
+
+### v2.2.0
+- **Todoist Import Wizard**: Introduced CSV parsing and column-mapping workflows to seamlessly migrate tasks and projects from Todoist.
+
+### v2.1.13
 - **Maskable PWA Icons**: Added `"purpose": "any maskable"` property to PWA icons in `manifest.json` to tell Google Pixel/Android launchers that the icon can be rendered full-bleed, preventing the launcher from automatically wrapping the icon inside an ugly double-padded white circular badge.
 
 ### v2.1.12

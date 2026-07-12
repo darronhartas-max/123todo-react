@@ -24,8 +24,8 @@ This document outlines the planned refinements for the 123 ToDo application to i
 - [x] **Dark Mode**
     - [x] Implement system-aware dark mode support.
     - [x] Define a refined dark color palette.
-- [ ] **Improved Feedback**
-    - [ ] Better visual cues during Drag & Drop operations.
+- [/] **Improved Feedback**
+    - [x] Better visual cues during Drag & Drop operations (dashed outline drop-zone borders, highlighted sections, expanded empty targets).
     - [ ] Haptic feedback (where supported on mobile).
 
 ## 🚀 Phase 3: Enhanced Functionality
@@ -40,6 +40,7 @@ This document outlines the planned refinements for the 123 ToDo application to i
     - [x] User-configurable projects with custom names and colors.
     - [x] Horizontal tab filtering system.
     - [x] Context-aware task assignment.
+    - [x] Support cross-priority dragging and dropping (automatically updates task priority).
 
 ## 💎 Version 1.1 Revisions (Completed)
 - [x] **UI Scaling**: 10% increase in text sizes across all components for better readability.
