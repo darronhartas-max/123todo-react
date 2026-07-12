@@ -37,7 +37,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
             border: '1px solid var(--border-color)',
             borderRadius: '4px',
             resize: 'none',
-            overflow: 'hidden',
+            overflowY: 'auto',
             marginBottom: '12px',
             minHeight: '60px',
             maxHeight: '300px',
