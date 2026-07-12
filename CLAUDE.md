@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.2.2
+- **Version**: v2.2.1
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -20,8 +20,9 @@
 
 2. **Task Management**
    - Add, edit, complete, archive, restore tasks
-   - 200 character limit per task
-   - Drag-and-drop reordering within priorities
+   - 200 character limit per task title
+   - Unlimited-length notes field per task (ideal for full Todoist migrations)
+   - Drag-and-drop reordering within and across priorities
    - Sample tasks for new users
 
 3. **Engagement Features**
@@ -34,7 +35,8 @@
 4. **Data Management**
    - JSON export/import for backup
    - All data stored in browser localStorage
-   - Project structure preserved in backups (New v1.1)
+   - Project structure preserved in backups
+   - **Todoist Import Wizard**: 3-step CSV import — upload, map projects, confirm
 
 5. **Advanced Features (v1.1)**
    - **Project Layer**: Custom project tabs with color coding
@@ -135,7 +137,7 @@
 
 ---
 
-**Last Updated**: 2026-07-07 (v2.1.0 - Layout & Appearance Settings)
+**Last Updated**: 2026-07-12 (v2.2.1 — Unlimited Notes & Todoist Import Wizard)
 **Project Owner**: Darron Hartas
 **License**: © Darron Hartas 2026
 **Live URLs**:
@@ -144,15 +146,16 @@
 
 ## Version History
 
-### v2.2.2 (2026-07-12)
-- **Feature**: Added global keyboard shortcuts for power users: `a`/`q` (toggle task input), `/` (search focus), `s` (settings), and `Esc` (unfocus/close). Added strict focus checks to prevent triggering shortcuts while typing inside form inputs.
-
 ### v2.2.1 (2026-07-12)
-- **UX**: Enhanced drag-and-drop to support moving tasks across different priority sections (automatically updates task priority on drop).
-- **UX**: Added section-level drop zones (dropping on section header or background places the task at the very top of that priority).
-- **UX**: Added dynamic dashed border drop-zone helper and expanded empty section heights to make dragging targets intuitive on mobile.
-- **Fix**: Resolved React inline style reconciliation bug in TaskItem where drag state updates clobbered the custom project left border color.
-- **Fix**: Resolved Notes textarea height-clipping bug in EditModal by changing `overflow: 'hidden'` to `overflowY: 'auto'` to prevent text from cutting off after ~500 characters.
+- **Feature**: Removed the 2,048-character cap on task notes — notes are now unlimited length, ensuring large Todoist descriptions import and display without truncation or breakage in the Edit modal.
+- **Feature**: Complete Todoist import wizard (3-step: Upload → Map Projects → Confirm).
+  - Drag-and-drop on upload zone now works correctly.
+  - `TYPE=section` and `TYPE=note` rows filtered out at parse time (no more ghost tasks).
+  - `DATE` column appended to task notes as `📅 Due: …`
+  - `INDENT` column respected — sub-tasks prefixed with `↳`.
+  - Fuzzy project name matching pre-selects best existing project per CSV file.
+  - Case-insensitive duplicate project guard before creating new projects.
+  - `handleTodoistImportData` updated to use `targetProjectId` from mapping step.
 
 ### v2.2.0 (2026-07-08)
 - **Feature**: Added Todoist CSV import wizard supporting project mapping (Phase 1 + 2).

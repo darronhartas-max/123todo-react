@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.2.2 | © Darron Hartas 2026
+Version 2.2.1 | © Darron Hartas 2026
 
 ---
 
@@ -42,7 +42,7 @@ npm run build
 - **Search System**: Powerful search bar to filter tasks by text across any category
 - **Category Management**: Create, edit, and delete custom categories with color coding
 - **Consolidated "Manage" Hub**: Centralized modal for all category maintenance tasks
-- **Note Management**: Add detailed descriptions to tasks (up to 2,048 characters)
+- **Note Management**: Add unlimited-length descriptions to tasks — ideal for rich Todoist migrations
 - **Compact View**: Notes are hidden by default with a `+` toggle to save space
 
 ### Priority System
@@ -54,7 +54,7 @@ npm run build
 ### Data Management
 - **Local Storage**: All data stored in your browser (no server required)
 - **Export/Import**: JSON backup and restore functionality
-- **Todoist Import**: Direct CSV import support for Todoist projects (multi-file)
+- **Todoist Import**: Full 3-step wizard — upload CSVs, map each to an existing or new project, confirm before writing
 - **Archive System**: Completed tasks saved with timestamps
 - **Restore Feature**: Bring archived tasks back with new priority
 
@@ -118,8 +118,8 @@ npm run build
    - On Hold: Tasks waiting on external factors
 
 2. **Keep Tasks Concise**
-   - Use the 200-character limit to stay focused
-   - One task = one action
+   - Use the 200-character task title limit to stay focused
+   - One task = one action; use the Notes field for extra detail
    - Break large projects into smaller tasks
 
 3. **Regular Backups**
@@ -276,18 +276,19 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 - **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
 
-### v2.2.2 (Current)
-- **Keyboard Shortcuts**: Added support for common task shortcuts (`a`/`q` to toggle add task input, `/` to focus search, `s` to open settings, and `Esc` to close modals or cancel actions). Includes input focus detection to avoid clashes while typing.
-
-### v2.2.1
-- **Cross-Priority Dragging**: Enabled drag-and-drop task movements across priority sections (automatically reassigns task priorities upon drop).
-- **Section Drop Targets**: Transformed priority section headers and background areas into drop targets, making it easy to sort a task to the very top of a category (especially useful for touchscreens on mobile).
-- **Visual Drop Helpers**: Added a dashed border section indicator and a default minimum drop-zone height for empty lists to enhance dragging usability.
-- **Project Color Reconciliation Fix**: Stopped drag-and-drop state switches from erasing the color-coded project indicator bar on task items.
-- **Task Notes Cutoff Fix**: Changed notes textarea styling from `overflow: 'hidden'` to `overflowY: 'auto'` in `EditModal` to resolve a bug where notes longer than 500 characters were visually clipped.
+### v2.2.1 (Current)
+- **Unlimited Task Notes**: Removed the previous 2,048-character cap on task notes. Notes fields now accept any length of text, ensuring Todoist task descriptions of any size import and display cleanly without truncation.
+- **Todoist Import — Bug Fixes & Project Mapping Wizard**: Full 3-step import experience:
+  - *Step 1 — Upload*: Drag-and-drop (now fully working) or click to select one or more Todoist CSV project exports at once.
+  - *Step 2 — Map Projects*: Each CSV is listed with a dropdown to assign it to an existing 123todo project or create a new one. A fuzzy name matcher pre-selects the best match and displays a green "matched" badge.
+  - *Step 3 — Confirm*: Summary table of all projects and task counts before any data is written.
+  - Todoist `TYPE=section` and `TYPE=note` rows are now filtered out (previously imported as ghost tasks).
+  - `DATE` column is mapped to task notes as `📅 Due: …`
+  - `INDENT` column is respected — sub-tasks get a `↳` prefix to preserve hierarchy.
+  - Case-insensitive duplicate project name guard prevents creating duplicate projects.
 
 ### v2.2.0
-- **Todoist Import Wizard**: Introduced CSV parsing and column-mapping workflows to seamlessly migrate tasks and projects from Todoist.
+- **Todoist Import Wizard (initial)**: Introduced CSV parsing and column-mapping workflows to seamlessly migrate tasks and projects from Todoist.
 
 ### v2.1.13
 - **Maskable PWA Icons**: Added `"purpose": "any maskable"` property to PWA icons in `manifest.json` to tell Google Pixel/Android launchers that the icon can be rendered full-bleed, preventing the launcher from automatically wrapping the icon inside an ugly double-padded white circular badge.
@@ -367,8 +368,8 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 - **Social Sharing Spacing & Icon Size**: Enlarged share icons by 20% to 26px and restructured footer margins/padding to save height.
 
 ### v1.4.0
-- **Todoist CSV Import**: New robust importer for Todoist projects with multi-file support and automatic mapping.
-- **Task Notes & Descriptions**: Added support for long-form task notes (up to 2,048 chars) with a toggleable UI.
+- **Todoist CSV Import**: Initial importer for Todoist projects with multi-file support (later replaced by the full wizard in v2.2.1).
+- **Task Notes & Descriptions**: Added support for long-form task notes with a toggleable UI (limit later removed in v2.2.1).
 - **Atomic ID Generation**: Completely refactored task ID system to be atomic, preventing collisions during bulk operations.
 - **Improved Task Editor**: Notes field in the edit modal now auto-grows for better visibility.
 - **Production Build Polish**: Resolved all ESLint warnings for a perfectly clean deployment bundle.
