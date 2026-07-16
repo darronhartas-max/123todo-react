@@ -1,6 +1,49 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS } from '../utils/constants';
 
+// Sanitizes task lists to resolve any duplicate task IDs or missing IDs,
+// ensuring every task has a unique integer ID and the counter is correct.
+const sanitizeTaskIds = (tasksList, archivedList, startCounter) => {
+    const usedIds = new Set();
+    let maxId = startCounter;
+
+    // Find the maximum ID used in either list to ensure auto-generated IDs do not collide
+    const findMaxId = (list) => {
+        (list || []).forEach(t => {
+            if (t && typeof t.id === 'number' && t.id > maxId) {
+                maxId = t.id;
+            }
+        });
+    };
+    findMaxId(tasksList);
+    findMaxId(archivedList);
+
+    let currentCounter = maxId;
+
+    const sanitizeList = (list) => {
+        return (list || []).map(task => {
+            if (!task) return null;
+            let id = task.id;
+            if (id === undefined || id === null || usedIds.has(id)) {
+                currentCounter++;
+                id = currentCounter;
+            } else {
+                usedIds.add(id);
+            }
+            return { ...task, id };
+        }).filter(Boolean);
+    };
+
+    const sanitizedTasks = sanitizeList(tasksList);
+    const sanitizedArchived = sanitizeList(archivedList);
+
+    return {
+        tasks: sanitizedTasks,
+        archived: sanitizedArchived,
+        counter: currentCounter
+    };
+};
+
 export const useTasks = () => {
     const [tasks, setTasks] = useState([]);
     const [archived, setArchived] = useState([]);
@@ -51,16 +94,18 @@ export const useTasks = () => {
                 }
             }
 
+            let loadedTasks = [];
             if (savedTasks) {
                 const parsed = JSON.parse(savedTasks);
                 // MIGRATION: Ensure every task has a projectId, support fallback from legacy categoryId
-                setTasks(parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' })));
+                loadedTasks = parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
             }
 
+            let loadedArchived = [];
             if (savedArchived) {
                 const parsed = JSON.parse(savedArchived);
                 // MIGRATION: Ensure every archived task has a projectId, support fallback from legacy categoryId
-                setArchived(parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' })));
+                loadedArchived = parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
             }
 
             if (savedProjects) {
@@ -77,9 +122,17 @@ export const useTasks = () => {
                 setProjects([{ id: 'general', name: 'General', color: '#285a82' }]);
             }
 
-            if (savedCounter) setCounter(parseInt(savedCounter));
+            let startCounter = 0;
+            if (savedCounter) startCounter = parseInt(savedCounter, 10);
+            
             const savedTimestamp = localStorage.getItem(STORAGE_KEYS.TIMESTAMP);
             if (savedTimestamp) setTimestamp(parseInt(savedTimestamp));
+
+            // Sanitize loaded tasks and assign unique IDs to resolve collisions
+            const sanitized = sanitizeTaskIds(loadedTasks, loadedArchived, startCounter);
+            setTasks(sanitized.tasks);
+            setArchived(sanitized.archived);
+            setCounter(sanitized.counter);
 
             // Add sample tasks if new user
             if (!savedTasks && !savedArchived) {
@@ -271,20 +324,23 @@ export const useTasks = () => {
             mappedProjects.unshift({ id: 'general', name: 'General', color: '#285a82' });
         }
 
-        setTasks(mappedTasks);
-        setArchived(mappedArchived);
+        // Sanitize imported tasks to resolve duplicate ID collisions
+        const sanitized = sanitizeTaskIds(mappedTasks, mappedArchived, data.counter || 0);
+
+        setTasks(sanitized.tasks);
+        setArchived(sanitized.archived);
         setProjects(mappedProjects);
-        setCounter(data.counter || 0);
+        setCounter(sanitized.counter);
         if (data.timestamp) setTimestamp(data.timestamp);
 
         // Also update shadow backup upon successful manual import
         try {
             const now = Date.now();
             const snapshot = {
-                tasks: mappedTasks,
-                archived: mappedArchived,
+                tasks: sanitized.tasks,
+                archived: sanitized.archived,
                 projects: mappedProjects,
-                counter: data.counter || 0,
+                counter: sanitized.counter,
                 timestamp: now
             };
             localStorage.setItem(STORAGE_KEYS.SHADOW_BACKUP, JSON.stringify(snapshot));

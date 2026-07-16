@@ -28,6 +28,25 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         localDataRef.current = localData;
     }, [localData]);
 
+    const handleTokenExpired = useCallback(() => {
+        console.warn('Google Access Token expired or invalid.');
+        localStorage.removeItem('123Todo_Google_AccessToken');
+        localStorage.removeItem('123Todo_Google_TokenExpiry');
+        accessTokenRef.current = null;
+        if (localStorage.getItem('123Todo_Google_Authed') === 'true' && tokenClientRef.current) {
+            try {
+                tokenClientRef.current.requestAccessToken({ prompt: '' });
+            } catch (err) {
+                console.error('Failed to silently request token:', err);
+                setIsAuthed(false);
+                setSyncStatus('offline');
+            }
+        } else {
+            setIsAuthed(false);
+            setSyncStatus('offline');
+        }
+    }, []);
+
     const performSync = useCallback(async (isInitial = false) => {
         if (!accessTokenRef.current || !passphrase) return;
 
@@ -35,22 +54,30 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         try {
             const headers = { 'Authorization': `Bearer ${accessTokenRef.current}` };
             
-            // 1. Check if the file exists on Drive
-            const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${SYNC_FILE_NAME}'&fields=files(id, modifiedTime)`, { headers });
+            // 1. Check if the file exists on Drive, fetching metadata description as the JS timestamp
+            const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${SYNC_FILE_NAME}'&fields=files(id, modifiedTime, description)`, { headers });
+            if (searchRes.status === 401) {
+                handleTokenExpired();
+                return;
+            }
             const searchData = await searchRes.json();
             
             const remoteFile = searchData.files && searchData.files.length > 0 ? searchData.files[0] : null;
             let remoteTimestamp = 0;
             if (remoteFile) {
                 syncFileIdRef.current = remoteFile.id;
-                remoteTimestamp = new Date(remoteFile.modifiedTime).getTime();
+                // Use description field (exact local timestamp), falling back to modifiedTime if not set
+                remoteTimestamp = parseInt(remoteFile.description, 10) || new Date(remoteFile.modifiedTime).getTime();
             }
 
             const currentLocalData = localDataRef.current;
             const localTimestamp = currentLocalData.timestamp || 0;
 
             const uploadSyncFile = async (base64Payload, fileId = null) => {
-                const metadata = { name: SYNC_FILE_NAME };
+                const metadata = { 
+                    name: SYNC_FILE_NAME,
+                    description: localTimestamp.toString() // Store exact local JS timestamp in metadata
+                };
                 if (!fileId) {
                     metadata.parents = ['appDataFolder'];
                 }
@@ -59,26 +86,35 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                 form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
                 form.append('file', new Blob([fileContent], { type: 'application/json' }));
 
-                let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime';
+                let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime,description';
                 let method = 'POST';
                 if (fileId) {
-                    url = `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&fields=id,modifiedTime`;
+                    url = `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&fields=id,modifiedTime,description`;
                     method = 'PATCH';
                 }
 
                 const res = await fetch(url, { method, headers, body: form });
+                if (res.status === 401) {
+                    handleTokenExpired();
+                    return;
+                }
                 if (!res.ok) throw new Error('Upload failed: ' + await res.text());
                 return await res.json();
             };
 
             const downloadSyncFile = async (fileId) => {
                 const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers });
+                if (res.status === 401) {
+                    handleTokenExpired();
+                    return;
+                }
                 if (!res.ok) throw new Error('Download failed');
                 return await res.json();
             };
 
             if (isInitial && remoteFile) {
                  const fileData = await downloadSyncFile(remoteFile.id);
+                 if (!fileData) return; // 401 handled
                  if (fileData && fileData.payload) {
                      const decrypted = await decryptData(fileData.payload, passphrase);
                      if (decrypted.timestamp > localTimestamp || localTimestamp === 0) {
@@ -92,10 +128,13 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                 // PUSH
                 const encrypted = await encryptData(currentLocalData, passphrase);
                 const updatedFile = await uploadSyncFile(encrypted, syncFileIdRef.current);
-                syncFileIdRef.current = updatedFile.id;
+                if (updatedFile) {
+                    syncFileIdRef.current = updatedFile.id;
+                }
             } else if (remoteTimestamp > localTimestamp && remoteFile) {
                 // PULL
                 const fileData = await downloadSyncFile(remoteFile.id);
+                if (!fileData) return; // 401 handled
                 if (fileData && fileData.payload) {
                     const decrypted = await decryptData(fileData.payload, passphrase);
                     importDataCallback(decrypted);
@@ -107,12 +146,25 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             console.error('Sync failed:', error);
             setSyncStatus('error');
         }
-    }, [passphrase, importDataCallback]);
+    }, [passphrase, importDataCallback, handleTokenExpired]);
 
     // Initialize Google Identity Services
     useEffect(() => {
         const initGoogleClient = () => {
             if (window.google && window.google.accounts) {
+                // First, check if we have a valid stored token. If so, use it immediately!
+                const storedToken = localStorage.getItem('123Todo_Google_AccessToken');
+                const storedExpiry = localStorage.getItem('123Todo_Google_TokenExpiry');
+                let hasValidToken = false;
+
+                if (storedToken && storedExpiry && Date.now() < parseInt(storedExpiry, 10)) {
+                    accessTokenRef.current = storedToken;
+                    setIsAuthed(true);
+                    hasValidToken = true;
+                    // Trigger an initial pull/sync
+                    performSync(true);
+                }
+
                 tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
                     client_id: CLIENT_ID,
                     scope: SCOPES,
@@ -120,6 +172,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                         if (tokenResponse.error !== undefined) {
                             console.error('Google Auth Error:', tokenResponse);
                             setIsAuthed(false);
+                            localStorage.removeItem('123Todo_Google_AccessToken');
+                            localStorage.removeItem('123Todo_Google_TokenExpiry');
                             if (tokenResponse.type === 'tokenFailed') {
                                 localStorage.removeItem('123Todo_Google_Authed');
                             }
@@ -128,13 +182,17 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                         accessTokenRef.current = tokenResponse.access_token;
                         setIsAuthed(true);
                         localStorage.setItem('123Todo_Google_Authed', 'true');
+                        // Store the token and expiry (expires_in is in seconds, e.g. 3600)
+                        const expiryTime = Date.now() + (parseInt(tokenResponse.expires_in, 10) || 3600) * 1000;
+                        localStorage.setItem('123Todo_Google_AccessToken', tokenResponse.access_token);
+                        localStorage.setItem('123Todo_Google_TokenExpiry', expiryTime.toString());
                         // Trigger an initial pull/sync
                         performSync(true);
                     },
                 });
 
-                // Attempt automatic sign-in if they previously signed in
-                if (localStorage.getItem('123Todo_Google_Authed') === 'true') {
+                // Attempt automatic sign-in if they previously signed in AND we don't have a valid token currently
+                if (!hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
                     // prompt: '' attempts to sign in silently without the popup if they are already authorized
                     tokenClientRef.current.requestAccessToken({ prompt: '' });
                 }
@@ -146,7 +204,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         };
         initGoogleClient();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [performSync]);
 
     const signIn = useCallback(() => {
         if (tokenClientRef.current) {
@@ -165,6 +223,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         setSyncStatus('offline');
         setPassphrase('');
         localStorage.removeItem('123Todo_Google_Authed');
+        localStorage.removeItem('123Todo_Google_AccessToken');
+        localStorage.removeItem('123Todo_Google_TokenExpiry');
         syncFileIdRef.current = null;
     }, []);
 

@@ -31,15 +31,15 @@ const TodoApp = () => {
   } = useTasks();
 
   const {
+    isAuthed, syncStatus, passphrase, setPassphrase, signIn, signOut, performSync
+  } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
+
+  const {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
     showUpdateReady, swRegistration,
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
     dismissBackupReminder, recordBackup
-  } = useAppSystem(archived.length, tasks.length);
-
-  const {
-    isAuthed, syncStatus, passphrase, setPassphrase, signIn, signOut, performSync
-  } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
+  } = useAppSystem(archived.length, tasks.length, isAuthed);
 
   // UI State
   const [showAddSection, setShowAddSection] = useState(false);

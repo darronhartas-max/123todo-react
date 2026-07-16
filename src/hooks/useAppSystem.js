@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, BACKUP_REMINDER_DAYS, INSTALL_PROMPT_DAYS } from '../utils/constants';
 
-export const useAppSystem = (archivedCount, tasksCount) => {
+export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [showBackupReminder, setShowBackupReminder] = useState(false);
@@ -33,6 +33,11 @@ export const useAppSystem = (archivedCount, tasksCount) => {
     }, []);
 
     const checkBackupReminder = useCallback((count) => {
+        if (isSyncAuthed) {
+            setShowBackupReminder(false);
+            return;
+        }
+
         let lastBackup = localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
         
         // If it's a new user or they've never backed up, start the timer from today
@@ -52,7 +57,7 @@ export const useAppSystem = (archivedCount, tasksCount) => {
         if (shouldShowReminder && count > 0) {
             setShowBackupReminder(true);
         }
-    }, []);
+    }, [isSyncAuthed]);
 
     const checkInstallPrompt = useCallback(() => {
         const installDismissed = localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISSED);

@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.2.1
+- **Version**: v2.2.2
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,12 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.2.2 (2026-07-16)
+- **Feature**: Reduced Google Drive sync authorization prompt frequency by caching the access token and its expiration in `localStorage`.
+- **Feature**: Stored exact local JS timestamps in Google Drive file `description` metadata to prevent redundant sync operations and clock skew issues.
+- **Feature**: Disabled weekly backup reminder banner when Google Drive Sync is active and authenticated.
+- **Fix**: Implemented robust task ID validation and auto-sanitization on storage load and import to prevent duplicate tasks after editing.
 
 ### v2.2.1 (2026-07-12)
 - **Feature**: Removed the 2,048-character cap on task notes — notes are now unlimited length, ensuring large Todoist descriptions import and display without truncation or breakage in the Edit modal.
