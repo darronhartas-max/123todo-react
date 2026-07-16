@@ -331,7 +331,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                             padding: '4px 6px',
                                             borderRadius: '4px',
                                             background: 'rgba(0,0,0,0.01)',
-                                            fontSize: '0.9rem',
+                                            fontSize: '1.05rem',
                                             userSelect: 'none',
                                             transition: 'background 0.2s ease'
                                         }}
@@ -343,12 +343,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                             checked={st.completed}
                                             onChange={(e) => handleToggleSubtask(e, st.id)}
                                             onClick={(e) => e.stopPropagation()}
-                                            style={{ cursor: 'pointer', width: '14px', height: '14px', margin: 0 }}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', margin: 0 }}
                                         />
                                         <span style={{
                                             textDecoration: st.completed ? 'line-through' : 'none',
                                             color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                            fontSize: '0.95rem'
+                                            fontSize: '1.05rem'
                                         }}>
                                             {st.text}
                                         </span>
@@ -404,20 +404,24 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </>
                 ) : (
                     <>
-                        <motion.button
-                            onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
-                            style={{
-                                ...styles.actionBtn,
-                                color: task.scheduledDate ? 'var(--accent-color)' : 'var(--muted-text)',
-                                background: showQuickSchedule ? 'rgba(37, 99, 235, 0.1)' : 'transparent',
-                                marginRight: '2px'
-                            }}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            title="Schedule / Defer task"
-                        >
-                            <Calendar size={18} />
-                        </motion.button>
+                        {task.scheduledDate && (
+                            <motion.button
+                                onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
+                                style={{
+                                    ...styles.actionBtn,
+                                    color: 'var(--accent-color)',
+                                    background: showQuickSchedule ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.05)',
+                                    border: '1px solid rgba(37, 99, 235, 0.2)',
+                                    marginRight: '6px',
+                                    opacity: isHovered || showQuickSchedule ? 1.0 : 0.8
+                                }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                title="Change schedule / Defer task"
+                            >
+                                <Calendar size={18} />
+                            </motion.button>
+                        )}
                         <motion.button
                             onClick={handleComplete}
                             style={{

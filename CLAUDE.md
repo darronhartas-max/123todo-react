@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.1
+- **Version**: v2.3.2
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,11 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.2 (2026-07-16)
+- **Feature**: Hid the calendar Quick Defer button on the task card by default. The calendar icon button is now only shown on the list page if the task already has a scheduled date attached to it.
+- **Feature**: Refactored the calendar icon button styling on cards (border and subtle background accent color) to ensure clear contrast in dark mode.
+- **Feature**: Enlarged the font sizes for Notes, Subtask checklist items/inputs/buttons, and Scheduling recurrence options in both `AddTask.js` and `EditModal.js` to improve readability.
 
 ### v2.3.1 (2026-07-16)
 - **Feature**: Added a background blur filter container around active lists, on hold, scheduled drawer, and archive drawers. When the Add Task section is expanded, the rest of the application list page blurs and dims dynamically for absolute focus.

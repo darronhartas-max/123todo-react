@@ -114,9 +114,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
-        fontSize: '0.85rem',
+        fontSize: '1.05rem',
         fontWeight: '600',
-        padding: '4px 8px',
+        padding: '6px 12px',
         borderRadius: '4px',
         background: isActive ? 'var(--accent-color)' : 'rgba(37, 99, 235, 0.05)',
         transition: 'all 0.2s ease'
@@ -254,12 +254,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             {showSubtasks && (
                 <div style={{
                     marginTop: '10px',
-                    padding: '10px',
+                    padding: '12px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     background: 'var(--bg-color)'
                 }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
                         📋 Subtasks / Checklist
                     </div>
                     {subtasks.length > 0 && (
@@ -269,7 +269,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    padding: '6px 0',
+                                    padding: '8px 0',
                                     borderBottom: '1px solid rgba(0,0,0,0.03)'
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
@@ -279,12 +279,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                             onChange={() => {
                                                 setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
                                             }}
-                                            style={{ cursor: 'pointer' }}
+                                            style={{ cursor: 'pointer', width: '15px', height: '15px' }}
                                         />
                                         <span style={{
                                             textDecoration: st.completed ? 'line-through' : 'none',
                                             color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                            fontSize: '0.95rem'
+                                            fontSize: '1.05rem'
                                         }}>
                                             {st.text}
                                         </span>
@@ -296,7 +296,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                             background: 'transparent',
                                             color: '#ef4444',
                                             cursor: 'pointer',
-                                            fontSize: '0.85rem'
+                                            fontSize: '1rem',
+                                            fontWeight: '600'
                                         }}
                                     >
                                         Delete
@@ -313,8 +314,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                             placeholder="Add subtask step..."
                             style={{
                                 flex: 1,
-                                padding: '6px 8px',
-                                fontSize: '0.95rem',
+                                padding: '8px 10px',
+                                fontSize: '1.05rem',
                                 border: '1px solid var(--border-color)',
                                 borderRadius: '4px',
                                 background: 'var(--item-bg)',
@@ -330,13 +331,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         <button
                             onClick={handleAddSubtask}
                             style={{
-                                padding: '6px 12px',
+                                padding: '8px 16px',
                                 background: 'var(--accent-color)',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '0.9rem',
+                                fontSize: '1.05rem',
                                 fontWeight: '600'
                             }}
                         >
@@ -349,24 +350,24 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             {showSchedule && (
                 <div style={{
                     marginTop: '10px',
-                    padding: '10px',
+                    padding: '12px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     background: 'var(--bg-color)'
                 }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
                         📅 Date & Recurrence Scheduling
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '150px' }}>
-                            <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>Start/Scheduled Date</label>
+                            <label style={{ fontSize: '0.95rem', color: 'var(--muted-text)', fontWeight: '500' }}>Start/Scheduled Date</label>
                             <input
                                 type="date"
                                 value={scheduledDate || ''}
                                 onChange={(e) => setScheduledDate(e.target.value || null)}
                                 style={{
-                                    padding: '6px 8px',
-                                    fontSize: '0.95rem',
+                                    padding: '8px 10px',
+                                    fontSize: '1.05rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--item-bg)',
@@ -380,13 +381,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                             <button
                                 onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                 style={{
-                                    padding: '6px 12px',
+                                    padding: '8px 16px',
                                     background: '#e5e7eb',
                                     border: 'none',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.85rem',
-                                    marginTop: '18px',
+                                    fontSize: '1.05rem',
+                                    fontWeight: '600',
+                                    marginTop: '22px',
                                     color: '#333'
                                 }}
                             >
@@ -397,12 +399,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
 
                     {scheduledDate && (
                         <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
                                 <input
                                     type="checkbox"
                                     checked={isRecurring}
                                     onChange={(e) => setIsRecurring(e.target.checked)}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ cursor: 'pointer', width: '15px', height: '15px' }}
                                 />
                                 🔁 Repeat this task
                             </label>
@@ -410,7 +412,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                             {isRecurring && (
                                 <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.95rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '1.05rem' }}>
                                             <span>Every</span>
                                             <input
                                                 type="number"
@@ -418,8 +420,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                                 value={recurrenceFrequency}
                                                 onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
                                                 style={{
-                                                    width: '50px',
-                                                    padding: '4px 6px',
+                                                    width: '60px',
+                                                    padding: '6px 8px',
+                                                    fontSize: '1.05rem',
                                                     border: '1px solid var(--border-color)',
                                                     borderRadius: '4px',
                                                     background: 'var(--item-bg)',
@@ -432,8 +435,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                             value={recurrenceInterval}
                                             onChange={(e) => setRecurrenceInterval(e.target.value)}
                                             style={{
-                                                padding: '4px 8px',
-                                                fontSize: '0.95rem',
+                                                padding: '6px 10px',
+                                                fontSize: '1.05rem',
                                                 border: '1px solid var(--border-color)',
                                                 borderRadius: '4px',
                                                 background: 'var(--item-bg)',
@@ -449,10 +452,10 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
 
                                     {recurrenceInterval === 'weeks' && (
                                         <div style={{ marginTop: '6px' }}>
-                                            <span style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>
+                                            <span style={{ fontSize: '0.95rem', color: 'var(--muted-text)', display: 'block', marginBottom: '6px', fontWeight: '500' }}>
                                                 Repeat on specific days:
                                             </span>
-                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
                                                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
                                                     const isSelected = recurrenceDaysOfWeek.includes(idx);
                                                     return (
@@ -468,8 +471,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                                             }}
                                                             style={{
                                                                 flex: 1,
-                                                                padding: '6px 2px',
-                                                                fontSize: '0.75rem',
+                                                                padding: '8px 4px',
+                                                                fontSize: '0.95rem',
                                                                 fontWeight: '700',
                                                                 borderRadius: '4px',
                                                                 cursor: 'pointer',
