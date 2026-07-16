@@ -69,18 +69,20 @@ const ExportModal = ({ data, onClose, onRecordBackup }) => {
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     files: [file],
-                    title: '123 ToDo Backup',
-                    text: 'Here is my 123 ToDo tasks backup file.'
+                    title: '123 To Do Backup',
+                    text: 'Here is my 123 To Do tasks backup file.'
                 });
                 onRecordBackup();
                 onClose();
             } else {
-                alert("File sharing is not supported by your browser/device configuration.");
+                alert("Direct file sharing is not supported by your browser/device configuration. We will copy your backup data to your clipboard and open your email client instead.");
+                handleEmailFallback();
             }
         } catch (err) {
             if (err.name !== 'AbortError') {
                 console.error('Sharing failed:', err);
-                alert("Sharing failed. Please try saving locally instead.");
+                alert("Direct file sharing is not supported on this browser/OS configuration. Your backup data has been copied to your clipboard, and your email client will now open so you can paste it.");
+                handleEmailFallback();
             }
         }
     };
