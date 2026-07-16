@@ -629,7 +629,7 @@ const TodoApp = () => {
         <input
           type="file"
           id="fileInput"
-          accept=".json"
+          accept=".json,.txt"
           style={{ display: 'none' }}
           onChange={handleImport}
         />

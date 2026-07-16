@@ -64,7 +64,9 @@ const ExportModal = ({ data, onClose, onRecordBackup }) => {
 
     const handleShareBackup = async () => {
         try {
-            const file = new File([backupString], fileName, { type: 'application/json' });
+            // We use text/plain and a .txt extension because Android/iOS often restrict sharing raw JSON files
+            const shareFileName = fileName.replace('.json', '.txt');
+            const file = new File([backupString], shareFileName, { type: 'text/plain' });
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
