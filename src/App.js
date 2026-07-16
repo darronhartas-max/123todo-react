@@ -18,11 +18,12 @@ import TodoistImportModal from './components/modals/TodoistImportModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import SyncModal from './components/modals/SyncModal';
+import UpdatedModal from './components/modals/UpdatedModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION } from './utils/constants';
 
 const TodoApp = () => {
   const {
@@ -59,6 +60,21 @@ const TodoApp = () => {
   const [showRestoreToast, setShowRestoreToast] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showUpdatedModal, setShowUpdatedModal] = useState(false);
+  const [prevVersionStr, setPrevVersionStr] = useState('');
+
+  // Check if we just completed an update and should show the update confirmation modal
+  useEffect(() => {
+    const showModal = localStorage.getItem('123Todo_Show_Updated_Modal') === 'true';
+    const prevVersion = localStorage.getItem('123Todo_Previous_Version');
+    if (showModal && prevVersion && prevVersion !== APP_VERSION) {
+      setPrevVersionStr(prevVersion);
+      setShowUpdatedModal(true);
+    } else {
+      localStorage.removeItem('123Todo_Show_Updated_Modal');
+      localStorage.removeItem('123Todo_Previous_Version');
+    }
+  }, []);
 
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
@@ -386,10 +402,26 @@ const TodoApp = () => {
   };
 
   const handleApplyUpdate = () => {
+    localStorage.setItem('123Todo_Previous_Version', APP_VERSION);
+    localStorage.setItem('123Todo_Show_Updated_Modal', 'true');
+
     if (swRegistration && swRegistration.waiting) {
+      // Set up listener for Service Worker takeover to trigger page reload
+      const onControllerChange = () => {
+        window.location.reload();
+      };
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+      }
       swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      
+      // Fallback: reload anyway in 2 seconds in case controllerchange doesn't fire
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      window.location.reload();
     }
-    window.location.reload();
   };
 
   const styles = {
@@ -623,6 +655,18 @@ const TodoApp = () => {
           projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
+        />
+      )}
+
+      {showUpdatedModal && (
+        <UpdatedModal
+          oldVersion={prevVersionStr}
+          newVersion={APP_VERSION}
+          onClose={() => {
+            setShowUpdatedModal(false);
+            localStorage.removeItem('123Todo_Show_Updated_Modal');
+            localStorage.removeItem('123Todo_Previous_Version');
+          }}
         />
       )}
 
