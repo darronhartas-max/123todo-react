@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.5
+- **Version**: v2.3.6
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.6 (2026-07-16)
+- **Feature**: Re-styled and brightened the calendar icon button on task cards in dark mode. Shifted `--accent-color` in dark mode from steel blue (`#5289b4`) to a vibrant, high-contrast light blue (`#60a5fa`).
+- **Feature**: Styled the calendar button border and background dynamically based on CSS theme variables with 1.0 opacity, guaranteeing high-contrast visibility.
 
 ### v2.3.5 (2026-07-16)
 - **Feature**: Removed the restriction requiring a start date to be set before enabling recurrence scheduling. Users can check "Repeat this task" immediately. Checking it automatically defaults the start date to today's date if empty.

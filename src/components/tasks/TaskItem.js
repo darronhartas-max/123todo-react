@@ -363,10 +363,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 style={{
                                     ...styles.actionBtn,
                                     color: 'var(--accent-color)',
-                                    background: showQuickSchedule ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.05)',
-                                    border: '1px solid rgba(37, 99, 235, 0.2)',
+                                    background: showQuickSchedule ? 'var(--accent-bg)' : 'transparent',
+                                    border: '1px solid var(--accent-color)',
                                     marginRight: '6px',
-                                    opacity: isHovered || showQuickSchedule ? 1.0 : 0.8
+                                    opacity: 1.0
                                 }}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
