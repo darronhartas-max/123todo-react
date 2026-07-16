@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { Plus, Minus } from 'lucide-react';
+import { getTodayDateString, adjustStartDateForWeekdays } from '../../utils/dateUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const fallbackProjectId = projects[0]?.id || 'general';
@@ -42,7 +43,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         
         // Build recurrence rule if recurring is selected
         let recurrence = null;
-        if (isRecurring && scheduledDate) {
+        let finalScheduledDate = scheduledDate;
+        if (isRecurring) {
+            if (!finalScheduledDate) {
+                finalScheduledDate = getTodayDateString();
+            }
+            if (recurrenceInterval === 'weeks' && recurrenceDaysOfWeek.length > 0) {
+                finalScheduledDate = adjustStartDateForWeekdays(finalScheduledDate, recurrenceDaysOfWeek);
+            }
             recurrence = {
                 frequency: recurrenceFrequency,
                 interval: recurrenceInterval,
@@ -51,9 +59,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         }
 
         onAdd(text, priority, finalProjectId, notes.trim(), {
-            scheduledDate,
+            scheduledDate: finalScheduledDate,
             subtasks,
-            isRecurring: isRecurring && !!scheduledDate,
+            isRecurring: isRecurring && !!finalScheduledDate,
             recurrence
         });
 
@@ -397,13 +405,17 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         )}
                     </div>
 
-                    {scheduledDate && (
                         <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
                                 <input
                                     type="checkbox"
                                     checked={isRecurring}
-                                    onChange={(e) => setIsRecurring(e.target.checked)}
+                                    onChange={(e) => {
+                                        setIsRecurring(e.target.checked);
+                                        if (e.target.checked && !scheduledDate) {
+                                            setScheduledDate(getTodayDateString());
+                                        }
+                                    }}
                                     style={{ cursor: 'pointer', width: '15px', height: '15px' }}
                                 />
                                 🔁 Repeat this task
@@ -463,11 +475,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                                             key={day}
                                                             type="button"
                                                             onClick={() => {
+                                                                let updatedDays;
                                                                 if (isSelected) {
-                                                                    setRecurrenceDaysOfWeek(recurrenceDaysOfWeek.filter(d => d !== idx));
+                                                                    updatedDays = recurrenceDaysOfWeek.filter(d => d !== idx);
                                                                 } else {
-                                                                    setRecurrenceDaysOfWeek([...recurrenceDaysOfWeek, idx]);
+                                                                    updatedDays = [...recurrenceDaysOfWeek, idx];
                                                                 }
+                                                                setRecurrenceDaysOfWeek(updatedDays);
+                                                                
+                                                                // Auto-snap start date to next weekday
+                                                                const baseDate = scheduledDate || getTodayDateString();
+                                                                const snappedDate = adjustStartDateForWeekdays(baseDate, updatedDays);
+                                                                setScheduledDate(snappedDate);
                                                             }}
                                                             style={{
                                                                 flex: 1,
@@ -493,7 +512,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                                 </div>
                             )}
                         </div>
-                    )}
                 </div>
             )}
 

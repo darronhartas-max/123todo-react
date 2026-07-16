@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
+import { getTodayDateString, adjustStartDateForWeekdays } from '../../utils/dateUtils';
 
 const EditModal = ({ task, onSave, onClose, projects }) => {
     const [editingTask, setEditingTask] = useState({ ...task });
@@ -25,7 +26,14 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
 
     const handleSave = () => {
         let recurrence = null;
-        if (isRecurring && scheduledDate) {
+        let finalScheduledDate = scheduledDate;
+        if (isRecurring) {
+            if (!finalScheduledDate) {
+                finalScheduledDate = getTodayDateString();
+            }
+            if (recurrenceInterval === 'weeks' && recurrenceDaysOfWeek.length > 0) {
+                finalScheduledDate = adjustStartDateForWeekdays(finalScheduledDate, recurrenceDaysOfWeek);
+            }
             recurrence = {
                 frequency: recurrenceFrequency,
                 interval: recurrenceInterval,
@@ -38,9 +46,9 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
             priority: editingTask.priority,
             projectId: editingTask.projectId,
             notes: editingTask.notes,
-            scheduledDate,
+            scheduledDate: finalScheduledDate,
             subtasks,
-            isRecurring: isRecurring && !!scheduledDate,
+            isRecurring: isRecurring && !!finalScheduledDate,
             recurrence
         });
         onClose();
@@ -361,103 +369,113 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                             )}
                         </div>
 
-                        {scheduledDate && (
-                            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isRecurring}
-                                        onChange={(e) => setIsRecurring(e.target.checked)}
-                                        style={{ cursor: 'pointer', width: '15px', height: '15px' }}
-                                    />
-                                    🔁 Repeat this task
-                                </label>
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={isRecurring}
+                                    onChange={(e) => {
+                                        setIsRecurring(e.target.checked);
+                                        if (e.target.checked && !scheduledDate) {
+                                            setScheduledDate(getTodayDateString());
+                                        }
+                                    }}
+                                    style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                                />
+                                🔁 Repeat this task
+                            </label>
 
-                                {isRecurring && (
-                                    <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '1.05rem' }}>
-                                                <span>Every</span>
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    value={recurrenceFrequency}
-                                                    onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
-                                                    style={{
-                                                        width: '60px',
-                                                        padding: '6px 8px',
-                                                        fontSize: '1.05rem',
-                                                        border: '1px solid var(--border-color)',
-                                                        borderRadius: '4px',
-                                                        background: 'var(--bg-color)',
-                                                        color: 'var(--text-color)',
-                                                        textAlign: 'center'
-                                                    }}
-                                                />
-                                            </div>
-                                            <select
-                                                value={recurrenceInterval}
-                                                onChange={(e) => setRecurrenceInterval(e.target.value)}
+                            {isRecurring && (
+                                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '1.05rem' }}>
+                                            <span>Every</span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={recurrenceFrequency}
+                                                onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
                                                 style={{
-                                                    padding: '6px 10px',
+                                                    width: '60px',
+                                                    padding: '6px 8px',
                                                     fontSize: '1.05rem',
                                                     border: '1px solid var(--border-color)',
                                                     borderRadius: '4px',
                                                     background: 'var(--bg-color)',
-                                                    color: 'var(--text-color)'
+                                                    color: 'var(--text-color)',
+                                                    textAlign: 'center'
                                                 }}
-                                            >
-                                                <option value="days">Day(s)</option>
-                                                <option value="weeks">Week(s)</option>
-                                                <option value="months">Month(s)</option>
-                                                <option value="years">Year(s)</option>
-                                            </select>
+                                            />
                                         </div>
-
-                                        {recurrenceInterval === 'weeks' && (
-                                            <div style={{ marginTop: '6px' }}>
-                                                <span style={{ fontSize: '0.95rem', color: 'var(--muted-text)', display: 'block', marginBottom: '6px', fontWeight: '500' }}>
-                                                    Repeat on specific days:
-                                                </span>
-                                                <div style={{ display: 'flex', gap: '6px' }}>
-                                                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
-                                                        const isSelected = recurrenceDaysOfWeek.includes(idx);
-                                                        return (
-                                                            <button
-                                                                key={day}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    if (isSelected) {
-                                                                        setRecurrenceDaysOfWeek(recurrenceDaysOfWeek.filter(d => d !== idx));
-                                                                    } else {
-                                                                        setRecurrenceDaysOfWeek([...recurrenceDaysOfWeek, idx]);
-                                                                    }
-                                                                }}
-                                                                style={{
-                                                                    flex: 1,
-                                                                    padding: '8px 4px',
-                                                                    fontSize: '0.95rem',
-                                                                    fontWeight: '700',
-                                                                    borderRadius: '4px',
-                                                                    cursor: 'pointer',
-                                                                    border: '1px solid',
-                                                                    borderColor: isSelected ? 'var(--accent-color)' : 'var(--border-color)',
-                                                                    background: isSelected ? 'var(--accent-color)' : 'var(--bg-color)',
-                                                                    color: isSelected ? 'white' : 'var(--text-color)',
-                                                                    transition: 'all 0.2s ease'
-                                                                }}
-                                                            >
-                                                                {day[0]}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        )}
+                                        <select
+                                            value={recurrenceInterval}
+                                            onChange={(e) => setRecurrenceInterval(e.target.value)}
+                                            style={{
+                                                padding: '6px 10px',
+                                                fontSize: '1.05rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                background: 'var(--bg-color)',
+                                                color: 'var(--text-color)'
+                                            }}
+                                        >
+                                            <option value="days">Day(s)</option>
+                                            <option value="weeks">Week(s)</option>
+                                            <option value="months">Month(s)</option>
+                                            <option value="years">Year(s)</option>
+                                        </select>
                                     </div>
-                                )}
-                            </div>
-                        )}
+
+                                    {recurrenceInterval === 'weeks' && (
+                                        <div style={{ marginTop: '6px' }}>
+                                            <span style={{ fontSize: '0.95rem', color: 'var(--muted-text)', display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+                                                Repeat on specific days:
+                                            </span>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
+                                                    const isSelected = recurrenceDaysOfWeek.includes(idx);
+                                                    return (
+                                                        <button
+                                                            key={day}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                let updatedDays;
+                                                                if (isSelected) {
+                                                                    updatedDays = recurrenceDaysOfWeek.filter(d => d !== idx);
+                                                                } else {
+                                                                    updatedDays = [...recurrenceDaysOfWeek, idx];
+                                                                }
+                                                                setRecurrenceDaysOfWeek(updatedDays);
+                                                                
+                                                                // Auto-snap start date to next weekday
+                                                                const baseDate = scheduledDate || getTodayDateString();
+                                                                const snappedDate = adjustStartDateForWeekdays(baseDate, updatedDays);
+                                                                setScheduledDate(snappedDate);
+                                                            }}
+                                                            style={{
+                                                                flex: 1,
+                                                                padding: '8px 4px',
+                                                                fontSize: '0.95rem',
+                                                                fontWeight: '700',
+                                                                borderRadius: '4px',
+                                                                cursor: 'pointer',
+                                                                border: '1px solid',
+                                                                borderColor: isSelected ? 'var(--accent-color)' : 'var(--border-color)',
+                                                                background: isSelected ? 'var(--accent-color)' : 'var(--bg-color)',
+                                                                color: isSelected ? 'white' : 'var(--text-color)',
+                                                                transition: 'all 0.2s ease'
+                                                            }}
+                                                        >
+                                                            {day[0]}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 

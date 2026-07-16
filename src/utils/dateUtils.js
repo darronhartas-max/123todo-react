@@ -76,3 +76,31 @@ export const calculateNextRecurrenceDate = (currentDateStr, recurrence) => {
     
     return formatDateString(date);
 };
+
+/**
+ * Adjusts a starting date string to the next occurrence of one of the target weekdays.
+ * If the current weekday of the date is already in daysOfWeek, it returns the date unchanged.
+ * @param {string} dateStr - YYYY-MM-DD format
+ * @param {Array<number>} daysOfWeek - Array of weekday indexes (0-6)
+ * @returns {string} YYYY-MM-DD format
+ */
+export const adjustStartDateForWeekdays = (dateStr, daysOfWeek) => {
+    if (!daysOfWeek || daysOfWeek.length === 0) return dateStr;
+    const date = parseDateString(dateStr);
+    const initialDay = date.getDay();
+    if (daysOfWeek.includes(initialDay)) {
+        return dateStr;
+    }
+    
+    let found = false;
+    let safetyCounter = 0;
+    while (!found && safetyCounter < 7) {
+        date.setDate(date.getDate() + 1);
+        safetyCounter++;
+        const day = date.getDay();
+        if (daysOfWeek.includes(day)) {
+            found = true;
+        }
+    }
+    return formatDateString(date);
+};

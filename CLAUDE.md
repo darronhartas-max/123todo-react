@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.4
+- **Version**: v2.3.5
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.5 (2026-07-16)
+- **Feature**: Removed the restriction requiring a start date to be set before enabling recurrence scheduling. Users can check "Repeat this task" immediately. Checking it automatically defaults the start date to today's date if empty.
+- **Feature**: Added weekday date snapping. When selecting specific recurrence weekdays (e.g. repeat every Monday), the start date automatically snaps in real time to the next upcoming selected weekday in both `AddTask.js` and `EditModal.js` forms, reducing scheduling steps and friction.
 
 ### v2.3.4 (2026-07-16)
 - **Feature**: Hid calendar details text badges (scheduled date, recurrence text, and deferral counts) in the primary active list views (Must, Should, Could, On Hold lists) to keep task cards completely clean and uncluttered. Pushed these details to render only inside the Scheduled Tasks list drawer using a dynamic `showFullDetails` toggle prop.
