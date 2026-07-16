@@ -1,6 +1,7 @@
 import React from 'react';
+import { APP_VERSION } from '../../utils/constants';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = '2.1.14' }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = APP_VERSION }) => {
     const styles = {
         footer: {
             flexShrink: 0,
