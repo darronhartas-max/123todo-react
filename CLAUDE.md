@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.2.2
+- **Version**: v2.2.3
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.2.3 (2026-07-16)
+- **Feature**: Added a "Shortcuts" tab to SettingsModal to display keyboard shortcuts list for users.
+- **Fix**: Prevented global keyboard shortcuts from firing if command, control, or alt modifier keys are active, preventing conflicts with browser shortcuts (e.g. Cmd+Q).
 
 ### v2.2.2 (2026-07-16)
 - **Feature**: Reduced Google Drive sync authorization prompt frequency by caching the access token and its expiration in `localStorage`.

@@ -133,6 +133,11 @@ const TodoApp = () => {
         return;
       }
 
+      // Ignore shortcuts if command, control, or alt/option modifier keys are pressed
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+
       // 1. "a" or "q" to toggle Add Task Panel
       if (e.key === 'a' || e.key === 'q') {
         e.preventDefault();

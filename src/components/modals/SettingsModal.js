@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS } from '../../utils/constants';
+
+const SHORTCUTS_LIST = [
+    { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
+    { keys: ['/'], desc: 'Focus Search Bar' },
+    { keys: ['S'], desc: 'Open Settings' },
+    { keys: ['Esc'], desc: 'Close Modal / Cancel / Unfocus' },
+    { keys: ['Enter'], desc: 'Save task (when editing/adding)' },
+    { keys: ['Shift + Enter'], desc: 'Insert line break in notes' }
+];
 
 const SettingsModal = ({
     isOpen,
@@ -269,6 +278,26 @@ const SettingsModal = ({
             outline: 'none',
             accentColor: 'var(--accent-color)',
             cursor: 'pointer'
+        },
+        shortcutItem: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 14px',
+            borderBottom: '1px solid var(--border-color)',
+            fontSize: '1rem',
+            color: 'var(--text-color)'
+        },
+        kbdBadge: {
+            background: 'var(--bg-color)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '6px',
+            padding: '4px 8px',
+            fontFamily: 'monospace',
+            fontWeight: '700',
+            fontSize: '0.9rem',
+            boxShadow: '0 2px 0 var(--border-color)',
+            color: 'var(--accent-color)'
         }
     };
 
@@ -304,6 +333,13 @@ const SettingsModal = ({
                         >
                             <Sliders size={18} />
                             Appearance
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'shortcuts')}
+                            onClick={() => setActiveTab('shortcuts')}
+                        >
+                            <Keyboard size={18} />
+                            Shortcuts
                         </button>
                     </div>
 
@@ -523,6 +559,24 @@ const SettingsModal = ({
                                             Kanban Columns (1000px)
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'shortcuts' && (
+                            <div>
+                                <div style={styles.sectionTitle}>Keyboard Shortcuts</div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    {SHORTCUTS_LIST.map((s, idx) => (
+                                        <div key={idx} style={styles.shortcutItem}>
+                                            <span style={{ color: 'var(--text-color)', fontWeight: '500' }}>{s.desc}</span>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                                {s.keys.map(k => (
+                                                    <kbd key={k} style={styles.kbdBadge}>{k}</kbd>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
