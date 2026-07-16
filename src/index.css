@@ -78,3 +78,19 @@ code {
 * {
   box-sizing: border-box;
 }
+
+/* Ensure native calendar indicator matches dark mode contrast constraints */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.theme-light) input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.9) brightness(1.5);
+  }
+}
+
+:root.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.9) brightness(1.5);
+}
