@@ -66,7 +66,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
     };
 
     const toggleButtonStyle = (isActive) => ({
-        border: 'none',
+        border: '1px solid var(--accent-color)',
         color: isActive ? 'white' : 'var(--accent-color)',
         cursor: 'pointer',
         display: 'flex',
@@ -76,7 +76,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
         fontWeight: '600',
         padding: '8px 12px',
         borderRadius: '4px',
-        background: isActive ? 'var(--accent-color)' : 'rgba(37, 99, 235, 0.05)',
+        background: isActive ? 'var(--accent-color)' : 'transparent',
         transition: 'all 0.2s ease',
         boxSizing: 'border-box'
     });
@@ -354,14 +354,14 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                                     onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                     style={{
                                         padding: '8px 16px',
-                                        background: '#e5e7eb',
-                                        border: 'none',
+                                        background: 'var(--border-color)',
+                                        border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
                                         fontSize: '1.05rem',
                                         fontWeight: '600',
                                         marginTop: '22px',
-                                        color: '#333'
+                                        color: 'var(--text-color)'
                                     }}
                                 >
                                     Clear Date

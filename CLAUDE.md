@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.7
+- **Version**: v2.3.8
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.8 (2026-07-16)
+- **Fix**: Replaced hardcoded light-mode `rgba(37, 99, 235, 0.05)` inactive background on the 📅 Schedule and 📋 Subtasks toggle buttons in both `EditModal.js` and `AddTask.js` with `transparent` background and a `1px solid var(--accent-color)` border, ensuring the buttons are clearly visible in dark mode.
+- **Fix**: Updated the "Clear Date" button in `EditModal.js` to use `var(--border-color)` and `var(--text-color)` instead of hardcoded `#e5e7eb` / `#333`, preventing it from being invisible on dark backgrounds.
 
 ### v2.3.7 (2026-07-16)
 - **Feature**: Styled the webkit-calendar-picker-indicator globally in `index.css` to invert and increase brightness when dark theme is active, making browser-native date input calendar drop triggers clearly visible.

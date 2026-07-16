@@ -116,7 +116,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     };
 
     const toggleButtonStyle = (isActive) => ({
-        border: 'none',
+        border: '1px solid var(--accent-color)',
         color: isActive ? 'white' : 'var(--accent-color)',
         cursor: 'pointer',
         display: 'flex',
@@ -126,7 +126,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         fontWeight: '600',
         padding: '6px 12px',
         borderRadius: '4px',
-        background: isActive ? 'var(--accent-color)' : 'rgba(37, 99, 235, 0.05)',
+        background: isActive ? 'var(--accent-color)' : 'transparent',
         transition: 'all 0.2s ease'
     });
 
