@@ -538,128 +538,135 @@ const TodoApp = () => {
           />
         )}
 
-        <div style={styles.sectionsContainer}>
-          {[1, 2, 3].map(priority => (
-            <PrioritySection
-              key={priority}
-              priority={priority}
-              tasks={filteredTasks}
-              projects={[...DEFAULT_PROJECTS, ...projects]}
-              onComplete={handleCompleteTask}
-              onEdit={setEditingTask}
-              onUpdate={updateTask}
-              handleDragStart={handleDragStart}
-              handleDragOver={handleDragOver}
-              handleDrop={handleDrop}
-              handleDragEnd={handleDragEnd}
-              draggedId={draggedId}
-              dragOverId={dragOverId}
-            />
-          ))}
+        <div style={{
+          filter: showAddSection ? 'blur(5px)' : 'none',
+          pointerEvents: showAddSection ? 'none' : 'auto',
+          transition: 'all 0.3s ease',
+          opacity: showAddSection ? 0.5 : 1
+        }}>
+          <div style={styles.sectionsContainer}>
+            {[1, 2, 3].map(priority => (
+              <PrioritySection
+                key={priority}
+                priority={priority}
+                tasks={filteredTasks}
+                projects={[...DEFAULT_PROJECTS, ...projects]}
+                onComplete={handleCompleteTask}
+                onEdit={setEditingTask}
+                onUpdate={updateTask}
+                handleDragStart={handleDragStart}
+                handleDragOver={handleDragOver}
+                handleDrop={handleDrop}
+                handleDragEnd={handleDragEnd}
+                draggedId={draggedId}
+                dragOverId={dragOverId}
+              />
+            ))}
 
-          {filteredTasks.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
-              {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
+            {filteredTasks.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
+                {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
+              </div>
+            )}
+          </div>
+
+          {onHoldTasksFiltered.length > 0 && (
+            <div style={{ ...styles.toggleSection, background: 'var(--accent-bg)' }}>
+              <button
+                onClick={() => setShowOnHold(!showOnHold)}
+                style={{ ...styles.toggleBtn, color: '#9333ea' }}
+              >
+                {showOnHold ? 'Hide' : 'Show'} On Hold ({onHoldTasksFiltered.length})
+              </button>
+              {showOnHold && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  <AnimatePresence mode="popLayout">
+                    {onHoldTasksFiltered.map(task => {
+                      const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
+                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                        p.name.toLowerCase() === task.projectId?.toLowerCase()
+                      );
+                      return (
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          projectColor={project?.color}
+                          onComplete={handleCompleteTask}
+                          onEdit={setEditingTask}
+                          onUpdate={updateTask}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
+                </ul>
+              )}
             </div>
           )}
-        </div>
 
-        {onHoldTasksFiltered.length > 0 && (
-          <div style={{ ...styles.toggleSection, background: 'var(--accent-bg)' }}>
-            <button
-              onClick={() => setShowOnHold(!showOnHold)}
-              style={{ ...styles.toggleBtn, color: '#9333ea' }}
-            >
-              {showOnHold ? 'Hide' : 'Show'} On Hold ({onHoldTasksFiltered.length})
-            </button>
-            {showOnHold && (
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                <AnimatePresence mode="popLayout">
-                  {onHoldTasksFiltered.map(task => {
-                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                      p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                      p.name.toLowerCase() === task.projectId?.toLowerCase()
-                    );
-                    return (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        projectColor={project?.color}
-                        onComplete={handleCompleteTask}
-                        onEdit={setEditingTask}
-                        onUpdate={updateTask}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </ul>
-            )}
-          </div>
-        )}
-
-        {filteredScheduled.length > 0 && (
-          <div style={{ ...styles.toggleSection, background: 'rgba(37, 99, 235, 0.04)', border: '1px dashed rgba(37, 99, 235, 0.2)' }}>
-            <button
-              onClick={() => setShowScheduled(!showScheduled)}
-              style={{ ...styles.toggleBtn, color: 'var(--accent-color)' }}
-            >
-              {showScheduled ? 'Hide' : 'Show'} Scheduled & Recurring ({filteredScheduled.length})
-            </button>
-            {showScheduled && (
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                <AnimatePresence mode="popLayout">
-                  {filteredScheduled.map(task => {
-                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                      p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                      p.name.toLowerCase() === task.projectId?.toLowerCase()
-                    );
-                    return (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        projectColor={project?.color}
-                        onComplete={handleCompleteTask}
-                        onEdit={setEditingTask}
-                        onUpdate={updateTask}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </ul>
-            )}
-          </div>
-        )}
-
-        <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
-          <button
-            onClick={() => setShowArchive(!showArchive)}
-            style={{ ...styles.toggleBtn, color: '#667eea' }}
-          >
-            {showArchive ? 'Hide' : 'Show'} Archive ({filteredArchived.length})
-          </button>
-          {showArchive && (
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
-              <AnimatePresence mode="popLayout">
-                {filteredArchived.map(task => {
-                  const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                    p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                    p.name.toLowerCase() === task.projectId?.toLowerCase()
-                  );
-                  return (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      projectColor={project?.color}
-                      isArchived={true}
-                      onRestore={onRestoreRequest}
-                      onDelete={deleteArchivedTask}
-                      onUpdate={updateTask}
-                    />
-                  );
-                })}
-              </AnimatePresence>
-            </ul>
+          {filteredScheduled.length > 0 && (
+            <div style={{ ...styles.toggleSection, background: 'rgba(37, 99, 235, 0.04)', border: '1px dashed rgba(37, 99, 235, 0.2)' }}>
+              <button
+                onClick={() => setShowScheduled(!showScheduled)}
+                style={{ ...styles.toggleBtn, color: 'var(--accent-color)' }}
+              >
+                {showScheduled ? 'Hide' : 'Show'} Scheduled & Recurring ({filteredScheduled.length})
+              </button>
+              {showScheduled && (
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  <AnimatePresence mode="popLayout">
+                    {filteredScheduled.map(task => {
+                      const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
+                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                        p.name.toLowerCase() === task.projectId?.toLowerCase()
+                      );
+                      return (
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          projectColor={project?.color}
+                          onComplete={handleCompleteTask}
+                          onEdit={setEditingTask}
+                          onUpdate={updateTask}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
+                </ul>
+              )}
+            </div>
           )}
+
+          <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
+            <button
+              onClick={() => setShowArchive(!showArchive)}
+              style={{ ...styles.toggleBtn, color: '#667eea' }}
+            >
+              {showArchive ? 'Hide' : 'Show'} Archive ({filteredArchived.length})
+            </button>
+            {showArchive && (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
+                <AnimatePresence mode="popLayout">
+                  {filteredArchived.map(task => {
+                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
+                      p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                      p.name.toLowerCase() === task.projectId?.toLowerCase()
+                    );
+                    return (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        projectColor={project?.color}
+                        isArchived={true}
+                        onRestore={onRestoreRequest}
+                        onDelete={deleteArchivedTask}
+                        onUpdate={updateTask}
+                      />
+                    );
+                  })}
+                </AnimatePresence>
+              </ul>
+            )}
+          </div>
         </div>
 
         <Footer

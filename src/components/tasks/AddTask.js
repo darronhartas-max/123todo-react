@@ -202,31 +202,29 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                 maxLength={MAX_TASK_LENGTH}
             />
 
-            {text.length > 0 && (
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
-                    <button
-                        onClick={() => setShowNotes(!showNotes)}
-                        style={toggleButtonStyle(showNotes)}
-                    >
-                        {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                        Notes
-                    </button>
-                    <button
-                        onClick={() => setShowSubtasks(!showSubtasks)}
-                        style={toggleButtonStyle(showSubtasks)}
-                    >
-                        {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
-                        Subtasks ({subtasks.length})
-                    </button>
-                    <button
-                        onClick={() => setShowSchedule(!showSchedule)}
-                        style={toggleButtonStyle(showSchedule)}
-                    >
-                        {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
-                        {scheduledDate ? `Scheduled: ${scheduledDate}` : 'Schedule'}
-                    </button>
-                </div>
-            )}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
+                <button
+                    onClick={() => setShowNotes(!showNotes)}
+                    style={toggleButtonStyle(showNotes)}
+                >
+                    {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                    Notes
+                </button>
+                <button
+                    onClick={() => setShowSubtasks(!showSubtasks)}
+                    style={toggleButtonStyle(showSubtasks)}
+                >
+                    {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
+                    Subtasks ({subtasks.length})
+                </button>
+                <button
+                    onClick={() => setShowSchedule(!showSchedule)}
+                    style={toggleButtonStyle(showSchedule)}
+                >
+                    {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
+                    {scheduledDate ? `Scheduled: ${scheduledDate}` : 'Schedule'}
+                </button>
+            </div>
 
             {showNotes && (
                 <div style={{ marginTop: '10px' }}>

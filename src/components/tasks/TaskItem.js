@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare } from 'lucide-react';
+import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
@@ -7,6 +7,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
+    const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
 
     const handleComplete = (e) => {
@@ -236,6 +237,59 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 )}
 
+                {/* Quick Defer Inline Calendar */}
+                {showQuickSchedule && (
+                    <div 
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            marginTop: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'var(--surface-color)',
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid var(--border-color)',
+                            width: 'fit-content',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                        }}
+                    >
+                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--muted-text)' }}>Defer:</span>
+                        <input
+                            type="date"
+                            value={task.scheduledDate || ''}
+                            onChange={(e) => {
+                                const newDate = e.target.value || null;
+                                onUpdate(task.id, { scheduledDate: newDate });
+                                setShowQuickSchedule(false);
+                            }}
+                            style={{
+                                padding: '3px 6px',
+                                fontSize: '0.85rem',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '4px',
+                                background: 'var(--item-bg)',
+                                color: 'var(--text-color)',
+                                outline: 'none'
+                            }}
+                        />
+                        <button
+                            onClick={() => setShowQuickSchedule(false)}
+                            style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: '#ef4444',
+                                cursor: 'pointer',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                marginLeft: '4px'
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
+
                 {/* Subtask indicator and checklist */}
                 {subtasksCount > 0 && (
                     <div style={{ marginTop: '8px', width: '100%', paddingRight: '8px', boxSizing: 'border-box' }}>
@@ -349,41 +403,57 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         </button>
                     </>
                 ) : (
-                    <motion.button
-                        onClick={handleComplete}
-                        style={{
-                            ...styles.actionBtn,
-                            color: isChecked ? '#10b981' : 'var(--muted-text)',
-                            background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
-                        title={isChecked ? "Cancel completion" : "Complete Task"}
-                    >
-                        <AnimatePresence mode="wait" initial={false}>
-                            {isChecked ? (
-                                <motion.div
-                                    key="check"
-                                    initial={{ opacity: 0, scale: 0.5 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.5 }}
-                                    transition={{ duration: 0.1 }}
-                                >
-                                    <CheckSquare size={18} strokeWidth={2.5} />
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="square"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.1 }}
-                                >
-                                    <Square size={18} opacity={isHovered ? 1.0 : 0.6} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.button>
+                    <>
+                        <motion.button
+                            onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
+                            style={{
+                                ...styles.actionBtn,
+                                color: task.scheduledDate ? 'var(--accent-color)' : 'var(--muted-text)',
+                                background: showQuickSchedule ? 'rgba(37, 99, 235, 0.1)' : 'transparent',
+                                marginRight: '2px'
+                            }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            title="Schedule / Defer task"
+                        >
+                            <Calendar size={18} />
+                        </motion.button>
+                        <motion.button
+                            onClick={handleComplete}
+                            style={{
+                                ...styles.actionBtn,
+                                color: isChecked ? '#10b981' : 'var(--muted-text)',
+                                background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                            }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+                            title={isChecked ? "Cancel completion" : "Complete Task"}
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                {isChecked ? (
+                                    <motion.div
+                                        key="check"
+                                        initial={{ opacity: 0, scale: 0.5 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.5 }}
+                                        transition={{ duration: 0.1 }}
+                                    >
+                                        <CheckSquare size={18} strokeWidth={2.5} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="square"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.1 }}
+                                    >
+                                        <Square size={18} opacity={isHovered ? 1.0 : 0.6} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.button>
+                    </>
                 )}
             </div>
         </motion.li>
