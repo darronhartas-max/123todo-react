@@ -627,6 +627,7 @@ const TodoApp = () => {
                           onComplete={handleCompleteTask}
                           onEdit={setEditingTask}
                           onUpdate={updateTask}
+                          showFullDetails={true}
                         />
                       );
                     })}

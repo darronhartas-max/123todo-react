@@ -3,7 +3,7 @@ import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
@@ -178,7 +178,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 </div>
 
                 {/* Scheduled / Recurrence details */}
-                {((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
+                {showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',

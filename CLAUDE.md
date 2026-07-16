@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.3
+- **Version**: v2.3.4
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,9 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.4 (2026-07-16)
+- **Feature**: Hid calendar details text badges (scheduled date, recurrence text, and deferral counts) in the primary active list views (Must, Should, Could, On Hold lists) to keep task cards completely clean and uncluttered. Pushed these details to render only inside the Scheduled Tasks list drawer using a dynamic `showFullDetails` toggle prop.
 
 ### v2.3.3 (2026-07-16)
 - **Feature**: Removed the inline subtask checklists from task cards to conserve dashboard screen real-estate. The progress bar indicator and step count (`Steps: 1/3 (33%)`) remain on the card to indicate progress, while detailed checking off/editing of steps is accessed by clicking on the task (which opens the Edit Modal).
