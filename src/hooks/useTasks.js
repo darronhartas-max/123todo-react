@@ -66,7 +66,7 @@ export const useTasks = () => {
                 { id: 2, text: "📝 Click on any task to edit its text and priority level", priority: 1, isSample: true, projectId: 'general' },
                 { id: 3, text: "📝 Try the + button to add your own tasks", priority: 2, isSample: true, projectId: 'general' },
                 { id: 4, text: "🏆 Complete 5 tasks to unlock your first achievement!", priority: 2, isSample: true, projectId: 'general' },
-                { id: 5, text: "💡 Drag and drop tasks to reorder them within each priority", priority: 3, isSample: true, projectId: 'general' },
+                { id: 5, text: "💡 Drag and drop tasks to reorder them or move them between priorities", priority: 3, isSample: true, projectId: 'general' },
                 { id: 6, text: "📱 Install this app on your home screen for quick access", priority: 3, isSample: true, projectId: 'general' },
                 { id: 7, text: "📊 Check the Archive section to see completed tasks", priority: 3, isSample: true, projectId: 'general' }
             ];
