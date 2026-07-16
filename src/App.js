@@ -19,6 +19,7 @@ import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import SyncModal from './components/modals/SyncModal';
 import UpdatedModal from './components/modals/UpdatedModal';
+import ExportModal from './components/modals/ExportModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -60,6 +61,7 @@ const TodoApp = () => {
   const [showRestoreToast, setShowRestoreToast] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
   const [prevVersionStr, setPrevVersionStr] = useState('');
 
@@ -306,21 +308,7 @@ const TodoApp = () => {
   };
 
   const handleExport = () => {
-    const data = JSON.stringify({
-      tasks,
-      archived,
-      projects
-    }, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `123todo-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    recordBackup();
+    setShowExportModal(true);
   };
 
   const handleImport = (event) => {
@@ -667,6 +655,14 @@ const TodoApp = () => {
             localStorage.removeItem('123Todo_Show_Updated_Modal');
             localStorage.removeItem('123Todo_Previous_Version');
           }}
+        />
+      )}
+
+      {showExportModal && (
+        <ExportModal
+          data={{ tasks, archived, projects }}
+          onClose={() => setShowExportModal(false)}
+          onRecordBackup={recordBackup}
         />
       )}
 

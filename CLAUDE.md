@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.2.4
+- **Version**: v2.2.5
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,11 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.2.5 (2026-07-16)
+- **Feature**: Added a new `ExportModal` that opens when exporting data manually.
+- **Feature**: Integrated the File System Access API (`showSaveFilePicker`) for desktop Chrome/Edge users, allowing them to choose a custom folder location and save the backup directly, which is remembered for subsequent exports.
+- **Feature**: Integrated the Web Share API (`navigator.share`) for mobile and Safari/macOS users to directly share or email their backup file as an attachment. Added email clipboard copy fallback for other browsers.
 
 ### v2.2.4 (2026-07-16)
 - **Feature**: Added a dedicated post-update verification modal (`UpdatedModal`) showing the old vs new version number upon successful update.
