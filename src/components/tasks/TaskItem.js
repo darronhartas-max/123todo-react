@@ -34,14 +34,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         };
     }, []);
 
-    const handleToggleSubtask = (e, subtaskId) => {
-        e.stopPropagation();
-        if (!onUpdate) return;
-        const updatedSubtasks = (task.subtasks || []).map(st => 
-            st.id === subtaskId ? { ...st, completed: !st.completed } : st
-        );
-        onUpdate(task.id, { subtasks: updatedSubtasks });
-    };
+
 
     const getRecurrenceText = (rec) => {
         if (!rec) return '';
@@ -316,46 +309,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 transition: 'width 0.3s ease'
                             }} />
                         </div>
-                        
-                        {!isArchived && (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                {task.subtasks.map(st => (
-                                    <li 
-                                        key={st.id} 
-                                        onClick={(e) => handleToggleSubtask(e, st.id)}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            cursor: 'pointer',
-                                            padding: '4px 6px',
-                                            borderRadius: '4px',
-                                            background: 'rgba(0,0,0,0.01)',
-                                            fontSize: '1.05rem',
-                                            userSelect: 'none',
-                                            transition: 'background 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.01)'}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={st.completed}
-                                            onChange={(e) => handleToggleSubtask(e, st.id)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            style={{ cursor: 'pointer', width: '16px', height: '16px', margin: 0 }}
-                                        />
-                                        <span style={{
-                                            textDecoration: st.completed ? 'line-through' : 'none',
-                                            color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                            fontSize: '1.05rem'
-                                        }}>
-                                            {st.text}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                     </div>
                 )}
 
