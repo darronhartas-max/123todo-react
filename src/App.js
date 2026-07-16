@@ -25,6 +25,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION } from './utils/constants';
+import { getTodayDateString } from './utils/dateUtils';
 
 const TodoApp = () => {
   const {
@@ -47,6 +48,7 @@ const TodoApp = () => {
   const [showAddSection, setShowAddSection] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showOnHold, setShowOnHold] = useState(false);
+  const [showScheduled, setShowScheduled] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
@@ -266,10 +268,15 @@ const TodoApp = () => {
     currentProjectId === 'all' || t.projectId === currentProjectId
   );
 
-  const filteredTasks = filteredByProject(filteredBySearch(tasks));
+  const today = getTodayDateString();
+  const activeTasks = tasks.filter(t => !t.scheduledDate || t.scheduledDate <= today);
+  const scheduledTasks = tasks.filter(t => t.scheduledDate && t.scheduledDate > today);
+
+  const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
+  const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));
   const filteredArchived = filteredByProject(filteredBySearch(archived));
 
-  const activeTasksCount = tasks.filter(t => t.priority <= 3).length;
+  const activeTasksCount = activeTasks.filter(t => t.priority <= 3).length;
   const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
 
   // Sync milestones when archived items change
@@ -540,6 +547,7 @@ const TodoApp = () => {
               projects={[...DEFAULT_PROJECTS, ...projects]}
               onComplete={handleCompleteTask}
               onEdit={setEditingTask}
+              onUpdate={updateTask}
               handleDragStart={handleDragStart}
               handleDragOver={handleDragOver}
               handleDrop={handleDrop}
@@ -579,6 +587,40 @@ const TodoApp = () => {
                         projectColor={project?.color}
                         onComplete={handleCompleteTask}
                         onEdit={setEditingTask}
+                        onUpdate={updateTask}
+                      />
+                    );
+                  })}
+                </AnimatePresence>
+              </ul>
+            )}
+          </div>
+        )}
+
+        {filteredScheduled.length > 0 && (
+          <div style={{ ...styles.toggleSection, background: 'rgba(37, 99, 235, 0.04)', border: '1px dashed rgba(37, 99, 235, 0.2)' }}>
+            <button
+              onClick={() => setShowScheduled(!showScheduled)}
+              style={{ ...styles.toggleBtn, color: 'var(--accent-color)' }}
+            >
+              {showScheduled ? 'Hide' : 'Show'} Scheduled & Recurring ({filteredScheduled.length})
+            </button>
+            {showScheduled && (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                <AnimatePresence mode="popLayout">
+                  {filteredScheduled.map(task => {
+                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
+                      p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                      p.name.toLowerCase() === task.projectId?.toLowerCase()
+                    );
+                    return (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        projectColor={project?.color}
+                        onComplete={handleCompleteTask}
+                        onEdit={setEditingTask}
+                        onUpdate={updateTask}
                       />
                     );
                   })}
@@ -611,6 +653,7 @@ const TodoApp = () => {
                       isArchived={true}
                       onRestore={onRestoreRequest}
                       onDelete={deleteArchivedTask}
+                      onUpdate={updateTask}
                     />
                   );
                 })}

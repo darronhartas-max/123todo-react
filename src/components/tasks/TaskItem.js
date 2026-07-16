@@ -3,7 +3,7 @@ import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare } from 'lucide-reac
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES } from '../../utils/constants';
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, dragHandlers, projectColor, isDragging, isDragOver }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
@@ -33,6 +33,33 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
         };
     }, []);
 
+    const handleToggleSubtask = (e, subtaskId) => {
+        e.stopPropagation();
+        if (!onUpdate) return;
+        const updatedSubtasks = (task.subtasks || []).map(st => 
+            st.id === subtaskId ? { ...st, completed: !st.completed } : st
+        );
+        onUpdate(task.id, { subtasks: updatedSubtasks });
+    };
+
+    const getRecurrenceText = (rec) => {
+        if (!rec) return '';
+        const { frequency = 1, interval = 'days', daysOfWeek = [] } = rec;
+        const intervalLabel = frequency === 1 
+            ? (interval === 'days' ? 'day' : interval === 'weeks' ? 'week' : interval === 'months' ? 'month' : 'year')
+            : (interval === 'days' ? 'days' : interval === 'weeks' ? 'weeks' : interval === 'months' ? 'months' : 'years');
+            
+        const freqText = frequency === 1 ? 'Every' : `Every ${frequency}`;
+        
+        if (interval === 'weeks' && daysOfWeek && daysOfWeek.length > 0) {
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const selectedDays = daysOfWeek.map(d => dayNames[d]).join(', ');
+            return `${freqText} week on ${selectedDays}`;
+        }
+        
+        return `${freqText} ${intervalLabel}`;
+    };
+
     const styles = {
         taskItem: {
             display: 'flex',
@@ -58,7 +85,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             borderRadius: '50%',
             marginRight: '10px',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            backgroundColor: PRIORITIES[task.priority]?.dotColor || 'var(--muted-text)'
+            backgroundColor: PRIORITIES[task.priority]?.dotColor || 'var(--muted-text)',
+            marginTop: '6px'
         },
         taskText: {
             flex: 1,
@@ -70,7 +98,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
             fontFamily: 'Inter, sans-serif',
             wordWrap: 'break-word',
             whiteSpace: 'normal',
-            textAlign: 'left'
+            textAlign: 'left',
+            fontWeight: '500'
         },
         actionBtn: {
             background: 'transparent',
@@ -89,7 +118,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
         }
     };
 
-
+    const subtasksCount = (task.subtasks || []).length;
+    const completedCount = (task.subtasks || []).filter(s => s.completed).length;
 
     return (
         <motion.li
@@ -152,6 +182,129 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, d
                     )}
                     <span style={styles.taskText}>{task.text}</span>
                 </div>
+
+                {/* Scheduled / Recurrence details */}
+                {((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.8rem',
+                        color: 'var(--muted-text)',
+                        marginTop: '4px',
+                        flexWrap: 'wrap'
+                    }}>
+                        {task.scheduledDate && !isArchived && (
+                            <span style={{
+                                background: 'rgba(37, 99, 235, 0.08)',
+                                color: 'var(--accent-color)',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                            }}>
+                                📅 {task.scheduledDate}
+                            </span>
+                        )}
+                        {task.isRecurring && task.recurrence && (
+                            <span style={{
+                                background: 'rgba(16, 185, 129, 0.08)',
+                                color: '#10b981',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                            }}>
+                                🔁 {getRecurrenceText(task.recurrence)}
+                            </span>
+                        )}
+                        {task.deferCount > 0 && !isArchived && (
+                            <span style={{
+                                background: 'rgba(239, 68, 68, 0.08)',
+                                color: '#ef4444',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: '600'
+                            }} title={`This task has been deferred ${task.deferCount} times`}>
+                                ⚠️ Deferred {task.deferCount}x
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* Subtask indicator and checklist */}
+                {subtasksCount > 0 && (
+                    <div style={{ marginTop: '8px', width: '100%', paddingRight: '8px', boxSizing: 'border-box' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--muted-text)' }}>
+                                📋 Steps: {completedCount}/{subtasksCount}
+                            </span>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-color)' }}>
+                                {Math.round((completedCount / subtasksCount) * 100)}%
+                            </span>
+                        </div>
+                        <div style={{
+                            width: '100%',
+                            height: '4px',
+                            background: 'var(--border-color)',
+                            borderRadius: '2px',
+                            overflow: 'hidden',
+                            marginBottom: '6px'
+                        }}>
+                            <div style={{
+                                width: `${(completedCount / subtasksCount) * 100}%`,
+                                height: '100%',
+                                background: 'var(--accent-color)',
+                                transition: 'width 0.3s ease'
+                            }} />
+                        </div>
+                        
+                        {!isArchived && (
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                {task.subtasks.map(st => (
+                                    <li 
+                                        key={st.id} 
+                                        onClick={(e) => handleToggleSubtask(e, st.id)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            cursor: 'pointer',
+                                            padding: '4px 6px',
+                                            borderRadius: '4px',
+                                            background: 'rgba(0,0,0,0.01)',
+                                            fontSize: '0.9rem',
+                                            userSelect: 'none',
+                                            transition: 'background 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.01)'}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={st.completed}
+                                            onChange={(e) => handleToggleSubtask(e, st.id)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            style={{ cursor: 'pointer', width: '14px', height: '14px', margin: 0 }}
+                                        />
+                                        <span style={{
+                                            textDecoration: st.completed ? 'line-through' : 'none',
+                                            color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                            fontSize: '0.95rem'
+                                        }}>
+                                            {st.text}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
                 {showNotes && task.notes && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}

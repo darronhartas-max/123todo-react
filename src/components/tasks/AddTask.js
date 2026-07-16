@@ -9,6 +9,19 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const [notes, setNotes] = useState('');
     const [showNotes, setShowNotes] = useState(false);
     const [priority, setPriority] = useState(1);
+    
+    // New scheduling and subtask states
+    const [showSubtasks, setShowSubtasks] = useState(false);
+    const [subtasks, setSubtasks] = useState([]);
+    const [newSubtaskText, setNewSubtaskText] = useState('');
+    
+    const [showSchedule, setShowSchedule] = useState(false);
+    const [scheduledDate, setScheduledDate] = useState(null);
+    const [isRecurring, setIsRecurring] = useState(false);
+    const [recurrenceFrequency, setRecurrenceFrequency] = useState(1);
+    const [recurrenceInterval, setRecurrenceInterval] = useState('days');
+    const [recurrenceDaysOfWeek, setRecurrenceDaysOfWeek] = useState([]);
+    
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -26,11 +39,49 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const handleSubmit = () => {
         if (!text.trim()) return;
         const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
-        onAdd(text, priority, finalProjectId, notes.trim());
+        
+        // Build recurrence rule if recurring is selected
+        let recurrence = null;
+        if (isRecurring && scheduledDate) {
+            recurrence = {
+                frequency: recurrenceFrequency,
+                interval: recurrenceInterval,
+                daysOfWeek: recurrenceInterval === 'weeks' && recurrenceDaysOfWeek.length > 0 ? recurrenceDaysOfWeek : []
+            };
+        }
+
+        onAdd(text, priority, finalProjectId, notes.trim(), {
+            scheduledDate,
+            subtasks,
+            isRecurring: isRecurring && !!scheduledDate,
+            recurrence
+        });
+
+        // Reset all states
         setText('');
         setNotes('');
         setShowNotes(false);
+        setSubtasks([]);
+        setNewSubtaskText('');
+        setScheduledDate(null);
+        setIsRecurring(false);
+        setRecurrenceFrequency(1);
+        setRecurrenceInterval('days');
+        setRecurrenceDaysOfWeek([]);
+        setShowSubtasks(false);
+        setShowSchedule(false);
         onClose();
+    };
+
+    const handleAddSubtask = () => {
+        if (!newSubtaskText.trim()) return;
+        const newSubtask = {
+            id: Date.now() + Math.random(),
+            text: newSubtaskText.trim(),
+            completed: false
+        };
+        setSubtasks([...subtasks, newSubtask]);
+        setNewSubtaskText('');
     };
 
     const getPriorityButtonStyle = (p) => {
@@ -56,12 +107,27 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         };
     };
 
+    const toggleButtonStyle = (isActive) => ({
+        border: 'none',
+        color: isActive ? 'white' : 'var(--accent-color)',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        fontSize: '0.85rem',
+        fontWeight: '600',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        background: isActive ? 'var(--accent-color)' : 'rgba(37, 99, 235, 0.05)',
+        transition: 'all 0.2s ease'
+    });
+
     const styles = {
         addSection: {
             padding: isOpen ? '12px' : '0',
             background: 'var(--surface-color)',
-            maxHeight: isOpen ? '600px' : '0',
-            overflow: 'hidden',
+            maxHeight: isOpen ? '900px' : '0',
+            overflowY: 'auto',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
             boxSizing: 'border-box'
@@ -111,27 +177,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     alignItems: 'center',
                     gap: '12px'
                 }}>
-                    {text.length > 0 && (
-                        <button
-                            onClick={() => setShowNotes(!showNotes)}
-                            style={{
-                                border: 'none',
-                                color: 'var(--accent-color)',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '0.9rem',
-                                fontWeight: '600',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                background: 'rgba(37, 99, 235, 0.05)'
-                            }}
-                        >
-                            {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                            {showNotes ? 'Hide Notes' : 'Add Notes'}
-                        </button>
-                    )}
                     <div style={{
                         fontSize: '0.85rem',
                         color: '#6b7280',
@@ -157,6 +202,32 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                 maxLength={MAX_TASK_LENGTH}
             />
 
+            {text.length > 0 && (
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
+                    <button
+                        onClick={() => setShowNotes(!showNotes)}
+                        style={toggleButtonStyle(showNotes)}
+                    >
+                        {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                        Notes
+                    </button>
+                    <button
+                        onClick={() => setShowSubtasks(!showSubtasks)}
+                        style={toggleButtonStyle(showSubtasks)}
+                    >
+                        {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
+                        Subtasks ({subtasks.length})
+                    </button>
+                    <button
+                        onClick={() => setShowSchedule(!showSchedule)}
+                        style={toggleButtonStyle(showSchedule)}
+                    >
+                        {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
+                        {scheduledDate ? `Scheduled: ${scheduledDate}` : 'Schedule'}
+                    </button>
+                </div>
+            )}
+
             {showNotes && (
                 <div style={{ marginTop: '10px' }}>
                     <textarea
@@ -179,6 +250,249 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     }}>
                         {notes.length} chars
                     </div>
+                </div>
+            )}
+
+            {showSubtasks && (
+                <div style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '6px',
+                    background: 'var(--bg-color)'
+                }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                        📋 Subtasks / Checklist
+                    </div>
+                    {subtasks.length > 0 && (
+                        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
+                            {subtasks.map((st) => (
+                                <li key={st.id} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '6px 0',
+                                    borderBottom: '1px solid rgba(0,0,0,0.03)'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={st.completed}
+                                            onChange={() => {
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                        <span style={{
+                                            textDecoration: st.completed ? 'line-through' : 'none',
+                                            color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                            fontSize: '0.95rem'
+                                        }}>
+                                            {st.text}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
+                                        style={{
+                                            border: 'none',
+                                            background: 'transparent',
+                                            color: '#ef4444',
+                                            cursor: 'pointer',
+                                            fontSize: '0.85rem'
+                                        }}
+                                    >
+                                        Delete
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <input
+                            type="text"
+                            value={newSubtaskText}
+                            onChange={(e) => setNewSubtaskText(e.target.value)}
+                            placeholder="Add subtask step..."
+                            style={{
+                                flex: 1,
+                                padding: '6px 8px',
+                                fontSize: '0.95rem',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '4px',
+                                background: 'var(--item-bg)',
+                                color: 'var(--text-color)'
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddSubtask();
+                                }
+                            }}
+                        />
+                        <button
+                            onClick={handleAddSubtask}
+                            style={{
+                                padding: '6px 12px',
+                                background: 'var(--accent-color)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            Add
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {showSchedule && (
+                <div style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '6px',
+                    background: 'var(--bg-color)'
+                }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                        📅 Date & Recurrence Scheduling
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '150px' }}>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>Start/Scheduled Date</label>
+                            <input
+                                type="date"
+                                value={scheduledDate || ''}
+                                onChange={(e) => setScheduledDate(e.target.value || null)}
+                                style={{
+                                    padding: '6px 8px',
+                                    fontSize: '0.95rem',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '4px',
+                                    background: 'var(--item-bg)',
+                                    color: 'var(--text-color)',
+                                    width: '100%',
+                                    boxSizing: 'border-box'
+                                }}
+                            />
+                        </div>
+                        {scheduledDate && (
+                            <button
+                                onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
+                                style={{
+                                    padding: '6px 12px',
+                                    background: '#e5e7eb',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.85rem',
+                                    marginTop: '18px',
+                                    color: '#333'
+                                }}
+                            >
+                                Clear Date
+                            </button>
+                        )}
+                    </div>
+
+                    {scheduledDate && (
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={isRecurring}
+                                    onChange={(e) => setIsRecurring(e.target.checked)}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                                🔁 Repeat this task
+                            </label>
+
+                            {isRecurring && (
+                                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.95rem' }}>
+                                            <span>Every</span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={recurrenceFrequency}
+                                                onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
+                                                style={{
+                                                    width: '50px',
+                                                    padding: '4px 6px',
+                                                    border: '1px solid var(--border-color)',
+                                                    borderRadius: '4px',
+                                                    background: 'var(--item-bg)',
+                                                    color: 'var(--text-color)',
+                                                    textAlign: 'center'
+                                                }}
+                                            />
+                                        </div>
+                                        <select
+                                            value={recurrenceInterval}
+                                            onChange={(e) => setRecurrenceInterval(e.target.value)}
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '0.95rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                background: 'var(--item-bg)',
+                                                color: 'var(--text-color)'
+                                            }}
+                                        >
+                                            <option value="days">Day(s)</option>
+                                            <option value="weeks">Week(s)</option>
+                                            <option value="months">Month(s)</option>
+                                            <option value="years">Year(s)</option>
+                                        </select>
+                                    </div>
+
+                                    {recurrenceInterval === 'weeks' && (
+                                        <div style={{ marginTop: '6px' }}>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>
+                                                Repeat on specific days:
+                                            </span>
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
+                                                    const isSelected = recurrenceDaysOfWeek.includes(idx);
+                                                    return (
+                                                        <button
+                                                            key={day}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (isSelected) {
+                                                                    setRecurrenceDaysOfWeek(recurrenceDaysOfWeek.filter(d => d !== idx));
+                                                                } else {
+                                                                    setRecurrenceDaysOfWeek([...recurrenceDaysOfWeek, idx]);
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                flex: 1,
+                                                                padding: '6px 2px',
+                                                                fontSize: '0.75rem',
+                                                                fontWeight: '700',
+                                                                borderRadius: '4px',
+                                                                cursor: 'pointer',
+                                                                border: '1px solid',
+                                                                borderColor: isSelected ? 'var(--accent-color)' : 'var(--border-color)',
+                                                                background: isSelected ? 'var(--accent-color)' : 'var(--item-bg)',
+                                                                color: isSelected ? 'white' : 'var(--text-color)',
+                                                                transition: 'all 0.2s ease'
+                                                            }}
+                                                        >
+                                                            {day[0]}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
 

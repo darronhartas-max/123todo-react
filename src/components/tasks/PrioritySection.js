@@ -9,6 +9,7 @@ const PrioritySection = ({
     projects,
     onComplete,
     onEdit,
+    onUpdate,
     handleDragStart,
     handleDragOver,
     handleDrop,
@@ -64,6 +65,7 @@ const PrioritySection = ({
                                 projectColor={project?.color}
                                 onComplete={onComplete}
                                 onEdit={onEdit}
+                                onUpdate={onUpdate}
                                 isDragging={draggedId === task.id}
                                 isDragOver={dragOverId === task.id}
                                 dragHandlers={{

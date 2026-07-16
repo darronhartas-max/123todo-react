@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS } from '../utils/constants';
+import { calculateNextRecurrenceDate, getTodayDateString } from '../utils/dateUtils';
 
 // Sanitizes task lists to resolve any duplicate task IDs or missing IDs,
 // ensuring every task has a unique integer ID and the counter is correct.
@@ -30,7 +31,16 @@ const sanitizeTaskIds = (tasksList, archivedList, startCounter) => {
             } else {
                 usedIds.add(id);
             }
-            return { ...task, id };
+            return {
+                ...task,
+                id,
+                projectId: task.projectId || task.categoryId || 'general',
+                scheduledDate: task.scheduledDate || null,
+                deferCount: task.deferCount || 0,
+                subtasks: task.subtasks || [],
+                isRecurring: task.isRecurring || false,
+                recurrence: task.recurrence || null
+            };
         }).filter(Boolean);
     };
 
@@ -182,9 +192,7 @@ export const useTasks = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tasks, archived, projects, counter, isLoaded]);
 
-    const addTask = useCallback((text, priority, projectId = 'general', notes = '') => {
-        if (!text.trim()) return;
-
+    const addTask = useCallback((text, priority, projectId = 'general', notes = '', extraFields = {}) => {
         const newId = counter + 1;
         const newTask = {
             id: newId,
@@ -192,7 +200,13 @@ export const useTasks = () => {
             priority,
             projectId: projectId || 'general',
             notes: (notes || '').trim(),
-            isSample: false
+            isSample: false,
+            scheduledDate: extraFields.scheduledDate || null,
+            deferCount: 0,
+            subtasks: extraFields.subtasks || [],
+            isRecurring: extraFields.isRecurring || false,
+            recurrence: extraFields.recurrence || null,
+            completedAt: null
         };
 
         setCounter(newId);
@@ -201,6 +215,8 @@ export const useTasks = () => {
     }, [counter]);
 
     const completeTask = useCallback((id) => {
+        let spawnedTask = null;
+
         setTasks(prev => {
             const taskIndex = prev.findIndex(t => t.id === id);
             if (taskIndex === -1) return prev;
@@ -209,12 +225,45 @@ export const useTasks = () => {
             const [task] = newTasks.splice(taskIndex, 1);
             const completedTask = {
                 ...task,
+                isRecurring: false,
+                recurrence: null,
                 completedAt: Date.now()
             };
 
             setArchived(arch => [completedTask, ...arch]);
+
+            if (task.isRecurring && task.recurrence) {
+                const baseDate = task.scheduledDate || new Date().toISOString().split('T')[0];
+                const nextDate = calculateNextRecurrenceDate(baseDate, task.recurrence);
+                
+                if (nextDate) {
+                    const resetSubtasks = (task.subtasks || []).map(st => ({
+                        ...st,
+                        completed: false
+                    }));
+
+                    spawnedTask = {
+                        ...task,
+                        scheduledDate: nextDate,
+                        deferCount: 0,
+                        subtasks: resetSubtasks,
+                        completedAt: null
+                    };
+                }
+            }
+
             return newTasks;
         });
+
+        if (spawnedTask) {
+            setCounter(curr => {
+                const newId = curr + 1;
+                spawnedTask.id = newId;
+                setTasks(prev => [spawnedTask, ...prev]);
+                return newId;
+            });
+        }
+
         setTimestamp(Date.now());
     }, []);
 
@@ -243,9 +292,21 @@ export const useTasks = () => {
     }, []);
 
     const updateTask = useCallback((id, updates) => {
-        setTasks(prev => prev.map(task =>
-            task.id === id ? { ...task, ...updates, isSample: false } : task
-        ));
+        const today = getTodayDateString();
+        setTasks(prev => prev.map(task => {
+            if (task.id === id) {
+                const finalUpdates = { ...updates };
+                const oldIsActive = !task.scheduledDate || task.scheduledDate <= today;
+                const newIsFuture = updates.scheduledDate && updates.scheduledDate > today;
+                
+                if (oldIsActive && newIsFuture) {
+                    finalUpdates.deferCount = (task.deferCount || 0) + 1;
+                }
+                
+                return { ...task, ...finalUpdates, isSample: false };
+            }
+            return task;
+        }));
         setTimestamp(Date.now());
     }, []);
 
