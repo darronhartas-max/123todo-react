@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS } from '../../utils/constants';
 
@@ -19,6 +19,7 @@ const SettingsModal = ({
     onAddProject,
     onEditProject,
     onDeleteProject,
+    onMoveProject,
     fontSize,
     setFontSize,
     density,
@@ -348,7 +349,7 @@ const SettingsModal = ({
                             <div>
                                 <div style={styles.sectionTitle}>Manage Projects</div>
                                 <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
-                                    {projects.map(project => (
+                                    {projects.map((project, idx) => (
                                         <div key={project.id} style={styles.projectItem}>
                                             {editingProjectId === project.id ? (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
@@ -407,6 +408,30 @@ const SettingsModal = ({
                                                         {project.name}
                                                     </div>
                                                      <div style={styles.actions}>
+                                                         <button
+                                                             style={{
+                                                                 ...styles.actionBtn,
+                                                                 opacity: idx === 0 ? 0.3 : 1,
+                                                                 cursor: idx === 0 ? 'default' : 'pointer'
+                                                             }}
+                                                             disabled={idx === 0}
+                                                             onClick={() => onMoveProject && onMoveProject(project.id, 'up')}
+                                                             title="Move project up"
+                                                         >
+                                                             <ChevronUp size={18} />
+                                                         </button>
+                                                         <button
+                                                             style={{
+                                                                 ...styles.actionBtn,
+                                                                 opacity: idx === projects.length - 1 ? 0.3 : 1,
+                                                                 cursor: idx === projects.length - 1 ? 'default' : 'pointer'
+                                                             }}
+                                                             disabled={idx === projects.length - 1}
+                                                             onClick={() => onMoveProject && onMoveProject(project.id, 'down')}
+                                                             title="Move project down"
+                                                         >
+                                                             <ChevronDown size={18} />
+                                                         </button>
                                                          <button
                                                              style={styles.actionBtn}
                                                              onClick={() => {

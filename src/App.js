@@ -30,7 +30,8 @@ import { getTodayDateString } from './utils/dateUtils';
 const TodoApp = () => {
   const {
     tasks, archived, projects, counter, timestamp, addTask, completeTask, deleteArchivedTask,
-    restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, importData, bulkAddTasks
+    restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, moveProject,
+    importData, bulkAddTasks
   } = useTasks();
 
   const {
@@ -774,6 +775,7 @@ const TodoApp = () => {
         onAddProject={addProject}
         onEditProject={updateProject}
         onDeleteProject={handleDeleteProjectRequest}
+        onMoveProject={moveProject}
         fontSize={fontSize}
         setFontSize={setFontSize}
         density={density}

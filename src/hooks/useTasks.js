@@ -374,6 +374,26 @@ export const useTasks = () => {
         setTimestamp(Date.now());
     }, []);
 
+    const moveProject = useCallback((id, direction) => {
+        setProjects(prev => {
+            const index = prev.findIndex(p => p.id === id);
+            if (index === -1) return prev;
+            const targetIndex = direction === 'up' ? index - 1 : index + 1;
+            if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+
+            const updated = [...prev];
+            const [moved] = updated.splice(index, 1);
+            updated.splice(targetIndex, 0, moved);
+            return updated;
+        });
+        setTimestamp(Date.now());
+    }, []);
+
+    const reorderProjects = useCallback((reorderedList) => {
+        setProjects(reorderedList);
+        setTimestamp(Date.now());
+    }, []);
+
     const importData = useCallback((data) => {
         // Map tasks and fallback legacy categoryId to projectId
         const mappedTasks = (data.tasks || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
@@ -457,6 +477,8 @@ export const useTasks = () => {
         addProject,
         updateProject,
         deleteProject,
+        moveProject,
+        reorderProjects,
         importData,
         bulkAddTasks,
         recoverFromShadow
