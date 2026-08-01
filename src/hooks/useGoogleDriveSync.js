@@ -232,12 +232,12 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         if (isAuthed && passphrase) {
             const timeoutId = setTimeout(() => {
                 performSync(false);
-            }, 3000); // 3 second debounce
+            }, 800); // 800ms debounce for near-instant push
             return () => clearTimeout(timeoutId);
         }
     }, [localData.timestamp, isAuthed, passphrase, performSync]);
 
-    // Smart Sync: Focus Listener & Gentle Polling
+    // Smart Sync: Focus Listener, Network Reconnect & 15s Active Polling
     useEffect(() => {
         if (!isAuthed || !passphrase) return;
 
@@ -246,11 +246,11 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         const startPolling = () => {
             if (intervalId) clearInterval(intervalId);
             intervalId = setInterval(() => {
-                // Only poll if the tab is visible
+                // Only poll lightweight metadata if tab is visible
                 if (document.visibilityState === 'visible') {
                     performSync(false);
                 }
-            }, 60000); // 60 seconds
+            }, 15000); // 15 seconds polling for fast cross-device updates
         };
         startPolling();
 
@@ -262,11 +262,13 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         };
 
         window.addEventListener('focus', handleFocusOrVisible);
+        window.addEventListener('online', handleFocusOrVisible);
         document.addEventListener('visibilitychange', handleFocusOrVisible);
 
         return () => {
             if (intervalId) clearInterval(intervalId);
             window.removeEventListener('focus', handleFocusOrVisible);
+            window.removeEventListener('online', handleFocusOrVisible);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
     }, [isAuthed, passphrase, performSync]);
