@@ -779,6 +779,9 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
                         {activeTab === 'swipe' && (
                             <div>
                                 <div style={styles.sectionTitle}>
