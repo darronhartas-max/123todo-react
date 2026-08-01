@@ -33,18 +33,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         localStorage.removeItem('123Todo_Google_AccessToken');
         localStorage.removeItem('123Todo_Google_TokenExpiry');
         accessTokenRef.current = null;
-        if (localStorage.getItem('123Todo_Google_Authed') === 'true' && tokenClientRef.current) {
-            try {
-                tokenClientRef.current.requestAccessToken({ prompt: '' });
-            } catch (err) {
-                console.error('Failed to silently request token:', err);
-                setIsAuthed(false);
-                setSyncStatus('offline');
-            }
-        } else {
-            setIsAuthed(false);
-            setSyncStatus('offline');
-        }
+        setIsAuthed(false);
+        setSyncStatus('offline');
     }, []);
 
     const performSync = useCallback(async (isInitial = false) => {
@@ -191,10 +181,10 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                     },
                 });
 
-                // Attempt automatic sign-in if they previously signed in AND we don't have a valid token currently
-                if (!hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
-                    // prompt: '' attempts to sign in silently without the popup if they are already authorized
-                    tokenClientRef.current.requestAccessToken({ prompt: '' });
+                // If no valid stored token, remain offline until user explicitly clicks Sign In
+                if (!hasValidToken) {
+                    setIsAuthed(false);
+                    setSyncStatus('offline');
                 }
 
             } else {
