@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { STORAGE_KEYS, BACKUP_REMINDER_DAYS, INSTALL_PROMPT_DAYS } from '../utils/constants';
+import { STORAGE_KEYS, INSTALL_PROMPT_DAYS } from '../utils/constants';
 
 export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     const [showWelcome, setShowWelcome] = useState(false);
@@ -33,31 +33,9 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     }, []);
 
     const checkBackupReminder = useCallback((count) => {
-        if (isSyncAuthed) {
-            setShowBackupReminder(false);
-            return;
-        }
-
-        let lastBackup = localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
-        
-        // If it's a new user or they've never backed up, start the timer from today
-        if (!lastBackup) {
-            lastBackup = Date.now().toString();
-            localStorage.setItem(STORAGE_KEYS.LAST_BACKUP, lastBackup);
-            return;
-        }
-
-        const lastReminderDismiss = localStorage.getItem(STORAGE_KEYS.REMINDER_DISMISSED);
-        const now = Date.now();
-        const reminderPeriod = BACKUP_REMINDER_DAYS * 24 * 60 * 60 * 1000;
-
-        const shouldShowReminder = ((now - parseInt(lastBackup)) > reminderPeriod) &&
-            (!lastReminderDismiss || (now - parseInt(lastReminderDismiss)) > reminderPeriod);
-
-        if (shouldShowReminder && count > 0) {
-            setShowBackupReminder(true);
-        }
-    }, [isSyncAuthed]);
+        // Redundant due to automatic 24-hour shadow backups, persistent storage API, and Google Drive sync.
+        setShowBackupReminder(false);
+    }, []);
 
     const checkInstallPrompt = useCallback(() => {
         const installDismissed = localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISSED);
