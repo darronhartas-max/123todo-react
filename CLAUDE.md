@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.3.8
+- **Version**: v2.3.9
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,14 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.3.9 (2026-08-01)
+- **Feature**: Reduced task item completion/archiving delay from 2.0s to 1.5s for faster, punchier user interaction.
+- **Feature**: Defaulted newly added task project to the last entered project to save user entry time.
+- **Feature**: Expanded task description input field in Add Task drawer with auto-resizing height up to 140px.
+- **Fix**: Prevented unprompted Google Sign-In popups on app startup and token expiration, enabling silent background token refresh (`prompt: 'none'`).
+- **Feature**: Added focus blur to Search and Project sections when Add Task is open while keeping header close toggle clear.
+- **Feature**: Added Move Up (▲) and Move Down (▼) project reordering controls in Settings.
 
 ### v2.3.8 (2026-07-16)
 - **Fix**: Replaced hardcoded light-mode `rgba(37, 99, 235, 0.05)` inactive background on the 📅 Schedule and 📋 Subtasks toggle buttons in both `EditModal.js` and `AddTask.js` with `transparent` background and a `1px solid var(--accent-color)` border, ensuring the buttons are clearly visible in dark mode.

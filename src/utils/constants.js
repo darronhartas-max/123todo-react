@@ -51,4 +51,4 @@ export const MAX_TASK_LENGTH = 200;
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.3.8';
+export const APP_VERSION = '2.3.9';
