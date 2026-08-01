@@ -16,6 +16,15 @@ export function register(config) {
             return;
         }
 
+        // Auto reload when a new service worker takes control
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+            }
+        });
+
         window.addEventListener('load', () => {
             const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
@@ -55,7 +64,10 @@ function registerValidSW(swUrl, config) {
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // New content found!
+                            // New content found! Tell the waiting worker to skip waiting & activate immediately!
+                            if (installingWorker) {
+                                installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                            }
                             console.log('New content available, preparing to update...');
 
                             if (config && config.onUpdate) {
