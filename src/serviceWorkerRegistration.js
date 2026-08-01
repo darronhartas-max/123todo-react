@@ -64,16 +64,13 @@ function registerValidSW(swUrl, config) {
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // New content found! Tell the waiting worker to skip waiting & activate immediately!
-                            if (installingWorker) {
-                                installingWorker.postMessage({ type: 'SKIP_WAITING' });
-                            }
-                            console.log('New content available, preparing to update...');
+                            // New content found! Notify UI so user can choose when to update
+                            console.log('New content available, notify user to update...');
 
                             if (config && config.onUpdate) {
                                 config.onUpdate(registration);
                             } else {
-                                // Dispatch custom event so App.js can handle the UI
+                                // Dispatch custom event so App.js can display update banner
                                 const event = new CustomEvent('swUpdateAvailable', { detail: registration });
                                 window.dispatchEvent(event);
                             }

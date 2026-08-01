@@ -964,8 +964,9 @@ const TodoApp = () => {
             onClick={() => {
               localStorage.setItem('123Todo_Show_Updated_Modal', 'true');
               localStorage.setItem('123Todo_Previous_Version', APP_VERSION);
-              if (swRegistration && swRegistration.waiting) {
-                swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              const worker = swRegistration?.waiting || swRegistration?.installing;
+              if (worker) {
+                worker.postMessage({ type: 'SKIP_WAITING' });
               }
               window.location.reload();
             }}
