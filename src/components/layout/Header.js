@@ -33,24 +33,42 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark }) => {
 
     return (
         <header style={styles.header}>
-            <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block' }}>
-                <img
-                    src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
-                    alt="123 ToDo logo"
-                    style={{
-                        width: '240px',
-                        height: 'auto',
-                        cursor: 'pointer',
-                        display: 'block'
-                    }}
-                />
-            </a>
-            <div style={styles.taskCounter}>
-                {taskCount} active
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flex: 1,
+                filter: isAddOpen ? 'blur(5px)' : 'none',
+                opacity: isAddOpen ? 0.5 : 1,
+                transition: 'all 0.3s ease',
+                pointerEvents: isAddOpen ? 'none' : 'auto'
+            }}>
+                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block' }}>
+                    <img
+                        src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
+                        alt="123 ToDo logo"
+                        style={{
+                            width: '240px',
+                            height: 'auto',
+                            cursor: 'pointer',
+                            display: 'block'
+                        }}
+                    />
+                </a>
+                <div style={styles.taskCounter}>
+                    {taskCount} active
+                </div>
             </div>
             <button
                 onClick={onToggleAdd}
-                style={styles.addTaskToggle}
+                style={{
+                    ...styles.addTaskToggle,
+                    position: 'relative',
+                    zIndex: 10,
+                    filter: 'none',
+                    opacity: 1,
+                    pointerEvents: 'auto'
+                }}
                 aria-label={isAddOpen ? "Close add task" : "Open add task"}
             >
                 {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}

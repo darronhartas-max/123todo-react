@@ -489,61 +489,61 @@ const TodoApp = () => {
           defaultProjectId={currentProjectId}
         />
 
-        {showInstallPrompt && (
-          <InstallPrompt onInstall={() => { }} onDismiss={dismissInstallPrompt} />
-        )}
-
-        {showUpdateReady && (
-          <UpdateReadyPrompt
-            onBackup={() => {
-              handleExport();
-              // Keep showing update prompt so they can click 'Update Now' next
-            }}
-            onUpdate={handleApplyUpdate}
-            onDismiss={() => setShowUpdateReady(false)}
-          />
-        )}
-
-        {showBackupReminder && (
-          <BackupReminder onBackup={handleExport} onDismiss={dismissBackupReminder} />
-        )}
-
-        {showSearch && (
-          <SearchBar
-            value={searchTerm}
-            onChange={setSearchTerm}
-            onClear={() => setSearchTerm('')}
-          />
-        )}
-
-        <ProjectTabs
-          projects={projects}
-          currentProjectId={currentProjectId}
-          onSelect={setCurrentProjectId}
-          onAdd={addProject}
-          onUpdate={updateProject}
-          onDelete={handleDeleteProjectRequest}
-          showSearch={showSearch}
-          onToggleSearch={() => setShowSearch(!showSearch)}
-          onOpenSettings={() => setShowSettings(true)}
-        />
-
-        {projectToDelete && (
-          <DeleteProjectModal
-            project={projectToDelete}
-            projects={projects}
-            taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
-            onConfirm={handleDeleteProjectConfirm}
-            onClose={() => setProjectToDelete(null)}
-          />
-        )}
-
         <div style={{
           filter: showAddSection ? 'blur(5px)' : 'none',
           pointerEvents: showAddSection ? 'none' : 'auto',
           transition: 'all 0.3s ease',
           opacity: showAddSection ? 0.5 : 1
         }}>
+          {showInstallPrompt && (
+            <InstallPrompt onInstall={() => { }} onDismiss={dismissInstallPrompt} />
+          )}
+
+          {showUpdateReady && (
+            <UpdateReadyPrompt
+              onBackup={() => {
+                handleExport();
+                // Keep showing update prompt so they can click 'Update Now' next
+              }}
+              onUpdate={handleApplyUpdate}
+              onDismiss={() => setShowUpdateReady(false)}
+            />
+          )}
+
+          {showBackupReminder && (
+            <BackupReminder onBackup={handleExport} onDismiss={dismissBackupReminder} />
+          )}
+
+          {showSearch && (
+            <SearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onClear={() => setSearchTerm('')}
+            />
+          )}
+
+          <ProjectTabs
+            projects={projects}
+            currentProjectId={currentProjectId}
+            onSelect={setCurrentProjectId}
+            onAdd={addProject}
+            onUpdate={updateProject}
+            onDelete={handleDeleteProjectRequest}
+            showSearch={showSearch}
+            onToggleSearch={() => setShowSearch(!showSearch)}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+
+          {projectToDelete && (
+            <DeleteProjectModal
+              project={projectToDelete}
+              projects={projects}
+              taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
+              onConfirm={handleDeleteProjectConfirm}
+              onClose={() => setProjectToDelete(null)}
+            />
+          )}
+
           <div style={styles.sectionsContainer}>
             {[1, 2, 3].map(priority => (
               <PrioritySection
