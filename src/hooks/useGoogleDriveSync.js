@@ -181,8 +181,17 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                     },
                 });
 
-                // If no valid stored token, remain offline until user explicitly clicks Sign In
-                if (!hasValidToken) {
+                // Attempt silent automatic token refresh if user previously signed in AND token is expired
+                if (!hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
+                    try {
+                        // prompt: 'none' requests token silently in background without displaying any popup/UI
+                        tokenClientRef.current.requestAccessToken({ prompt: 'none' });
+                    } catch (err) {
+                        console.warn('Silent token refresh failed:', err);
+                        setIsAuthed(false);
+                        setSyncStatus('offline');
+                    }
+                } else if (!hasValidToken) {
                     setIsAuthed(false);
                     setSyncStatus('offline');
                 }
