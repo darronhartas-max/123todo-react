@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.4.5
+- **Version**: v2.4.6
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,10 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.4.6 (2026-08-01)
+- **UI**: Added a prominent, high-contrast ON/OFF status banner card at the top of the Swipe Settings tab.
+- **UX**: Removed unused P1, P2, and P3 priority swipe options to keep swipe action configuration concise.
 
 ### v2.4.5 (2026-08-01)
 - **Fix**: Resolved JSX closing tag syntax error in `SettingsModal.js` to ensure clean production builds on GitHub Actions.

@@ -80,15 +80,6 @@ const TodoApp = () => {
           updateTask(task.id, { isArchived: true });
         }
         break;
-      case 'priority_1':
-        updateTask(task.id, { priority: 1 });
-        break;
-      case 'priority_2':
-        updateTask(task.id, { priority: 2 });
-        break;
-      case 'priority_3':
-        updateTask(task.id, { priority: 3 });
-        break;
       case 'priority_4':
         updateTask(task.id, { priority: 4 });
         break;
