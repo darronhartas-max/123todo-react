@@ -256,7 +256,7 @@ const TodoApp = () => {
     setShowArchiveToast(true);
     setTimeout(() => {
       setShowArchiveToast(false);
-    }, 2000);
+    }, 1500);
   };
 
   // Filtering

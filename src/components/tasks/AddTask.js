@@ -1,11 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
+import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { Plus, Minus } from 'lucide-react';
 import { getTodayDateString, adjustStartDateForWeekdays } from '../../utils/dateUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
-    const fallbackProjectId = projects[0]?.id || 'general';
-    const [projectId, setProjectId] = useState(defaultProjectId === 'all' ? fallbackProjectId : (defaultProjectId || fallbackProjectId));
+    const getInitialProjectId = () => {
+        const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
+        const isValid = (id) => projects.some(p => p.id === id);
+        if (defaultProjectId && defaultProjectId !== 'all' && isValid(defaultProjectId)) {
+            return defaultProjectId;
+        }
+        if (savedLastProject && isValid(savedLastProject)) {
+            return savedLastProject;
+        }
+        return projects[0]?.id || 'general';
+    };
+
+    const [projectId, setProjectId] = useState(getInitialProjectId);
     const [text, setText] = useState('');
     const [notes, setNotes] = useState('');
     const [showNotes, setShowNotes] = useState(false);
@@ -28,11 +39,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     useEffect(() => {
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
-            const currentFallback = projects[0]?.id || 'general';
-            if (defaultProjectId && defaultProjectId !== 'all') {
+            const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
+            const isValid = (id) => projects.some(p => p.id === id);
+
+            if (defaultProjectId && defaultProjectId !== 'all' && isValid(defaultProjectId)) {
                 setProjectId(defaultProjectId);
-            } else if (defaultProjectId === 'all') {
-                setProjectId(currentFallback);
+            } else if (savedLastProject && isValid(savedLastProject)) {
+                setProjectId(savedLastProject);
+            } else if (projects.length > 0) {
+                setProjectId(projects[0]?.id || 'general');
             }
         }
     }, [isOpen, defaultProjectId, projects]);
@@ -65,6 +80,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             recurrence
         });
 
+        try {
+            localStorage.setItem(STORAGE_KEYS.LAST_PROJECT, finalProjectId);
+        } catch (e) {
+            console.warn('Could not save last project preference:', e);
+        }
+
         // Reset all states
         setText('');
         setNotes('');
@@ -78,6 +99,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         setRecurrenceDaysOfWeek([]);
         setShowSubtasks(false);
         setShowSchedule(false);
+        setProjectId(finalProjectId);
         onClose();
     };
 

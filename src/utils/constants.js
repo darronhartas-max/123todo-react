@@ -16,6 +16,7 @@ export const STORAGE_KEYS = {
   INSTALL_DISMISSED: '123TodoInstallDismissed',
   LAST_INSTALL_PROMPT: '123TodoLastInstallPrompt',
   PROJECTS: '123TodoProjects',
+  LAST_PROJECT: '123TodoLastProject',
   SHADOW_BACKUP: '123TodoShadowBackup',
   LAST_SHADOW_TIME: '123TodoLastShadowTime',
   TIMESTAMP: '123TodoTimestamp'

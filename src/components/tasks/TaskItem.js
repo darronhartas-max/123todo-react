@@ -22,7 +22,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             setIsChecked(true);
             archiveTimeoutRef.current = setTimeout(() => {
                 onComplete(task.id);
-            }, 2000);
+            }, 1500);
         }
     };
 
