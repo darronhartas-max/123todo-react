@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.4.2
+- **Version**: v2.4.3
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,11 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.4.3 (2026-08-01)
+- **Perf**: Ultra-fast Google Drive sync — reduced local push debounce to 300ms and active tab polling frequency to 4s.
+- **Fix**: Added concurrency guard `isSyncingRef` to guarantee network requests never race or overlap during ultra-fast sync.
+- **Feature**: Added `pointerenter` listener to check Google Drive metadata instantly when mouse returns to the window.
 
 ### v2.4.2 (2026-08-01)
 - **Perf**: Accelerated Google Drive local change push debounce from 3.0s down to 800ms for near-instant upload.

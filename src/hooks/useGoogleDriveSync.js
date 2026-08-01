@@ -13,6 +13,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
     const accessTokenRef = useRef(null);
     const tokenClientRef = useRef(null);
     const syncFileIdRef = useRef(null);
+    const isSyncingRef = useRef(false);
 
     // Save passphrase to local storage so we don't ask every time
     useEffect(() => {
@@ -38,8 +39,9 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
     }, []);
 
     const performSync = useCallback(async (isInitial = false) => {
-        if (!accessTokenRef.current || !passphrase) return;
+        if (!accessTokenRef.current || !passphrase || isSyncingRef.current) return;
 
+        isSyncingRef.current = true;
         setSyncStatus('syncing');
         try {
             const headers = { 'Authorization': `Bearer ${accessTokenRef.current}` };
@@ -135,6 +137,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         } catch (error) {
             console.error('Sync failed:', error);
             setSyncStatus('error');
+        } finally {
+            isSyncingRef.current = false;
         }
     }, [passphrase, importDataCallback, handleTokenExpired]);
 
@@ -232,12 +236,12 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         if (isAuthed && passphrase) {
             const timeoutId = setTimeout(() => {
                 performSync(false);
-            }, 800); // 800ms debounce for near-instant push
+            }, 300); // 300ms debounce for immediate push
             return () => clearTimeout(timeoutId);
         }
     }, [localData.timestamp, isAuthed, passphrase, performSync]);
 
-    // Smart Sync: Focus Listener, Network Reconnect & 15s Active Polling
+    // Smart Sync: Focus, Pointer, Network Reconnect & 4s Active Polling
     useEffect(() => {
         if (!isAuthed || !passphrase) return;
 
@@ -250,7 +254,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                 if (document.visibilityState === 'visible') {
                     performSync(false);
                 }
-            }, 15000); // 15 seconds polling for fast cross-device updates
+            }, 4000); // 4 seconds polling for near real-time updates
         };
         startPolling();
 
@@ -263,12 +267,14 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
 
         window.addEventListener('focus', handleFocusOrVisible);
         window.addEventListener('online', handleFocusOrVisible);
+        window.addEventListener('pointerenter', handleFocusOrVisible);
         document.addEventListener('visibilitychange', handleFocusOrVisible);
 
         return () => {
             if (intervalId) clearInterval(intervalId);
             window.removeEventListener('focus', handleFocusOrVisible);
             window.removeEventListener('online', handleFocusOrVisible);
+            window.removeEventListener('pointerenter', handleFocusOrVisible);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
     }, [isAuthed, passphrase, performSync]);
