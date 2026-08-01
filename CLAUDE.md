@@ -4,7 +4,7 @@
 **123 ToDo** is a React-based Progressive Web App (PWA) for task management with offline support, priority-based organization, and achievement tracking.
 
 ## Current Status
-- **Version**: v2.4.7
+- **Version**: v2.4.8
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **State**: Production Refactor Complete (2026-02-21), Google Drive Sync Active
 - **Data Storage**: Browser localStorage (client-side only)
@@ -145,6 +145,9 @@
 - **Legacy**: https://123todo.com
 
 ## Version History
+
+### v2.4.8 (2026-08-01)
+- **Perf**: Added instant mobile touch event listeners (`touchend` & `touchcancel`) to trigger 50ms Google Drive sync pushes on touch release, resolving mobile Safari/Chrome touch timer throttling on reorders & swipes.
 
 ### v2.4.7 (2026-08-01)
 - **UI**: Compacted Manage Projects list layout in Settings (padding reduced to 6px 12px, margin-bottom to 4px, action buttons to 28px) fitting 13+ projects directly into view without scrolling.

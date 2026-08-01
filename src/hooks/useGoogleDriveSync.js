@@ -265,16 +265,32 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             }
         };
 
+        // Mobile touch end listener to flush sync immediately when finger lifts on mobile
+        let touchTimeoutId;
+        const handleTouchEnd = () => {
+            if (document.visibilityState === 'visible') {
+                if (touchTimeoutId) clearTimeout(touchTimeoutId);
+                touchTimeoutId = setTimeout(() => {
+                    performSync(false);
+                }, 50); // 50ms instant flush on mobile touch release
+            }
+        };
+
         window.addEventListener('focus', handleFocusOrVisible);
         window.addEventListener('online', handleFocusOrVisible);
         window.addEventListener('pointerenter', handleFocusOrVisible);
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+        window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
         document.addEventListener('visibilitychange', handleFocusOrVisible);
 
         return () => {
             if (intervalId) clearInterval(intervalId);
+            if (touchTimeoutId) clearTimeout(touchTimeoutId);
             window.removeEventListener('focus', handleFocusOrVisible);
             window.removeEventListener('online', handleFocusOrVisible);
             window.removeEventListener('pointerenter', handleFocusOrVisible);
+            window.removeEventListener('touchend', handleTouchEnd);
+            window.removeEventListener('touchcancel', handleTouchEnd);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
     }, [isAuthed, passphrase, performSync]);
