@@ -1,14 +1,71 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar } from 'lucide-react';
+import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PRIORITIES } from '../../utils/constants';
+import { PRIORITIES, SWIPE_ACTIONS } from '../../utils/constants';
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails }) => {
+const ACTION_ICONS = {
+    CheckSquare,
+    Trash2,
+    Flag,
+    PauseCircle,
+    Edit2,
+    Slash
+};
+
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
+
+    // Swipe Gesture State
+    const [swipeOffset, setSwipeOffset] = useState(0);
+    const touchStartRef = React.useRef({ x: 0, y: 0 });
+    const isSwipingRef = React.useRef(false);
+
+    const handleTouchStart = (e) => {
+        if (!swipeSettings?.enabled || isArchived) return;
+        const touch = e.touches[0];
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+        isSwipingRef.current = false;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!swipeSettings?.enabled || isArchived) return;
+        const touch = e.touches[0];
+        const diffX = touch.clientX - touchStartRef.current.x;
+        const diffY = touch.clientY - touchStartRef.current.y;
+
+        if (!isSwipingRef.current) {
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+                isSwipingRef.current = true;
+            } else if (Math.abs(diffY) > 10) {
+                return;
+            }
+        }
+
+        if (isSwipingRef.current) {
+            if (e.cancelable) e.preventDefault();
+            const clampedOffset = Math.max(-140, Math.min(140, diffX));
+            setSwipeOffset(clampedOffset);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        if (!swipeSettings?.enabled || !isSwipingRef.current) {
+            setSwipeOffset(0);
+            return;
+        }
+        const THRESHOLD = 75;
+        if (swipeOffset > THRESHOLD && swipeSettings.swipeRight !== 'none') {
+            onSwipeAction && onSwipeAction(task, swipeSettings.swipeRight);
+        } else if (swipeOffset < -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
+            onSwipeAction && onSwipeAction(task, swipeSettings.swipeLeft);
+        }
+        setSwipeOffset(0);
+        isSwipingRef.current = false;
+    };
 
     const handleComplete = (e) => {
         e.stopPropagation();
@@ -115,19 +172,87 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const subtasksCount = (task.subtasks || []).length;
     const completedCount = (task.subtasks || []).filter(s => s.completed).length;
 
+    const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
+    const leftSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeLeft ? SWIPE_ACTIONS[swipeSettings.swipeLeft] : null;
+
+    const RightIcon = rightSwipeAction ? ACTION_ICONS[rightSwipeAction.icon] || CheckSquare : null;
+    const LeftIcon = leftSwipeAction ? ACTION_ICONS[leftSwipeAction.icon] || Trash2 : null;
+
     return (
-        <motion.li
-            layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            style={styles.taskItem}
-            draggable={!isArchived}
-            {...(dragHandlers || {})}
-            onClick={() => !isArchived && onEdit && onEdit(task)}
-            onMouseEnter={() => !isArchived && setIsHovered(true)}
-            onMouseLeave={() => !isArchived && setIsHovered(false)}
-        >
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '6px', marginBottom: 'var(--task-margin, 4px)' }}>
+            {/* Background Swipe Reveal Layer - Right Swipe (Left Side) */}
+            {swipeOffset > 0 && rightSwipeAction && swipeSettings?.swipeRight !== 'none' && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, bottom: 0, left: 0, right: 0,
+                    background: rightSwipeAction.bg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    paddingLeft: '16px',
+                    borderRadius: '6px',
+                    color: rightSwipeAction.color,
+                    fontWeight: '700',
+                    fontSize: '0.95rem',
+                    gap: '8px',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                }}>
+                    {RightIcon && <RightIcon size={22} style={{ transform: swipeOffset > 75 ? 'scale(1.25)' : 'scale(1)', transition: 'transform 0.15s ease' }} />}
+                    <span style={{ opacity: swipeOffset > 30 ? 1 : 0, transition: 'opacity 0.15s ease' }}>
+                        {rightSwipeAction.label}
+                    </span>
+                </div>
+            )}
+
+            {/* Background Swipe Reveal Layer - Left Swipe (Right Side) */}
+            {swipeOffset < 0 && leftSwipeAction && swipeSettings?.swipeLeft !== 'none' && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, bottom: 0, left: 0, right: 0,
+                    background: leftSwipeAction.bg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    paddingRight: '16px',
+                    borderRadius: '6px',
+                    color: leftSwipeAction.color,
+                    fontWeight: '700',
+                    fontSize: '0.95rem',
+                    gap: '8px',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                }}>
+                    <span style={{ opacity: Math.abs(swipeOffset) > 30 ? 1 : 0, transition: 'opacity 0.15s ease' }}>
+                        {leftSwipeAction.label}
+                    </span>
+                    {LeftIcon && <LeftIcon size={22} style={{ transform: Math.abs(swipeOffset) > 75 ? 'scale(1.25)' : 'scale(1)', transition: 'transform 0.15s ease' }} />}
+                </div>
+            )}
+
+            <motion.li
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                style={{
+                    ...styles.taskItem,
+                    marginBottom: 0,
+                    transform: `translateX(${swipeOffset}px)`,
+                    transition: swipeOffset === 0 ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease' : 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
+                    position: 'relative',
+                    zIndex: 2
+                }}
+                draggable={!isArchived}
+                {...(dragHandlers || {})}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchEnd}
+                onClick={() => !isArchived && onEdit && onEdit(task)}
+                onMouseEnter={() => !isArchived && setIsHovered(true)}
+                onMouseLeave={() => !isArchived && setIsHovered(false)}
+            >
             {isDragOver && (
                 <div style={{
                     position: 'absolute',
@@ -414,6 +539,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
             </div>
         </motion.li>
+        </div>
     );
 };
 

@@ -15,7 +15,9 @@ const PrioritySection = ({
     handleDrop,
     handleDragEnd,
     draggedId,
-    dragOverId
+    dragOverId,
+    swipeSettings,
+    onSwipeAction
 }) => {
     const config = PRIORITIES[priority];
     const sectionTasks = tasks.filter(t => t.priority === priority);
@@ -66,6 +68,8 @@ const PrioritySection = ({
                                 onComplete={onComplete}
                                 onEdit={onEdit}
                                 onUpdate={onUpdate}
+                                swipeSettings={swipeSettings}
+                                onSwipeAction={onSwipeAction}
                                 isDragging={draggedId === task.id}
                                 isDragOver={dragOverId === task.id}
                                 dragHandlers={{

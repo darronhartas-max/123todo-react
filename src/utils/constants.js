@@ -19,7 +19,25 @@ export const STORAGE_KEYS = {
   LAST_PROJECT: '123TodoLastProject',
   SHADOW_BACKUP: '123TodoShadowBackup',
   LAST_SHADOW_TIME: '123TodoLastShadowTime',
-  TIMESTAMP: '123TodoTimestamp'
+  TIMESTAMP: '123TodoTimestamp',
+  SWIPE_SETTINGS: '123TodoSwipeSettings'
+};
+
+export const SWIPE_ACTIONS = {
+  complete: { label: 'Complete Task', icon: 'CheckSquare', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
+  delete: { label: 'Delete Task', icon: 'Trash2', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
+  priority_1: { label: 'Must Do (P1)', icon: 'Flag', color: '#dc2626', bg: 'rgba(220, 38, 38, 0.15)' },
+  priority_2: { label: 'Should Do (P2)', icon: 'Flag', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+  priority_3: { label: 'Could Do (P3)', icon: 'Flag', color: '#6b7280', bg: 'rgba(107, 114, 128, 0.15)' },
+  priority_4: { label: 'On Hold (P4)', icon: 'PauseCircle', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.15)' },
+  edit: { label: 'Edit Task', icon: 'Edit2', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
+  none: { label: 'None (Disabled)', icon: 'Slash', color: '#9ca3af', bg: 'transparent' }
+};
+
+export const DEFAULT_SWIPE_SETTINGS = {
+  enabled: true,
+  swipeRight: 'complete',
+  swipeLeft: 'delete'
 };
 
 export const PROJECT_COLORS = [

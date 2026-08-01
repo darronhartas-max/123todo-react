@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, ChevronUp, ChevronDown, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PROJECT_COLORS } from '../../utils/constants';
+import { PROJECT_COLORS, SWIPE_ACTIONS } from '../../utils/constants';
 
 const SHORTCUTS_LIST = [
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
@@ -11,6 +11,133 @@ const SHORTCUTS_LIST = [
     { keys: ['Enter'], desc: 'Save task (when editing/adding)' },
     { keys: ['Shift + Enter'], desc: 'Insert line break in notes' }
 ];
+
+const ACTION_ICONS = {
+    CheckSquare,
+    Trash2,
+    Flag,
+    PauseCircle,
+    Edit2,
+    Slash
+};
+
+const SwipeDemoCard = ({ swipeSettings }) => {
+    const [swipeOffset, setSwipeOffset] = useState(0);
+    const [demoMessage, setDemoMessage] = useState('Swipe this sample task card left or right!');
+    const touchStartRef = React.useRef({ x: 0, y: 0 });
+    const isSwipingRef = React.useRef(false);
+
+    const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
+    const leftSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeLeft ? SWIPE_ACTIONS[swipeSettings.swipeLeft] : null;
+
+    const RightIcon = rightSwipeAction ? ACTION_ICONS[rightSwipeAction.icon] || CheckSquare : null;
+    const LeftIcon = leftSwipeAction ? ACTION_ICONS[leftSwipeAction.icon] || Trash2 : null;
+
+    const handleTouchStart = (e) => {
+        if (!swipeSettings?.enabled) return;
+        const touch = e.touches ? e.touches[0] : e;
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+        isSwipingRef.current = false;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!swipeSettings?.enabled) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const diffX = touch.clientX - touchStartRef.current.x;
+        const diffY = touch.clientY - touchStartRef.current.y;
+
+        if (!isSwipingRef.current) {
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+                isSwipingRef.current = true;
+            } else if (Math.abs(diffY) > 10) {
+                return;
+            }
+        }
+
+        if (isSwipingRef.current) {
+            if (e.cancelable) e.preventDefault();
+            const clampedOffset = Math.max(-140, Math.min(140, diffX));
+            setSwipeOffset(clampedOffset);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        if (!swipeSettings?.enabled || !isSwipingRef.current) {
+            setSwipeOffset(0);
+            return;
+        }
+        const THRESHOLD = 75;
+        if (swipeOffset > THRESHOLD && swipeSettings.swipeRight !== 'none') {
+            setDemoMessage(`Triggered Right Swipe: ${rightSwipeAction?.label}! 🎉`);
+        } else if (swipeOffset < -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
+            setDemoMessage(`Triggered Left Swipe: ${leftSwipeAction?.label}! ⚡`);
+        }
+        setSwipeOffset(0);
+        isSwipingRef.current = false;
+    };
+
+    if (!swipeSettings?.enabled) {
+        return (
+            <div style={{ textAlign: 'center', padding: '12px', color: 'var(--muted-text)', fontSize: '0.9rem' }}>
+                Swipe gestures are currently disabled. Enable them above to test.
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
+            {swipeOffset > 0 && rightSwipeAction && (
+                <div style={{
+                    position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
+                    background: rightSwipeAction.bg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+                    paddingLeft: '16px', color: rightSwipeAction.color, fontWeight: '700', gap: '8px', zIndex: 1
+                }}>
+                    {RightIcon && <RightIcon size={20} />}
+                    <span>{rightSwipeAction.label}</span>
+                </div>
+            )}
+            {swipeOffset < 0 && leftSwipeAction && (
+                <div style={{
+                    position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
+                    background: leftSwipeAction.bg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+                    paddingRight: '16px', color: leftSwipeAction.color, fontWeight: '700', gap: '8px', zIndex: 1
+                }}>
+                    <span>{leftSwipeAction.label}</span>
+                    {LeftIcon && <LeftIcon size={20} />}
+                </div>
+            )}
+            <div
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleTouchStart}
+                onMouseMove={(e) => { if (e.buttons === 1) handleTouchMove(e); }}
+                onMouseUp={handleTouchEnd}
+                style={{
+                    padding: '12px 16px',
+                    background: 'var(--item-bg)',
+                    transform: `translateX(${swipeOffset}px)`,
+                    transition: swipeOffset === 0 ? 'transform 0.25s ease' : 'none',
+                    position: 'relative',
+                    zIndex: 2,
+                    cursor: 'grab',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    userSelect: 'none'
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-color)' }} />
+                    <span style={{ fontWeight: '600', fontSize: '0.95rem', color: 'var(--text-color)' }}>{demoMessage}</span>
+                </div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>Drag me ↔</span>
+            </div>
+        </div>
+    );
+};
 
 const SettingsModal = ({
     isOpen,
@@ -27,7 +154,9 @@ const SettingsModal = ({
     layoutWidth,
     setLayoutWidth,
     themeMode,
-    setThemeMode
+    setThemeMode,
+    swipeSettings,
+    onUpdateSwipeSettings
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -341,6 +470,13 @@ const SettingsModal = ({
                             Appearance
                         </button>
                         <button
+                            style={styles.tabBtn(activeTab === 'swipe')}
+                            onClick={() => setActiveTab('swipe')}
+                        >
+                            <MoveHorizontal size={18} />
+                            Swipe
+                        </button>
+                        <button
                             style={styles.tabBtn(activeTab === 'shortcuts')}
                             onClick={() => setActiveTab('shortcuts')}
                         >
@@ -642,6 +778,115 @@ const SettingsModal = ({
                                             Kanban Columns (1000px)
                                         </button>
                                     </div>
+                                </div>
+                        {activeTab === 'swipe' && (
+                            <div>
+                                <div style={styles.sectionTitle}>
+                                    <MoveHorizontal size={20} /> Swipe Gestures
+                                </div>
+
+                                {/* Enable / Disable Toggle */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Enable Swipe Gestures</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', marginBottom: '6px' }}>
+                                        Swipe task cards left or right to perform quick actions like complete, delete, or re-prioritize.
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(swipeSettings?.enabled)}
+                                            onClick={() => onUpdateSwipeSettings({ enabled: true })}
+                                        >
+                                            Enabled
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(!swipeSettings?.enabled)}
+                                            onClick={() => onUpdateSwipeSettings({ enabled: false })}
+                                        >
+                                            Disabled
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Swipe Right Config */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>➡️ Swipe Right Action (Left to Right)</span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {Object.entries(SWIPE_ACTIONS).map(([key, action]) => {
+                                            const isSelected = swipeSettings?.swipeRight === key;
+                                            const IconComp = ACTION_ICONS[action.icon] || CheckSquare;
+                                            return (
+                                                <div
+                                                    key={key}
+                                                    onClick={() => onUpdateSwipeSettings({ swipeRight: key })}
+                                                    style={{
+                                                        padding: '10px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? action.color : 'var(--border-color)'}`,
+                                                        background: isSelected ? `${action.color}15` : 'var(--item-bg)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: isSelected ? '700' : '500',
+                                                        color: isSelected ? action.color : 'var(--text-color)',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                >
+                                                    <IconComp size={16} style={{ color: action.color, flexShrink: 0 }} />
+                                                    <span>{action.label}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Swipe Left Config */}
+                                <div style={{ ...styles.settingRow, marginTop: '20px' }}>
+                                    <div style={styles.settingLabel}>
+                                        <span>⬅️ Swipe Left Action (Right to Left)</span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {Object.entries(SWIPE_ACTIONS).map(([key, action]) => {
+                                            const isSelected = swipeSettings?.swipeLeft === key;
+                                            const IconComp = ACTION_ICONS[action.icon] || Trash2;
+                                            return (
+                                                <div
+                                                    key={key}
+                                                    onClick={() => onUpdateSwipeSettings({ swipeLeft: key })}
+                                                    style={{
+                                                        padding: '10px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? action.color : 'var(--border-color)'}`,
+                                                        background: isSelected ? `${action.color}15` : 'var(--item-bg)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: isSelected ? '700' : '500',
+                                                        color: isSelected ? action.color : 'var(--text-color)',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                >
+                                                    <IconComp size={16} style={{ color: action.color, flexShrink: 0 }} />
+                                                    <span>{action.label}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Live Practice Card */}
+                                <div style={{ marginTop: '24px', padding: '16px', borderRadius: '12px', background: 'var(--bg-color)', border: '1px dashed var(--border-color)' }}>
+                                    <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '8px', color: 'var(--text-color)' }}>
+                                        🧪 Test Your Swipe Gestures Live:
+                                    </div>
+                                    <SwipeDemoCard swipeSettings={swipeSettings} />
                                 </div>
                             </div>
                         )}

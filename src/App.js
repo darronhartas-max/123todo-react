@@ -24,7 +24,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/l
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 
 const TodoApp = () => {
@@ -44,6 +44,61 @@ const TodoApp = () => {
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
     dismissBackupReminder, recordBackup
   } = useAppSystem(archived.length, tasks.length, isAuthed);
+
+  // Swipe Settings State
+  const [swipeSettings, setSwipeSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.SWIPE_SETTINGS);
+      return saved ? JSON.parse(saved) : DEFAULT_SWIPE_SETTINGS;
+    } catch {
+      return DEFAULT_SWIPE_SETTINGS;
+    }
+  });
+
+  const updateSwipeSettings = (updates) => {
+    setSwipeSettings(prev => {
+      const updated = { ...prev, ...updates };
+      try {
+        localStorage.setItem(STORAGE_KEYS.SWIPE_SETTINGS, JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save swipe settings:', e);
+      }
+      return updated;
+    });
+  };
+
+  const handleSwipeAction = (task, actionKey) => {
+    if (!actionKey || actionKey === 'none') return;
+    switch (actionKey) {
+      case 'complete':
+        handleCompleteTask(task.id);
+        break;
+      case 'delete':
+        if (task.isArchived) {
+          deleteArchivedTask(task.id);
+        } else {
+          updateTask(task.id, { isArchived: true });
+        }
+        break;
+      case 'priority_1':
+        updateTask(task.id, { priority: 1 });
+        break;
+      case 'priority_2':
+        updateTask(task.id, { priority: 2 });
+        break;
+      case 'priority_3':
+        updateTask(task.id, { priority: 3 });
+        break;
+      case 'priority_4':
+        updateTask(task.id, { priority: 4 });
+        break;
+      case 'edit':
+        setEditingTask(task);
+        break;
+      default:
+        break;
+    }
+  };
 
   // UI State
   const [showAddSection, setShowAddSection] = useState(false);
@@ -561,6 +616,8 @@ const TodoApp = () => {
                 handleDragEnd={handleDragEnd}
                 draggedId={draggedId}
                 dragOverId={dragOverId}
+                swipeSettings={swipeSettings}
+                onSwipeAction={handleSwipeAction}
               />
             ))}
 
@@ -595,6 +652,8 @@ const TodoApp = () => {
                           onComplete={handleCompleteTask}
                           onEdit={setEditingTask}
                           onUpdate={updateTask}
+                          swipeSettings={swipeSettings}
+                          onSwipeAction={handleSwipeAction}
                         />
                       );
                     })}
@@ -628,6 +687,8 @@ const TodoApp = () => {
                           onComplete={handleCompleteTask}
                           onEdit={setEditingTask}
                           onUpdate={updateTask}
+                          swipeSettings={swipeSettings}
+                          onSwipeAction={handleSwipeAction}
                           showFullDetails={true}
                         />
                       );
@@ -784,6 +845,8 @@ const TodoApp = () => {
         setLayoutWidth={setLayoutWidth}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
+        swipeSettings={swipeSettings}
+        onUpdateSwipeSettings={updateSwipeSettings}
       />
 
       <AnimatePresence>
