@@ -121,12 +121,33 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                 </div>
 
                 <div style={{
+                    background: 'var(--bg-color)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '12px',
+                    padding: '14px 16px',
+                    margin: '16px 0',
+                    fontSize: '0.9rem',
+                    textAlign: 'left',
+                    color: 'var(--text-color)'
+                }}>
+                    <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '8px', color: 'var(--accent-color)' }}>
+                        ✨ What's New in v{newVersion}:
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.4' }}>
+                        <li><strong>👈 Task Swipe Gestures:</strong> Drag cards left or right to complete, delete, edit, or set On Hold.</li>
+                        <li><strong>⚡ Ultra-Fast Google Drive Sync:</strong> Near real-time 300ms push & 4s polling across all devices.</li>
+                        <li><strong>🚀 User-Controlled Updates:</strong> Tap "Update Now" when convenient — no unexpected reloads.</li>
+                        <li><strong>📋 Compact Projects List:</strong> Fits 13+ projects into view in Settings without scrolling.</li>
+                    </ul>
+                </div>
+
+                <div style={{
                     background: 'rgba(16, 185, 129, 0.05)',
                     border: '1px solid rgba(16, 185, 129, 0.1)',
                     borderRadius: '10px',
-                    padding: '12px 16px',
-                    margin: '20px 0',
-                    fontSize: '0.95rem',
+                    padding: '10px 14px',
+                    margin: '12px 0',
+                    fontSize: '0.9rem',
                     textAlign: 'left',
                     display: 'flex',
                     alignItems: 'center',
@@ -134,7 +155,7 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                     color: 'var(--text-color)'
                 }}>
                     <Check size={18} style={{ color: '#10b981', flexShrink: 0 }} strokeWidth={3} />
-                    <span>All your settings, custom projects, and tasks were safely migrated.</span>
+                    <span>All your settings, custom projects, and tasks were safely preserved.</span>
                 </div>
 
                 <button

@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.2.1 | © Darron Hartas 2026
+Version 2.4.9 | © Darron Hartas 2026
 
 ---
 
@@ -10,11 +10,11 @@ Version 2.2.1 | © Darron Hartas 2026
 
 ### For End Users
 
-1. **Access the App**: Visit https://www.123todo.com in your web browser
+1. **Access the App**: Visit https://app.123todo.com in your web browser
 2. **Install on Mobile** (Optional but Recommended):
    - **iPhone/iPad**: Tap Share → "Add to Home Screen" → "Add"
    - **Android**: Tap Menu (⋮) → "Add to Home screen" or "Install app" → "Install"
-3. **Start Managing Tasks**: Add your first task using the ➕ button!
+3. **Start Managing Tasks**: Add your first task using the ➕ button or swipe task cards for quick actions!
 
 ### For Developers
 
@@ -33,15 +33,15 @@ npm run build
 
 ## 📱 Features
 
-### Task Management
+### Task Management & Swipe Gestures
+- **Customizable Swipe Gestures**: Swipe task cards left or right on touch devices or desktop to quickly complete, delete, edit, or set On Hold.
 - **4 Priority Levels**: Must Do, Should Do, Could Do, On Hold
-- **Quick Actions**: Complete (✓), Edit, Archive, Delete, Restore
-- **Drag & Drop**: Reorder tasks within each priority level
+- **Quick Actions**: Complete (✓), Edit, Archive, Delete, Restore, Swipe
+- **Drag & Drop**: Reorder tasks within each priority level with instant 50ms mobile touch sync
 - **Character Limit**: 200 characters per task for concise task descriptions
 - **Auto-Expanding Editor**: Task editor automatically adjusts to show all text
-- **Search System**: Powerful search bar to filter tasks by text across any category
-- **Category Management**: Create, edit, and delete custom categories with color coding
-- **Consolidated "Manage" Hub**: Centralized modal for all category maintenance tasks
+- **Search System**: Powerful search bar to filter tasks by text across any project
+- **Project Management**: Create, edit, reorder (▲/▼), and delete custom projects with color coding in a compact view fitting 13+ projects at once
 - **Note Management**: Add unlimited-length descriptions to tasks — ideal for rich Todoist migrations
 - **Compact View**: Notes are hidden by default with a `+` toggle to save space
 
@@ -51,11 +51,18 @@ npm run build
 3. **Could Do** (Gray) - Nice to have, lower priority
 4. **On Hold** (Purple) - Paused or waiting tasks
 
+### Ultra-Fast Cross-Device Cloud Sync
+- **Google Drive AppData Sync**: End-to-end encrypted backup to your personal Google Drive
+- **Near Real-Time Speed**: Ultra-fast 300ms push debounce & 4s active tab polling
+- **Mobile Touch Release Sync**: Instant 50ms flush on finger touch lift-off
+- **Data-Efficient**: Polling uses lightweight ~300-byte metadata checks only when tab is visible
+- **Concurrency Protection**: Strict lock guards against racing network requests
+
 ### Data Management
-- **Local Storage**: All data stored in your browser (no server required)
+- **Local Storage & Persistent Storage**: All data stored locally in your browser with persistent storage API protection
 - **Export/Import**: JSON backup and restore functionality
 - **Todoist Import**: Full 3-step wizard — upload CSVs, map each to an existing or new project, confirm before writing
-- **Archive System**: Completed tasks saved with timestamps
+- **Archive System**: Completed tasks saved with timestamps and snappy 600ms transition
 - **Restore Feature**: Bring archived tasks back with new priority
 
 ### Achievement System
@@ -63,11 +70,10 @@ npm run build
 - **Daily Tracking**: Resets each day to encourage consistent productivity
 - **Motivational Messages**: Encouraging feedback on achievements
 
-### PWA Features
+### PWA & Smart Updates
 - **Offline Support**: Works without internet connection
 - **Home Screen Install**: Add to mobile home screen like a native app
-- **Fast Loading**: Cached resources for quick startup
-- **Auto-Updates**: Service worker automatically updates the app
+- **User-Controlled Updates**: Floating `🚀 New update ready! [Update Now]` banner lets you choose when to reload without unexpected restarts
 
 ### Smart Reminders
 - **Weekly Backup Reminder**: Prompts you to export data every 7 days
@@ -78,16 +84,23 @@ npm run build
 
 ## 🎯 How to Use
 
+### 👈👉 Swipe Gestures & Swipe Settings
+1. Open **Settings** ➔ **Swipe** tab (`MoveHorizontal` icon).
+2. Toggle **ON / OFF** using the prominent status card.
+3. Custom-pick your preferred **Swipe Right** and **Swipe Left** actions (`Complete`, `Delete`, `On Hold`, `Edit`, or `None`).
+4. Practice dragging the live test card right inside Settings!
+
 ### Adding Tasks
 1. Click the ➕ button in the header
 2. Type your task (max 200 characters)
 3. Select priority: Must Do, Should Do, or Could Do
 4. Click "ADD TASK" or press Enter
 
-### Managing Tasks
-- **Complete**: Click the ✓ button to move task to archive
-- **Edit**: Click anywhere on the task text to edit content or change priority
-- **Reorder**: Drag and drop tasks within the same priority section
+### Managing & Reordering Tasks
+- **Swipe**: Drag any task left or right to trigger configured action
+- **Complete**: Click the ✓ button or swipe right to move task to archive
+- **Edit**: Click on the task text or swipe left/right to edit content or change priority
+- **Reorder**: Drag and drop tasks within priority sections (syncs cross-device in seconds)
 - **View Archive**: Click "Show Archive" at the bottom to see completed tasks
 
 ### Editing Tasks
