@@ -278,18 +278,18 @@ const SettingsModal = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '10px 14px',
+            padding: '6px 12px',
             border: '1px solid var(--border-color)',
             borderRadius: '8px',
-            marginBottom: '8px',
+            marginBottom: '4px',
             background: 'var(--item-bg)'
         },
         projectInfo: {
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '10px',
             fontWeight: '600',
-            fontSize: '1.05rem',
+            fontSize: '0.95rem',
             color: 'var(--text-color)'
         },
         colorDot: (color) => ({
@@ -300,12 +300,12 @@ const SettingsModal = ({
         }),
         actions: {
             display: 'flex',
-            gap: '12px',
+            gap: '6px',
             alignItems: 'center'
         },
         actionBtn: {
-            padding: '8px 10px',
-            borderRadius: '8px',
+            padding: '4px 6px',
+            borderRadius: '6px',
             background: 'var(--bg-color)',
             border: '1px solid var(--border-color)',
             cursor: 'pointer',
@@ -314,8 +314,8 @@ const SettingsModal = ({
             justifyContent: 'center',
             color: 'var(--muted-text)',
             transition: 'all 0.15s ease',
-            minWidth: '36px',
-            minHeight: '36px'
+            minWidth: '28px',
+            minHeight: '28px'
         },
         addSection: {
             marginTop: '20px',
@@ -559,7 +559,7 @@ const SettingsModal = ({
                                                              onClick={() => onMoveProject && onMoveProject(project.id, 'up')}
                                                              title="Move project up"
                                                          >
-                                                             <ChevronUp size={18} />
+                                                             <ChevronUp size={15} />
                                                          </button>
                                                          <button
                                                              style={{
@@ -571,7 +571,7 @@ const SettingsModal = ({
                                                              onClick={() => onMoveProject && onMoveProject(project.id, 'down')}
                                                              title="Move project down"
                                                          >
-                                                             <ChevronDown size={18} />
+                                                             <ChevronDown size={15} />
                                                          </button>
                                                          <button
                                                              style={styles.actionBtn}
@@ -582,7 +582,7 @@ const SettingsModal = ({
                                                              }}
                                                              title="Edit project"
                                                          >
-                                                             <Edit2 size={18} />
+                                                             <Edit2 size={15} />
                                                          </button>
                                                          <button
                                                              style={{ ...styles.actionBtn, color: '#dc2626', borderColor: '#fee2e2' }}
@@ -595,7 +595,7 @@ const SettingsModal = ({
                                                              }}
                                                              title="Delete project"
                                                          >
-                                                             <Trash2 size={18} />
+                                                             <Trash2 size={15} />
                                                          </button>
                                                      </div>
                                                 </>
