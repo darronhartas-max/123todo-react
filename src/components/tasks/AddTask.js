@@ -35,20 +35,27 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
     const [recurrenceDaysOfWeek, setRecurrenceDaysOfWeek] = useState([]);
     
     const inputRef = useRef(null);
+    const hasOpenedRef = useRef(false);
 
     useEffect(() => {
         if (isOpen) {
-            setTimeout(() => inputRef.current?.focus(), 100);
-            const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
-            const isValid = (id) => projects.some(p => p.id === id);
+            if (!hasOpenedRef.current) {
+                hasOpenedRef.current = true;
+                setTimeout(() => inputRef.current?.focus(), 100);
 
-            if (defaultProjectId && defaultProjectId !== 'all' && isValid(defaultProjectId)) {
-                setProjectId(defaultProjectId);
-            } else if (savedLastProject && isValid(savedLastProject)) {
-                setProjectId(savedLastProject);
-            } else if (projects.length > 0) {
-                setProjectId(projects[0]?.id || 'general');
+                const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
+                const isValid = (id) => projects.some(p => p.id === id);
+
+                if (defaultProjectId && defaultProjectId !== 'all' && isValid(defaultProjectId)) {
+                    setProjectId(defaultProjectId);
+                } else if (savedLastProject && isValid(savedLastProject)) {
+                    setProjectId(savedLastProject);
+                } else if (projects.length > 0) {
+                    setProjectId(projects[0]?.id || 'general');
+                }
             }
+        } else {
+            hasOpenedRef.current = false;
         }
     }, [isOpen, defaultProjectId, projects]);
 

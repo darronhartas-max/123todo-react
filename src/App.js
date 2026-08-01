@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import Header from './components/layout/Header';
@@ -33,6 +33,11 @@ const TodoApp = () => {
     restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, moveProject,
     importData, bulkAddTasks
   } = useTasks();
+
+  const availableProjects = useMemo(() => [
+    ...DEFAULT_PROJECTS.filter(p => p.id !== 'all'),
+    ...projects
+  ], [projects]);
 
   const {
     isAuthed, syncStatus, passphrase, setPassphrase, signIn, signOut, performSync
@@ -532,7 +537,7 @@ const TodoApp = () => {
           isOpen={showAddSection}
           onAdd={addTask}
           onClose={() => setShowAddSection(false)}
-          projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
+          projects={availableProjects}
           defaultProjectId={currentProjectId}
         />
 
