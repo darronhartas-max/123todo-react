@@ -152,6 +152,11 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
         transition: 'all 0.2s ease'
     });
 
+    const handleInput = (e) => {
+        e.target.style.height = 'auto';
+        e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px';
+    };
+
     const styles = {
         addSection: {
             padding: isOpen ? '12px' : '0',
@@ -168,13 +173,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
             fontSize: '1.1rem',
             border: '1px solid var(--accent-color)',
             borderRadius: '6px',
-            resize: 'none',
-            height: '40px',
-            overflow: 'hidden',
+            resize: 'vertical',
+            minHeight: '48px',
+            maxHeight: '140px',
+            overflowY: 'auto',
             fontFamily: 'Inter, sans-serif',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            transition: 'all 0.3s ease',
+            transition: 'border-color 0.3s ease',
             boxSizing: 'border-box',
             outline: 'none'
         },
@@ -221,6 +227,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                 ref={inputRef}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+                onInput={handleInput}
                 onKeyPress={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -261,10 +268,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Add details/notes..."
+                        onInput={handleInput}
+                        placeholder="Add details/notes (unlimited length)..."
                         style={{
                             ...styles.taskInput,
-                            height: '80px',
+                            minHeight: '80px',
+                            maxHeight: '200px',
                             fontSize: '1.1rem',
                             borderColor: 'var(--border-color)',
                             overflowY: 'auto'
@@ -276,7 +285,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         textAlign: 'right',
                         marginTop: '2px'
                     }}>
-                        {notes.length} chars
+                        {notes.length} chars (unlimited)
                     </div>
                 </div>
             )}
