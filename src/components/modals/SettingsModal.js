@@ -32,6 +32,7 @@ const SettingsModal = ({
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
+    const [showAddForm, setShowAddForm] = useState(false);
 
     // Inline project editing states
     const [editingProjectId, setEditingProjectId] = useState(null);
@@ -46,6 +47,7 @@ const SettingsModal = ({
             onAddProject(projectName.trim(), selectedColor);
             setProjectName('');
             setSelectedColor(PROJECT_COLORS[0]);
+            setShowAddForm(false);
         }
     };
 
@@ -348,7 +350,7 @@ const SettingsModal = ({
                         {activeTab === 'projects' && (
                             <div>
                                 <div style={styles.sectionTitle}>Manage Projects</div>
-                                <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
+                                <div style={{ maxHeight: showAddForm ? '220px' : '440px', overflowY: 'auto', paddingRight: '4px', transition: 'max-height 0.3s ease' }}>
                                     {projects.map((project, idx) => (
                                         <div key={project.id} style={styles.projectItem}>
                                             {editingProjectId === project.id ? (
@@ -463,37 +465,90 @@ const SettingsModal = ({
                                     ))}
                                 </div>
 
-                                <div style={styles.addSection}>
-                                    <div style={{ fontWeight: '600', marginBottom: '10px', fontSize: '0.95rem', display: 'flex', alignItems: 'center' }}>
-                                        <Plus size={16} style={{ marginRight: '6px' }} /> Create New Project
-                                    </div>
-                                    <form onSubmit={handleAddProject}>
-                                        <input
-                                            value={projectName}
-                                            onChange={e => setProjectName(e.target.value)}
-                                            placeholder="Project name..."
-                                            style={styles.input}
-                                            required
-                                        />
-                                        <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', marginBottom: '8px' }}>Project Color</div>
-                                        <div style={styles.colorGrid}>
-                                            {PROJECT_COLORS.map(c => (
-                                                <div
-                                                    key={c}
-                                                    style={styles.colorBtn(c, selectedColor === c)}
-                                                    onClick={() => setSelectedColor(c)}
-                                                />
-                                            ))}
+                                {!showAddForm ? (
+                                    <button
+                                        onClick={() => setShowAddForm(true)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '10px 16px',
+                                            borderRadius: '8px',
+                                            background: 'var(--accent-bg)',
+                                            border: '1.5px dashed var(--accent-color)',
+                                            color: 'var(--accent-color)',
+                                            fontWeight: '600',
+                                            fontSize: '1rem',
+                                            cursor: 'pointer',
+                                            marginTop: '12px',
+                                            width: '100%',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    >
+                                        <Plus size={18} /> Create New Project
+                                    </button>
+                                ) : (
+                                    <div style={{ ...styles.addSection, marginTop: '12px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                            <div style={{ fontWeight: '700', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-color)' }}>
+                                                <Plus size={18} /> Create New Project
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAddForm(false)}
+                                                style={{ background: 'none', border: 'none', color: 'var(--muted-text)', cursor: 'pointer', display: 'flex' }}
+                                                title="Close"
+                                            >
+                                                <X size={18} />
+                                            </button>
                                         </div>
-                                        <button
-                                            type="submit"
-                                            style={{ ...styles.submitBtn, opacity: projectName.trim() ? 1 : 0.5 }}
-                                            disabled={!projectName.trim()}
-                                        >
-                                            Add Project
-                                        </button>
-                                    </form>
-                                </div>
+                                        <form onSubmit={handleAddProject}>
+                                            <input
+                                                value={projectName}
+                                                onChange={e => setProjectName(e.target.value)}
+                                                placeholder="Project name..."
+                                                style={styles.input}
+                                                autoFocus
+                                                required
+                                            />
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', marginBottom: '8px', fontWeight: '500' }}>Project Color</div>
+                                            <div style={styles.colorGrid}>
+                                                {PROJECT_COLORS.map(c => (
+                                                    <div
+                                                        key={c}
+                                                        style={styles.colorBtn(c, selectedColor === c)}
+                                                        onClick={() => setSelectedColor(c)}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <button
+                                                    type="submit"
+                                                    style={{ ...styles.submitBtn, opacity: projectName.trim() ? 1 : 0.5, flex: 1 }}
+                                                    disabled={!projectName.trim()}
+                                                >
+                                                    Add Project
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowAddForm(false)}
+                                                    style={{
+                                                        padding: '10px 16px',
+                                                        background: 'var(--item-bg)',
+                                                        border: '1px solid var(--border-color)',
+                                                        borderRadius: '8px',
+                                                        color: 'var(--text-color)',
+                                                        fontWeight: '600',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
                         )}
 
