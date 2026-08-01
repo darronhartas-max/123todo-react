@@ -312,7 +312,7 @@ const TodoApp = () => {
     setShowArchiveToast(true);
     setTimeout(() => {
       setShowArchiveToast(false);
-    }, 1500);
+    }, 800);
   };
 
   // Filtering
@@ -860,8 +860,7 @@ const TodoApp = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-            backdropFilter: 'blur(1px)',
+            backgroundColor: 'transparent',
             zIndex: 10000,
             pointerEvents: 'none'
           }}>
