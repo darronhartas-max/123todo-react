@@ -98,70 +98,59 @@ export const BackupReminder = ({ onBackup, onDismiss }) => (
         </div>
     </div>
 );
-export const UpdateReadyPrompt = ({ onUpdate, onBackup, onDismiss }) => (
+export const UpdateReadyPrompt = ({ onUpdate, onDismiss }) => (
     <div style={{
-        background: 'linear-gradient(135deg, #2b6cb0, #2c5282)',
+        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
         color: 'white',
         border: 'none',
-        borderRadius: '6px',
+        borderRadius: '8px',
         padding: '12px 16px',
         margin: '8px 12px',
         display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        fontSize: '0.85rem',
-        boxShadow: '0 4px 12px rgba(44, 82, 130, 0.4)',
-        borderLeft: '4px solid #f6e05e'
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontSize: '0.9rem',
+        boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+        gap: '12px'
     }}>
-        <div style={{ fontWeight: '600', lineHeight: '1.4' }}>
+        <div style={{ flex: 1, fontWeight: '600', lineHeight: '1.4' }}>
             🚀 A new version of 123 To Do is ready!
-            <p style={{ margin: '4px 0 0 0', fontWeight: '400', opacity: 0.9 }}>
-                To keep your tasks safe, we recommend backing them up before updating.
-            </p>
+            <div style={{ fontSize: '0.8rem', fontWeight: '400', opacity: 0.9, marginTop: '2px' }}>
+                Tap Update Now to get the latest features and performance improvements.
+            </div>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-                onClick={onBackup}
-                style={{
-                    background: '#f6e05e',
-                    color: '#2c5282',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '6px 12px',
-                    fontSize: '0.8rem',
-                    fontWeight: '700',
-                    cursor: 'pointer'
-                }}
-            >
-                1. Backup Tasks
-            </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
                 onClick={onUpdate}
                 style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    borderRadius: '4px',
-                    padding: '6px 12px',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
+                    background: '#ffffff',
+                    color: '#2563eb',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '6px 14px',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
             >
-                2. Update Now
+                Update Now
             </button>
             <button
                 onClick={onDismiss}
                 style={{
                     background: 'transparent',
-                    color: 'rgba(255,255,255,0.7)',
-                    border: 'none',
+                    color: 'rgba(255,255,255,0.8)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    borderRadius: '6px',
+                    padding: '6px 10px',
                     fontSize: '0.8rem',
                     cursor: 'pointer',
-                    marginLeft: 'auto'
+                    whiteSpace: 'nowrap'
                 }}
             >
-                Later
+                Not Now
             </button>
         </div>
     </div>

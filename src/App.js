@@ -553,10 +553,6 @@ const TodoApp = () => {
 
           {showUpdateReady && (
             <UpdateReadyPrompt
-              onBackup={() => {
-                handleExport();
-                // Keep showing update prompt so they can click 'Update Now' next
-              }}
               onUpdate={handleApplyUpdate}
               onDismiss={() => setShowUpdateReady(false)}
             />
@@ -945,51 +941,6 @@ const TodoApp = () => {
           </div>
         )}
       </AnimatePresence>
-
-      {showUpdateReady && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'var(--accent-color)',
-          color: '#ffffff',
-          padding: '12px 20px',
-          borderRadius: '12px',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-          zIndex: 100000,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          fontWeight: '600',
-          fontSize: '0.95rem'
-        }}>
-          <span>🚀 New 123 ToDo update is ready!</span>
-          <button
-            onClick={() => {
-              localStorage.setItem('123Todo_Show_Updated_Modal', 'true');
-              localStorage.setItem('123Todo_Previous_Version', APP_VERSION);
-              const worker = swRegistration?.waiting || swRegistration?.installing;
-              if (worker) {
-                worker.postMessage({ type: 'SKIP_WAITING' });
-              }
-              window.location.reload();
-            }}
-            style={{
-              background: '#ffffff',
-              color: 'var(--accent-color)',
-              border: 'none',
-              padding: '6px 14px',
-              borderRadius: '8px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
-            Update Now
-          </button>
-        </div>
-      )}
     </div>
   );
 };
