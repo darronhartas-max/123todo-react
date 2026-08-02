@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.4.9 | © Darron Hartas 2026
+Version 2.4.15 | © Darron Hartas 2026
 
 ---
 
@@ -37,13 +37,11 @@ npm run build
 - **Customizable Swipe Gestures**: Swipe task cards left or right on touch devices or desktop to quickly complete, delete, edit, or set On Hold.
 - **4 Priority Levels**: Must Do, Should Do, Could Do, On Hold
 - **Quick Actions**: Complete (✓), Edit, Archive, Delete, Restore, Swipe
-- **Drag & Drop**: Reorder tasks within each priority level with instant 50ms mobile touch sync
-- **Character Limit**: 200 characters per task for concise task descriptions
-- **Auto-Expanding Editor**: Task editor automatically adjusts to show all text
-- **Search System**: Powerful search bar to filter tasks by text across any project
-- **Project Management**: Create, edit, reorder (▲/▼), and delete custom projects with color coding in a compact view fitting 13+ projects at once
-- **Note Management**: Add unlimited-length descriptions to tasks — ideal for rich Todoist migrations
-- **Compact View**: Notes are hidden by default with a `+` toggle to save space
+- **Drag & Drop Reordering**: Reorder tasks within priority sections, and drag-and-drop projects using grip handles in Settings.
+- **Note Management**: Add **unlimited-length notes** (no character limit) to tasks — ideal for rich Todoist migrations, checklists, or detailed instructions.
+- **Auto-Expanding Editor**: Task editor automatically adjusts height to show all text seamlessly.
+- **Search System**: Powerful search bar to filter tasks by text across any project.
+- **Project Management**: Create, edit, drag-and-drop reorder, and delete custom projects with color coding in a compact view fitting 13+ projects at once.
 
 ### Priority System
 1. **Must Do** (Red) - Critical, urgent tasks

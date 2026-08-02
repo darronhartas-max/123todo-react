@@ -55,7 +55,18 @@ const WelcomeModal = ({ onAccept }) => {
                             <li>Tap "Add" or "Install" to confirm</li>
                         </ol>
                     </div>
-                    <p><strong>Benefits:</strong> Works offline with faster loading.</p>
+                    <div style={{ background: 'var(--bg-color)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                        <h5 style={{ margin: '0 0 8px 0', fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-color)' }}>
+                            ✨ Powerful Features Included:
+                        </h5>
+                        <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)', fontSize: '0.9rem', lineHeight: '1.4', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <li><strong>📝 Unlimited Task Notes:</strong> Rich task descriptions with no length cap.</li>
+                            <li><strong>👈 Task Swipe Gestures:</strong> Swipe left or right to complete, delete, or edit.</li>
+                            <li><strong>🔒 Encrypted Google Drive Sync:</strong> Keep your tasks in sync across all devices.</li>
+                            <li><strong>🖐️ Custom Projects & Reordering:</strong> Drag and drop projects to organize your workflow.</li>
+                            <li><strong>⚡ Works Offline:</strong> Instant loading with full offline PWA support.</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div style={{

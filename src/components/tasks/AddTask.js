@@ -276,7 +276,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         onInput={handleInput}
-                        placeholder="Add details/notes (unlimited length)..."
+                        placeholder="Add unlimited notes, task descriptions, or rich details (no length cap)..."
                         style={{
                             ...styles.taskInput,
                             minHeight: '80px',
@@ -288,11 +288,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     />
                     <div style={{
                         fontSize: '0.85rem',
-                        color: '#6b7280',
+                        color: 'var(--muted-text)',
                         textAlign: 'right',
-                        marginTop: '2px'
+                        marginTop: '2px',
+                        fontWeight: '500'
                     }}>
-                        {notes.length} chars (unlimited)
+                        📝 {notes.length} chars (unlimited text capacity)
                     </div>
                 </div>
             )}

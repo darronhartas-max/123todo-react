@@ -189,12 +189,15 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 </div>
 
                 <div style={{ marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Notes</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)' }}>Notes</label>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-color)', fontWeight: '600' }}>📝 Unlimited Text Capacity</span>
+                    </div>
                     <textarea
                         value={editingTask.notes || ''}
                         onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                         onInput={handleInput}
-                        placeholder="Add notes or descriptions here..."
+                        placeholder="Add unlimited notes, task descriptions, or details here (no length cap)..."
                         style={{ ...styles.textarea, minHeight: '60px', fontSize: '1.1rem' }}
                         ref={(textarea) => {
                             if (textarea) {
