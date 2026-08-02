@@ -136,9 +136,9 @@ npm run build
    - Could Do: Future tasks or low-priority items
    - On Hold: Tasks waiting on external factors
 
-2. **Punchy Titles & Unlimited Notes**
-   - Keep task titles concise (up to 200 characters) for quick dashboard scanning
-   - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or checklists with zero length limits
+2. **Punchy Titles & Unlimited In-App Notes**
+   - Keep task titles concise (up to 200 characters) for fast dashboard scanning
+   - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or documentation—no external note tools required!
 
 3. **Break Down Big Tasks with Subtask Checklists**
    - Divide large projects into step-by-step checklists using **Subtasks**
