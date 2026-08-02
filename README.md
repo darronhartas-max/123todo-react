@@ -91,23 +91,24 @@ npm run build
 3. Custom-pick your preferred **Swipe Right** and **Swipe Left** actions (`Complete`, `Delete`, `On Hold`, `Edit`, or `None`).
 4. Practice dragging the live test card right inside Settings!
 
-### Adding Tasks
+### Adding Tasks & Unlimited Notes
 1. Click the ➕ button in the header
-2. Type your task (max 200 characters)
-3. Select priority: Must Do, Should Do, or Could Do
-4. Click "ADD TASK" or press Enter
+2. Type your task title (max 200 characters for quick dashboard scanning)
+3. Expand **Notes** to add unlimited text descriptions, instructions, or checklists (no length cap!)
+4. Select priority: Must Do, Should Do, Could Do, or On Hold
+5. Click "ADD TASK" or press Enter
 
 ### Managing & Reordering Tasks
 - **Swipe**: Drag any task left or right to trigger configured action
 - **Complete**: Click the ✓ button or swipe right to move task to archive
-- **Edit**: Click on the task text or swipe left/right to edit content or change priority
+- **Edit**: Click on the task text or swipe left/right to edit content, notes, or change priority
 - **Reorder**: Drag and drop tasks within priority sections (syncs cross-device in seconds)
 - **View Archive**: Click "Show Archive" at the bottom to see completed tasks
 
 ### Editing Tasks
 1. Click on any task to open the edit modal
-2. Text area auto-expands to show all content
-3. Change the task text (auto-saves as you type)
+2. Text area auto-expands to show all content and unlimited notes
+3. Change the task text or notes (auto-saves as you type)
 4. Change priority using the dropdown
 5. Click "Save" to apply changes or "Cancel" to discard
 
@@ -131,10 +132,9 @@ npm run build
    - Could Do: Future tasks or low-priority items
    - On Hold: Tasks waiting on external factors
 
-2. **Keep Tasks Concise**
-   - Use the 200-character task title limit to stay focused
-   - One task = one action; use the Notes field for extra detail
-   - Break large projects into smaller tasks
+2. **Punchy Titles & Unlimited Notes**
+   - Keep task titles concise (up to 200 characters) for quick dashboard scanning
+   - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or checklists with zero length limits
 
 3. **Regular Backups**
    - Export your data weekly (the app will remind you)
