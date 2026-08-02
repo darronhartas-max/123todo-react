@@ -140,7 +140,12 @@ npm run build
    - Keep task titles concise (up to 200 characters) for quick dashboard scanning
    - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or checklists with zero length limits
 
-3. **Automated Data Protection & Sync**
+3. **Break Down Big Tasks with Subtask Checklists**
+   - Divide large projects into step-by-step checklists using **Subtasks**
+   - Track progress visually (`Steps 1/3 (33%)`) right inside your task card
+   - Automatically receive anti-procrastination nudges if a task is deferred multiple times
+
+4. **Automated Data Protection & Sync**
    - Activate **Google Drive Sync** for automatic end-to-end encrypted backups across all your devices
    - **Shadow Backups** automatically save daily internal recovery snapshots in your browser
    - Perform manual JSON exports anytime from the footer whenever you want an offline copy
