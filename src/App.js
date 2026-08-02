@@ -490,7 +490,7 @@ const TodoApp = () => {
       borderRadius: '8px',
       overflow: 'hidden',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-      marginTop: '20px',
+      marginTop: '0px',
       flex: 1
     },
     sectionsContainer: {

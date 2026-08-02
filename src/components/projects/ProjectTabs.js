@@ -16,7 +16,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
 
     const styles = {
         mainWrapper: {
-            padding: '4px 12px 8px 12px',
+            padding: '4px 12px 4px 12px',
             borderBottom: '1px solid var(--border-color)',
             background: 'var(--accent-bg)'
         },
@@ -27,9 +27,9 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             alignItems: 'center'
         },
         tab: (isActive, color) => ({
-            padding: '6px 12px',
-            borderRadius: '16px',
-            fontSize: '1.1rem',
+            padding: '4px 10px',
+            borderRadius: '14px',
+            fontSize: '0.95rem',
             fontWeight: '600',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
@@ -43,7 +43,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             boxShadow: isActive ? `0 2px 6px ${color}22` : 'none'
         }),
         actionBtn: {
-            padding: '6px',
+            padding: '5px',
             borderRadius: '50%',
             background: 'var(--bg-color)',
             border: '1.5px solid var(--border-color)',
@@ -55,8 +55,8 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             transition: 'all 0.2s ease'
         },
         addBtn: {
-            padding: '5px 10px',
-            borderRadius: '16px',
+            padding: '4px 8px',
+            borderRadius: '12px',
             background: 'var(--bg-color)',
             border: '1.5px dashed var(--border-color)',
             color: 'var(--muted-text)',
@@ -64,7 +64,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            fontSize: '1.1rem',
+            fontSize: '0.95rem',
             fontWeight: '600'
         },
 
@@ -72,19 +72,19 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
-            padding: '12px',
-            marginTop: '8px',
+            padding: '10px',
+            marginTop: '6px',
             background: 'var(--bg-color)',
-            borderRadius: '10px',
+            borderRadius: '8px',
             border: '1px solid var(--border-color)'
         },
         input: {
-            padding: '8px 12px',
+            padding: '6px 10px',
             borderRadius: '6px',
             border: '1px solid var(--border-color)',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            fontSize: '1.1rem',
+            fontSize: '0.95rem',
             outline: 'none',
             flex: 1
         },
@@ -103,12 +103,12 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
         },
         customSelectTrigger: (color) => ({
             width: '100%',
-            padding: '8px 12px',
-            borderRadius: '8px',
+            padding: '4px 10px',
+            borderRadius: '6px',
             border: `1.5px solid ${color}`,
             background: 'var(--item-bg)',
             color: color,
-            fontSize: '1.1rem',
+            fontSize: '0.95rem',
             fontWeight: '600',
             cursor: 'pointer',
             display: 'flex',
@@ -125,34 +125,34 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
             right: 0,
             background: 'var(--surface-color)',
             border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            borderRadius: '6px',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
             zIndex: 100,
-            maxHeight: '480px',
+            maxHeight: '320px',
             overflowY: 'auto',
-            padding: '4px 0'
+            padding: '2px 0'
         },
         customOption: (isActive, color) => ({
-            padding: '10px 12px',
+            padding: '6px 10px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '8px',
             cursor: 'pointer',
-            fontSize: '1.1rem',
+            fontSize: '0.95rem',
             fontWeight: '600',
             color: isActive ? color : 'var(--text-color)',
             transition: 'all 0.15s ease'
         }),
         customOptionBand: (color) => ({
             width: '4px',
-            height: '18px',
+            height: '14px',
             borderRadius: '2px',
             backgroundColor: color,
             flexShrink: 0
         }),
         colorBtn: (color, isSelected) => ({
-            width: '24px',
-            height: '24px',
+            width: '20px',
+            height: '20px',
             borderRadius: '50%',
             background: color,
             cursor: 'pointer',
@@ -182,11 +182,11 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
                 {useDropdown ? (
                     <>
                         <div style={styles.dropdownContainer}>
-                            <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>PROJECT:</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>PROJECT:</span>
                             <div style={{
-                                width: '6px',
-                                height: '24px',
-                                borderRadius: '3px',
+                                width: '5px',
+                                height: '18px',
+                                borderRadius: '2px',
                                 backgroundColor: activeColor,
                                 flexShrink: 0,
                                 transition: 'background-color 0.2s ease'
@@ -197,7 +197,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
                                     style={styles.customSelectTrigger(activeColor)}
                                 >
                                     <span>{activeProject?.name}</span>
-                                    <ChevronDown size={18} style={{ color: activeColor, transition: 'color 0.2s ease' }} />
+                                    <ChevronDown size={16} style={{ color: activeColor, transition: 'color 0.2s ease' }} />
                                 </button>
                                 {isOpen && (
                                     <>
@@ -239,7 +239,7 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
                                 )}
                             </div>
                             <button onClick={onOpenSettings} style={styles.addBtn} title="Settings">
-                                <Settings size={20} />
+                                <Settings size={18} />
                             </button>
                         </div>
                     </>

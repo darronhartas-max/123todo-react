@@ -5,7 +5,7 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, ve
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '30px 20px 40px 20px',
+            padding: '24px 20px 18px 20px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
             fontSize: '1.1rem',
