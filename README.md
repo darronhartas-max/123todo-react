@@ -67,6 +67,9 @@ npm run build
 - **Milestone Celebrations**: Unlock achievements at 5, 10, and 15 daily completed tasks
 - **Daily Tracking**: Resets each day to encourage consistent productivity
 - **Motivational Messages**: Encouraging feedback on achievements
+### Customizable Typography & Appearance
+- **Customizable Typography & Layouts**: Tailor your visual experience with custom text sizing (8pt to 20pt), spacing density modes (Cozy vs Compact), and desktop layout width controls (Single Column vs Kanban Board) for maximum readability across mobile and desktop devices.
+- **Theme Modes**: Supports Light, Dark, and System Auto theme modes.
 
 ### PWA & Smart Updates
 - **Offline Support**: Works without internet connection
