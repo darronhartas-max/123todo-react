@@ -202,19 +202,43 @@ npm run build
 - **Internal Snapshots**: Daily Shadow Backups automatically save local recovery snapshots in your browser.
 - **Offline Backups**: Perform a quick 1-click JSON export anytime for offline peace of mind.
 
-### PWA Installation Issues
-- Ensure you're using HTTPS (required for PWA)
-- Try a different browser
-- Check that browser supports PWA installation
-- Dismiss and retry install prompt
+### PWA Installation
+- **HTTPS Required**: PWA installation requires a secure connection (`https://`).
+- **Browser Support**: Supported on Chrome, Safari (iOS Add to Home Screen), Edge, and Firefox.
+- **Re-install Prompt**: If dismissed, you can re-trigger installation anytime from your browser menu.
 
 ---
 
-## 📞 Support & Feedback
+## 🐛 Troubleshooting & Help Guide
+
+### 🔄 Google Drive Sync Issues
+- **Sync Disconnected or Paused**: Click the Google Drive icon in the footer and tap **Sign In** or **Sync Now** to refresh your session.
+- **Tasks Not Appearing Across Devices**: Ensure you entered the **exact same encryption Passphrase** on all devices (passphrases are case-sensitive).
+- **Authentication Popup Blocked**: Allow popup windows in your browser if Google sign-in fails to open.
+
+### 💾 Restoring Data & Backups
+- **Shadow Backup Snapshot**: Click **Import ➔ Shadow Backup** to recover your latest 24-hour internal snapshot.
+- **Restoring Cloud Data**: If browser cache was cleared, simply sign back into **Google Drive Sync** to restore your encrypted tasks automatically.
+- **Manual JSON Import**: Click **Import ➔ 123 ToDo Backup** to upload a previously exported `.json` file.
+
+### 🚀 App Updates & New Features
+- **Check for Updates**: Open **Settings ➔ Appearance** and click **Check for Updates**, or tap **[Update Now]** on the floating update notification banner.
+- **Hard Refresh**: If a new version is not showing, close all app tabs and re-open to trigger the PWA service worker refresh.
+
+### 📂 Todoist & CSV Imports
+- **CSV Format Required**: Ensure you export `.csv` files directly from Todoist project menus (not raw text files).
+- **Step-by-Step Guide**: Click **Import ➔ Todoist Export ➔ 📖 View Guide** for complete export instructions.
+
+### 👈👉 Swipe Gestures & Customization
+- **Enable Gestures**: Open **Settings ➔ Swipe** tab and ensure **Enable Swipe Gestures** is toggled ON.
+- **Appearance & Typography**: Custom-scale text sizing (8pt to 20pt) or switch density modes in **Settings ➔ Appearance**.
+
+---
+
+## 📞 Support & Resources
 
 - **Website**: https://www.123todo.com
-- **Terms**: https://www.123todo.com/terms
-- **Issues**: Check browser console for error messages
+- **Terms & Privacy**: https://www.123todo.com/terms
 
 ---
 
