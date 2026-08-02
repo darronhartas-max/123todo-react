@@ -91,11 +91,14 @@ npm run build
 3. Custom-pick your preferred **Swipe Right** and **Swipe Left** actions (`Complete`, `Delete`, `On Hold`, `Edit`, or `None`).
 4. Practice dragging the live test card right inside Settings!
 
-### Adding Tasks & Unlimited Notes
-1. Click the ➕ button in the header
-2. Type your task title and select a priority level (Must Do, Should Do, Could Do, or On Hold)
-3. Expand **Notes** to add unlimited text descriptions, instructions, or checklists
-4. Click "ADD TASK" or press Enter
+### Adding Tasks & Enhanced Features
+1. Click the **➕ Add Task** button in the header or priority section.
+2. **Task Title**: Type a concise task title (up to 200 characters for quick dashboard scanning).
+3. **Priority & Project**: Select a Priority level (*Must Do, Should Do, Could Do, On Hold*) and assign a color-coded **Project**.
+4. **Unlimited Notes**: Expand **Notes** to write detailed descriptions, paste links, or store long instructions with zero length limits.
+5. **Subtasks & Checklists**: Click **📋 Subtasks** to break down large tasks into smaller step-by-step checklists.
+6. **Schedule & Recurrence**: Click **📅 Schedule** to set a due date and configure automated recurring rules (e.g. daily, weekly on specific days).
+7. Click **ADD TASK** or press **Enter** to save!
 
 ### Managing, Scheduling & Subtasks
 - **Swipe**: Drag any task left or right to trigger configured actions (Complete, Delete, On Hold, Edit).
