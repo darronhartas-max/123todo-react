@@ -141,11 +141,9 @@ npm run build
    - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or checklists with zero length limits
 
 3. **Automated Data Protection & Sync**
-   - Activate **Google Drive Sync** for automatic encrypted backups across all your devices
-   - **Shadow Backups** automatically save daily internal snapshots of your task list
-   - Perform manual JSON exports anytime from the footer
-   - Store backups in cloud storage (Dropbox, Google Drive, etc.)
-   - Use descriptive filenames: `123todo-2026-02-28.json`
+   - Activate **Google Drive Sync** for automatic end-to-end encrypted backups across all your devices
+   - **Shadow Backups** automatically save daily internal recovery snapshots in your browser
+   - Perform manual JSON exports anytime from the footer whenever you want an offline copy
 
 4. **Archive Hygiene**
    - Review archive monthly
