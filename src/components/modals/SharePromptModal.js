@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const SharePromptModal = ({ onClose, onShared }) => {
     const [copied, setCopied] = useState(false);
 
-    const rawShareText = 'Organize your day in seconds with 123 ToDo — the free, simple task manager that cuts through clutter and helps you get your life in order!';
+    const rawShareText = 'Been using 123 ToDo to stay on top of things — it\'s free, no account needed, and it genuinely helps. Thought you might find it useful! 👉 www.123todo.com';
     const rawShareUrl = 'https://www.123todo.com';
     const shareText = encodeURIComponent(rawShareText);
     const shareUrl = encodeURIComponent(rawShareUrl);
@@ -115,7 +115,7 @@ const SharePromptModal = ({ onClose, onShared }) => {
         {
             label: 'Email',
             color: '#6B7280',
-            url: `mailto:?subject=${encodeURIComponent('Stay organized with 123 ToDo')}&body=${shareText}%20${rawShareUrl}`,
+            url: `mailto:?subject=${encodeURIComponent('Thought you might find this useful')}&body=${shareText}%20${rawShareUrl}`,
             icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -162,7 +162,7 @@ const SharePromptModal = ({ onClose, onShared }) => {
                         color: 'var(--text-primary, #0f172a)',
                         lineHeight: 1.3,
                     }}>
-                        Enjoying 123 ToDo?
+                        Glad it's been useful! 😊
                     </h2>
 
                     <p style={{
@@ -171,7 +171,7 @@ const SharePromptModal = ({ onClose, onShared }) => {
                         fontWeight: '600',
                         color: '#285a82',
                     }}>
-                        Help others discover the power of simple organisation!
+                        Know someone who could do with a bit more headspace?
                     </p>
 
                     <p style={{
@@ -180,7 +180,7 @@ const SharePromptModal = ({ onClose, onShared }) => {
                         color: 'var(--text-muted, #64748b)',
                         lineHeight: 1.6,
                     }}>
-                        If 123 ToDo has helped you feel more in control of your day, share it with a friend or colleague — completely free, no strings attached.
+                        If this has helped you feel less frazzled, it might do the same for a friend or colleague. It's completely free — no catch, no signup.
                     </p>
 
                     {/* Share Buttons Grid */}

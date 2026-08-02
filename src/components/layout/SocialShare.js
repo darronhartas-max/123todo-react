@@ -41,7 +41,7 @@ const SocialShare = () => {
         }
     };
 
-    const rawShareText = 'Organize your day in seconds with 123 ToDo — the free, simple task manager that cuts through clutter and helps you get your life in order!';
+    const rawShareText = 'Been using 123 ToDo to keep on top of things — it\'s free, no sign-up, and actually works. Worth a look 👇';
     const rawShareUrl = 'https://www.123todo.com';
     const shareText = encodeURIComponent(rawShareText);
     const shareUrl = encodeURIComponent(rawShareUrl);
@@ -63,7 +63,7 @@ const SocialShare = () => {
     return (
         <div style={styles.adPanel}>
             <span style={{ fontSize: isMobile ? '0.8rem' : '0.9rem', marginRight: isMobile ? '0' : '12px' }}>
-                🤝 Help others get organized — please SHARE!
+                Found this useful? Pass it on — it's free! 😊
             </span>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {/* X (Twitter) Share */}
@@ -124,7 +124,7 @@ const SocialShare = () => {
 
                 {/* Email Share */}
                 <a
-                    href={`mailto:?subject=${encodeURIComponent('Organize your day with 123 ToDo')}&body=${shareText}%20${shareUrl}`}
+                    href={`mailto:?subject=${encodeURIComponent('Thought you might find this useful')}\u0026body=${shareText}%20${shareUrl}`}
                     onClick={handleShareClick}
                     style={styles.shareBtn}
                     title="Share via Email"
