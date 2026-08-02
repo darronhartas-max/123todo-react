@@ -120,10 +120,12 @@ npm run build
 - **Restore**: Click the ↻ button and select a new priority
 - **Delete**: Click the 🗑️ button to permanently remove
 
-### Backup & Restore
-- **Export**: Click "Export" in the footer to download a JSON file
-- **Import**: Click "Import" and select a previously exported JSON file
-- **Frequency**: Recommended to backup weekly (app will remind you)
+### Backup, Restore & Todoist Migration
+- **123 ToDo Backup**: Click "Export" in the footer to download a JSON file, or "Import" to restore a backup.
+- **Todoist Export & Migration**: Click "Import" in the footer, then select "Todoist Export" (or click "📖 View Guide").
+  1. *Export from Todoist*: Open Todoist ➔ select a Project ➔ click **(...)** ➔ **Export as CSV**.
+  2. *Upload to 123 To Do*: Drag & drop your `.csv` files into the upload zone.
+  3. *Map & Confirm*: 123 To Do auto-matches project names, imports task descriptions into **unlimited text Notes**, preserves due dates (`📅 Due: ...`), and maintains subtask indentation (`↳`).
 
 ---
 

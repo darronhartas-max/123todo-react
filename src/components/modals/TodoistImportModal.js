@@ -182,7 +182,7 @@ const StepIndicator = ({ currentStep }) => {
 
 // ─── Main Modal ──────────────────────────────────────────────────────────────
 
-const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) => {
+const TodoistImportModal = ({ onClose, onImport, onOpenGuide, projects: existingProjects }) => {
     const [step, setStep]         = useState(STEP_UPLOAD);
     const [parsedFiles, setParsedFiles]   = useState([]);   // { name, tasks, warnings }[]
     const [mappings, setMappings] = useState([]);            // { csvName, targetType, targetId, targetName, color }[]
@@ -639,6 +639,26 @@ const TodoistImportModal = ({ onClose, onImport, projects: existingProjects }) =
                             <FileText size={18} />
                         </div>
                         <h2 style={s.title}>Import from Todoist</h2>
+                        {onOpenGuide && (
+                            <button
+                                onClick={onOpenGuide}
+                                style={{
+                                    background: 'rgba(228, 67, 50, 0.1)',
+                                    border: 'none',
+                                    color: '#e44332',
+                                    padding: '4px 10px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}
+                            >
+                                📖 View Guide
+                            </button>
+                        )}
                     </div>
                     <button onClick={onClose} style={COMMON_STYLES.btnReset}>
                         <X size={22} style={{ color: 'var(--muted-text)' }} />

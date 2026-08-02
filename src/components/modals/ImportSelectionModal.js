@@ -2,7 +2,7 @@ import React from 'react';
 import { COMMON_STYLES } from '../../utils/styles';
 import { FileJson, FileType, X, Database } from 'lucide-react';
 
-const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onRestoreShadow, onClose }) => {
+const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onRestoreShadow, onOpenTodoistGuide, onClose }) => {
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
@@ -112,9 +112,30 @@ const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onRestoreShadow, 
                         <div style={{ background: 'rgba(228, 67, 50, 0.1)', padding: '10px', borderRadius: '8px', color: '#e44332' }}>
                             <FileType size={24} />
                         </div>
-                        <div>
-                            <div style={{ fontWeight: '700' }}>Todoist Export</div>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>Import from Todoist .csv files</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: '700', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Todoist Export</span>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onClose();
+                                        if (onOpenTodoistGuide) onOpenTodoistGuide();
+                                    }}
+                                    style={{
+                                        background: 'rgba(228, 67, 50, 0.12)',
+                                        border: 'none',
+                                        color: '#e44332',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '700',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    📖 View Guide
+                                </button>
+                            </div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)', marginTop: '2px' }}>Import from Todoist .csv files</div>
                         </div>
                     </button>
 

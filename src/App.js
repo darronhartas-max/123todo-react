@@ -15,6 +15,7 @@ import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
+import TodoistGuideModal from './components/modals/TodoistGuideModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import SyncModal from './components/modals/SyncModal';
@@ -110,6 +111,7 @@ const TodoApp = () => {
   const [currentProjectId, setCurrentProjectId] = useState('all');
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [showTodoistImport, setShowTodoistImport] = useState(false);
+  const [showTodoistGuide, setShowTodoistGuide] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
   const [showArchiveToast, setShowArchiveToast] = useState(false);
   const [shadowBackupData, setShadowBackupData] = useState(null);
@@ -790,6 +792,7 @@ const TodoApp = () => {
           projects={projects}
           onClose={() => setShowTodoistImport(false)}
           onImport={handleTodoistImportData}
+          onOpenGuide={() => setShowTodoistGuide(true)}
         />
       )}
 
@@ -797,10 +800,20 @@ const TodoApp = () => {
         <ImportSelectionModal
           onJSONImport={() => document.getElementById('fileInput').click()}
           onTodoistImport={() => setShowTodoistImport(true)}
+          onOpenTodoistGuide={() => setShowTodoistGuide(true)}
           onRestoreShadow={handleOpenRestoreShadow}
           onClose={() => setShowImportSelection(false)}
         />
       )}
+
+      <TodoistGuideModal
+        isOpen={showTodoistGuide}
+        onClose={() => setShowTodoistGuide(false)}
+        onStartImport={() => {
+          setShowTodoistGuide(false);
+          setShowTodoistImport(true);
+        }}
+      />
 
       {shadowBackupData && (
         <RestoreShadowModal
