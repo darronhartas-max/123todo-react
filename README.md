@@ -185,19 +185,15 @@ npm run build
 
 ## ⚠️ Important Notices
 
-### Data Responsibility
-- **You are responsible for backing up your data**
-- Data stored only in your browser's localStorage
-- Can be lost if:
-  - Browser cache/data is cleared
-  - Browser is uninstalled
-  - Device is reset/reformatted
-  - Browser updates cause issues
+### Data Storage & Privacy
+- **Local-First Storage**: Tasks are stored locally in your browser (`localStorage`).
+- **Zero Third-Party Servers**: No task data is ever collected, tracked, or sent to vendor servers.
+- **Optional Encrypted Cloud Sync**: When Google Drive Sync is enabled, data is encrypted on your device (AES-256-GCM) and synced directly to your personal Google account.
+- **Safety Features**: 24-hour automatic internal Shadow Backups and Persistent Storage API protection help safeguard your data.
 
 ### Terms of Use
-- This app is provided "as is" without warranties
-- Use entirely at your own risk
-- No data is collected or transmitted to servers
+- This app is provided "as is" without warranties.
+- Use entirely at your own risk.
 - Full terms: https://www.123todo.com/terms
 
 ### Browser Storage Warnings
