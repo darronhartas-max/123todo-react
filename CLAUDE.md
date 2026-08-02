@@ -28,14 +28,21 @@ src/
 
 Deployment is automated via GitHub Actions (`.github/workflows/deploy.yml`).
 
-### Assistant Rule for Git Commits:
+### Assistant Rule for Git Commits & Deployment Verification:
 Whenever the user asks to "commit to git" or "commit":
 1. **Stage & Commit**:
    ```bash
    git add <files>
    git commit -m "<descriptive message>"
    ```
-2. **Push to Remote (CRITICAL)**: Always execute `git push origin main` with `BypassSandbox: true` (network bypass enabled). This ensures the push to GitHub succeeds despite sandbox restrictions, automatically triggering the GitHub Actions workflow to build and deploy to the production VPS (`51.195.136.55`).
+2. **Push to Remote (CRITICAL)**: Always execute `git push origin main` with `BypassSandbox: true` (network bypass enabled).
+3. **Automated Deployment Verification (MANDATORY)**: Immediately after pushing, check the GitHub Actions workflow run status via GitHub REST API:
+   ```bash
+   curl -s "https://api.github.com/repos/darronhartas-max/123todo-react/actions/runs?per_page=1"
+   ```
+   - Verify `status` reaches `"completed"` and `conclusion` is `"success"`.
+   - Confirm `head_sha` matches the pushed commit.
+   - If the build fails (`conclusion: "failure"`), fetch log details, fix the root cause immediately, and push the fix.
 
 ## Core Features & Systems
 - **Priority System**: P1 Must Do (#dc2626), P2 Should Do (#f59e0b), P3 Could Do (#6b7280), P4 On Hold (#9333ea).
