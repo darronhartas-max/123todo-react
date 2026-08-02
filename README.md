@@ -93,10 +93,9 @@ npm run build
 
 ### Adding Tasks & Unlimited Notes
 1. Click the ➕ button in the header
-2. Type your task title (max 200 characters for quick dashboard scanning)
-3. Expand **Notes** to add unlimited text descriptions, instructions, or checklists (no length cap!)
-4. Select priority: Must Do, Should Do, Could Do, or On Hold
-5. Click "ADD TASK" or press Enter
+2. Type your task title and select a priority level (Must Do, Should Do, Could Do, or On Hold)
+3. Expand **Notes** to add unlimited text descriptions, instructions, or checklists
+4. Click "ADD TASK" or press Enter
 
 ### Managing & Reordering Tasks
 - **Swipe**: Drag any task left or right to trigger configured action
