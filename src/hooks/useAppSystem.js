@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, INSTALL_PROMPT_DAYS } from '../utils/constants';
+import { checkForUpdates as triggerSWUpdateCheck } from '../serviceWorkerRegistration';
 
 export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     const [showWelcome, setShowWelcome] = useState(false);
@@ -126,6 +127,10 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         setShowBackupReminder(false);
     };
 
+    const checkForUpdates = useCallback(async () => {
+        return await triggerSWUpdateCheck();
+    }, []);
+
     return {
         showWelcome,
         showInstallPrompt,
@@ -139,6 +144,7 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         dismissWelcome,
         dismissInstallPrompt,
         dismissBackupReminder,
-        recordBackup
+        recordBackup,
+        checkForUpdates
     };
 };

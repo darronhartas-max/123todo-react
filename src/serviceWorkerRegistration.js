@@ -123,3 +123,19 @@ export function unregister() {
             });
     }
 }
+
+export async function checkForUpdates() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            if (registration) {
+                await registration.update();
+                return { success: true, registration };
+            }
+        } catch (error) {
+            console.error('Failed to check for service worker updates:', error);
+            return { success: false, error };
+        }
+    }
+    return { success: false, error: 'No Service Worker' };
+}

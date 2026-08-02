@@ -48,7 +48,7 @@ const TodoApp = () => {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
     showUpdateReady, swRegistration,
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
-    dismissBackupReminder, recordBackup
+    dismissBackupReminder, recordBackup, checkForUpdates
   } = useAppSystem(archived.length, tasks.length, isAuthed);
 
   // Swipe Settings State
@@ -847,6 +847,7 @@ const TodoApp = () => {
         setThemeMode={setThemeMode}
         swipeSettings={swipeSettings}
         onUpdateSwipeSettings={updateSwipeSettings}
+        onCheckForUpdates={checkForUpdates}
       />
 
       <AnimatePresence>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PROJECT_COLORS, SWIPE_ACTIONS } from '../../utils/constants';
+import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION } from '../../utils/constants';
 
 const SHORTCUTS_LIST = [
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
@@ -157,12 +157,24 @@ const SettingsModal = ({
     themeMode,
     setThemeMode,
     swipeSettings,
-    onUpdateSwipeSettings
+    onUpdateSwipeSettings,
+    onCheckForUpdates
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [updateCheckStatus, setUpdateCheckStatus] = useState('idle'); // 'idle' | 'checking' | 'up-to-date'
+
+    const handleManualCheckForUpdates = async () => {
+        setUpdateCheckStatus('checking');
+        if (onCheckForUpdates) {
+            await onCheckForUpdates();
+        }
+        setTimeout(() => {
+            setUpdateCheckStatus('up-to-date');
+        }, 800);
+    };
 
     // Inline project editing states
     const [editingProjectId, setEditingProjectId] = useState(null);
@@ -806,7 +818,7 @@ const SettingsModal = ({
                                     </div>
                                 </div>
 
-                                {/* Layout Width Constraint */}
+                                 {/* Layout Width Constraint */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>Desktop Layout Width</div>
                                     <div style={styles.segmentContainer}>
@@ -821,6 +833,63 @@ const SettingsModal = ({
                                             onClick={() => setLayoutWidth('1000px')}
                                         >
                                             Kanban Columns (1000px)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* App Version & Manual Update Check */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>App Version & Updates</span>
+                                        <span style={{ fontSize: '0.9rem', color: 'var(--muted-text)', fontWeight: '600' }}>
+                                            v{APP_VERSION}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        background: 'var(--bg-color)',
+                                        padding: '12px 16px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--border-color)',
+                                        gap: '12px'
+                                    }}>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-color)' }}>
+                                            {updateCheckStatus === 'checking' && (
+                                                <span style={{ color: 'var(--accent-color)', fontWeight: '600' }}>Checking for updates...</span>
+                                            )}
+                                            {updateCheckStatus === 'up-to-date' && (
+                                                <span style={{ color: '#10b981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Check size={16} /> 123 To Do is up to date (v{APP_VERSION})
+                                                </span>
+                                            )}
+                                            {updateCheckStatus === 'idle' && (
+                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available.</span>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={handleManualCheckForUpdates}
+                                            disabled={updateCheckStatus === 'checking'}
+                                            style={{
+                                                padding: '6px 12px',
+                                                borderRadius: '6px',
+                                                border: '1px solid var(--border-color)',
+                                                background: 'var(--surface-color)',
+                                                color: 'var(--accent-color)',
+                                                fontWeight: '600',
+                                                fontSize: '0.85rem',
+                                                cursor: updateCheckStatus === 'checking' ? 'default' : 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                whiteSpace: 'nowrap',
+                                                transition: 'all 0.2s ease',
+                                                opacity: updateCheckStatus === 'checking' ? 0.6 : 1
+                                            }}
+                                        >
+                                            <RefreshCw size={14} style={{ animation: updateCheckStatus === 'checking' ? 'spin 1s linear infinite' : 'none' }} />
+                                            {updateCheckStatus === 'checking' ? 'Checking...' : 'Check for Updates'}
                                         </button>
                                     </div>
                                 </div>
