@@ -297,9 +297,13 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-- **Brand Consistency**: Applied primary blue (#285a82) from the logo as the main accent color.
+### v2.4.16 (Current)
+- **Interactive Todoist Migration Guide Modal**: Created a dedicated `TodoistGuideModal` linked directly from import selection and Todoist wizard dialogs.
+- **Search Engine Optimization (SEO)**: Integrated Schema.org `JSON-LD` structured data, high-intent titles, meta descriptions, Open Graph, and Twitter Cards for Google rich snippets.
+- **Comprehensive User Guide & Copy Revisions**: Updated landing page copy for unlimited task notes, subtask checklists, and custom typography/spacing density.
+- **Modernized Troubleshooting Guide**: Replaced outdated warnings with modern guidance covering Google Drive sync, 24h Shadow Backups, and PWA update checks.
 
-### v2.2.1 (Current)
+### v2.4.15
 - **Unlimited Task Notes**: Removed the previous 2,048-character cap on task notes. Notes fields now accept any length of text, ensuring Todoist task descriptions of any size import and display cleanly without truncation.
 - **Todoist Import — Bug Fixes & Project Mapping Wizard**: Full 3-step import experience:
   - *Step 1 — Upload*: Drag-and-drop (now fully working) or click to select one or more Todoist CSV project exports at once.
