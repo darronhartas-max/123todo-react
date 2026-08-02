@@ -196,31 +196,11 @@ npm run build
 - Use entirely at your own risk.
 - Full terms: https://www.123todo.com/terms
 
-### Browser Storage Warnings
-- Do not clear browser data/cache if you want to keep tasks
-- Add browser to "don't clear" exceptions if possible
-- Export data regularly as a safety measure
-
----
-
-## 🐛 Troubleshooting
-
-### Tasks Not Saving
-- Check browser localStorage is enabled
-- Ensure you're not in Private/Incognito mode
-- Try refreshing the page
-- Export and re-import data if issues persist
-
-### App Not Loading
-- Clear browser cache and refresh
-- Check internet connection (for first load)
-- Try a different browser
-- Disable browser extensions temporarily
-
-### Lost Data
-- Check if you have a backup JSON file
-- Use Import feature to restore from backup
-- If no backup exists, data cannot be recovered
+### Browser Storage & Protection Guidance
+- **Google Drive Sync**: Enable cloud sync for automatic, zero-knowledge encrypted backups. If browser cache is ever cleared, signing back in restores all tasks instantly.
+- **Persistent Storage API**: 123 To Do requests browser storage persistence to prevent browsers from clearing local data.
+- **Internal Snapshots**: Daily Shadow Backups automatically save local recovery snapshots in your browser.
+- **Offline Backups**: Perform a quick 1-click JSON export anytime for offline peace of mind.
 
 ### PWA Installation Issues
 - Ensure you're using HTTPS (required for PWA)
