@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, FileType, CheckCircle2, ArrowRight, HelpCircle, Download, FileText, Layers, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, FileType, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
 
 const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
