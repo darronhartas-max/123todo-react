@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, Rocket } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
+import { RELEASE_CHANGELOG, APP_VERSION } from '../../utils/constants';
 
 const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
     const styles = {
@@ -120,26 +121,38 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                     </div>
                 </div>
 
-                <div style={{
-                    background: 'var(--bg-color)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '12px',
-                    padding: '14px 16px',
-                    margin: '16px 0',
-                    fontSize: '0.9rem',
-                    textAlign: 'left',
-                    color: 'var(--text-color)'
-                }}>
-                    <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '8px', color: 'var(--accent-color)' }}>
-                        ✨ What's New in v{newVersion}:
-                    </div>
-                    <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.4' }}>
-                        <li><strong>👈 Task Swipe Gestures:</strong> Drag cards left or right to complete, delete, edit, or set On Hold.</li>
-                        <li><strong>⚡ Ultra-Fast Google Drive Sync:</strong> Near real-time 300ms push & 4s polling across all devices.</li>
-                        <li><strong>🚀 User-Controlled Updates:</strong> Tap "Update Now" when convenient — no unexpected reloads.</li>
-                        <li><strong>📋 Compact Projects List:</strong> Fits 13+ projects into view in Settings without scrolling.</li>
-                    </ul>
-                </div>
+                {(() => {
+                    const highlights = RELEASE_CHANGELOG[newVersion] || RELEASE_CHANGELOG[APP_VERSION] || [
+                        { title: '🔄 Manual Update Check:', desc: 'Check for updates anytime under Settings ➔ Appearance.' },
+                        { title: '🖐️ Drag & Drop Projects:', desc: 'Reorder your projects by dragging grip handles in Settings.' },
+                        { title: '🔔 Sync Alert Popup:', desc: 'Automatic prompt if Google Drive session disconnects so you can re-auth in 1 tap.' },
+                        { title: '📐 Compact Layout:', desc: 'Optimized project selector dropdown and trimmed header/footer margins.' }
+                    ];
+
+                    return (
+                        <div style={{
+                            background: 'var(--bg-color)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '12px',
+                            padding: '14px 16px',
+                            margin: '16px 0',
+                            fontSize: '0.9rem',
+                            textAlign: 'left',
+                            color: 'var(--text-color)'
+                        }}>
+                            <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '8px', color: 'var(--accent-color)' }}>
+                                ✨ What's New in v{newVersion}:
+                            </div>
+                            <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.4' }}>
+                                {highlights.map((item, idx) => (
+                                    <li key={idx}>
+                                        <strong>{item.title}</strong> {item.desc}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    );
+                })()}
 
                 <div style={{
                     background: 'rgba(16, 185, 129, 0.05)',

@@ -44,6 +44,11 @@ Whenever the user asks to "commit to git" or "commit":
    - Confirm `head_sha` matches the pushed commit.
    - If the build fails (`conclusion: "failure"`), fetch log details, fix the root cause immediately, and push the fix.
 
+### Assistant Rule for Version Bumps & Release Changelog:
+Whenever bumping the application version (`APP_VERSION`):
+1. Update `APP_VERSION` in `src/utils/constants.js`, `package.json`, `package-lock.json`, and `CLAUDE.md`.
+2. Add the release highlights to `RELEASE_CHANGELOG` in `src/utils/constants.js`. This ensures the post-update modal (`UpdatedModal.js`) dynamically presents accurate "What's New" highlights for the user's specific version update.
+
 ## Core Features & Systems
 - **Priority System**: P1 Must Do (#dc2626), P2 Should Do (#f59e0b), P3 Could Do (#6b7280), P4 On Hold (#9333ea).
 - **Google Drive Sync**: Client-side AES-256-GCM encryption (`crypto.js`), auto-token drop detection (`isSyncDropped`), single-tap re-auth popup modal (`SyncDroppedModal.js`).
