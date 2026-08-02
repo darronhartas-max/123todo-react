@@ -97,12 +97,13 @@ npm run build
 3. Expand **Notes** to add unlimited text descriptions, instructions, or checklists
 4. Click "ADD TASK" or press Enter
 
-### Managing & Reordering Tasks
-- **Swipe**: Drag any task left or right to trigger configured action
-- **Complete**: Click the ✓ button or swipe right to move task to archive
-- **Edit**: Click on the task text or swipe left/right to edit content, notes, or change priority
-- **Reorder**: Drag and drop tasks within priority sections (syncs cross-device in seconds)
-- **View Archive**: Click "Show Archive" at the bottom to see completed tasks
+### Managing, Scheduling & Subtasks
+- **Swipe**: Drag any task left or right to trigger configured actions (Complete, Delete, On Hold, Edit).
+- **Schedule & Recurrence**: Set scheduled due dates and recurring rules (daily, weekly, monthly) for any task.
+- **Subtasks & Checklists**: Break down large tasks into smaller step-by-step checklists.
+- **Reorder**: Drag and drop tasks within priority sections or projects.
+- **Complete**: Click the checkbox or swipe right to mark tasks complete and move to archive.
+- **View Archive**: Click "Show Archive" at the bottom to view completed items.
 
 ### Editing Tasks
 1. Click on any task to open the edit modal
