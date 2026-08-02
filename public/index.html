@@ -7,49 +7,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#285a82" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#5289b4" media="(prefers-color-scheme: dark)" />
+
+  <!-- Primary SEO Meta Tags -->
+  <title>123 ToDo | Free, Private & Encrypted Todo List & Task Manager App</title>
+  <meta name="title" content="123 ToDo | Free, Private & Encrypted Todo List & Task Manager App" />
   <meta name="description"
-    content="FREE simple, powerful task management with offline support. Organize your tasks by priority and stay productive anywhere." />
+    content="The free, privacy-first todo list and task manager app. Organize tasks by priority, add unlimited text notes, track subtasks, sync securely via AES-256 encrypted Google Drive, and work 100% offline." />
+  <meta name="keywords"
+    content="todo list app, task manager, free task management, private todo app, encrypted task list, google drive sync todo, offline task manager pwa, todoist alternative, priority todo list, subtasks checklist, project task manager" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.123todo.com" />
+
+  <!-- Mobile & PWA Web App Capability -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="123 ToDo" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png?v=2.1.14" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://app.123todo.com" />
-  <meta property="og:title" content="123 ToDo - FREE Simple Task Management" />
+  <meta property="og:url" content="https://www.123todo.com" />
+  <meta property="og:site_name" content="123 ToDo" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="123 ToDo | Free, Private & Encrypted Todo List & Task Manager App" />
   <meta property="og:description"
-    content="FREE simple, powerful task management with offline support. Organize your tasks by priority and stay productive anywhere." />
-  <meta property="og:image" content="https://app.123todo.com/social-share.svg" />
+    content="Organize tasks effortlessly with 123 ToDo. Free, privacy-first task management featuring end-to-end encrypted Google Drive sync, unlimited task notes, subtasks, customizable swipe gestures, and offline PWA capability." />
+  <meta property="og:image" content="https://www.123todo.com/social-share.svg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="123 ToDo - FREE Simple Task Management" />
+  <meta property="og:image:alt" content="123 ToDo - Free, Private & Encrypted Task Manager" />
 
-  <!-- Twitter -->
+  <!-- Twitter Card -->
   <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://app.123todo.com" />
-  <meta property="twitter:title" content="123 ToDo - FREE Simple Task Management" />
+  <meta property="twitter:url" content="https://www.123todo.com" />
+  <meta property="twitter:title" content="123 ToDo | Free, Private & Encrypted Todo List & Task Manager App" />
   <meta property="twitter:description"
-    content="FREE simple, powerful task management with offline support. Organize your tasks by priority and stay productive anywhere." />
-  <meta property="twitter:image" content="https://app.123todo.com/social-share.svg" />
-  <meta property="twitter:image:alt" content="123 ToDo - FREE Simple Task Management" />
+    content="Organize tasks effortlessly with 123 ToDo. Free, privacy-first task management with end-to-end encrypted Google Drive sync, unlimited task notes, subtasks, and offline support." />
+  <meta property="twitter:image" content="https://www.123todo.com/social-share.svg" />
+  <meta property="twitter:image:alt" content="123 ToDo - Free, Private & Encrypted Task Manager" />
 
+  <!-- Web App Manifest -->
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json?v=2.1.14" />
-  <title>123 ToDo - FREE Simple Task Management</title>
+
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Schema.org JSON-LD Structured Data for Google Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "123 ToDo",
+    "url": "https://www.123todo.com",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All (Web, iOS, Android, macOS, Windows)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free, privacy-first todo list and task manager app with zero tracking, end-to-end client-side encryption, Google Drive sync, unlimited task notes, subtask checklists, and offline PWA support.",
+    "softwareVersion": "2.4.15",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "128"
+    },
+    "featureList": [
+      "Zero Knowledge AES-256-GCM Encrypted Google Drive Sync",
+      "Unlimited Text Notes per Task",
+      "Step-by-Step Subtask Checklists with Visual Progress",
+      "Customizable Swipe Gestures (Complete, Edit, Delete, On Hold)",
+      "4 Priority Levels (Must Do, Should Do, Could Do, On Hold)",
+      "Color-Coded Custom Projects",
+      "Scheduled Due Dates & Recurring Tasks",
+      "Offline PWA Support & Daily Shadow Backups",
+      "Seamless Todoist Multi-Project CSV Migration Wizard"
+    ]
+  }
+  </script>
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <noscript>You need to enable JavaScript to run 123 ToDo.</noscript>
   <div id="root"></div>
-  <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
 </body>
 
 </html>

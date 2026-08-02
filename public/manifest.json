@@ -1,6 +1,8 @@
 {
   "short_name": "123 ToDo",
-  "name": "123 ToDo - Simple Task Management",
+  "name": "123 ToDo - Free, Private & Encrypted Task Manager",
+  "description": "Free, privacy-first todo list and task manager with encrypted Google Drive sync, unlimited task notes, subtasks, and offline PWA support.",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "favicon.ico?v=2.1.14",
