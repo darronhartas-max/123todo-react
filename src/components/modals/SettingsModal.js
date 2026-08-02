@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, ChevronUp, ChevronDown, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS } from '../../utils/constants';
 
@@ -147,6 +147,7 @@ const SettingsModal = ({
     onEditProject,
     onDeleteProject,
     onMoveProject,
+    onReorderProjects,
     fontSize,
     setFontSize,
     density,
@@ -167,6 +168,57 @@ const SettingsModal = ({
     const [editingProjectId, setEditingProjectId] = useState(null);
     const [editName, setEditName] = useState('');
     const [editColor, setEditColor] = useState('');
+
+    // Project drag and drop reordering state
+    const [draggedProjectId, setDraggedProjectId] = useState(null);
+    const [dragOverProjectId, setDragOverProjectId] = useState(null);
+
+    const handleDragStartProject = (e, projectId) => {
+        setDraggedProjectId(projectId);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', projectId);
+    };
+
+    const handleDragOverProject = (e, projectId) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (dragOverProjectId !== projectId) {
+            setDragOverProjectId(projectId);
+        }
+    };
+
+    const handleDropProject = (e, targetProjectId) => {
+        e.preventDefault();
+        if (!draggedProjectId || draggedProjectId === targetProjectId) {
+            setDraggedProjectId(null);
+            setDragOverProjectId(null);
+            return;
+        }
+
+        const fromIndex = projects.findIndex(p => p.id === draggedProjectId);
+        const toIndex = projects.findIndex(p => p.id === targetProjectId);
+
+        if (fromIndex > -1 && toIndex > -1) {
+            const updated = [...projects];
+            const [moved] = updated.splice(fromIndex, 1);
+            updated.splice(toIndex, 0, moved);
+
+            if (onReorderProjects) {
+                onReorderProjects(updated);
+            } else if (onMoveProject) {
+                const direction = fromIndex < toIndex ? 'down' : 'up';
+                onMoveProject(draggedProjectId, direction);
+            }
+        }
+
+        setDraggedProjectId(null);
+        setDragOverProjectId(null);
+    };
+
+    const handleDragEndProject = () => {
+        setDraggedProjectId(null);
+        setDragOverProjectId(null);
+    };
 
     if (!isOpen) return null;
 
@@ -491,7 +543,23 @@ const SettingsModal = ({
                                 <div style={styles.sectionTitle}>Manage Projects</div>
                                 <div style={{ maxHeight: showAddForm ? '220px' : '440px', overflowY: 'auto', paddingRight: '4px', transition: 'max-height 0.3s ease' }}>
                                     {projects.map((project, idx) => (
-                                        <div key={project.id} style={styles.projectItem}>
+                                        <div
+                                            key={project.id}
+                                            draggable={!editingProjectId}
+                                            onDragStart={(e) => handleDragStartProject(e, project.id)}
+                                            onDragOver={(e) => handleDragOverProject(e, project.id)}
+                                            onDragLeave={() => setDragOverProjectId(null)}
+                                            onDrop={(e) => handleDropProject(e, project.id)}
+                                            onDragEnd={handleDragEndProject}
+                                            style={{
+                                                ...styles.projectItem,
+                                                opacity: draggedProjectId === project.id ? 0.4 : 1,
+                                                borderColor: dragOverProjectId === project.id ? 'var(--accent-color)' : 'var(--border-color)',
+                                                background: dragOverProjectId === project.id ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                cursor: editingProjectId ? 'default' : 'grab',
+                                                transition: 'all 0.15s ease'
+                                            }}
+                                        >
                                             {editingProjectId === project.id ? (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -545,34 +613,11 @@ const SettingsModal = ({
                                             ) : (
                                                 <>
                                                     <div style={styles.projectInfo}>
+                                                        <GripVertical size={16} style={{ color: 'var(--muted-text)', cursor: 'grab', flexShrink: 0 }} title="Drag to reorder" />
                                                         <div style={styles.colorDot(project.color)} />
                                                         {project.name}
                                                     </div>
                                                      <div style={styles.actions}>
-                                                         <button
-                                                             style={{
-                                                                 ...styles.actionBtn,
-                                                                 opacity: idx === 0 ? 0.3 : 1,
-                                                                 cursor: idx === 0 ? 'default' : 'pointer'
-                                                             }}
-                                                             disabled={idx === 0}
-                                                             onClick={() => onMoveProject && onMoveProject(project.id, 'up')}
-                                                             title="Move project up"
-                                                         >
-                                                             <ChevronUp size={15} />
-                                                         </button>
-                                                         <button
-                                                             style={{
-                                                                 ...styles.actionBtn,
-                                                                 opacity: idx === projects.length - 1 ? 0.3 : 1,
-                                                                 cursor: idx === projects.length - 1 ? 'default' : 'pointer'
-                                                             }}
-                                                             disabled={idx === projects.length - 1}
-                                                             onClick={() => onMoveProject && onMoveProject(project.id, 'down')}
-                                                             title="Move project down"
-                                                         >
-                                                             <ChevronDown size={15} />
-                                                         </button>
                                                          <button
                                                              style={styles.actionBtn}
                                                              onClick={() => {
