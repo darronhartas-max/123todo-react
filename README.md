@@ -76,10 +76,9 @@ npm run build
 - **Home Screen Install**: Add to mobile home screen like a native app
 - **User-Controlled Updates**: Floating `🚀 New update ready! [Update Now]` banner lets you choose when to reload without unexpected restarts
 
-### Smart Reminders
-- **Weekly Backup Reminder**: Prompts you to export data every 7 days
+### Smart Onboarding & PWA
 - **Install Prompts**: Gentle reminders to install as PWA (dismissible)
-- **Welcome Screen**: First-time user guide with installation instructions
+- **Welcome Screen**: First-time user guide with installation instructions and feature overview
 
 ---
 
@@ -141,8 +140,10 @@ npm run build
    - Keep task titles concise (up to 200 characters) for quick dashboard scanning
    - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or checklists with zero length limits
 
-3. **Regular Backups**
-   - Export your data weekly (the app will remind you)
+3. **Automated Data Protection & Sync**
+   - Activate **Google Drive Sync** for automatic encrypted backups across all your devices
+   - **Shadow Backups** automatically save daily internal snapshots of your task list
+   - Perform manual JSON exports anytime from the footer
    - Store backups in cloud storage (Dropbox, Google Drive, etc.)
    - Use descriptive filenames: `123todo-2026-02-28.json`
 
