@@ -22,6 +22,7 @@ import SyncModal from './components/modals/SyncModal';
 import SyncDroppedModal from './components/modals/SyncDroppedModal';
 import UpdatedModal from './components/modals/UpdatedModal';
 import ExportModal from './components/modals/ExportModal';
+import SharePromptModal from './components/modals/SharePromptModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -121,6 +122,7 @@ const TodoApp = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
   const [prevVersionStr, setPrevVersionStr] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Check if we just completed an update and should show the update confirmation modal
   useEffect(() => {
@@ -133,6 +135,15 @@ const TodoApp = () => {
       localStorage.removeItem('123Todo_Show_Updated_Modal');
       localStorage.removeItem('123Todo_Previous_Version');
     }
+  }, []);
+
+  // Initialise first-use timestamp for smart share modal
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('share_modal_first_used')) {
+        localStorage.setItem('share_modal_first_used', Date.now().toString());
+      }
+    } catch (e) {}
   }, []);
 
   // Preference state loaded from localStorage or default
@@ -312,6 +323,16 @@ const TodoApp = () => {
     setTimeout(() => {
       setShowArchiveToast(false);
     }, 800);
+    // Smart share modal trigger: show after 24h of first use, max 3 declines, not if already shared
+    try {
+      const firstUsed = parseInt(localStorage.getItem('share_modal_first_used') || '0', 10);
+      const hasShared = localStorage.getItem('share_modal_has_shared') === 'true';
+      const declineCount = parseInt(localStorage.getItem('share_modal_declined_count') || '0', 10);
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+      if (!hasShared && declineCount < 3 && firstUsed > 0 && Date.now() - firstUsed >= twentyFourHours) {
+        setTimeout(() => setShowShareModal(true), 1200);
+      }
+    } catch (e) {}
   };
 
   // Filtering
@@ -744,6 +765,23 @@ const TodoApp = () => {
       </div>
 
       <SocialShare />
+
+      {showShareModal && (
+        <SharePromptModal
+          onClose={() => {
+            setShowShareModal(false);
+            try {
+              const prev = parseInt(localStorage.getItem('share_modal_declined_count') || '0', 10);
+              localStorage.setItem('share_modal_declined_count', (prev + 1).toString());
+            } catch (e) {}
+          }}
+          onShared={() => {
+            try {
+              localStorage.setItem('share_modal_has_shared', 'true');
+            } catch (e) {}
+          }}
+        />
+      )}
 
       {editingTask && (
         <EditModal

@@ -134,7 +134,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                     onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                     onInput={handleInput}
                     style={styles.textarea}
-                    maxLength={MAX_TASK_LENGTH}
+                    maxLength={Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
                     ref={(textarea) => {
                         if (textarea) {
                             textarea.style.height = 'auto';
@@ -191,7 +191,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 <div style={{ marginBottom: '8px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)' }}>Notes</label>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-color)', fontWeight: '600' }}>📝 Unlimited Text Capacity</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-color)', fontWeight: '600' }}>📝 Unlimited Notes (Never truncated when editing)</span>
                     </div>
                     <textarea
                         value={editingTask.notes || ''}
@@ -206,6 +206,9 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                             }
                         }}
                     />
+                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)', marginTop: '2px', textAlign: 'right' }}>
+                        📝 {(editingTask.notes || '').length} characters (100% full text preserved — zero length cap)
+                    </div>
                 </div>
 
                 {/* Subtask and Scheduling triggers */}

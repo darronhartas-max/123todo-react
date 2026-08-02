@@ -135,7 +135,7 @@ const ImportSelectionModal = ({ onJSONImport, onTodoistImport, onRestoreShadow, 
                                     📖 View Guide
                                 </button>
                             </div>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)', marginTop: '2px' }}>Import from Todoist .csv files</div>
+                            <div style={{ fontSize: '0.88rem', color: 'var(--muted-text)', marginTop: '2px' }}>Import multi-project .csv files — 100% text & descriptions preserved with zero length cap</div>
                         </div>
                     </button>
 

@@ -56,7 +56,7 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, ve
             <br />
 
             <div style={{ fontSize: '0.9rem', margin: '8px 0', opacity: 0.8 }}>
-                Copyright © Darron Hartas {new Date().getFullYear()} | v{version}
+                Copyright © Unforgettable Management Ltd {new Date().getFullYear()} | v{version}
             </div>
 
             <div style={{ marginTop: '8px', fontSize: '1rem' }}>

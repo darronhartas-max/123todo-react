@@ -205,24 +205,24 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
                     textAlign: 'left'
                 }}>
                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--accent-color)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Sparkles size={16} /> What Gets Migrated & Preserved:
+                        <Sparkles size={16} /> 🛡️ What Gets Migrated & Preserved (Zero Truncation Guarantee):
                     </div>
                     <div style={styles.featureGrid}>
                         <div style={styles.featureItem}>
                             <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Unlimited Notes:</strong> Full descriptions imported without character limits.</span>
+                            <span><strong>Unlimited Text Capacity:</strong> Todoist titles & descriptions of any length are imported in full.</span>
                         </div>
                         <div style={styles.featureItem}>
                             <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Due Dates:</strong> Todoist dates formatted as <code>📅 Due: ...</code></span>
+                            <span><strong>No Truncation on Edit:</strong> Notes & text are never capped or cut off when editing tasks later.</span>
                         </div>
                         <div style={styles.featureItem}>
                             <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Subtask Hierarchy:</strong> Subtasks indented with <code>↳</code></span>
+                            <span><strong>Due Dates & Subtasks:</strong> Dates preserved as <code>📅 Due: ...</code> and subtasks indented with <code>↳</code>.</span>
                         </div>
                         <div style={styles.featureItem}>
                             <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Clean Import:</strong> Section headers & blank rows auto-filtered out.</span>
+                            <span><strong>Clean Import:</strong> Section headers & blank rows auto-filtered out cleanly.</span>
                         </div>
                     </div>
                 </div>

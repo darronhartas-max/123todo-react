@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { COMMON_STYLES } from '../../utils/styles';
 import { PROJECT_COLORS } from '../../utils/constants';
-import { X, FileText, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Layers, Info } from 'lucide-react';
+import { X, FileText, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Layers, Info, ShieldCheck } from 'lucide-react';
 
 // ─── Step identifiers ───────────────────────────────────────────────────────
 const STEP_UPLOAD  = 'upload';
@@ -120,13 +120,17 @@ const parseTodoistFile = (filename, text) => {
             notes = notes ? `${notes}\n📅 Due: ${dateStr}` : `📅 Due: ${dateStr}`;
         }
 
-        // Append sub-task indicator if indented
+        // Sub-task indent prefix
         const indent = indentIdx !== -1 ? parseInt(row[indentIdx] || '1') : 1;
-        if (indent > 1) {
-            const prefix = '↳ '.repeat(indent - 1);
-            tasks.push({ text: prefix + content, notes, priority });
+        const prefix = indent > 1 ? '↳ '.repeat(indent - 1) : '';
+
+        // If content exceeds 200 chars, preserve the 100% full original title in unlimited notes so zero text is lost
+        if (content.length > 200) {
+            const headline = content.slice(0, 197) + '...';
+            notes = `Full Task Title:\n${content}${notes ? '\n\n' + notes : ''}`;
+            tasks.push({ text: prefix + headline, notes, priority });
         } else {
-            tasks.push({ text: content, notes, priority });
+            tasks.push({ text: prefix + content, notes, priority });
         }
     });
 
@@ -465,6 +469,25 @@ const TodoistImportModal = ({ onClose, onImport, onOpenGuide, projects: existing
                 <span>
                     Export each Todoist project separately: open the project → <strong>···</strong> → <strong>Export as CSV</strong>.
                     Upload one or all project CSVs at once. Completed tasks are not included in Todoist's CSV export.
+                </span>
+            </div>
+
+            <div style={{
+                background: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                borderRadius: '8px',
+                padding: '10px 12px',
+                fontSize: '0.85rem',
+                color: 'var(--text-color)',
+                marginBottom: '12px',
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'flex-start',
+                textAlign: 'left'
+            }}>
+                <ShieldCheck size={16} style={{ marginTop: '2px', color: '#2563eb', flexShrink: 0 }} />
+                <span>
+                    <strong>🛡️ Zero Text Truncation Guarantee:</strong> Todoist tasks & descriptions of ANY length are imported in full. Long task names and rich descriptions are safely stored in unlimited Notes and will <strong>NEVER be truncated when editing</strong> later.
                 </span>
             </div>
 
