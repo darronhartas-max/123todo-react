@@ -18,6 +18,7 @@ import TodoistImportModal from './components/modals/TodoistImportModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import SyncModal from './components/modals/SyncModal';
+import SyncDroppedModal from './components/modals/SyncDroppedModal';
 import UpdatedModal from './components/modals/UpdatedModal';
 import ExportModal from './components/modals/ExportModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
@@ -40,7 +41,7 @@ const TodoApp = () => {
   ], [projects]);
 
   const {
-    isAuthed, syncStatus, passphrase, setPassphrase, signIn, signOut, performSync
+    isAuthed, syncStatus, isSyncDropped, dismissSyncDropped, passphrase, setPassphrase, signIn, signOut, performSync
   } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
 
   const {
@@ -819,6 +820,12 @@ const TodoApp = () => {
         signIn={signIn}
         signOut={signOut}
         performSync={performSync}
+      />
+
+      <SyncDroppedModal
+        isOpen={isSyncDropped}
+        onSignIn={signIn}
+        onClose={dismissSyncDropped}
       />
 
       <SettingsModal

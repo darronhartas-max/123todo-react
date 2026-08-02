@@ -9,6 +9,7 @@ const SYNC_FILE_NAME = '123todo_sync.json';
 export const useGoogleDriveSync = (localData, importDataCallback) => {
     const [isAuthed, setIsAuthed] = useState(false);
     const [syncStatus, setSyncStatus] = useState('offline'); // 'offline', 'syncing', 'synced', 'error'
+    const [isSyncDropped, setIsSyncDropped] = useState(false);
     const [passphrase, setPassphrase] = useState(localStorage.getItem('123Todo_Sync_Passphrase') || '');
     const accessTokenRef = useRef(null);
     const tokenClientRef = useRef(null);
@@ -36,6 +37,9 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         accessTokenRef.current = null;
         setIsAuthed(false);
         setSyncStatus('offline');
+        if (localStorage.getItem('123Todo_Google_Authed') === 'true') {
+            setIsSyncDropped(true);
+        }
     }, []);
 
     const performSync = useCallback(async (isInitial = false) => {
@@ -168,6 +172,9 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                             setIsAuthed(false);
                             localStorage.removeItem('123Todo_Google_AccessToken');
                             localStorage.removeItem('123Todo_Google_TokenExpiry');
+                            if (localStorage.getItem('123Todo_Google_Authed') === 'true') {
+                                setIsSyncDropped(true);
+                            }
                             if (tokenResponse.type === 'tokenFailed') {
                                 localStorage.removeItem('123Todo_Google_Authed');
                             }
@@ -175,6 +182,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                         }
                         accessTokenRef.current = tokenResponse.access_token;
                         setIsAuthed(true);
+                        setIsSyncDropped(false);
                         localStorage.setItem('123Todo_Google_Authed', 'true');
                         // Store the token and expiry (expires_in is in seconds, e.g. 3600)
                         const expiryTime = Date.now() + (parseInt(tokenResponse.expires_in, 10) || 3600) * 1000;
@@ -194,6 +202,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                         console.warn('Silent token refresh failed:', err);
                         setIsAuthed(false);
                         setSyncStatus('offline');
+                        setIsSyncDropped(true);
                     }
                 } else if (!hasValidToken) {
                     setIsAuthed(false);
@@ -223,12 +232,17 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         }
         accessTokenRef.current = null;
         setIsAuthed(false);
+        setIsSyncDropped(false);
         setSyncStatus('offline');
         setPassphrase('');
         localStorage.removeItem('123Todo_Google_Authed');
         localStorage.removeItem('123Todo_Google_AccessToken');
         localStorage.removeItem('123Todo_Google_TokenExpiry');
         syncFileIdRef.current = null;
+    }, []);
+
+    const dismissSyncDropped = useCallback(() => {
+        setIsSyncDropped(false);
     }, []);
 
     // Setup an effect to auto-sync when local data changes (with debounce)
@@ -298,6 +312,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
     return {
         isAuthed,
         syncStatus,
+        isSyncDropped,
+        dismissSyncDropped,
         passphrase,
         setPassphrase,
         signIn,
