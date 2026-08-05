@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.4.15 | © Darron Hartas 2026
+Version 2.4.16 | © Unforgettable Management Ltd 2026
 
 ---
 

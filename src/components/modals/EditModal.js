@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, adjustStartDateForWeekdays } from '../../utils/dateUtils';
+import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 
-const EditModal = ({ task, onSave, onClose, projects }) => {
+const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK' }) => {
     const [editingTask, setEditingTask] = useState({ ...task });
     
     // Subtask states
@@ -189,15 +189,14 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                 </div>
 
                 <div style={{ marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ marginBottom: '4px' }}>
                         <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)' }}>Notes</label>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-color)', fontWeight: '600' }}>📝 Unlimited Notes (Never truncated when editing)</span>
                     </div>
                     <textarea
                         value={editingTask.notes || ''}
                         onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                         onInput={handleInput}
-                        placeholder="Add unlimited notes, task descriptions, or details here (no length cap)..."
+                        placeholder="Add unlimited text..."
                         style={{ ...styles.textarea, minHeight: '60px', fontSize: '1.1rem' }}
                         ref={(textarea) => {
                             if (textarea) {
@@ -207,7 +206,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                         }}
                     />
                     <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)', marginTop: '2px', textAlign: 'right' }}>
-                        📝 {(editingTask.notes || '').length} characters (100% full text preserved — zero length cap)
+                        📝 {(editingTask.notes || '').length} chars
                     </div>
                 </div>
 
@@ -223,7 +222,7 @@ const EditModal = ({ task, onSave, onClose, projects }) => {
                         onClick={() => setShowSchedule(!showSchedule)}
                         style={toggleButtonStyle(showSchedule)}
                     >
-                        📅 {scheduledDate ? `Scheduled: ${scheduledDate}` : 'Schedule'}
+                        📅 {scheduledDate ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}` : 'Schedule'}
                     </button>
                 </div>
 

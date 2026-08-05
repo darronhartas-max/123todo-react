@@ -33,6 +33,44 @@ export const formatDateString = (date) => {
 };
 
 /**
+ * Formats a YYYY-MM-DD string or Date object according to user preference.
+ * @param {string|Date} dateVal - YYYY-MM-DD date string or Date instance
+ * @param {string} formatStyle - 'UK' | 'US' | 'ISO' | 'UK_TEXT' | 'US_TEXT'
+ * @returns {string} Formatted display date string
+ */
+export const formatDisplayDate = (dateVal, formatStyle = 'UK') => {
+    if (!dateVal) return '';
+    let d;
+    if (typeof dateVal === 'string') {
+        d = parseDateString(dateVal);
+    } else {
+        d = dateVal;
+    }
+    if (isNaN(d.getTime())) return String(dateVal);
+
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthText = monthNames[d.getMonth()];
+
+    switch (formatStyle) {
+        case 'US':
+            return `${month}/${day}/${year}`;
+        case 'ISO':
+            return `${year}-${month}-${day}`;
+        case 'UK_TEXT':
+            return `${d.getDate()} ${monthText} ${year}`;
+        case 'US_TEXT':
+            return `${monthText} ${d.getDate()}, ${year}`;
+        case 'UK':
+        default:
+            return `${day}/${month}/${year}`;
+    }
+};
+
+/**
  * Calculates the next recurrence date based on the current scheduled date and the recurrence rules.
  * @param {string} currentDateStr - YYYY-MM-DD format
  * @param {Object} recurrence - { frequency, interval, daysOfWeek }

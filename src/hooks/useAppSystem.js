@@ -127,8 +127,8 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         setShowBackupReminder(false);
     };
 
-    const checkForUpdates = useCallback(async () => {
-        return await triggerSWUpdateCheck();
+    const checkForUpdates = useCallback(async (forceSimulate = false) => {
+        return await triggerSWUpdateCheck(forceSimulate);
     }, []);
 
     return {

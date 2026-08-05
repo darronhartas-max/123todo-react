@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION } from '../../utils/constants';
+import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
 
 const SHORTCUTS_LIST = [
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
@@ -27,11 +27,25 @@ const SwipeDemoCard = ({ swipeSettings }) => {
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
 
+    const THRESHOLD = 75;
+
+    const applyDamping = (diffX) => {
+        const absX = Math.abs(diffX);
+        if (absX <= THRESHOLD) return diffX;
+        const over = absX - THRESHOLD;
+        return Math.sign(diffX) * (THRESHOLD + over * 0.35);
+    };
+
     const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
     const leftSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeLeft ? SWIPE_ACTIONS[swipeSettings.swipeLeft] : null;
 
     const RightIcon = rightSwipeAction ? ACTION_ICONS[rightSwipeAction.icon] || CheckSquare : null;
     const LeftIcon = leftSwipeAction ? ACTION_ICONS[leftSwipeAction.icon] || Trash2 : null;
+
+    const isRightArmed = swipeOffset >= THRESHOLD && swipeSettings?.swipeRight !== 'none';
+    const isLeftArmed = Math.abs(swipeOffset) >= THRESHOLD && swipeOffset < 0 && swipeSettings?.swipeLeft !== 'none';
+    const rightProgress = Math.min(1, Math.max(0, swipeOffset / THRESHOLD));
+    const leftProgress = Math.min(1, Math.max(0, Math.abs(swipeOffset) / THRESHOLD));
 
     const handleTouchStart = (e) => {
         if (!swipeSettings?.enabled) return;
@@ -47,16 +61,17 @@ const SwipeDemoCard = ({ swipeSettings }) => {
         const diffY = touch.clientY - touchStartRef.current.y;
 
         if (!isSwipingRef.current) {
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 8) {
                 isSwipingRef.current = true;
-            } else if (Math.abs(diffY) > 10) {
+            } else if (Math.abs(diffY) > 8) {
                 return;
             }
         }
 
         if (isSwipingRef.current) {
             if (e.cancelable) e.preventDefault();
-            const clampedOffset = Math.max(-140, Math.min(140, diffX));
+            const rawOffset = applyDamping(diffX);
+            const clampedOffset = Math.max(-140, Math.min(140, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
@@ -66,10 +81,9 @@ const SwipeDemoCard = ({ swipeSettings }) => {
             setSwipeOffset(0);
             return;
         }
-        const THRESHOLD = 75;
-        if (swipeOffset > THRESHOLD && swipeSettings.swipeRight !== 'none') {
+        if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight !== 'none') {
             setDemoMessage(`Triggered Right Swipe: ${rightSwipeAction?.label}! 🎉`);
-        } else if (swipeOffset < -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
+        } else if (swipeOffset <= -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
             setDemoMessage(`Triggered Left Swipe: ${leftSwipeAction?.label}! ⚡`);
         }
         setSwipeOffset(0);
@@ -86,26 +100,66 @@ const SwipeDemoCard = ({ swipeSettings }) => {
 
     return (
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
-            {swipeOffset > 0 && rightSwipeAction && (
+            {swipeOffset > 0 && rightSwipeAction && swipeSettings?.swipeRight !== 'none' && (
                 <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-                    background: rightSwipeAction.bg,
+                    background: isRightArmed ? (rightSwipeAction.activeBg || rightSwipeAction.color) : rightSwipeAction.bg,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-                    paddingLeft: '16px', color: rightSwipeAction.color, fontWeight: '700', gap: '8px', zIndex: 1
+                    paddingLeft: `${Math.min(32, Math.max(16, swipeOffset * 0.25))}px`,
+                    borderRadius: '8px',
+                    color: isRightArmed ? (rightSwipeAction.activeColor || '#ffffff') : rightSwipeAction.color,
+                    fontWeight: isRightArmed ? '800' : '600',
+                    fontSize: '0.95rem',
+                    gap: '10px',
+                    zIndex: 1,
+                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease'
                 }}>
-                    {RightIcon && <RightIcon size={20} />}
-                    <span>{rightSwipeAction.label}</span>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '32px', height: '32px', borderRadius: '50%',
+                        background: isRightArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                        transform: isRightArmed ? 'scale(1.2)' : `scale(${0.8 + rightProgress * 0.2})`,
+                        transition: 'transform 0.2s ease'
+                    }}>
+                        {RightIcon && <RightIcon size={20} color={isRightArmed ? '#ffffff' : rightSwipeAction.color} />}
+                    </div>
+                    <span style={{ opacity: rightProgress > 0.2 ? 1 : 0 }}>
+                        {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
+                    </span>
+                    {!isRightArmed && (
+                        <div style={{ position: 'absolute', left: `${THRESHOLD}px`, top: '20%', bottom: '20%', width: '2px', background: rightSwipeAction.color, opacity: 0.35 }} />
+                    )}
                 </div>
             )}
-            {swipeOffset < 0 && leftSwipeAction && (
+            {swipeOffset < 0 && leftSwipeAction && swipeSettings?.swipeLeft !== 'none' && (
                 <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-                    background: leftSwipeAction.bg,
+                    background: isLeftArmed ? (leftSwipeAction.activeBg || leftSwipeAction.color) : leftSwipeAction.bg,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-                    paddingRight: '16px', color: leftSwipeAction.color, fontWeight: '700', gap: '8px', zIndex: 1
+                    paddingRight: `${Math.min(32, Math.max(16, Math.abs(swipeOffset) * 0.25))}px`,
+                    borderRadius: '8px',
+                    color: isLeftArmed ? (leftSwipeAction.activeColor || '#ffffff') : leftSwipeAction.color,
+                    fontWeight: isLeftArmed ? '800' : '600',
+                    fontSize: '0.95rem',
+                    gap: '10px',
+                    zIndex: 1,
+                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease'
                 }}>
-                    <span>{leftSwipeAction.label}</span>
-                    {LeftIcon && <LeftIcon size={20} />}
+                    <span style={{ opacity: leftProgress > 0.2 ? 1 : 0 }}>
+                        {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
+                    </span>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '32px', height: '32px', borderRadius: '50%',
+                        background: isLeftArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                        transform: isLeftArmed ? 'scale(1.2)' : `scale(${0.8 + leftProgress * 0.2})`,
+                        transition: 'transform 0.2s ease'
+                    }}>
+                        {LeftIcon && <LeftIcon size={20} color={isLeftArmed ? '#ffffff' : leftSwipeAction.color} />}
+                    </div>
+                    {!isLeftArmed && (
+                        <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '20%', bottom: '20%', width: '2px', background: leftSwipeAction.color, opacity: 0.35 }} />
+                    )}
                 </div>
             )}
             <div
@@ -119,7 +173,7 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                     padding: '12px 16px',
                     background: 'var(--item-bg)',
                     transform: `translateX(${swipeOffset}px)`,
-                    transition: swipeOffset === 0 ? 'transform 0.25s ease' : 'none',
+                    transition: swipeOffset === 0 ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
                     position: 'relative',
                     zIndex: 2,
                     cursor: 'grab',
@@ -158,22 +212,20 @@ const SettingsModal = ({
     setThemeMode,
     swipeSettings,
     onUpdateSwipeSettings,
-    onCheckForUpdates
+    onCheckForUpdates,
+    updateCheckStatus = 'idle',
+    dateFormat = 'UK',
+    setDateFormat
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
-    const [updateCheckStatus, setUpdateCheckStatus] = useState('idle'); // 'idle' | 'checking' | 'up-to-date'
 
-    const handleManualCheckForUpdates = async () => {
-        setUpdateCheckStatus('checking');
+    const handleManualCheckForUpdates = (e) => {
         if (onCheckForUpdates) {
-            await onCheckForUpdates();
+            onCheckForUpdates(e);
         }
-        setTimeout(() => {
-            setUpdateCheckStatus('up-to-date');
-        }, 800);
     };
 
     // Inline project editing states
@@ -836,6 +888,48 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+                                 {/* Date Format Order Preference */}
+                                 <div style={styles.settingRow}>
+                                     <div style={styles.settingLabel}>
+                                         <span>Date Format Order</span>
+                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                             Choose UK, US, or ISO date order display
+                                         </span>
+                                     </div>
+                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                         {DATE_FORMAT_OPTIONS.map(fmt => {
+                                             const isSelected = dateFormat === fmt.id;
+                                             return (
+                                                 <div
+                                                     key={fmt.id}
+                                                     onClick={() => setDateFormat && setDateFormat(fmt.id)}
+                                                     style={{
+                                                         padding: '10px 12px',
+                                                         borderRadius: '8px',
+                                                         border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                         background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                         cursor: 'pointer',
+                                                         display: 'flex',
+                                                         flexDirection: 'column',
+                                                         gap: '2px',
+                                                         transition: 'all 0.15s ease'
+                                                     }}
+                                                 >
+                                                     <div style={{
+                                                         fontSize: '0.85rem',
+                                                         fontWeight: isSelected ? '700' : '600',
+                                                         color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                     }}>
+                                                         {fmt.label}
+                                                     </div>
+                                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'monospace' }}>
+                                                         {fmt.example}
+                                                     </div>
+                                                 </div>
+                                             );
+                                         })}
+                                     </div>
+                                 </div>
 
                                 {/* App Version & Manual Update Check */}
                                 <div style={styles.settingRow}>
@@ -864,8 +958,13 @@ const SettingsModal = ({
                                                     <Check size={16} /> 123 To Do is up to date (v{APP_VERSION})
                                                 </span>
                                             )}
+                                            {updateCheckStatus === 'update-available' && (
+                                                <span style={{ color: '#10b981', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Check size={16} /> New version ready! Click 'Update Now' banner above to pull & reload.
+                                                </span>
+                                            )}
                                             {updateCheckStatus === 'idle' && (
-                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available.</span>
+                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available. (Shift+click to test)</span>
                                             )}
                                         </div>
                                         <button

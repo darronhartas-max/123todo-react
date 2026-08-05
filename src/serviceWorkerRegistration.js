@@ -53,8 +53,15 @@ function registerValidSW(swUrl, config) {
     navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
+            // Immediate check if a Service Worker is ALREADY waiting to activate
+            if (registration.waiting && navigator.serviceWorker.controller) {
+                console.log('Service Worker is already waiting to activate.');
+                const event = new CustomEvent('swUpdateAvailable', { detail: registration });
+                window.dispatchEvent(event);
+            }
+
             // Force update check on registration
-            registration.update();
+            registration.update().catch(err => console.log('SW update check info:', err));
 
             registration.onupdatefound = () => {
                 const installingWorker = registration.installing;
@@ -124,13 +131,39 @@ export function unregister() {
     }
 }
 
-export async function checkForUpdates() {
+export async function checkForUpdates(forceSimulate = false) {
+    if (forceSimulate) {
+        console.log('Simulating Service Worker update for testing...');
+        const event = new CustomEvent('swUpdateAvailable', { detail: null });
+        window.dispatchEvent(event);
+        return { success: true, updated: true, simulated: true };
+    }
+
     if ('serviceWorker' in navigator) {
         try {
             const registration = await navigator.serviceWorker.ready;
             if (registration) {
                 await registration.update();
-                return { success: true, registration };
+
+                if (registration.waiting && navigator.serviceWorker.controller) {
+                    const event = new CustomEvent('swUpdateAvailable', { detail: registration });
+                    window.dispatchEvent(event);
+                    return { success: true, updated: true, registration };
+                }
+
+                if (registration.installing) {
+                    return new Promise((resolve) => {
+                        registration.installing.onstatechange = function() {
+                            if (this.state === 'installed' && navigator.serviceWorker.controller) {
+                                const event = new CustomEvent('swUpdateAvailable', { detail: registration });
+                                window.dispatchEvent(event);
+                                resolve({ success: true, updated: true, registration });
+                            }
+                        };
+                        setTimeout(() => resolve({ success: true, updated: false, registration }), 3000);
+                    });
+                }
+                return { success: true, updated: false, registration };
             }
         } catch (error) {
             console.error('Failed to check for service worker updates:', error);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PRIORITIES, SWIPE_ACTIONS } from '../../utils/constants';
+import { formatDisplayDate } from '../../utils/dateUtils';
 
 const ACTION_ICONS = {
     CheckSquare,
@@ -12,59 +13,97 @@ const ACTION_ICONS = {
     Slash
 };
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK' }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
 
-    // Swipe Gesture State
+    // Swipe Gesture State & Visual Damping
     const [swipeOffset, setSwipeOffset] = useState(0);
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
 
-    const handleTouchStart = (e) => {
+    const THRESHOLD = 75;
+
+    const applyDamping = (diffX) => {
+        const absX = Math.abs(diffX);
+        if (absX <= THRESHOLD) return diffX;
+        const over = absX - THRESHOLD;
+        const dampedOver = over * 0.35;
+        return Math.sign(diffX) * (THRESHOLD + dampedOver);
+    };
+
+    const handleStart = (clientX, clientY) => {
         if (!swipeSettings?.enabled || isArchived) return;
-        const touch = e.touches[0];
-        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+        touchStartRef.current = { x: clientX, y: clientY };
         isSwipingRef.current = false;
     };
 
-    const handleTouchMove = (e) => {
+    const handleMove = (clientX, clientY, e) => {
         if (!swipeSettings?.enabled || isArchived) return;
-        const touch = e.touches[0];
-        const diffX = touch.clientX - touchStartRef.current.x;
-        const diffY = touch.clientY - touchStartRef.current.y;
+        const diffX = clientX - touchStartRef.current.x;
+        const diffY = clientY - touchStartRef.current.y;
 
         if (!isSwipingRef.current) {
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 8) {
                 isSwipingRef.current = true;
-            } else if (Math.abs(diffY) > 10) {
+            } else if (Math.abs(diffY) > 8) {
                 return;
             }
         }
 
         if (isSwipingRef.current) {
-            if (e.cancelable) e.preventDefault();
-            const clampedOffset = Math.max(-140, Math.min(140, diffX));
+            if (e && e.cancelable) e.preventDefault();
+            const rawOffset = applyDamping(diffX);
+            const clampedOffset = Math.max(-140, Math.min(140, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
 
-    const handleTouchEnd = () => {
+    const handleEnd = () => {
         if (!swipeSettings?.enabled || !isSwipingRef.current) {
             setSwipeOffset(0);
+            isSwipingRef.current = false;
             return;
         }
-        const THRESHOLD = 75;
-        if (swipeOffset > THRESHOLD && swipeSettings.swipeRight !== 'none') {
+        if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight !== 'none') {
             onSwipeAction && onSwipeAction(task, swipeSettings.swipeRight);
-        } else if (swipeOffset < -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
+        } else if (swipeOffset <= -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
             onSwipeAction && onSwipeAction(task, swipeSettings.swipeLeft);
         }
         setSwipeOffset(0);
         isSwipingRef.current = false;
+    };
+
+    const handleTouchStart = (e) => {
+        const touch = e.touches[0];
+        handleStart(touch.clientX, touch.clientY);
+    };
+
+    const handleTouchMove = (e) => {
+        const touch = e.touches[0];
+        handleMove(touch.clientX, touch.clientY, e);
+    };
+
+    const handleTouchEnd = () => {
+        handleEnd();
+    };
+
+    const handlePointerDown = (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        handleStart(e.clientX, e.clientY);
+    };
+
+    const handlePointerMove = (e) => {
+        if (touchStartRef.current.x === 0 && touchStartRef.current.y === 0) return;
+        handleMove(e.clientX, e.clientY, e);
+    };
+
+    const handlePointerUp = () => {
+        handleEnd();
+        touchStartRef.current = { x: 0, y: 0 };
     };
 
     const handleComplete = (e) => {
@@ -178,6 +217,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const RightIcon = rightSwipeAction ? ACTION_ICONS[rightSwipeAction.icon] || CheckSquare : null;
     const LeftIcon = leftSwipeAction ? ACTION_ICONS[leftSwipeAction.icon] || Trash2 : null;
 
+    const isRightArmed = swipeOffset >= THRESHOLD && swipeSettings?.swipeRight !== 'none';
+    const isLeftArmed = Math.abs(swipeOffset) >= THRESHOLD && swipeOffset < 0 && swipeSettings?.swipeLeft !== 'none';
+    const rightProgress = Math.min(1, Math.max(0, swipeOffset / THRESHOLD));
+    const leftProgress = Math.min(1, Math.max(0, Math.abs(swipeOffset) / THRESHOLD));
+
     return (
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '6px', marginBottom: 'var(--task-margin, 4px)' }}>
             {/* Background Swipe Reveal Layer - Right Swipe (Left Side) */}
@@ -185,23 +229,69 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 <div style={{
                     position: 'absolute',
                     top: 0, bottom: 0, left: 0, right: 0,
-                    background: rightSwipeAction.bg,
+                    background: isRightArmed ? (rightSwipeAction.activeBg || rightSwipeAction.color) : rightSwipeAction.bg,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    paddingLeft: '16px',
+                    paddingLeft: `${Math.min(32, Math.max(16, swipeOffset * 0.25))}px`,
                     borderRadius: '6px',
-                    color: rightSwipeAction.color,
-                    fontWeight: '700',
+                    color: isRightArmed ? (rightSwipeAction.activeColor || '#ffffff') : rightSwipeAction.color,
+                    fontWeight: isRightArmed ? '800' : '600',
                     fontSize: '0.95rem',
-                    gap: '8px',
+                    gap: '10px',
                     pointerEvents: 'none',
-                    zIndex: 1
+                    zIndex: 1,
+                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease',
+                    boxShadow: isRightArmed ? `inset 0 0 20px rgba(0,0,0,0.1)` : 'none'
                 }}>
-                    {RightIcon && <RightIcon size={22} style={{ transform: swipeOffset > 75 ? 'scale(1.25)' : 'scale(1)', transition: 'transform 0.15s ease' }} />}
-                    <span style={{ opacity: swipeOffset > 30 ? 1 : 0, transition: 'opacity 0.15s ease' }}>
-                        {rightSwipeAction.label}
-                    </span>
+                    <motion.div
+                        animate={{
+                            scale: isRightArmed ? 1.25 : (0.8 + rightProgress * 0.2),
+                            rotate: isRightArmed ? [0, -8, 0] : 0
+                        }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            background: isRightArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                            backdropFilter: isRightArmed ? 'blur(4px)' : 'none',
+                            boxShadow: isRightArmed ? '0 0 12px rgba(255, 255, 255, 0.4)' : 'none'
+                        }}
+                    >
+                        {RightIcon && <RightIcon size={22} color={isRightArmed ? '#ffffff' : rightSwipeAction.color} />}
+                    </motion.div>
+                    <motion.span
+                        animate={{
+                            opacity: rightProgress > 0.2 ? 1 : 0,
+                            x: isRightArmed ? 2 : 0,
+                            scale: isRightArmed ? 1.05 : 1
+                        }}
+                        transition={{ duration: 0.15 }}
+                        style={{
+                            letterSpacing: isRightArmed ? '0.02em' : 'normal',
+                            textShadow: isRightArmed ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                        }}
+                    >
+                        {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
+                    </motion.span>
+
+                    {/* Threshold Snap Notch Marker when swiping below threshold */}
+                    {!isRightArmed && (
+                        <div style={{
+                            position: 'absolute',
+                            left: `${THRESHOLD}px`,
+                            top: '20%',
+                            bottom: '20%',
+                            width: '2px',
+                            background: rightSwipeAction.color,
+                            opacity: 0.35,
+                            borderRadius: '1px'
+                        }} />
+                    )}
                 </div>
             )}
 
@@ -210,23 +300,69 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 <div style={{
                     position: 'absolute',
                     top: 0, bottom: 0, left: 0, right: 0,
-                    background: leftSwipeAction.bg,
+                    background: isLeftArmed ? (leftSwipeAction.activeBg || leftSwipeAction.color) : leftSwipeAction.bg,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    paddingRight: '16px',
+                    paddingRight: `${Math.min(32, Math.max(16, Math.abs(swipeOffset) * 0.25))}px`,
                     borderRadius: '6px',
-                    color: leftSwipeAction.color,
-                    fontWeight: '700',
+                    color: isLeftArmed ? (leftSwipeAction.activeColor || '#ffffff') : leftSwipeAction.color,
+                    fontWeight: isLeftArmed ? '800' : '600',
                     fontSize: '0.95rem',
-                    gap: '8px',
+                    gap: '10px',
                     pointerEvents: 'none',
-                    zIndex: 1
+                    zIndex: 1,
+                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease',
+                    boxShadow: isLeftArmed ? `inset 0 0 20px rgba(0,0,0,0.1)` : 'none'
                 }}>
-                    <span style={{ opacity: Math.abs(swipeOffset) > 30 ? 1 : 0, transition: 'opacity 0.15s ease' }}>
-                        {leftSwipeAction.label}
-                    </span>
-                    {LeftIcon && <LeftIcon size={22} style={{ transform: Math.abs(swipeOffset) > 75 ? 'scale(1.25)' : 'scale(1)', transition: 'transform 0.15s ease' }} />}
+                    <motion.span
+                        animate={{
+                            opacity: leftProgress > 0.2 ? 1 : 0,
+                            x: isLeftArmed ? -2 : 0,
+                            scale: isLeftArmed ? 1.05 : 1
+                        }}
+                        transition={{ duration: 0.15 }}
+                        style={{
+                            letterSpacing: isLeftArmed ? '0.02em' : 'normal',
+                            textShadow: isLeftArmed ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                        }}
+                    >
+                        {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
+                    </motion.span>
+                    <motion.div
+                        animate={{
+                            scale: isLeftArmed ? 1.25 : (0.8 + leftProgress * 0.2),
+                            rotate: isLeftArmed ? [0, 8, 0] : 0
+                        }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            background: isLeftArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                            backdropFilter: isLeftArmed ? 'blur(4px)' : 'none',
+                            boxShadow: isLeftArmed ? '0 0 12px rgba(255, 255, 255, 0.4)' : 'none'
+                        }}
+                    >
+                        {LeftIcon && <LeftIcon size={22} color={isLeftArmed ? '#ffffff' : leftSwipeAction.color} />}
+                    </motion.div>
+
+                    {/* Threshold Snap Notch Marker when swiping below threshold */}
+                    {!isLeftArmed && (
+                        <div style={{
+                            position: 'absolute',
+                            right: `${THRESHOLD}px`,
+                            top: '20%',
+                            bottom: '20%',
+                            width: '2px',
+                            background: leftSwipeAction.color,
+                            opacity: 0.35,
+                            borderRadius: '1px'
+                        }} />
+                    )}
                 </div>
             )}
 
@@ -249,6 +385,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
                 onTouchCancel={handleTouchEnd}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
                 onClick={() => !isArchived && onEdit && onEdit(task)}
                 onMouseEnter={() => !isArchived && setIsHovered(true)}
                 onMouseLeave={() => !isArchived && setIsHovered(false)}
@@ -324,7 +464,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 alignItems: 'center',
                                 gap: '3px'
                             }}>
-                                📅 {task.scheduledDate}
+                                📅 {formatDisplayDate(task.scheduledDate, dateFormat)}
                             </span>
                         )}
                         {task.isRecurring && task.recurrence && (

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { Plus, Minus } from 'lucide-react';
-import { getTodayDateString, adjustStartDateForWeekdays } from '../../utils/dateUtils';
+import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 
-const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK' }) => {
     const getInitialProjectId = () => {
         const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
         const isValid = (id) => projects.some(p => p.id === id);
@@ -266,7 +266,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                     style={toggleButtonStyle(showSchedule)}
                 >
                     {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
-                    {scheduledDate ? `Scheduled: ${scheduledDate}` : 'Schedule'}
+                    {scheduledDate ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}` : 'Schedule'}
                 </button>
             </div>
 
@@ -276,7 +276,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         onInput={handleInput}
-                        placeholder="Add unlimited notes, task descriptions, or rich details (no length cap)..."
+                        placeholder="Add unlimited text..."
                         style={{
                             ...styles.taskInput,
                             minHeight: '80px',
@@ -293,7 +293,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId }) => {
                         marginTop: '2px',
                         fontWeight: '500'
                     }}>
-                        📝 {notes.length} chars (unlimited text capacity)
+                        📝 {notes.length} chars
                     </div>
                 </div>
             )}

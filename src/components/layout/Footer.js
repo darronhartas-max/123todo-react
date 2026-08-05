@@ -1,7 +1,7 @@
 import React from 'react';
 import { APP_VERSION } from '../../utils/constants';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = APP_VERSION }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = APP_VERSION, onCheckForUpdates, updateCheckStatus }) => {
     const styles = {
         footer: {
             flexShrink: 0,
@@ -55,8 +55,41 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, ve
 
             <br />
 
-            <div style={{ fontSize: '0.9rem', margin: '8px 0', opacity: 0.8 }}>
-                Copyright © Unforgettable Management Ltd {new Date().getFullYear()} | v{version}
+            <div style={{
+                fontSize: '0.9rem',
+                margin: '8px 0',
+                opacity: 0.9,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                flexWrap: 'wrap'
+            }}>
+                <span>Copyright © Unforgettable Management Ltd {new Date().getFullYear()}</span>
+                <span style={{ opacity: 0.4 }}>|</span>
+                <span style={{ fontWeight: '600', color: 'var(--text-color)' }}>v{version}</span>
+                {onCheckForUpdates && (
+                    <button
+                        onClick={onCheckForUpdates}
+                        style={{
+                            background: updateCheckStatus === 'update-available' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(37, 99, 235, 0.08)',
+                            color: updateCheckStatus === 'update-available' ? '#10b981' : (updateCheckStatus === 'up-to-date' ? '#10b981' : 'var(--accent-color)'),
+                            border: `1px solid ${updateCheckStatus === 'update-available' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(37, 99, 235, 0.2)'}`,
+                            borderRadius: '12px',
+                            padding: '3px 10px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}
+                        title="Click to check for updates (Hold Shift to test update notification flow)"
+                    >
+                        🔄 {updateCheckStatus === 'checking' ? 'Checking...' : (updateCheckStatus === 'up-to-date' ? 'Up to date ✓' : (updateCheckStatus === 'update-available' ? 'Update Ready! 🚀' : 'Check for Updates'))}
+                    </button>
+                )}
             </div>
 
             <div style={{ marginTop: '8px', fontSize: '1rem' }}>

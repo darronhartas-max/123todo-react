@@ -27,7 +27,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/l
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 
 const TodoApp = () => {
@@ -124,16 +124,16 @@ const TodoApp = () => {
   const [prevVersionStr, setPrevVersionStr] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
 
-  // Check if we just completed an update and should show the update confirmation modal
+  // Check if app has been updated to a newer version and show What's New modal
   useEffect(() => {
-    const showModal = localStorage.getItem('123Todo_Show_Updated_Modal') === 'true';
-    const prevVersion = localStorage.getItem('123Todo_Previous_Version');
-    if (showModal && prevVersion && prevVersion !== APP_VERSION) {
-      setPrevVersionStr(prevVersion);
+    const lastSeen = localStorage.getItem('123Todo_Last_Seen_Version') || localStorage.getItem('123Todo_Previous_Version');
+    const legacyShowModal = localStorage.getItem('123Todo_Show_Updated_Modal') === 'true';
+
+    if ((lastSeen && lastSeen !== APP_VERSION) || legacyShowModal) {
+      setPrevVersionStr(lastSeen && lastSeen !== APP_VERSION ? lastSeen : (lastSeen || '2.4.15'));
       setShowUpdatedModal(true);
-    } else {
-      localStorage.removeItem('123Todo_Show_Updated_Modal');
-      localStorage.removeItem('123Todo_Previous_Version');
+    } else if (!lastSeen) {
+      localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
     }
   }, []);
 
@@ -163,6 +163,9 @@ const TodoApp = () => {
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
+  const [dateFormat, setDateFormatState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT;
+  });
   const [isDark, setIsDark] = useState(false);
 
   const setFontSize = (size) => {
@@ -180,6 +183,14 @@ const TodoApp = () => {
   const setThemeMode = (val) => {
     setThemeModeState(val);
     localStorage.setItem('123TodoThemeMode', val);
+  };
+  const setDateFormat = (val) => {
+    setDateFormatState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.DATE_FORMAT, val);
+    } catch (e) {
+      console.error('Failed to save date format:', e);
+    }
   };
 
   // Apply visual styling settings to root element
@@ -472,7 +483,29 @@ const TodoApp = () => {
     setProjectToDelete(null);
   };
 
+  const [updateCheckStatus, setUpdateCheckStatus] = useState('idle');
+
+  const handleManualCheckForUpdates = async (e) => {
+    const forceSimulate = Boolean(e && (e.shiftKey || e.altKey));
+    setUpdateCheckStatus('checking');
+
+    try {
+      const res = await checkForUpdates(forceSimulate);
+      if (res && res.updated) {
+        setUpdateCheckStatus('update-available');
+        setShowUpdateReady(true);
+      } else {
+        setUpdateCheckStatus('up-to-date');
+        setTimeout(() => setUpdateCheckStatus('idle'), 4500);
+      }
+    } catch (err) {
+      console.error('Update check failed:', err);
+      setUpdateCheckStatus('idle');
+    }
+  };
+
   const handleApplyUpdate = () => {
+    localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
     localStorage.setItem('123Todo_Previous_Version', APP_VERSION);
     localStorage.setItem('123Todo_Show_Updated_Modal', 'true');
 
@@ -486,10 +519,10 @@ const TodoApp = () => {
       }
       swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
       
-      // Fallback: reload anyway in 2 seconds in case controllerchange doesn't fire
+      // Fallback: reload anyway in 1.5 seconds in case controllerchange doesn't fire
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 1500);
     } else {
       window.location.reload();
     }
@@ -563,6 +596,7 @@ const TodoApp = () => {
           onClose={() => setShowAddSection(false)}
           projects={availableProjects}
           defaultProjectId={currentProjectId}
+          dateFormat={dateFormat}
         />
 
         <div style={{
@@ -634,6 +668,7 @@ const TodoApp = () => {
                 dragOverId={dragOverId}
                 swipeSettings={swipeSettings}
                 onSwipeAction={handleSwipeAction}
+                dateFormat={dateFormat}
               />
             ))}
 
@@ -670,6 +705,7 @@ const TodoApp = () => {
                           onUpdate={updateTask}
                           swipeSettings={swipeSettings}
                           onSwipeAction={handleSwipeAction}
+                          dateFormat={dateFormat}
                         />
                       );
                     })}
@@ -705,6 +741,7 @@ const TodoApp = () => {
                           onUpdate={updateTask}
                           swipeSettings={swipeSettings}
                           onSwipeAction={handleSwipeAction}
+                          dateFormat={dateFormat}
                           showFullDetails={true}
                         />
                       );
@@ -754,6 +791,8 @@ const TodoApp = () => {
           onSyncClick={() => setShowSyncModal(true)}
           syncStatus={syncStatus}
           isAuthed={isAuthed}
+          onCheckForUpdates={handleManualCheckForUpdates}
+          updateCheckStatus={updateCheckStatus}
         />
         <input
           type="file"
@@ -789,6 +828,7 @@ const TodoApp = () => {
           projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
+          dateFormat={dateFormat}
         />
       )}
 
@@ -797,9 +837,10 @@ const TodoApp = () => {
           oldVersion={prevVersionStr}
           newVersion={APP_VERSION}
           onClose={() => {
-            setShowUpdatedModal(false);
+            localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
             localStorage.removeItem('123Todo_Show_Updated_Modal');
             localStorage.removeItem('123Todo_Previous_Version');
+            setShowUpdatedModal(false);
           }}
         />
       )}
@@ -898,7 +939,10 @@ const TodoApp = () => {
         setThemeMode={setThemeMode}
         swipeSettings={swipeSettings}
         onUpdateSwipeSettings={updateSwipeSettings}
-        onCheckForUpdates={checkForUpdates}
+        onCheckForUpdates={handleManualCheckForUpdates}
+        updateCheckStatus={updateCheckStatus}
+        dateFormat={dateFormat}
+        setDateFormat={setDateFormat}
       />
 
       <AnimatePresence>
