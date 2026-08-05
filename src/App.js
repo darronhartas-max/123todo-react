@@ -23,7 +23,7 @@ import SyncDroppedModal from './components/modals/SyncDroppedModal';
 import UpdatedModal from './components/modals/UpdatedModal';
 import ExportModal from './components/modals/ExportModal';
 import SharePromptModal from './components/modals/SharePromptModal';
-import { InstallPrompt, BackupReminder, UpdateReadyPrompt } from './components/layout/NotificationBar';
+import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
@@ -43,7 +43,7 @@ const TodoApp = () => {
   ], [projects]);
 
   const {
-    isAuthed, syncStatus, isSyncDropped, dismissSyncDropped, passphrase, setPassphrase, signIn, signOut, performSync
+    isAuthed, syncStatus, isSyncDropped, isOffline, dismissSyncDropped, passphrase, setPassphrase, signIn, signOut, performSync
   } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
 
   const {
@@ -52,6 +52,14 @@ const TodoApp = () => {
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
     dismissBackupReminder, recordBackup, checkForUpdates
   } = useAppSystem(archived.length, tasks.length, isAuthed);
+
+  const [showOfflinePrompt, setShowOfflinePrompt] = useState(true);
+
+  useEffect(() => {
+    if (isOffline) {
+      setShowOfflinePrompt(true);
+    }
+  }, [isOffline]);
 
   // Swipe Settings State
   const [swipeSettings, setSwipeSettings] = useState(() => {
@@ -605,6 +613,13 @@ const TodoApp = () => {
           transition: 'all 0.3s ease',
           opacity: showAddSection ? 0.5 : 1
         }}>
+          {(isOffline || !navigator.onLine) && showOfflinePrompt && (
+            <SyncOfflinePrompt
+              isAuthed={isAuthed}
+              onDismiss={() => setShowOfflinePrompt(false)}
+            />
+          )}
+
           {showInstallPrompt && (
             <InstallPrompt onInstall={() => { }} onDismiss={dismissInstallPrompt} />
           )}
@@ -791,6 +806,7 @@ const TodoApp = () => {
           onSyncClick={() => setShowSyncModal(true)}
           syncStatus={syncStatus}
           isAuthed={isAuthed}
+          isOffline={isOffline}
           onCheckForUpdates={handleManualCheckForUpdates}
           updateCheckStatus={updateCheckStatus}
         />

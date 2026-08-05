@@ -1,7 +1,7 @@
 import React from 'react';
 import { APP_VERSION } from '../../utils/constants';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, version = APP_VERSION, onCheckForUpdates, updateCheckStatus }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, isOffline, version = APP_VERSION, onCheckForUpdates, updateCheckStatus }) => {
     const styles = {
         footer: {
             flexShrink: 0,
@@ -30,13 +30,17 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, ve
     };
 
     const getSyncStatusText = () => {
+        if (isOffline || !navigator.onLine) return '📡 Offline Mode';
         if (syncStatus === 'error') return '⚠️ Sync Error';
+        if (syncStatus === 'syncing') return '🔄 Syncing...';
         if (isAuthed) return '☁️ Google Drive Sync';
         return '❌ Sync Offline';
     };
 
     const getSyncButtonStyle = () => {
+        if (isOffline || !navigator.onLine) return { ...styles.footerButton, background: 'rgba(245, 158, 11, 0.12)', color: '#d97706', borderColor: 'rgba(245, 158, 11, 0.3)' };
         if (syncStatus === 'error') return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' };
+        if (syncStatus === 'syncing') return { ...styles.footerButton, background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', borderColor: 'rgba(37, 99, 235, 0.3)' };
         if (isAuthed) return { ...styles.footerButton, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
         return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
     };

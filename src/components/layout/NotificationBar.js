@@ -155,3 +155,44 @@ export const UpdateReadyPrompt = ({ onUpdate, onDismiss }) => (
         </div>
     </div>
 );
+
+export const SyncOfflinePrompt = ({ onDismiss, isAuthed }) => (
+    <div style={{
+        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '8px',
+        padding: '10px 14px',
+        margin: '8px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontSize: '0.85rem',
+        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+        gap: '12px'
+    }}>
+        <div style={{ flex: 1, fontWeight: '600', lineHeight: '1.4' }}>
+            📡 Internet Connection Offline
+            <div style={{ fontSize: '0.8rem', fontWeight: '400', opacity: 0.95, marginTop: '2px' }}>
+                {isAuthed ? 'Tasks are saved locally and will auto-sync to Google Drive when back online.' : 'Tasks are saved locally on your device.'}
+            </div>
+        </div>
+        {onDismiss && (
+            <button
+                onClick={onDismiss}
+                style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                }}
+            >
+                Dismiss
+            </button>
+        )}
+    </div>
+);

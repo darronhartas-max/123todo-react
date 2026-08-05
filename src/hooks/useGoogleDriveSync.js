@@ -10,6 +10,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
     const [isAuthed, setIsAuthed] = useState(false);
     const [syncStatus, setSyncStatus] = useState('offline'); // 'offline', 'syncing', 'synced', 'error'
     const [isSyncDropped, setIsSyncDropped] = useState(false);
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
     const [passphrase, setPassphrase] = useState(localStorage.getItem('123Todo_Sync_Passphrase') || '');
     const accessTokenRef = useRef(null);
     const tokenClientRef = useRef(null);
@@ -140,7 +141,12 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             setSyncStatus('synced');
         } catch (error) {
             console.error('Sync failed:', error);
-            setSyncStatus('error');
+            if (!navigator.onLine) {
+                setIsOffline(true);
+                setSyncStatus('offline');
+            } else {
+                setSyncStatus('error');
+            }
         } finally {
             isSyncingRef.current = false;
         }
@@ -290,8 +296,23 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             }
         };
 
+        const handleOffline = () => {
+            console.warn('Network connection offline.');
+            setIsOffline(true);
+            setSyncStatus('offline');
+        };
+
+        const handleOnline = () => {
+            console.log('Network connection restored.');
+            setIsOffline(false);
+            if (isAuthed && passphrase) {
+                performSync(false);
+            }
+        };
+
         window.addEventListener('focus', handleFocusOrVisible);
-        window.addEventListener('online', handleFocusOrVisible);
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
         window.addEventListener('pointerenter', handleFocusOrVisible);
         window.addEventListener('touchend', handleTouchEnd, { passive: true });
         window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
@@ -301,7 +322,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             if (intervalId) clearInterval(intervalId);
             if (touchTimeoutId) clearTimeout(touchTimeoutId);
             window.removeEventListener('focus', handleFocusOrVisible);
-            window.removeEventListener('online', handleFocusOrVisible);
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
             window.removeEventListener('pointerenter', handleFocusOrVisible);
             window.removeEventListener('touchend', handleTouchEnd);
             window.removeEventListener('touchcancel', handleTouchEnd);
@@ -313,6 +335,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         isAuthed,
         syncStatus,
         isSyncDropped,
+        isOffline,
         dismissSyncDropped,
         passphrase,
         setPassphrase,
