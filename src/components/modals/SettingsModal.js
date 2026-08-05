@@ -121,62 +121,68 @@ const SwipeDemoCard = ({ swipeSettings }) => {
             {swipeOffset > 0 && rightSwipeAction && swipeSettings?.swipeRight !== 'none' && (
                 <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-                    background: isRightArmed ? (rightSwipeAction.activeBg || rightSwipeAction.color) : rightSwipeAction.bg,
+                    background: isRightArmed 
+                        ? (rightSwipeAction.activeBg || rightSwipeAction.color) 
+                        : `linear-gradient(90deg, ${rightSwipeAction.color}e6 0%, ${rightSwipeAction.color}b3 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-                    paddingLeft: `${Math.min(32, Math.max(16, swipeOffset * 0.25))}px`,
+                    paddingLeft: `${Math.max(14, Math.min(28, swipeOffset * 0.3))}px`,
                     borderRadius: '8px',
-                    color: isRightArmed ? (rightSwipeAction.activeColor || '#ffffff') : rightSwipeAction.color,
-                    fontWeight: isRightArmed ? '800' : '600',
+                    color: '#ffffff',
+                    fontWeight: isRightArmed ? '800' : '700',
                     fontSize: '0.95rem',
                     gap: '10px',
                     zIndex: 1,
-                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease'
+                    transition: 'background 0.15s ease'
                 }}>
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '32px', height: '32px', borderRadius: '50%',
-                        background: isRightArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
-                        transform: isRightArmed ? 'scale(1.2)' : `scale(${0.8 + rightProgress * 0.2})`,
-                        transition: 'transform 0.2s ease'
+                        width: '34px', height: '34px', borderRadius: '50%',
+                        background: isRightArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
+                        transform: isRightArmed ? 'scale(1.25)' : `scale(${0.85 + rightProgress * 0.25})`,
+                        transition: 'transform 0.15s ease',
+                        flexShrink: 0
                     }}>
-                        {RightIcon && <RightIcon size={20} color={isRightArmed ? '#ffffff' : rightSwipeAction.color} />}
+                        {RightIcon && <RightIcon size={20} color="#ffffff" />}
                     </div>
-                    <span style={{ opacity: rightProgress > 0.2 ? 1 : 0 }}>
+                    <span style={{ opacity: Math.min(1, rightProgress * 3), fontWeight: '700', whiteSpace: 'nowrap' }}>
                         {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
                     </span>
                     {!isRightArmed && (
-                        <div style={{ position: 'absolute', left: `${THRESHOLD}px`, top: '20%', bottom: '20%', width: '2px', background: rightSwipeAction.color, opacity: 0.35 }} />
+                        <div style={{ position: 'absolute', left: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
                     )}
                 </div>
             )}
             {swipeOffset < 0 && leftSwipeAction && swipeSettings?.swipeLeft !== 'none' && (
                 <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-                    background: isLeftArmed ? (leftSwipeAction.activeBg || leftSwipeAction.color) : leftSwipeAction.bg,
+                    background: isLeftArmed 
+                        ? (leftSwipeAction.activeBg || leftSwipeAction.color) 
+                        : `linear-gradient(270deg, ${leftSwipeAction.color}e6 0%, ${leftSwipeAction.color}b3 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-                    paddingRight: `${Math.min(32, Math.max(16, Math.abs(swipeOffset) * 0.25))}px`,
+                    paddingRight: `${Math.max(14, Math.min(28, Math.abs(swipeOffset) * 0.3))}px`,
                     borderRadius: '8px',
-                    color: isLeftArmed ? (leftSwipeAction.activeColor || '#ffffff') : leftSwipeAction.color,
-                    fontWeight: isLeftArmed ? '800' : '600',
+                    color: '#ffffff',
+                    fontWeight: isLeftArmed ? '800' : '700',
                     fontSize: '0.95rem',
                     gap: '10px',
                     zIndex: 1,
-                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease'
+                    transition: 'background 0.15s ease'
                 }}>
-                    <span style={{ opacity: leftProgress > 0.2 ? 1 : 0 }}>
+                    <span style={{ opacity: Math.min(1, leftProgress * 3), fontWeight: '700', whiteSpace: 'nowrap' }}>
                         {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
                     </span>
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '32px', height: '32px', borderRadius: '50%',
-                        background: isLeftArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
-                        transform: isLeftArmed ? 'scale(1.2)' : `scale(${0.8 + leftProgress * 0.2})`,
-                        transition: 'transform 0.2s ease'
+                        width: '34px', height: '34px', borderRadius: '50%',
+                        background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
+                        transform: isLeftArmed ? 'scale(1.25)' : `scale(${0.85 + leftProgress * 0.25})`,
+                        transition: 'transform 0.15s ease',
+                        flexShrink: 0
                     }}>
-                        {LeftIcon && <LeftIcon size={20} color={isLeftArmed ? '#ffffff' : leftSwipeAction.color} />}
+                        {LeftIcon && <LeftIcon size={20} color="#ffffff" />}
                     </div>
                     {!isLeftArmed && (
-                        <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '20%', bottom: '20%', width: '2px', background: leftSwipeAction.color, opacity: 0.35 }} />
+                        <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
                     )}
                 </div>
             )}

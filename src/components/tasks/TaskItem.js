@@ -227,6 +227,18 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const rightProgress = Math.min(1, Math.max(0, swipeOffset / THRESHOLD));
     const leftProgress = Math.min(1, Math.max(0, Math.abs(swipeOffset) / THRESHOLD));
 
+    // Haptic vibration feedback on threshold crossing
+    const prevArmedRef = React.useRef(false);
+    React.useEffect(() => {
+        const armed = isRightArmed || isLeftArmed;
+        if (armed && !prevArmedRef.current) {
+            if (navigator.vibrate) {
+                try { navigator.vibrate(12); } catch {}
+            }
+        }
+        prevArmedRef.current = armed;
+    }, [isRightArmed, isLeftArmed]);
+
     return (
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '6px', marginBottom: 'var(--task-margin, 4px)' }}>
             {/* Background Swipe Reveal Layer - Right Swipe (Left Side) */}
@@ -234,67 +246,73 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 <div style={{
                     position: 'absolute',
                     top: 0, bottom: 0, left: 0, right: 0,
-                    background: isRightArmed ? (rightSwipeAction.activeBg || rightSwipeAction.color) : rightSwipeAction.bg,
+                    background: isRightArmed 
+                        ? (rightSwipeAction.activeBg || rightSwipeAction.color) 
+                        : `linear-gradient(90deg, ${rightSwipeAction.color}e6 0%, ${rightSwipeAction.color}b3 100%)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    paddingLeft: `${Math.min(32, Math.max(16, swipeOffset * 0.25))}px`,
+                    paddingLeft: `${Math.max(14, Math.min(28, swipeOffset * 0.3))}px`,
                     borderRadius: '6px',
-                    color: isRightArmed ? (rightSwipeAction.activeColor || '#ffffff') : rightSwipeAction.color,
-                    fontWeight: isRightArmed ? '800' : '600',
+                    color: '#ffffff',
+                    fontWeight: isRightArmed ? '800' : '700',
                     fontSize: '0.95rem',
                     gap: '10px',
                     pointerEvents: 'none',
                     zIndex: 1,
-                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease',
-                    boxShadow: isRightArmed ? `inset 0 0 20px rgba(0,0,0,0.1)` : 'none'
+                    transition: 'background 0.15s ease',
+                    boxShadow: isRightArmed ? `inset 0 0 24px rgba(0,0,0,0.2)` : 'none'
                 }}>
                     <motion.div
                         animate={{
-                            scale: isRightArmed ? 1.25 : (0.8 + rightProgress * 0.2),
-                            rotate: isRightArmed ? [0, -8, 0] : 0
+                            scale: isRightArmed ? 1.35 : (0.85 + rightProgress * 0.25),
+                            rotate: isRightArmed ? [0, -10, 0] : 0
                         }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        transition={{ type: "spring", stiffness: 550, damping: 18 }}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '36px',
-                            height: '36px',
+                            width: '38px',
+                            height: '38px',
                             borderRadius: '50%',
-                            background: isRightArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
-                            backdropFilter: isRightArmed ? 'blur(4px)' : 'none',
-                            boxShadow: isRightArmed ? '0 0 12px rgba(255, 255, 255, 0.4)' : 'none'
+                            background: isRightArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
+                            boxShadow: isRightArmed ? '0 0 14px rgba(255, 255, 255, 0.6)' : 'none',
+                            flexShrink: 0
                         }}
                     >
-                        {RightIcon && <RightIcon size={22} color={isRightArmed ? '#ffffff' : rightSwipeAction.color} />}
+                        {RightIcon && <RightIcon size={22} color="#ffffff" />}
                     </motion.div>
                     <motion.span
                         animate={{
-                            opacity: rightProgress > 0.2 ? 1 : 0,
-                            x: isRightArmed ? 2 : 0,
-                            scale: isRightArmed ? 1.05 : 1
+                            opacity: Math.min(1, rightProgress * 3),
+                            x: isRightArmed ? 4 : 0,
+                            scale: isRightArmed ? 1.08 : 1
                         }}
-                        transition={{ duration: 0.15 }}
+                        transition={{ duration: 0.12 }}
                         style={{
-                            letterSpacing: isRightArmed ? '0.02em' : 'normal',
-                            textShadow: isRightArmed ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                            color: '#ffffff',
+                            letterSpacing: '0.02em',
+                            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                            fontWeight: '700',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
                     </motion.span>
 
-                    {/* Threshold Snap Notch Marker when swiping below threshold */}
+                    {/* Threshold Snap Notch Marker line */}
                     {!isRightArmed && (
                         <div style={{
                             position: 'absolute',
                             left: `${THRESHOLD}px`,
-                            top: '20%',
-                            bottom: '20%',
-                            width: '2px',
-                            background: rightSwipeAction.color,
-                            opacity: 0.35,
-                            borderRadius: '1px'
+                            top: '15%',
+                            bottom: '15%',
+                            width: '3px',
+                            background: '#ffffff',
+                            opacity: 0.65,
+                            borderRadius: '1.5px',
+                            boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
                         }} />
                     )}
                 </div>
@@ -305,67 +323,73 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 <div style={{
                     position: 'absolute',
                     top: 0, bottom: 0, left: 0, right: 0,
-                    background: isLeftArmed ? (leftSwipeAction.activeBg || leftSwipeAction.color) : leftSwipeAction.bg,
+                    background: isLeftArmed 
+                        ? (leftSwipeAction.activeBg || leftSwipeAction.color) 
+                        : `linear-gradient(270deg, ${leftSwipeAction.color}e6 0%, ${leftSwipeAction.color}b3 100%)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    paddingRight: `${Math.min(32, Math.max(16, Math.abs(swipeOffset) * 0.25))}px`,
+                    paddingRight: `${Math.max(14, Math.min(28, Math.abs(swipeOffset) * 0.3))}px`,
                     borderRadius: '6px',
-                    color: isLeftArmed ? (leftSwipeAction.activeColor || '#ffffff') : leftSwipeAction.color,
-                    fontWeight: isLeftArmed ? '800' : '600',
+                    color: '#ffffff',
+                    fontWeight: isLeftArmed ? '800' : '700',
                     fontSize: '0.95rem',
                     gap: '10px',
                     pointerEvents: 'none',
                     zIndex: 1,
-                    transition: 'background 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease',
-                    boxShadow: isLeftArmed ? `inset 0 0 20px rgba(0,0,0,0.1)` : 'none'
+                    transition: 'background 0.15s ease',
+                    boxShadow: isLeftArmed ? `inset 0 0 24px rgba(0,0,0,0.2)` : 'none'
                 }}>
                     <motion.span
                         animate={{
-                            opacity: leftProgress > 0.2 ? 1 : 0,
-                            x: isLeftArmed ? -2 : 0,
-                            scale: isLeftArmed ? 1.05 : 1
+                            opacity: Math.min(1, leftProgress * 3),
+                            x: isLeftArmed ? -4 : 0,
+                            scale: isLeftArmed ? 1.08 : 1
                         }}
-                        transition={{ duration: 0.15 }}
+                        transition={{ duration: 0.12 }}
                         style={{
-                            letterSpacing: isLeftArmed ? '0.02em' : 'normal',
-                            textShadow: isLeftArmed ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                            color: '#ffffff',
+                            letterSpacing: '0.02em',
+                            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                            fontWeight: '700',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
                     </motion.span>
                     <motion.div
                         animate={{
-                            scale: isLeftArmed ? 1.25 : (0.8 + leftProgress * 0.2),
-                            rotate: isLeftArmed ? [0, 8, 0] : 0
+                            scale: isLeftArmed ? 1.35 : (0.85 + leftProgress * 0.25),
+                            rotate: isLeftArmed ? [0, 10, 0] : 0
                         }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        transition={{ type: "spring", stiffness: 550, damping: 18 }}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '36px',
-                            height: '36px',
+                            width: '38px',
+                            height: '38px',
                             borderRadius: '50%',
-                            background: isLeftArmed ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
-                            backdropFilter: isLeftArmed ? 'blur(4px)' : 'none',
-                            boxShadow: isLeftArmed ? '0 0 12px rgba(255, 255, 255, 0.4)' : 'none'
+                            background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
+                            boxShadow: isLeftArmed ? '0 0 14px rgba(255, 255, 255, 0.6)' : 'none',
+                            flexShrink: 0
                         }}
                     >
-                        {LeftIcon && <LeftIcon size={22} color={isLeftArmed ? '#ffffff' : leftSwipeAction.color} />}
+                        {LeftIcon && <LeftIcon size={22} color="#ffffff" />}
                     </motion.div>
 
-                    {/* Threshold Snap Notch Marker when swiping below threshold */}
+                    {/* Threshold Snap Notch Marker line */}
                     {!isLeftArmed && (
                         <div style={{
                             position: 'absolute',
                             right: `${THRESHOLD}px`,
-                            top: '20%',
-                            bottom: '20%',
-                            width: '2px',
-                            background: leftSwipeAction.color,
-                            opacity: 0.35,
-                            borderRadius: '1px'
+                            top: '15%',
+                            bottom: '15%',
+                            width: '3px',
+                            background: '#ffffff',
+                            opacity: 0.65,
+                            borderRadius: '1.5px',
+                            boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
                         }} />
                     )}
                 </div>
