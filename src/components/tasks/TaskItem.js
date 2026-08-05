@@ -442,7 +442,28 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     }} />
                 </div>
             )}
-            <div style={styles.taskPriorityDot}></div>
+            {isArchived ? (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+                    style={{
+                        ...styles.actionBtn,
+                        color: '#ef4444',
+                        marginLeft: '0',
+                        marginRight: '8px',
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        width: '34px',
+                        height: '34px',
+                        minWidth: '34px',
+                        marginTop: '2px',
+                        flexShrink: 0
+                    }}
+                    title="Permanently Delete Task"
+                >
+                    <Trash2 size={18} />
+                </button>
+            ) : (
+                <div style={styles.taskPriorityDot}></div>
+            )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                     {task.notes && (
@@ -628,22 +649,21 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
             <div style={{ display: 'flex' }}>
                 {isArchived ? (
-                    <>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}
-                            style={{ ...styles.actionBtn, color: '#3b82f6' }}
-                            title="Restore Task"
-                        >
-                            <RotateCcw size={20} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-                            style={{ ...styles.actionBtn, color: '#dc2626' }}
-                            title="Delete Task"
-                        >
-                            <Trash2 size={20} />
-                        </button>
-                    </>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}
+                        style={{
+                            ...styles.actionBtn,
+                            color: '#3b82f6',
+                            background: 'rgba(59, 130, 246, 0.08)',
+                            width: '34px',
+                            height: '34px',
+                            minWidth: '34px',
+                            marginTop: '2px'
+                        }}
+                        title="Restore Task"
+                    >
+                        <RotateCcw size={18} />
+                    </button>
                 ) : (
                     <>
                         {task.scheduledDate && (
