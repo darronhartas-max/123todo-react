@@ -24,6 +24,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [swipeOffset, setSwipeOffset] = useState(0);
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
+    const wasSwipingRef = React.useRef(false);
 
     const THRESHOLD = 75;
 
@@ -39,6 +40,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (!swipeSettings?.enabled || isArchived) return;
         touchStartRef.current = { x: clientX, y: clientY };
         isSwipingRef.current = false;
+        wasSwipingRef.current = false;
     };
 
     const handleMove = (clientX, clientY, e) => {
@@ -47,9 +49,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         const diffY = clientY - touchStartRef.current.y;
 
         if (!isSwipingRef.current) {
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 8) {
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 6) {
                 isSwipingRef.current = true;
-            } else if (Math.abs(diffY) > 8) {
+                wasSwipingRef.current = true;
+            } else if (Math.abs(diffY) > 6) {
                 return;
             }
         }
@@ -57,7 +60,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (isSwipingRef.current) {
             if (e && e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
-            const clampedOffset = Math.max(-140, Math.min(140, rawOffset));
+            const clampedOffset = Math.max(-160, Math.min(160, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
@@ -66,6 +69,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (!swipeSettings?.enabled || !isSwipingRef.current) {
             setSwipeOffset(0);
             isSwipingRef.current = false;
+            setTimeout(() => { wasSwipingRef.current = false; }, 100);
             return;
         }
         if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight !== 'none') {
@@ -75,6 +79,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         }
         setSwipeOffset(0);
         isSwipingRef.current = false;
+        setTimeout(() => { wasSwipingRef.current = false; }, 100);
     };
 
     const handleTouchStart = (e) => {
@@ -376,11 +381,23 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     marginBottom: 0,
                     transform: `translateX(${swipeOffset}px)`,
                     transition: swipeOffset === 0 ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease' : 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
+                    touchAction: 'pan-y',
+                    userSelect: swipeOffset !== 0 ? 'none' : 'auto',
+                    WebkitUserSelect: swipeOffset !== 0 ? 'none' : 'auto',
                     position: 'relative',
                     zIndex: 2
                 }}
                 draggable={!isArchived}
-                {...(dragHandlers || {})}
+                {...(dragHandlers ? {
+                    ...dragHandlers,
+                    onDragStart: (e) => {
+                        if (isSwipingRef.current || Math.abs(swipeOffset) > 5) {
+                            e.preventDefault();
+                            return;
+                        }
+                        if (dragHandlers.onDragStart) dragHandlers.onDragStart(e);
+                    }
+                } : {})}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -389,7 +406,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
-                onClick={() => !isArchived && onEdit && onEdit(task)}
+                onClick={(e) => {
+                    if (wasSwipingRef.current || isSwipingRef.current || Math.abs(swipeOffset) > 5) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return;
+                    }
+                    if (!isArchived && onEdit) onEdit(task);
+                }}
                 onMouseEnter={() => !isArchived && setIsHovered(true)}
                 onMouseLeave={() => !isArchived && setIsHovered(false)}
             >

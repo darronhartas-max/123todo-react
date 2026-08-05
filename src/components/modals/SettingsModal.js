@@ -90,6 +90,24 @@ const SwipeDemoCard = ({ swipeSettings }) => {
         isSwipingRef.current = false;
     };
 
+    const handlePointerDown = (e) => {
+        if (!swipeSettings?.enabled) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+        handleTouchStart(e);
+    };
+
+    const handlePointerMove = (e) => {
+        if (!swipeSettings?.enabled) return;
+        if (touchStartRef.current.x === 0 && touchStartRef.current.y === 0) return;
+        handleTouchMove(e);
+    };
+
+    const handlePointerUp = () => {
+        handleTouchEnd();
+        touchStartRef.current = { x: 0, y: 0 };
+    };
+
     if (!swipeSettings?.enabled) {
         return (
             <div style={{ textAlign: 'center', padding: '12px', color: 'var(--muted-text)', fontSize: '0.9rem' }}>
@@ -166,21 +184,24 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                onMouseDown={handleTouchStart}
-                onMouseMove={(e) => { if (e.buttons === 1) handleTouchMove(e); }}
-                onMouseUp={handleTouchEnd}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
                 style={{
                     padding: '12px 16px',
                     background: 'var(--item-bg)',
                     transform: `translateX(${swipeOffset}px)`,
                     transition: swipeOffset === 0 ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
+                    touchAction: 'pan-y',
                     position: 'relative',
                     zIndex: 2,
                     cursor: 'grab',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none'
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
