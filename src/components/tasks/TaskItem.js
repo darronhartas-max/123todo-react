@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PRIORITIES, SWIPE_ACTIONS } from '../../utils/constants';
+import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
 
 const ACTION_ICONS = {
@@ -173,15 +173,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             paddingTop: 'var(--task-padding-top, 12px)',
             opacity: isDragging ? 0.35 : 1,
             boxShadow: isDragging ? 'none' : 'none'
-        },
-        taskPriorityDot: {
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            marginRight: '10px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            backgroundColor: PRIORITIES[task.priority]?.dotColor || 'var(--muted-text)',
-            marginTop: '6px'
         },
         taskText: {
             flex: 1,
@@ -466,7 +457,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     }} />
                 </div>
             )}
-            {isArchived ? (
+            {isArchived && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
                     style={{
@@ -485,8 +476,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 >
                     <Trash2 size={18} />
                 </button>
-            ) : (
-                <div style={styles.taskPriorityDot}></div>
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
