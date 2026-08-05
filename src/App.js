@@ -208,15 +208,17 @@ const TodoApp = () => {
 
   useEffect(() => {
     if (density === 'compact') {
-      document.documentElement.style.setProperty('--task-padding', '6px 12px');
-      document.documentElement.style.setProperty('--task-padding-top', '8px');
+      document.documentElement.style.setProperty('--task-padding', '4px 10px');
+      document.documentElement.style.setProperty('--task-padding-top', '6px');
       document.documentElement.style.setProperty('--task-margin', '2px');
-      document.documentElement.style.setProperty('--section-margin', '10px');
+      document.documentElement.style.setProperty('--task-font-size', '0.95rem');
+      document.documentElement.style.setProperty('--section-margin', '8px');
     } else {
-      document.documentElement.style.removeProperty('--task-padding');
-      document.documentElement.style.removeProperty('--task-padding-top');
-      document.documentElement.style.removeProperty('--task-margin');
-      document.documentElement.style.removeProperty('--section-margin');
+      document.documentElement.style.setProperty('--task-padding', '12px 16px');
+      document.documentElement.style.setProperty('--task-padding-top', '14px');
+      document.documentElement.style.setProperty('--task-margin', '8px');
+      document.documentElement.style.setProperty('--task-font-size', '1.1rem');
+      document.documentElement.style.setProperty('--section-margin', '20px');
     }
   }, [density]);
 

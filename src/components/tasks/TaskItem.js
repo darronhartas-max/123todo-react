@@ -187,7 +187,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             flex: 1,
             border: 'none',
             background: 'transparent',
-            fontSize: '1.1rem',
+            fontSize: 'var(--task-font-size, 1.1rem)',
             color: 'var(--text-color)',
             cursor: isArchived ? 'default' : 'pointer',
             fontFamily: 'Inter, sans-serif',

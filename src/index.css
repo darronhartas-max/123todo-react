@@ -18,10 +18,11 @@ html {
   --archive-bg: #f9fafb;
   
   /* Density Default Spacing */
-  --task-padding: 10px 12px;
-  --task-padding-top: 12px;
-  --task-margin: 4px;
-  --section-margin: 16px;
+  --task-padding: 12px 16px;
+  --task-padding-top: 14px;
+  --task-margin: 8px;
+  --task-font-size: 1.1rem;
+  --section-margin: 20px;
 }
 
 /* System Dark Mode: Apply unless light theme is explicitly forced */
