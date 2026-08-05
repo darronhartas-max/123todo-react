@@ -389,13 +389,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             <motion.li
                 layout
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0, x: swipeOffset }}
                 exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                    x: swipeOffset !== 0 ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 },
+                    opacity: { duration: 0.15 },
+                    y: { duration: 0.15 },
+                    layout: { duration: 0.2 }
+                }}
                 style={{
                     ...styles.taskItem,
                     marginBottom: 0,
-                    transform: `translateX(${swipeOffset}px)`,
-                    transition: swipeOffset === 0 ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease' : 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
                     touchAction: 'pan-y',
                     userSelect: swipeOffset !== 0 ? 'none' : 'auto',
                     WebkitUserSelect: swipeOffset !== 0 ? 'none' : 'auto',
