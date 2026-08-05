@@ -43,11 +43,13 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         }
     }, []);
 
-    const performSync = useCallback(async (isInitial = false) => {
+    const performSync = useCallback(async (isInitial = false, isUserAction = false) => {
         if (!accessTokenRef.current || !passphrase || isSyncingRef.current) return;
 
         isSyncingRef.current = true;
-        setSyncStatus('syncing');
+        if (isInitial || isUserAction) {
+            setSyncStatus('syncing');
+        }
         try {
             const headers = { 'Authorization': `Bearer ${accessTokenRef.current}` };
             
@@ -71,6 +73,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             const localTimestamp = currentLocalData.timestamp || 0;
 
             const uploadSyncFile = async (base64Payload, fileId = null) => {
+                setSyncStatus('syncing');
                 const metadata = { 
                     name: SYNC_FILE_NAME,
                     description: localTimestamp.toString() // Store exact local JS timestamp in metadata
@@ -100,6 +103,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             };
 
             const downloadSyncFile = async (fileId) => {
+                setSyncStatus('syncing');
                 const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers });
                 if (res.status === 401) {
                     handleTokenExpired();
@@ -122,14 +126,14 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                      }
                  }
             } else if (localTimestamp > remoteTimestamp) {
-                // PUSH
+                // PUSH local changes to cloud
                 const encrypted = await encryptData(currentLocalData, passphrase);
                 const updatedFile = await uploadSyncFile(encrypted, syncFileIdRef.current);
                 if (updatedFile) {
                     syncFileIdRef.current = updatedFile.id;
                 }
             } else if (remoteTimestamp > localTimestamp && remoteFile) {
-                // PULL
+                // PULL cloud changes to local
                 const fileData = await downloadSyncFile(remoteFile.id);
                 if (!fileData) return; // 401 handled
                 if (fileData && fileData.payload) {
@@ -274,7 +278,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                 if (document.visibilityState === 'visible') {
                     performSync(false);
                 }
-            }, 4000); // 4 seconds polling for near real-time updates
+            }, 25000); // 25 seconds background polling for polite, silent cloud checks
         };
         startPolling();
 
