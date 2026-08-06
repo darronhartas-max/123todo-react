@@ -182,15 +182,6 @@ const ProjectTabs = ({ projects, currentProjectId, onSelect, showSearch, onToggl
                 {useDropdown ? (
                     <>
                         <div style={styles.dropdownContainer}>
-                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>PROJECT:</span>
-                            <div style={{
-                                width: '5px',
-                                height: '18px',
-                                borderRadius: '2px',
-                                backgroundColor: activeColor,
-                                flexShrink: 0,
-                                transition: 'background-color 0.2s ease'
-                            }} />
                             <div style={styles.customSelectWrapper}>
                                 <button
                                     onClick={() => setIsOpen(!isOpen)}

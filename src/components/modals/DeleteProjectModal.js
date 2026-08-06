@@ -9,11 +9,11 @@ const DeleteProjectModal = ({ project, projects, taskCount, onConfirm, onClose }
         overlay: {
             position: 'fixed',
             top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000
+            zIndex: 10500
         },
         modal: {
             background: 'var(--surface-color)',

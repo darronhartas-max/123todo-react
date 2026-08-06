@@ -79,9 +79,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.6';
+export const APP_VERSION = '2.5.7';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.7': [
+    { title: '🗑️ Project Deletion Overlay Fix:', desc: 'Fixed Delete Project confirmation modal layer so deletion prompts render cleanly on top of Settings.' },
+    { title: '📐 Header Bar Space Optimization:', desc: 'Streamlined the projects bar by placing search icon directly next to the project selector.' }
+  ],
   '2.5.6': [
     { title: '🔤 Bold Text Typography Setting:', desc: 'Added a Bold Text checkbox under Settings ➔ Appearance for high-contrast typography.' },
     { title: '📐 Compact View Spacing Refinement:', desc: 'New default compact density for new users with extra padding between text rows and divider lines.' },

@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.6 (Current)
+### v2.5.7 (Current)
+- **Project Deletion Overlay Fix**: Increased Delete Project modal zIndex to ensure deletion confirmation prompts appear cleanly on top of Settings.
+- **Projects Header Optimization**: Streamlined the projects dropdown bar by removing redundant text labels and placing the search icon next to the selector.
+
+### v2.5.6
 - **Bold Text Typography Setting**: Added a toggle checkbox in Settings ➔ Appearance for high-contrast bold typography across all tasks, menus, and notes.
 - **Compact Density & Theme Defaults**: New users now default to Compact Density with refined bottom padding on task items and System Theme Mode.
 
