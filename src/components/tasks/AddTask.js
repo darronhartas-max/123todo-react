@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Mic, MicOff } from 'lucide-react';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { isSpeechRecognitionSupported, parseVoiceTask } from '../../utils/voiceUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -37,6 +38,88 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     
     const inputRef = useRef(null);
     const hasOpenedRef = useRef(false);
+
+    // Voice Input State
+    const [isListening, setIsListening] = useState(false);
+    const [voiceStatus, setVoiceStatus] = useState('');
+    const recognitionRef = useRef(null);
+    const speechSupported = isSpeechRecognitionSupported();
+
+    const toggleVoiceInput = () => {
+        if (!speechSupported) {
+            setVoiceStatus('Voice input is not supported in this browser.');
+            setTimeout(() => setVoiceStatus(''), 4000);
+            return;
+        }
+
+        if (isListening) {
+            if (recognitionRef.current) {
+                try { recognitionRef.current.stop(); } catch {}
+            }
+            setIsListening(false);
+            setVoiceStatus('');
+            return;
+        }
+
+        try {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                setIsListening(true);
+                setVoiceStatus('🎙️ Listening... Speak task (e.g. "Buy milk priority 1 project Shopping")');
+            };
+
+            recognition.onresult = (event) => {
+                const currentTranscript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+
+                if (currentTranscript) {
+                    const parsed = parseVoiceTask(currentTranscript, projects, projectId);
+                    if (parsed.taskText) {
+                        setText(parsed.taskText);
+                    }
+                    if (parsed.priority) {
+                        setPriority(parsed.priority);
+                    }
+                    if (parsed.projectId) {
+                        setProjectId(parsed.projectId);
+                    }
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                setIsListening(false);
+                if (event.error === 'not-allowed') {
+                    setVoiceStatus('⚠️ Microphone permission denied.');
+                } else if (event.error === 'no-speech') {
+                    setVoiceStatus('No speech detected. Tap mic to try again.');
+                } else {
+                    setVoiceStatus(`Voice error: ${event.error}`);
+                }
+                setTimeout(() => setVoiceStatus(''), 4000);
+            };
+
+            recognition.onend = () => {
+                setIsListening(false);
+                setVoiceStatus('✨ Voice input captured!');
+                setTimeout(() => setVoiceStatus(''), 3000);
+            };
+
+            recognitionRef.current = recognition;
+            recognition.start();
+        } catch (e) {
+            console.error('Failed to start speech recognition:', e);
+            setIsListening(false);
+            setVoiceStatus('Voice recognition error.');
+            setTimeout(() => setVoiceStatus(''), 3000);
+        }
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -219,8 +302,40 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px'
+                    gap: '10px'
                 }}>
+                    <button
+                        type="button"
+                        onClick={toggleVoiceInput}
+                        title={isListening ? "Stop Listening" : (speechSupported ? "Click to speak task" : "Voice input not supported")}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            borderRadius: '16px',
+                            border: `1.5px solid ${isListening ? '#ef4444' : 'var(--border-color)'}`,
+                            background: isListening ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                            color: isListening ? '#ef4444' : 'var(--text-color)',
+                            cursor: 'pointer',
+                            fontSize: '0.82rem',
+                            fontWeight: '600',
+                            transition: 'all 0.2s ease',
+                            boxShadow: isListening ? '0 0 10px rgba(239, 68, 68, 0.4)' : 'none'
+                        }}
+                    >
+                        {isListening ? (
+                            <>
+                                <MicOff size={14} style={{ animation: 'pulse 1.2s infinite' }} />
+                                <span>Listening...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Mic size={14} color="var(--accent-color)" />
+                                <span>Voice</span>
+                            </>
+                        )}
+                    </button>
                     <div style={{
                         fontSize: '0.85rem',
                         color: '#6b7280',
@@ -230,6 +345,24 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     </div>
                 </div>
             </div>
+
+            {voiceStatus && (
+                <div style={{
+                    fontSize: '0.82rem',
+                    padding: '6px 10px',
+                    borderRadius: '6px',
+                    marginTop: '6px',
+                    marginBottom: '4px',
+                    background: isListening ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
+                    color: isListening ? '#ef4444' : 'var(--accent-color)',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                }}>
+                    {voiceStatus}
+                </div>
+            )}
 
             <textarea
                 ref={inputRef}

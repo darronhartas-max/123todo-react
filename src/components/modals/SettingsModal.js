@@ -1006,6 +1006,34 @@ const SettingsModal = ({
                                      </div>
                                  </div>
 
+                                 {/* Voice Input Commands & Tips */}
+                                 <div style={styles.settingRow}>
+                                     <div style={styles.settingLabel}>
+                                         <span>🎙️ Voice Input & Commands</span>
+                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                             Tap the Voice button when adding tasks. Speaks natural language commands with automatic priority & project parsing.
+                                         </span>
+                                     </div>
+                                     <div style={{
+                                         background: 'var(--bg-color)',
+                                         padding: '12px 14px',
+                                         borderRadius: '10px',
+                                         border: '1px solid var(--border-color)',
+                                         marginTop: '6px',
+                                         fontSize: '0.84rem',
+                                         lineHeight: '1.5'
+                                     }}>
+                                         <div style={{ fontWeight: '700', marginBottom: '6px', color: 'var(--accent-color)' }}>
+                                             Examples of Voice Commands:
+                                         </div>
+                                         <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)' }}>
+                                             <li><strong>"Buy milk and bread priority 1 project Shopping"</strong> ➔ Task: <em>Buy milk and bread</em> | Priority: <em>Must Do (P1)</em> | Project: <em>Shopping</em></li>
+                                             <li><strong>"Finish quarterly report in Work"</strong> ➔ Task: <em>Finish quarterly report</em> | Priority: <em>Must Do (P1)</em> | Project: <em>Work</em></li>
+                                             <li><strong>"Call doctor"</strong> ➔ Task: <em>Call doctor</em> | Priority: <em>Must Do (P1 - Default)</em> | Project: <em>Active Project</em></li>
+                                         </ul>
+                                     </div>
+                                 </div>
+
                                 {/* App Version & Manual Update Check */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
