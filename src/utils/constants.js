@@ -81,9 +81,12 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.13';
+export const APP_VERSION = '2.5.14';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.14': [
+    { title: '🎯 Task Drag & Drop Position Persistence Fix:', desc: 'Guarantees custom reordered task positions stay permanently saved during 2-way background Google Drive sync.' }
+  ],
   '2.5.13': [
     { title: '📐 Single-Row Header Bar Alignment:', desc: 'Search icon, project dropdown (dynamically sized to project text), and Settings cog are now cleanly aligned on a single row.' }
   ],

@@ -108,7 +108,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     };
 
     const handlePointerDown = (e) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (e.pointerType === 'mouse') return;
         handleStart(e.clientX, e.clientY);
     };
 

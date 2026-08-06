@@ -83,4 +83,34 @@ test('filters out deleted archived tasks during 2-way sync merge', () => {
     expect(merged.deletedTaskKeys).toContain('id_101');
 });
 
+test('preserves user reordered task sequence when local timestamp is newer', () => {
+    const localData = {
+        tasks: [
+            { id: 2, text: 'Task B', priority: 1, projectId: 'general' },
+            { id: 1, text: 'Task A', priority: 1, projectId: 'general' }
+        ],
+        archived: [],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        counter: 2,
+        timestamp: 1700000500000
+    };
+
+    const remoteData = {
+        tasks: [
+            { id: 1, text: 'Task A', priority: 1, projectId: 'general' },
+            { id: 2, text: 'Task B', priority: 1, projectId: 'general' }
+        ],
+        archived: [],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        counter: 2,
+        timestamp: 1700000000000
+    };
+
+    const merged = mergeSyncDatasets(localData, remoteData);
+
+    expect(merged.tasks[0].id).toBe(2);
+    expect(merged.tasks[1].id).toBe(1);
+});
+
+
 

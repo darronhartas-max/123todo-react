@@ -76,7 +76,11 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   // 3. Merge Active Tasks & Resolve Active vs Archived Conflicts
   const activeTaskMap = new Map();
 
-  [...remoteTasks, ...localTasks].forEach(t => {
+  const primaryActiveTasks = (localData.timestamp || 0) >= (remoteData.timestamp || 0)
+    ? [...localTasks, ...remoteTasks]
+    : [...remoteTasks, ...localTasks];
+
+  primaryActiveTasks.forEach(t => {
     if (!t || !t.text) return;
     const contentKey = getTaskKey(t);
     const key = t.id ? `id_${t.id}` : contentKey;

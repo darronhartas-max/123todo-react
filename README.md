@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.13 (Current)
+### v2.5.14 (Current)
+- **Task Drag & Drop Reordering Fix**: Fixed active dataset 2-way sync conflict resolution so custom task order sequence is preserved and uploaded during background Google Drive syncs.
+
+### v2.5.13
 - **Single-Row Top Header Bar**: Aligned the search magnifying glass icon at the start of the row, followed by the project selector dropdown (dynamically sized to the widest project text), leaving space before the settings cog icon on the far right.
 
 ### v2.5.12
