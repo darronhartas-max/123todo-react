@@ -81,9 +81,12 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.18';
+export const APP_VERSION = '2.5.19';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.19': [
+    { title: '⚡ Deployment Trigger Optimization:', desc: 'Optimized GitHub Actions automated deployment workflow trigger for seamless VPS deployments.' }
+  ],
   '2.5.18': [
     { title: '🔒 Secret URL Admin Portal Access:', desc: 'Restricted Admin Analytics Portal access exclusively to secret URL parameter (?admin=1) with zero public UI footprint.' },
     { title: '🚀 VPS Deployment Automation Fix:', desc: 'Refreshed deployment trigger sequence to guarantee clean VPS container builds.' }

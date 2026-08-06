@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.18 (Current)
+### v2.5.19 (Current)
+- **Deployment Trigger Optimization**: Streamlined GitHub Actions deployment workflow.
+
+### v2.5.18
 - **Secret URL Admin Access**: Restricted Admin Analytics Portal access exclusively to secret URL parameters (`?admin=1`) with zero public UI footprint.
 - **VPS Deployment Trigger**: Refreshed automated VPS deployment workflow.
 
