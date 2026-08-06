@@ -79,9 +79,14 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.3';
+export const APP_VERSION = '2.5.4';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.4': [
+    { title: '🎙️ Voice Task & Notes Dictation:', desc: 'Tap the Voice button on task titles or notes to speak naturally. Speech automatically appends to text so you can pause to think.' },
+    { title: '🔄 Seamless 2-Way Multi-Device Sync:', desc: 'Guarantees that new tasks or projects added offline across multiple devices are merged seamlessly without data loss.' },
+    { title: '📏 Custom Task Description Length:', desc: 'Set your preferred task description length under Settings ➔ Appearance (250 characters default or Unlimited).' }
+  ],
   '2.5.3': [
     { title: '🎙️ Voice Notes Dictation:', desc: 'Dictate long descriptions, instructions, or links directly into the task Notes section using voice.' },
     { title: '🔄 Continuous Speech & Appending:', desc: 'Speech recognition automatically appends newly spoken words to existing text so pauses while thinking won\'t cut you off.' },

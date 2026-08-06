@@ -297,7 +297,12 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.3 (Current)
+### v2.5.4 (Current)
+- **Voice Task & Voice Notes Dictation**: Integrated continuous speech-to-text dictation across task creation and edit modals. Newly spoken words automatically append to existing text, ensuring pauses while thinking don't interrupt your dictation.
+- **2-Way Multi-Device Sync Engine**: Integrated a robust 2-way dataset merge engine (`syncUtils.js`) ensuring tasks created offline across multiple devices (laptop, phone) are merged without data loss or overwrites.
+- **Task Description Character Limit Preference**: Flexible setting under Settings ➔ Appearance allowing users to choose between the default 250-character limit and Unlimited mode.
+
+### v2.5.3
 - **Voice Notes Dictation & Appending**: Added 🎙️ Voice Notes button to dictate detailed notes and instructions directly into tasks. Enables continuous dictation and text appending so pauses while thinking don't cut off speech recording. All voice tasks automatically default to Top Priority (Priority 1) and your active project.
 
 ### v2.5.2
