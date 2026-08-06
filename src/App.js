@@ -165,6 +165,17 @@ const TodoApp = () => {
 
   const [showAdminStats, setShowAdminStats] = useState(false);
 
+  // Secret URL Parameter Trigger for Private Admin Portal (e.g. ?admin=1 or #admin)
+  useEffect(() => {
+    try {
+      const search = window.location.search.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (search.includes('admin') || search.includes('stats') || hash.includes('admin')) {
+        setShowAdminStats(true);
+      }
+    } catch (e) {}
+  }, []);
+
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
     const saved = localStorage.getItem('123TodoFontSize');
