@@ -3,7 +3,7 @@
 ## Overview
 **123 ToDo** is a React Progressive Web App (PWA) for task management featuring drag-and-drop, customizable swipe gestures, Google Drive end-to-end encrypted sync, subtasks/recurrence, and Todoist CSV imports.
 
-- **Version**: v2.5.12
+- **Version**: v2.5.13
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **Live URLs**:
   - Primary: https://app.123todo.com
@@ -55,6 +55,7 @@ Whenever bumping the application version (`APP_VERSION`):
 - **Projects**: Custom project tabs with color bands, HTML5 drag-and-drop project reordering in Settings (`GripVertical`).
 - **Updates**: Persistent version upgrade tracking (`123Todo_Last_Seen_Version`), automatic PWA update banner + 1-click "Check for Updates" control in Footer & Settings header (`v2.5.8`).
 - **Voice Task & Voice Notes**: Web Speech API continuous dictation with spoken punctuation recognition ("full stop", "comma", "question mark", etc.) & overwrite-proof speech buffer (`v2.5.5`).
+- **Single-Row Header Bar**: Clean single-row alignment of Search icon (start), Projects dropdown (dynamically sized to longest project text), and Settings cog (far right) (`v2.5.13`).
 - **Archive Task Deletion Sync Fix**: Permanent `deletedTaskKeys` tombstone tracking for deleted archived tasks during 2-way Google Drive sync (`v2.5.12`).
 - **Archive Button & Section Typography Refinement**: Simplified trigger label to "Open Archive" and reduced section title font sizes for Archive, Scheduled, and On Hold sections (`v2.5.11`).
 - **Project Deletion Sync Fix**: Permanent tombstone tracking for deleted projects during 2-way Google Drive sync (`v2.5.10`).

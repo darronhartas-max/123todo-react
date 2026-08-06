@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.12 (Current)
+### v2.5.13 (Current)
+- **Single-Row Top Header Bar**: Aligned the search magnifying glass icon at the start of the row, followed by the project selector dropdown (dynamically sized to the widest project text), leaving space before the settings cog icon on the far right.
+
+### v2.5.12
 - **Archive Deletion 2-Way Sync Fix**: Added persistent `deletedTaskKeys` tombstone tracking so items deleted from the Archive remain permanently deleted across all connected devices during 2-way Google Drive sync.
 
 ### v2.5.11
