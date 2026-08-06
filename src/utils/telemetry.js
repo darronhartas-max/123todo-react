@@ -129,12 +129,61 @@ export const recordPWAInstall = () => {
 
     let dayRecord = data.dailyHistory.find(d => d.date === today);
     if (!dayRecord) {
-        dayRecord = { date: today, visits: 1, installs: 1, standaloneOpens: 0 };
+        dayRecord = { date: today, visits: 1, installs: 1, standaloneOpens: 0, tasksCompleted: 0, activeMinutes: 0 };
         data.dailyHistory.push(dayRecord);
     } else {
         dayRecord.installs = (dayRecord.installs || 0) + 1;
     }
 
+    saveTelemetryData(data);
+};
+
+/** Track task completion */
+export const recordTaskCompleted = () => {
+    const data = getTelemetryData();
+    const today = getTodayDateStr();
+
+    data.totalTasksCompleted = (data.totalTasksCompleted || 0) + 1;
+
+    let dayRecord = data.dailyHistory.find(d => d.date === today);
+    if (!dayRecord) {
+        dayRecord = { date: today, visits: 1, installs: 0, standaloneOpens: 0, tasksCompleted: 1, activeMinutes: 0 };
+        data.dailyHistory.push(dayRecord);
+    } else {
+        dayRecord.tasksCompleted = (dayRecord.tasksCompleted || 0) + 1;
+    }
+
+    saveTelemetryData(data);
+};
+
+/** Record active usage time in minutes */
+export const recordActiveMinutes = (addedMinutes = 1) => {
+    const data = getTelemetryData();
+    const today = getTodayDateStr();
+
+    data.totalActiveMinutes = (data.totalActiveMinutes || 0) + addedMinutes;
+
+    let dayRecord = data.dailyHistory.find(d => d.date === today);
+    if (!dayRecord) {
+        dayRecord = { date: today, visits: 1, installs: 0, standaloneOpens: 0, tasksCompleted: 0, activeMinutes: addedMinutes };
+        data.dailyHistory.push(dayRecord);
+    } else {
+        dayRecord.activeMinutes = (dayRecord.activeMinutes || 0) + addedMinutes;
+    }
+
+    saveTelemetryData(data);
+};
+
+/** Record device type (Mobile vs Desktop) */
+export const recordDeviceType = () => {
+    if (typeof window === 'undefined') return;
+    const data = getTelemetryData();
+    const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+    if (isMobile) {
+        data.mobileVisits = (data.mobileVisits || 0) + 1;
+    } else {
+        data.desktopVisits = (data.desktopVisits || 0) + 1;
+    }
     saveTelemetryData(data);
 };
 

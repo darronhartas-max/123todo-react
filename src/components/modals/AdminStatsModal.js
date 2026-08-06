@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw } from 'lucide-react';
+import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw, Clock, CheckSquare } from 'lucide-react';
 import { getTelemetryData, verifyAdminPassword, updateAdminPassword, formatShortDateStr } from '../../utils/telemetry';
 
 const COMMON_STYLES = {
@@ -359,6 +359,36 @@ const AdminStatsModal = ({ isOpen, onClose }) => {
                                         </div>
                                         <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-color)' }}>
                                             {telemetry.totalStandaloneOpens || 0}
+                                        </div>
+                                    </div>
+
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted-text)', fontSize: '0.82rem', fontWeight: '600', marginBottom: '6px' }}>
+                                            <Clock size={16} style={{ color: '#f59e0b' }} />
+                                            <span>Active Usage</span>
+                                        </div>
+                                        <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-color)' }}>
+                                            {telemetry.totalActiveMinutes ? (telemetry.totalActiveMinutes >= 60 ? `${Math.floor(telemetry.totalActiveMinutes / 60)}h ${telemetry.totalActiveMinutes % 60}m` : `${telemetry.totalActiveMinutes}m`) : '< 1m'}
+                                        </div>
+                                    </div>
+
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted-text)', fontSize: '0.82rem', fontWeight: '600', marginBottom: '6px' }}>
+                                            <CheckSquare size={16} style={{ color: '#ec4899' }} />
+                                            <span>Tasks Completed</span>
+                                        </div>
+                                        <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-color)' }}>
+                                            {telemetry.totalTasksCompleted || 0}
                                         </div>
                                     </div>
                                 </div>

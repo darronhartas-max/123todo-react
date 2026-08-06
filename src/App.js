@@ -31,7 +31,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
-import { recordVisit, recordPWAInstall } from './utils/telemetry';
+import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted } from './utils/telemetry';
 
 const TodoApp = () => {
   const {
@@ -158,9 +158,21 @@ const TodoApp = () => {
 
     // Record privacy-preserving visit telemetry
     recordVisit();
+    recordDeviceType();
     const handleInstall = () => recordPWAInstall();
     window.addEventListener('appinstalled', handleInstall);
-    return () => window.removeEventListener('appinstalled', handleInstall);
+
+    // Active usage duration timer (heartbeat every 60s while tab is visible)
+    const activeInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        recordActiveMinutes(1);
+      }
+    }, 60000);
+
+    return () => {
+      window.removeEventListener('appinstalled', handleInstall);
+      clearInterval(activeInterval);
+    };
   }, []);
 
   const [showAdminStats, setShowAdminStats] = useState(false);
@@ -408,6 +420,7 @@ const TodoApp = () => {
 
   const handleCompleteTask = (id) => {
     completeTask(id);
+    recordTaskCompleted();
     setShowArchiveToast(true);
     setTimeout(() => {
       setShowArchiveToast(false);
