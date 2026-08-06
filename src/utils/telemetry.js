@@ -223,6 +223,28 @@ export const recordPlatformAndRegion = () => {
     saveTelemetryData(data);
 };
 
+/** Record JavaScript errors for silent health monitoring */
+export const recordJsError = () => {
+    const data = getTelemetryData();
+    data.totalJsErrors = (data.totalJsErrors || 0) + 1;
+    saveTelemetryData(data);
+};
+
+/** Record Sync Drop / Error */
+export const recordSyncError = () => {
+    const data = getTelemetryData();
+    data.totalSyncErrors = (data.totalSyncErrors || 0) + 1;
+    saveTelemetryData(data);
+};
+
+/** Record Feature Usage (Voice Input, Todoist Import, Search, etc.) */
+export const recordFeatureUsage = (featureKey) => {
+    const data = getTelemetryData();
+    data.featureUsage = data.featureUsage || {};
+    data.featureUsage[featureKey] = (data.featureUsage[featureKey] || 0) + 1;
+    saveTelemetryData(data);
+};
+
 /** Verify Admin Password */
 export const verifyAdminPassword = (inputPassword) => {
     if (!inputPassword) return false;

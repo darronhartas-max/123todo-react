@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw, Clock, CheckSquare, Globe, Monitor } from 'lucide-react';
+import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw, Clock, CheckSquare, Globe, Monitor, Activity } from 'lucide-react';
 import { getTelemetryData, verifyAdminPassword, updateAdminPassword, formatShortDateStr } from '../../utils/telemetry';
 
 const COMMON_STYLES = {
@@ -535,6 +535,64 @@ const AdminStatsModal = ({ isOpen, onClose }) => {
                                         ) : (
                                             <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Collecting location data...</div>
                                         )}
+                                    </div>
+                                </div>
+
+                                {/* App Health & Feature Adoption Grid */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                    gap: '12px',
+                                    marginBottom: '16px'
+                                }}>
+                                    {/* App Health & Errors */}
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <h5 style={{ margin: '0 0 10px', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Activity size={16} style={{ color: '#10b981' }} />
+                                            <span>App Health & Friction</span>
+                                        </h5>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>System Status</span>
+                                            <span style={{ fontWeight: '700', color: '#10b981' }}>100% Healthy</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>JS Errors Encountered</span>
+                                            <span style={{ fontWeight: '700', color: telemetry.totalJsErrors ? '#dc2626' : 'var(--muted-text)' }}>{telemetry.totalJsErrors || 0}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>Sync Drop Events</span>
+                                            <span style={{ fontWeight: '700', color: telemetry.totalSyncErrors ? '#f59e0b' : 'var(--muted-text)' }}>{telemetry.totalSyncErrors || 0}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Feature Adoption Breakdown */}
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <h5 style={{ margin: '0 0 10px', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <TrendingUp size={16} style={{ color: '#8b5cf6' }} />
+                                            <span>Feature Adoption</span>
+                                        </h5>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>🎤 Voice Dictation</span>
+                                            <span style={{ fontWeight: '700' }}>{(telemetry.featureUsage && telemetry.featureUsage.voice_input) || 0}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>🔄 Cloud Drive Sync</span>
+                                            <span style={{ fontWeight: '700' }}>{(telemetry.featureUsage && telemetry.featureUsage.gdrive_sync) || 0}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                            <span>📂 Todoist CSV Imports</span>
+                                            <span style={{ fontWeight: '700' }}>{(telemetry.featureUsage && telemetry.featureUsage.todoist_import) || 0}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </>

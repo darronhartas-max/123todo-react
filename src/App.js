@@ -31,7 +31,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
-import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion } from './utils/telemetry';
+import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 
 const TodoApp = () => {
   const {
@@ -170,8 +170,15 @@ const TodoApp = () => {
       }
     }, 60000);
 
+    // Global anonymous error listener for silent health monitoring
+    const handleError = () => recordJsError();
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleError);
+
     return () => {
       window.removeEventListener('appinstalled', handleInstall);
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleError);
       clearInterval(activeInterval);
     };
   }, []);

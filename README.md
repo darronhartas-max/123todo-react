@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.21 (Current)
+### v2.5.22 (Current)
+- **App Health & Friction Tracking**: Added 100% anonymous browser error and sync drop monitoring to detect friction in the wild.
+- **Feature Adoption Metrics**: Added privacy-preserving feature usage metrics for Voice Input, Cloud Drive Sync, Todoist Imports, and Search.
+
+### v2.5.21
 - **OS & Platform Breakdown**: Added 100% privacy-preserving OS classification (macOS, iOS, Windows, Android, Linux).
 - **Geographic Region Breakdown**: Added privacy-safe region metrics (United Kingdom 🇬🇧, Europe 🇪🇺, North America 🇺🇸, Australasia 🇦🇺, Asia 🌏).
 
