@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.4 (Current)
+### v2.5.5 (Current)
+- **Spoken Punctuation Recognition**: Converts spoken punctuation phrases like "full stop", "comma", "question mark", "exclamation mark", "colon", "semi colon", and "new line" directly into actual punctuation marks.
+- **Overwrite-Proof Speech Buffer**: Dictation uses a locked speech-accumulation buffer so long pauses or thinking breaks while speaking never truncate or overwrite previously spoken text.
+
+### v2.5.4
 - **Voice Task & Voice Notes Dictation**: Integrated continuous speech-to-text dictation across task creation and edit modals. Newly spoken words automatically append to existing text, ensuring pauses while thinking don't interrupt your dictation.
 - **2-Way Multi-Device Sync Engine**: Integrated a robust 2-way dataset merge engine (`syncUtils.js`) ensuring tasks created offline across multiple devices (laptop, phone) are merged without data loss or overwrites.
 - **Task Description Character Limit Preference**: Flexible setting under Settings ➔ Appearance allowing users to choose between the default 250-character limit and Unlimited mode.

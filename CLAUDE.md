@@ -3,7 +3,7 @@
 ## Overview
 **123 ToDo** is a React Progressive Web App (PWA) for task management featuring drag-and-drop, customizable swipe gestures, Google Drive end-to-end encrypted sync, subtasks/recurrence, and Todoist CSV imports.
 
-- **Version**: v2.5.4
+- **Version**: v2.5.5
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **Live URLs**:
   - Primary: https://app.123todo.com
@@ -53,8 +53,8 @@ Whenever bumping the application version (`APP_VERSION`):
 - **Priority System**: P1 Must Do (#dc2626), P2 Should Do (#f59e0b), P3 Could Do (#6b7280), P4 On Hold (#9333ea).
 - **Google Drive Sync**: Client-side AES-256-GCM encryption (`crypto.js`), 2-way multi-device dataset merge engine (`syncUtils.js`), auto-token drop detection (`isSyncDropped`), single-tap re-auth popup modal (`SyncDroppedModal.js`).
 - **Projects**: Custom project tabs with color bands, HTML5 drag-and-drop project reordering in Settings (`GripVertical`).
-- **Updates**: Persistent version upgrade tracking (`123Todo_Last_Seen_Version`), automatic PWA update banner + 1-click "Check for Updates" control in Footer & Settings header (`v2.5.4`).
-- **Voice Task & Voice Notes**: Web Speech API continuous dictation with text appending & automatic Top Priority assignment (`v2.5.4`).
+- **Updates**: Persistent version upgrade tracking (`123Todo_Last_Seen_Version`), automatic PWA update banner + 1-click "Check for Updates" control in Footer & Settings header (`v2.5.5`).
+- **Voice Task & Voice Notes**: Web Speech API continuous dictation with spoken punctuation recognition ("full stop", "comma", "question mark", etc.) & overwrite-proof speech buffer (`v2.5.5`).
 - **Date Format Preference**: User configurable date ordering (`UK`, `US`, `ISO`, `UK Text`, `US Text`) under Settings ➔ Appearance (`v2.4.17`).
 - **Task Description Length Preference**: User customizable task description length (`250` chars default or `Unlimited`) under Settings ➔ Appearance (`v2.5.0`).
 - **Voice Task Input**: Web Speech API dictation with smart priority (P1-P4) & project keyword parsing (`v2.5.1`).

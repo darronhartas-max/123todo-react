@@ -79,9 +79,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.4';
+export const APP_VERSION = '2.5.5';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.5': [
+    { title: '✍️ Spoken Punctuation Recognition:', desc: 'Speak "full stop", "comma", "question mark", "exclamation mark", "colon", "semi colon", or "new line" to insert punctuation naturally.' },
+    { title: '🛡️ Overwrite-Proof Voice Buffer:', desc: 'Uses a locked speech buffer so pauses or thinking breaks never overwrite or delete previously spoken text.' }
+  ],
   '2.5.4': [
     { title: '🎙️ Voice Task & Notes Dictation:', desc: 'Tap the Voice button on task titles or notes to speak naturally. Speech automatically appends to text so you can pause to think.' },
     { title: '🔄 Seamless 2-Way Multi-Device Sync:', desc: 'Guarantees that new tasks or projects added offline across multiple devices are merged seamlessly without data loss.' },
