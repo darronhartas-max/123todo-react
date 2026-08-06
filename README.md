@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.0 (Current)
+### v2.5.1 (Current)
+- **Voice Task Input (Speech-to-Task)**: Added a 🎙️ Voice button to Add Task with natural language speech parsing for task title, priority level (P1-P4), and project selection.
+- **Voice Commands Guidance**: Interactive voice command examples and tips provided under Settings ➔ Appearance.
+
+### v2.5.0
 - **Customizable Task Description Length**: Added an Appearance setting allowing users to switch between the default 250-character limit (encouraging concise tasks) and Unlimited mode.
 - **Sleeker Swipe Action Reveal Hints**: Made swipe action reveal indicators more compact and instantly visible upon initiating a swipe.
 - **Streamlined Notes Field UI**: Cleaned up notes field character counter elements for a cleaner, clutter-free modal editing experience.

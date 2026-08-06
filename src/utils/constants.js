@@ -79,9 +79,14 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.0';
+export const APP_VERSION = '2.5.1';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.1': [
+    { title: '🎙️ Voice Task Input (Speech-to-Task):', desc: 'Tap the Voice button to speak tasks naturally with automatic priority and project detection.' },
+    { title: '⚡ Smart Natural Language Parsing:', desc: 'Automatically parses priority (P1-P4) and project keywords from spoken phrases, defaulting to Priority 1 (Must Do).' },
+    { title: '💡 Voice Command Guidance:', desc: 'Interactive voice command examples and tips available under Settings ➔ Appearance.' }
+  ],
   '2.5.0': [
     { title: '📏 Custom Task Description Length:', desc: 'Set your preferred task description length under Settings ➔ Appearance (250 characters default or Unlimited).' },
     { title: '👈 Compact Swipe Reveal Visuals:', desc: 'Sleeker, faster visual swipe reveal hints that appear immediately upon starting a swipe gesture.' },
