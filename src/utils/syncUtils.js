@@ -19,6 +19,11 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const remoteDeletedProjects = Array.isArray(remoteData.deletedProjects) ? remoteData.deletedProjects : [];
   const mergedDeletedProjects = Array.from(new Set([...localDeletedProjects, ...remoteDeletedProjects]));
 
+  const localDeletedTaskKeys = Array.isArray(localData.deletedTaskKeys) ? localData.deletedTaskKeys : [];
+  const remoteDeletedTaskKeys = Array.isArray(remoteData.deletedTaskKeys) ? remoteData.deletedTaskKeys : [];
+  const mergedDeletedTaskKeys = Array.from(new Set([...localDeletedTaskKeys, ...remoteDeletedTaskKeys]));
+  const deletedTaskSet = new Set(mergedDeletedTaskKeys);
+
   // 1. Merge Projects
   const projectMap = new Map();
   // Ensure default General project exists
@@ -53,7 +58,11 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const archivedMap = new Map();
   [...remoteArchived, ...localArchived].forEach(t => {
     if (!t || !t.text) return;
-    const key = t.id ? `id_${t.id}` : getTaskKey(t);
+    const contentKey = getTaskKey(t);
+    const key = t.id ? `id_${t.id}` : contentKey;
+    if (deletedTaskSet.has(`id_${t.id}`) || (contentKey && deletedTaskSet.has(contentKey))) {
+      return; // Skip deleted archived task
+    }
     if (!archivedMap.has(key)) {
       archivedMap.set(key, t);
     } else {
@@ -71,6 +80,9 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
     if (!t || !t.text) return;
     const contentKey = getTaskKey(t);
     const key = t.id ? `id_${t.id}` : contentKey;
+    if (deletedTaskSet.has(`id_${t.id}`) || (contentKey && deletedTaskSet.has(contentKey))) {
+      return; // Skip deleted active task
+    }
 
     // Check if task exists in archivedMap (by ID or content key)
     const archivedKey = (t.id && archivedMap.has(`id_${t.id}`)) 
@@ -157,6 +169,7 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
     archived: finalArchived,
     projects: mergedProjects,
     deletedProjects: mergedDeletedProjects,
+    deletedTaskKeys: mergedDeletedTaskKeys,
     counter: currentCounter,
     timestamp: Date.now()
   };

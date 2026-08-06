@@ -23,7 +23,8 @@ export const STORAGE_KEYS = {
   SWIPE_SETTINGS: '123TodoSwipeSettings',
   DATE_FORMAT: '123TodoDateFormat',
   TASK_LENGTH_LIMIT: '123TodoTaskLengthLimit',
-  DELETED_PROJECTS: '123TodoDeletedProjects'
+  DELETED_PROJECTS: '123TodoDeletedProjects',
+  DELETED_TASKS: '123TodoDeletedTasks'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -80,9 +81,12 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.11';
+export const APP_VERSION = '2.5.12';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.12': [
+    { title: '🗑️ Archive Deletion 2-Way Sync Fix:', desc: 'Guarantees deleted items from the Archive remain permanently deleted across all connected devices during 2-way Google Drive sync.' }
+  ],
   '2.5.11': [
     { title: '📦 Simplified Archive Trigger:', desc: 'Shortened archive button label to "Open Archive" for a cleaner visual layout.' },
     { title: '📐 Refined Header Typography:', desc: 'Reduced section header font size on Archive, Scheduled, and On Hold titles for clean visual proportions.' }

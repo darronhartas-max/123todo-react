@@ -66,6 +66,14 @@ export const useTasks = () => {
             return [];
         }
     });
+    const [deletedTaskKeys, setDeletedTaskKeys] = useState(() => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEYS.DELETED_TASKS);
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
+    });
     const [counter, setCounter] = useState(0);
     const [timestamp, setTimestamp] = useState(Date.now());
     const [isLoaded, setIsLoaded] = useState(false);
@@ -172,6 +180,7 @@ export const useTasks = () => {
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
         localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
+        localStorage.setItem(STORAGE_KEYS.DELETED_TASKS, JSON.stringify(deletedTaskKeys));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
         localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
 
@@ -277,7 +286,20 @@ export const useTasks = () => {
     }, []);
 
     const deleteArchivedTask = useCallback((id) => {
-        setArchived(prev => prev.filter(t => t.id !== id));
+        setArchived(prevArchived => {
+            const taskToDelete = prevArchived.find(t => t.id === id);
+            if (taskToDelete) {
+                const keysToAdd = [`id_${id}`];
+                const cleanText = (taskToDelete.text || '').trim().toLowerCase();
+                const projId = taskToDelete.projectId || taskToDelete.categoryId || 'general';
+                if (cleanText) keysToAdd.push(`${cleanText}::${projId}`);
+                setDeletedTaskKeys(prev => Array.from(new Set([...prev, ...keysToAdd])));
+            } else {
+                setDeletedTaskKeys(prev => Array.from(new Set([...prev, `id_${id}`])));
+            }
+            return prevArchived.filter(t => t.id !== id);
+        });
+        setTasks(prevTasks => prevTasks.filter(t => t.id !== id));
         setTimestamp(Date.now());
     }, []);
 
@@ -297,6 +319,7 @@ export const useTasks = () => {
             };
             delete restoredTask.completedAt;
 
+            setDeletedTaskKeys(prev => prev.filter(k => k !== `id_${id}`));
             setTasks(current => [restoredTask, ...current]);
             return newArchived;
         });
@@ -428,6 +451,9 @@ export const useTasks = () => {
         if (Array.isArray(data.deletedProjects)) {
             setDeletedProjects(data.deletedProjects);
         }
+        if (Array.isArray(data.deletedTaskKeys)) {
+            setDeletedTaskKeys(data.deletedTaskKeys);
+        }
         setCounter(sanitized.counter);
         if (data.timestamp) setTimestamp(data.timestamp);
 
@@ -484,6 +510,7 @@ export const useTasks = () => {
         archived,
         projects,
         deletedProjects,
+        deletedTaskKeys,
         counter,
         timestamp,
         addTask,

@@ -56,3 +56,31 @@ test('filters out deleted projects during 2-way sync merge', () => {
     expect(merged.deletedProjects).toContain('work');
 });
 
+test('filters out deleted archived tasks during 2-way sync merge', () => {
+    const localData = {
+        tasks: [],
+        archived: [],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        deletedTaskKeys: ['id_101'],
+        counter: 101,
+        timestamp: 1700000500000
+    };
+
+    const remoteData = {
+        tasks: [],
+        archived: [
+            { id: 101, text: 'Fix navigation bar bug', priority: 1, projectId: 'general', completedAt: 1700000000000 }
+        ],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        deletedTaskKeys: [],
+        counter: 101,
+        timestamp: 1700000000000
+    };
+
+    const merged = mergeSyncDatasets(localData, remoteData);
+
+    expect(merged.archived).toHaveLength(0);
+    expect(merged.deletedTaskKeys).toContain('id_101');
+});
+
+

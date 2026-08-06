@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.11 (Current)
+### v2.5.12 (Current)
+- **Archive Deletion 2-Way Sync Fix**: Added persistent `deletedTaskKeys` tombstone tracking so items deleted from the Archive remain permanently deleted across all connected devices during 2-way Google Drive sync.
+
+### v2.5.11
 - **Archive Button & Title Wording**: Simplified the archive button text to "Open Archive" for cleaner UI layout.
 - **Header Typography Refinement**: Reduced font sizes for Archive, Scheduled, and On Hold section titles to align visually with standard priority headers.
 
