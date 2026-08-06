@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.20 (Current)
+### v2.5.21 (Current)
+- **OS & Platform Breakdown**: Added 100% privacy-preserving OS classification (macOS, iOS, Windows, Android, Linux).
+- **Geographic Region Breakdown**: Added privacy-safe region metrics (United Kingdom 🇬🇧, Europe 🇪🇺, North America 🇺🇸, Australasia 🇦🇺, Asia 🌏).
+
+### v2.5.20
 - **Active Session Usage Duration**: Added 100% privacy-preserving active usage session time tracking (heartbeat active minutes while app tab is in focus).
 - **Aggregate Task Completion Counter**: Added privacy-safe aggregate task completion metrics to the Admin Portal.
 

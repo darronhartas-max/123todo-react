@@ -81,9 +81,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.20';
+export const APP_VERSION = '2.5.21';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.21': [
+    { title: '💻 OS Platform Breakdown:', desc: 'Added 100% privacy-preserving OS & platform classification (macOS, iOS, Windows, Android, Linux).' },
+    { title: '🌐 Geographic Region Breakdown:', desc: 'Added privacy-safe approximate region metrics (United Kingdom, Europe, North America, Australasia, Asia).' }
+  ],
   '2.5.20': [
     { title: '⏱️ Active Session Usage Tracking:', desc: 'Added 100% privacy-preserving active usage session time tracking (heartbeat active minutes while app is in focus).' },
     { title: '✅ Aggregate Task Completion Counter:', desc: 'Added privacy-safe aggregate task completion count metric.' }

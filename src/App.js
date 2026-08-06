@@ -31,7 +31,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
-import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted } from './utils/telemetry';
+import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion } from './utils/telemetry';
 
 const TodoApp = () => {
   const {
@@ -159,6 +159,7 @@ const TodoApp = () => {
     // Record privacy-preserving visit telemetry
     recordVisit();
     recordDeviceType();
+    recordPlatformAndRegion();
     const handleInstall = () => recordPWAInstall();
     window.addEventListener('appinstalled', handleInstall);
 

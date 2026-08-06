@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw, Clock, CheckSquare } from 'lucide-react';
+import { X, Lock, ShieldCheck, Eye, EyeOff, TrendingUp, Download, Smartphone, Users, Check, RefreshCw, Clock, CheckSquare, Globe, Monitor } from 'lucide-react';
 import { getTelemetryData, verifyAdminPassword, updateAdminPassword, formatShortDateStr } from '../../utils/telemetry';
 
 const COMMON_STYLES = {
@@ -481,6 +481,60 @@ const AdminStatsModal = ({ isOpen, onClose }) => {
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                </div>
+
+                                {/* Platform & Region Breakdown Grid */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                    gap: '12px',
+                                    marginBottom: '16px'
+                                }}>
+                                    {/* OS Platforms Breakdown */}
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <h5 style={{ margin: '0 0 10px', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Monitor size={16} style={{ color: 'var(--accent-color)' }} />
+                                            <span>Platforms & OS</span>
+                                        </h5>
+                                        {telemetry.platforms && Object.keys(telemetry.platforms).length > 0 ? (
+                                            Object.entries(telemetry.platforms).map(([platformName, count]) => (
+                                                <div key={platformName} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                                    <span>{platformName}</span>
+                                                    <span style={{ fontWeight: '700' }}>{count}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Collecting platform data...</div>
+                                        )}
+                                    </div>
+
+                                    {/* Geographic Regions Breakdown */}
+                                    <div style={{
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        background: 'var(--bg-color)',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <h5 style={{ margin: '0 0 10px', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Globe size={16} style={{ color: '#10b981' }} />
+                                            <span>Approx. Geographic Regions</span>
+                                        </h5>
+                                        {telemetry.regions && Object.keys(telemetry.regions).length > 0 ? (
+                                            Object.entries(telemetry.regions).map(([regionName, count]) => (
+                                                <div key={regionName} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '4px 0', borderBottom: '1px dashed var(--border-color)', color: 'var(--text-color)' }}>
+                                                    <span>{regionName}</span>
+                                                    <span style={{ fontWeight: '700' }}>{count}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Collecting location data...</div>
+                                        )}
                                     </div>
                                 </div>
                             </>

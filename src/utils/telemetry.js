@@ -187,6 +187,42 @@ export const recordDeviceType = () => {
     saveTelemetryData(data);
 };
 
+/** Record OS Platform & Region (Timezone-based, 100% cookie & IP free) */
+export const recordPlatformAndRegion = () => {
+    if (typeof window === 'undefined') return;
+    const data = getTelemetryData();
+    const ua = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+
+    // OS Classifier
+    let osName = 'Other';
+    if (/iPhone|iPad|iPod/.test(ua)) osName = 'iOS 📱';
+    else if (/Android/.test(ua)) osName = 'Android 🤖';
+    else if (/Mac/.test(platform) || /Macintosh/.test(ua)) osName = 'macOS 💻';
+    else if (/Win/.test(platform) || /Windows/.test(ua)) osName = 'Windows 🖥️';
+    else if (/Linux/.test(platform)) osName = 'Linux 🐧';
+
+    data.platforms = data.platforms || {};
+    data.platforms[osName] = (data.platforms[osName] || 0) + 1;
+
+    // Approximate Region via Timezone (Privacy-preserving, 0 IP logging)
+    let region = 'Global';
+    try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        if (tz.includes('Europe/London')) region = 'United Kingdom 🇬🇧';
+        else if (tz.startsWith('Europe')) region = 'Europe 🇪🇺';
+        else if (tz.startsWith('America')) region = 'North America 🇺🇸';
+        else if (tz.startsWith('Australia') || tz.startsWith('Pacific/Auckland')) region = 'Australasia 🇦🇺';
+        else if (tz.startsWith('Asia')) region = 'Asia 🌏';
+        else if (tz.startsWith('Africa')) region = 'Africa 🌍';
+    } catch (e) {}
+
+    data.regions = data.regions || {};
+    data.regions[region] = (data.regions[region] || 0) + 1;
+
+    saveTelemetryData(data);
+};
+
 /** Verify Admin Password */
 export const verifyAdminPassword = (inputPassword) => {
     if (!inputPassword) return false;
