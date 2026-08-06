@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.7 (Current)
+### v2.5.8 (Current)
+- **Pull-to-Refresh Gesture Lock**: Added vertical scroll detection in `TaskItem.js` to prevent page pull-to-refresh gestures from accidentally triggering horizontal swipe-to-archive task actions.
+- **Archive Visibility Fix**: Updated swipe delete handling and archive filtering so archived tasks are correctly moved to the `archived` array and displayed in the Archive section.
+
+### v2.5.7
 - **Project Deletion Overlay Fix**: Increased Delete Project modal zIndex to ensure deletion confirmation prompts appear cleanly on top of Settings.
 - **Projects Header Optimization**: Streamlined the projects dropdown bar by removing redundant text labels and placing the search icon next to the selector.
 

@@ -25,6 +25,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
     const wasSwipingRef = React.useRef(false);
+    const isScrollingVerticalRef = React.useRef(false);
 
     const THRESHOLD = 75;
 
@@ -41,19 +42,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         touchStartRef.current = { x: clientX, y: clientY };
         isSwipingRef.current = false;
         wasSwipingRef.current = false;
+        isScrollingVerticalRef.current = false;
     };
 
     const handleMove = (clientX, clientY, e) => {
-        if (!swipeSettings?.enabled || isArchived) return;
+        if (!swipeSettings?.enabled || isArchived || isScrollingVerticalRef.current) return;
         const diffX = clientX - touchStartRef.current.x;
         const diffY = clientY - touchStartRef.current.y;
 
+        // If vertical movement is dominant (scrolling or pulling down screen to refresh), lock out swiping for this touch gesture!
+        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 6) {
+            isScrollingVerticalRef.current = true;
+            setSwipeOffset(0);
+            isSwipingRef.current = false;
+            return;
+        }
+
         if (!isSwipingRef.current) {
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 6) {
+            // Require clear horizontal intent (horizontal distance exceeds vertical by 1.5x and > 10px)
+            if (Math.abs(diffX) > Math.abs(diffY) * 1.5 && Math.abs(diffX) > 10) {
                 isSwipingRef.current = true;
                 wasSwipingRef.current = true;
-            } else if (Math.abs(diffY) > 6) {
-                return;
             }
         }
 
@@ -66,9 +75,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     };
 
     const handleEnd = () => {
-        if (!swipeSettings?.enabled || !isSwipingRef.current) {
+        if (!swipeSettings?.enabled || !isSwipingRef.current || isScrollingVerticalRef.current) {
             setSwipeOffset(0);
             isSwipingRef.current = false;
+            isScrollingVerticalRef.current = false;
             setTimeout(() => { wasSwipingRef.current = false; }, 100);
             return;
         }
@@ -79,6 +89,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         }
         setSwipeOffset(0);
         isSwipingRef.current = false;
+        isScrollingVerticalRef.current = false;
         setTimeout(() => { wasSwipingRef.current = false; }, 100);
     };
 

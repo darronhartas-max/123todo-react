@@ -79,9 +79,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.7';
+export const APP_VERSION = '2.5.8';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.8': [
+    { title: '🔒 Pull-to-Refresh Gesture Lock:', desc: 'Prevents vertical pull-to-refresh motions from accidentally triggering swipe-to-archive task actions.' },
+    { title: '📦 Complete Archive Visibility:', desc: 'Guarantees that all archived tasks are stored and rendered reliably in the Archive section.' }
+  ],
   '2.5.7': [
     { title: '🗑️ Project Deletion Overlay Fix:', desc: 'Fixed Delete Project confirmation modal layer so deletion prompts render cleanly on top of Settings.' },
     { title: '📐 Header Bar Space Optimization:', desc: 'Streamlined the projects bar by placing search icon directly next to the project selector.' }

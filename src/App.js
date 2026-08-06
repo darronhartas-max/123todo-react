@@ -93,7 +93,7 @@ const TodoApp = () => {
         if (task.isArchived) {
           deleteArchivedTask(task.id);
         } else {
-          updateTask(task.id, { isArchived: true });
+          handleCompleteTask(task.id);
         }
         break;
       case 'priority_4':
@@ -402,7 +402,7 @@ const TodoApp = () => {
 
   const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
   const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));
-  const filteredArchived = filteredByProject(filteredBySearch(archived));
+  const filteredArchived = filteredBySearch(archived);
 
   const activeTasksCount = activeTasks.filter(t => t.priority <= 3).length;
   const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
