@@ -106,9 +106,21 @@ const parseTodoistFile = (filename, text, taskLengthLimit = '250') => {
         const type    = typeIdx !== -1 ? (row[typeIdx] || '').trim().toLowerCase() : 'task';
         const content = (row[contentIdx] || '').trim();
 
-        // Phase 1 fix: skip section rows and blank content
-        if (type === 'section' || type === 'note') return;
+        // Skip section, note, header, config rows and blank content
+        if (['section', 'note', 'header', 'config', 'setting', 'metadata'].includes(type)) return;
         if (!content) return;
+
+        // Skip Todoist view_style or layout configuration rows (e.g. 'view_style=list', 'view_style=board', etc.)
+        const contentLower = content.toLowerCase();
+        if (
+            contentLower.startsWith('view_style') ||
+            contentLower.startsWith('view_type') ||
+            contentLower.startsWith('layout=') ||
+            contentLower.includes('view_style=') ||
+            contentLower.includes('view_type=')
+        ) {
+            return;
+        }
 
         const rawPriority = prioIdx !== -1 ? row[prioIdx] : '';
         const priority    = mapPriority(rawPriority);
@@ -699,4 +711,5 @@ const TodoistImportModal = ({ onClose, onImport, onOpenGuide, projects: existing
     );
 };
 
+export { parseTodoistFile, parseCSV };
 export default TodoistImportModal;

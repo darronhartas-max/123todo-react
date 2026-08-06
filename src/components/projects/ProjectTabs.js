@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 
-const ProjectTabs = ({ projects = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings }) => {
+const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
@@ -14,9 +14,24 @@ const ProjectTabs = ({ projects = [], currentProjectId, onSelect, showSearch, on
     const activeProject = allProjects.find(p => p.id === currentProjectId) || allProjects[0];
     const activeColor = activeProject?.color || '#6b7280';
 
-    // Calculate widest project text length to dynamically size the dropdown button
-    const maxProjectNameLength = Math.max(...allProjects.map(p => (p?.name || '').length), 8);
-    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 42, 130), 280);
+    const getProjectTaskCount = (projectId) => {
+        if (!tasks || tasks.length === 0) return 0;
+        if (projectId === 'all') {
+            return tasks.length;
+        }
+        return tasks.filter(t => (t.projectId || 'general').toLowerCase() === projectId.toLowerCase()).length;
+    };
+
+    const activeCount = getProjectTaskCount(activeProject?.id);
+
+    // Calculate widest project text length including task count badge to dynamically size the dropdown button
+    const getProjectLabelLength = (p) => {
+        const count = getProjectTaskCount(p.id);
+        return (p?.name || '').length + String(count).length + 4;
+    };
+
+    const maxProjectNameLength = Math.max(...allProjects.map(getProjectLabelLength), 10);
+    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 140), 320);
 
     const styles = {
         mainWrapper: {
@@ -126,7 +141,7 @@ const ProjectTabs = ({ projects = [], currentProjectId, onSelect, showSearch, on
                         style={styles.customSelectTrigger(activeColor)}
                     >
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {activeProject?.name}
+                            {activeProject?.name} ({activeCount})
                         </span>
                         <ChevronDown size={16} style={{ color: activeColor, flexShrink: 0, marginLeft: '6px' }} />
                     </button>
@@ -145,26 +160,42 @@ const ProjectTabs = ({ projects = [], currentProjectId, onSelect, showSearch, on
                                 }}
                             />
                             <div style={styles.customSelectDropdown}>
-                                {allProjects.map(p => (
-                                    <div
-                                        key={p.id}
-                                        onClick={() => {
-                                            onSelect(p.id);
-                                            setIsOpen(false);
-                                        }}
-                                        onMouseEnter={() => setHoveredOptionId(p.id)}
-                                        onMouseLeave={() => setHoveredOptionId(null)}
-                                        style={{
-                                            ...styles.customOption(p.id === currentProjectId, p.color),
-                                            background: p.id === currentProjectId
-                                                ? `${p.color}15`
-                                                : (hoveredOptionId === p.id ? 'var(--bg-color)' : 'transparent')
-                                        }}
-                                    >
-                                        <div style={styles.customOptionBand(p.color)} />
-                                        <span>{p.name}</span>
-                                    </div>
-                                ))}
+                                {allProjects.map(p => {
+                                    const count = getProjectTaskCount(p.id);
+                                    const isSelected = p.id === currentProjectId;
+                                    return (
+                                        <div
+                                            key={p.id}
+                                            onClick={() => {
+                                                onSelect(p.id);
+                                                setIsOpen(false);
+                                            }}
+                                            onMouseEnter={() => setHoveredOptionId(p.id)}
+                                            onMouseLeave={() => setHoveredOptionId(null)}
+                                            style={{
+                                                ...styles.customOption(isSelected, p.color),
+                                                background: isSelected
+                                                    ? `${p.color}15`
+                                                    : (hoveredOptionId === p.id ? 'var(--bg-color)' : 'transparent')
+                                            }}
+                                        >
+                                            <div style={styles.customOptionBand(p.color)} />
+                                            <span style={{ flex: 1 }}>{p.name}</span>
+                                            <span style={{
+                                                fontSize: '0.78rem',
+                                                fontWeight: '700',
+                                                padding: '2px 8px',
+                                                borderRadius: '10px',
+                                                background: isSelected ? `${p.color}25` : 'var(--bg-color)',
+                                                color: isSelected ? p.color : 'var(--muted-text)',
+                                                border: '1px solid var(--border-color)',
+                                                marginLeft: '10px'
+                                            }}>
+                                                {count}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </>
                     )}

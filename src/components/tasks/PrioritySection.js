@@ -77,10 +77,12 @@ const PrioritySection = ({
                                 dragHandlers={{
                                     onDragStart: (e) => handleDragStart(e, task.id),
                                     onDragOver: (e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         handleDragOver(e, task.id);
                                     },
                                     onDrop: (e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         handleDrop(e, task.id);
                                     },

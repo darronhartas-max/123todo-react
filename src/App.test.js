@@ -17,3 +17,11 @@ test('preserves user font size and bold font settings from localStorage', () => 
   expect(document.documentElement.classList.contains('bold-font-active')).toBe(true);
 });
 
+test('applies light mode background tone class to document root from localStorage', () => {
+  localStorage.setItem('123TodoLightModeTone', 'muted');
+
+  render(<App />);
+
+  expect(document.documentElement.classList.contains('light-tone-muted')).toBe(true);
+});
+

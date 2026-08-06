@@ -25,6 +25,52 @@ html {
   --section-margin: 20px;
 }
 
+/* Configurable Light Mode Tones (applied in light mode) */
+/* 1. Bright Tone (Standard Pure White) */
+:root.light-tone-bright:not(.theme-dark) {
+  --bg-color: #ffffff;
+  --text-color: #111827;
+  --surface-color: #ffffff;
+  --border-color: #e5e7eb;
+  --header-bg: #ffffff;
+  --footer-bg: #f9fafb;
+  --accent-color: #285a82;
+  --muted-text: #6b7280;
+  --item-bg: #ffffff;
+  --accent-bg: #f0f7ff;
+  --archive-bg: #f9fafb;
+}
+
+/* 2. Soft Tone (Soft Warm Light Grey - Reduced Eye Strain) */
+:root.light-tone-soft:not(.theme-dark) {
+  --bg-color: #f1f5f9;
+  --text-color: #1e293b;
+  --surface-color: #f8fafc;
+  --border-color: #cbd5e1;
+  --header-bg: #f8fafc;
+  --footer-bg: #e2e8f0;
+  --accent-color: #1e40af;
+  --muted-text: #64748b;
+  --item-bg: #ffffff;
+  --accent-bg: #e2e8f0;
+  --archive-bg: #f1f5f9;
+}
+
+/* 3. Muted Tone (Subdued Cozy Grey - Zero Glare) */
+:root.light-tone-muted:not(.theme-dark) {
+  --bg-color: #e2e8f0;
+  --text-color: #0f172a;
+  --surface-color: #f1f5f9;
+  --border-color: #94a3b8;
+  --header-bg: #f1f5f9;
+  --footer-bg: #cbd5e1;
+  --accent-color: #1e3a8a;
+  --muted-text: #475569;
+  --item-bg: #f8fafc;
+  --accent-bg: #cbd5e1;
+  --archive-bg: #e2e8f0;
+}
+
 /* System Dark Mode: Apply unless light theme is explicitly forced */
 @media (prefers-color-scheme: dark) {
   :root:not(.theme-light) {

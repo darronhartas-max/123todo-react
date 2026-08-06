@@ -297,7 +297,19 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.14 (Current)
+### v2.5.16 (Current)
+- **Archive Deletion 2-Stage Confirmation**: Added a prominent visual warning banner and 2-step approval buttons before permanently clearing archived tasks (`Delete ALL Archived Tasks`).
+- **Drag & Drop Task Reordering**: Restored smooth HTML5 drag-and-drop task reordering across priority list sections and On Hold tasks.
+- **Top Placement for New Tasks**: Newly created tasks now automatically appear at the top of their respective item list section.
+- **Todoist CSV Import Metadata Filter**: Automatically filters out Todoist CSV export metadata rows (such as `view_style=list`).
+- **Projects Dropdown Task Badges**: Displays active task count badges (e.g. `All (12)`, `Work (5)`) in the projects drop-down selector and option list.
+- **Configurable Light Mode Tones**: Introduced 3 light mode background tones (**Bright**, **Soft**, **Muted**) under Settings ➔ Appearance to eliminate glare and reduce eye strain.
+- **Streamlined Task List Layout**: Removed leading `+` note toggle symbol button to save space and enhance task list appearance.
+
+### v2.5.15
+- **Open Archive Range-Left Alignment**: Aligned Open Archive section button range-left to match On Hold and Scheduled headings.
+
+### v2.5.14
 - **Task Drag & Drop Reordering Fix**: Fixed active dataset 2-way sync conflict resolution so custom task order sequence is preserved and uploaded during background Google Drive syncs.
 
 ### v2.5.13

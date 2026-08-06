@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Search, X, Trash2, Calendar, Filter, ArrowUpDown, Check } from 'lucide-react';
+import { Archive, Search, X, Trash2, Calendar, Filter, ArrowUpDown, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';
@@ -9,7 +9,7 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProject, setSelectedProject] = useState('all');
     const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'oldest' | 'priority' | 'name'
-    const [confirmClearAll, setConfirmClearAll] = useState(false);
+    const [clearStep, setClearStep] = useState(0); // 0: idle, 1: first approval, 2: second approval
 
     // Close on Escape key press
     useEffect(() => {
@@ -65,7 +65,7 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
 
     const handleClearAll = () => {
         filteredArchivedTasks.forEach(task => onDelete(task.id));
-        setConfirmClearAll(false);
+        setClearStep(0);
     };
 
     const styles = {
@@ -229,18 +229,116 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
             color: 'var(--muted-text)'
         },
         clearBtn: {
-            background: 'rgba(239, 68, 68, 0.08)',
+            background: 'rgba(239, 68, 68, 0.1)',
             color: '#ef4444',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            padding: '6px 12px',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            padding: '7px 14px',
             borderRadius: '8px',
-            fontWeight: '600',
-            fontSize: '0.85rem',
+            fontWeight: '700',
+            fontSize: '0.88rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
             transition: 'all 0.2s ease'
+        },
+        warningBox: {
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.2) 100%)',
+            border: '2px solid #ef4444',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            margin: '4px 0 8px 0',
+            boxShadow: '0 6px 18px rgba(239, 68, 68, 0.15)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
+        },
+        warningHeader: {
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '14px'
+        },
+        warningTitleRow: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            flexWrap: 'wrap'
+        },
+        warningTitle: {
+            fontSize: '1.05rem',
+            fontWeight: '800',
+            color: '#ef4444',
+            margin: 0,
+            letterSpacing: '-0.2px'
+        },
+        stepBadgeAmber: {
+            background: '#f59e0b',
+            color: '#000000',
+            fontSize: '0.75rem',
+            fontWeight: '800',
+            padding: '2px 8px',
+            borderRadius: '10px',
+            textTransform: 'uppercase'
+        },
+        stepBadgeRed: {
+            background: '#dc2626',
+            color: '#ffffff',
+            fontSize: '0.75rem',
+            fontWeight: '800',
+            padding: '2px 8px',
+            borderRadius: '10px',
+            textTransform: 'uppercase'
+        },
+        warningMessage: {
+            fontSize: '0.9rem',
+            color: 'var(--text-color)',
+            margin: '4px 0 0 0',
+            lineHeight: '1.45'
+        },
+        warningActions: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            flexWrap: 'wrap',
+            marginTop: '2px'
+        },
+        approvalBtn1: {
+            background: '#f59e0b',
+            color: '#000000',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontWeight: '800',
+            fontSize: '0.88rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.35)'
+        },
+        approvalBtn2: {
+            background: '#dc2626',
+            color: '#ffffff',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontWeight: '800',
+            fontSize: '0.88rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 10px rgba(220, 38, 38, 0.45)'
+        },
+        cancelBtn: {
+            background: 'var(--surface-color)',
+            color: 'var(--text-color)',
+            border: '1px solid var(--border-color)',
+            padding: '8px 14px',
+            borderRadius: '8px',
+            fontWeight: '600',
+            fontSize: '0.88rem',
+            cursor: 'pointer'
         }
     };
 
@@ -332,12 +430,15 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                     onChange={(e) => setSelectedProject(e.target.value)}
                                     style={styles.select}
                                 >
-                                    <option value="all">All Projects</option>
-                                    {projects.map(p => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.name}
-                                        </option>
-                                    ))}
+                                    <option value="all">All Projects ({archived.length})</option>
+                                    {projects.map(p => {
+                                        const count = archived.filter(t => (t.projectId || 'general').toLowerCase() === p.id.toLowerCase()).length;
+                                        return (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name} ({count})
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </div>
 
@@ -358,38 +459,93 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                             </div>
                         </div>
 
-                        {archived.length > 0 && filteredArchivedTasks.length > 0 && (
-                            <div>
-                                {confirmClearAll ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span style={{ fontSize: '0.85rem', color: '#ef4444', fontWeight: '600' }}>
-                                            Delete {filteredArchivedTasks.length} items?
-                                        </span>
-                                        <button
-                                            onClick={handleClearAll}
-                                            style={{ ...styles.clearBtn, background: '#ef4444', color: 'white' }}
-                                        >
-                                            <Check size={14} /> Yes, Delete
-                                        </button>
-                                        <button
-                                            onClick={() => setConfirmClearAll(false)}
-                                            style={{ ...styles.clearBtn, color: 'var(--text-color)', background: 'transparent', border: '1px solid var(--border-color)' }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => setConfirmClearAll(true)}
-                                        style={styles.clearBtn}
-                                        title="Delete filtered tasks permanently"
-                                    >
-                                        <Trash2 size={14} /> Clear {searchQuery || selectedProject !== 'all' ? 'Filtered' : 'Archive'}
-                                    </button>
-                                )}
-                            </div>
+                        {archived.length > 0 && filteredArchivedTasks.length > 0 && clearStep === 0 && (
+                            <button
+                                onClick={() => setClearStep(1)}
+                                style={styles.clearBtn}
+                                title="Delete all archived tasks permanently"
+                            >
+                                <Trash2 size={14} /> Delete ALL Archived Tasks
+                            </button>
                         )}
                     </div>
+
+                    {/* BIG Warning Banner for Clear Archive (2-step Approval) */}
+                    {clearStep > 0 && filteredArchivedTasks.length > 0 && (
+                        <AnimatePresence>
+                            <motion.div
+                                initial={{ opacity: 0, height: 0, y: -10 }}
+                                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                                exit={{ opacity: 0, height: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {clearStep === 1 ? (
+                                    <div style={styles.warningBox}>
+                                        <div style={styles.warningHeader}>
+                                            <AlertTriangle size={28} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+                                            <div>
+                                                <div style={styles.warningTitleRow}>
+                                                    <h4 style={styles.warningTitle}>⚠️ BIG WARNING: PERMANENT DELETION</h4>
+                                                    <span style={styles.stepBadgeAmber}>Step 1 of 2</span>
+                                                </div>
+                                                <p style={styles.warningMessage}>
+                                                    You are about to clear <strong>{filteredArchivedTasks.length}</strong> archived task{filteredArchivedTasks.length === 1 ? '' : 's'}. This will permanently erase these items from your record and cannot be undone!
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div style={styles.warningActions}>
+                                            <button
+                                                onClick={() => setClearStep(2)}
+                                                style={styles.approvalBtn1}
+                                            >
+                                                <AlertTriangle size={15} /> Yes, Proceed to Final Approval (1/2)
+                                            </button>
+                                            <button
+                                                onClick={() => setClearStep(0)}
+                                                style={styles.cancelBtn}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div style={{
+                                        ...styles.warningBox,
+                                        borderColor: '#dc2626',
+                                        background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.18) 0%, rgba(185, 28, 28, 0.28) 100%)',
+                                        boxShadow: '0 6px 20px rgba(220, 38, 38, 0.3)'
+                                    }}>
+                                        <div style={styles.warningHeader}>
+                                            <ShieldAlert size={30} style={{ color: '#dc2626', flexShrink: 0, marginTop: '2px' }} />
+                                            <div>
+                                                <div style={styles.warningTitleRow}>
+                                                    <h4 style={{ ...styles.warningTitle, color: '#dc2626' }}>🚨 FINAL WARNING: ARE YOU 100% SURE?</h4>
+                                                    <span style={styles.stepBadgeRed}>Step 2 of 2 (FINAL)</span>
+                                                </div>
+                                                <p style={styles.warningMessage}>
+                                                    <strong>CRITICAL NOTICE:</strong> Clicking the final approval button below will <strong>PERMANENTLY DELETE ALL ARCHIVED TASKS</strong>. Recovery is impossible.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div style={styles.warningActions}>
+                                            <button
+                                                onClick={handleClearAll}
+                                                style={styles.approvalBtn2}
+                                            >
+                                                <Trash2 size={16} /> FINAL APPROVAL: Delete ALL Archived Tasks (2/2)
+                                            </button>
+                                            <button
+                                                onClick={() => setClearStep(0)}
+                                                style={styles.cancelBtn}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    )}
                 </div>
 
                 {/* Main Scrollable Task List */}

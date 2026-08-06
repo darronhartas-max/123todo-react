@@ -81,3 +81,86 @@ test('calls onClose when close button is clicked', () => {
 
     expect(handleClose).toHaveBeenCalledTimes(1);
 });
+
+test('renders Delete ALL Archived Tasks button', () => {
+    render(
+        <ArchiveModal
+            archived={sampleArchivedTasks}
+            projects={sampleProjects}
+            onRestore={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdate={jest.fn()}
+            onClose={jest.fn()}
+        />
+    );
+
+    const clearBtn = screen.getByRole('button', { name: /Delete ALL Archived Tasks/i });
+    expect(clearBtn).toBeInTheDocument();
+});
+
+test('requires 2 approval steps with BIG warning before clearing archive', () => {
+    const handleDelete = jest.fn();
+    render(
+        <ArchiveModal
+            archived={sampleArchivedTasks}
+            projects={sampleProjects}
+            onRestore={jest.fn()}
+            onDelete={handleDelete}
+            onUpdate={jest.fn()}
+            onClose={jest.fn()}
+        />
+    );
+
+    // Initial state: Delete ALL Archived Tasks button present, no onDelete call
+    const initialBtn = screen.getByRole('button', { name: /Delete ALL Archived Tasks/i });
+    fireEvent.click(initialBtn);
+
+    // Step 1: BIG Warning Banner and Step 1 approval button should be displayed
+    expect(screen.getByText(/BIG WARNING: PERMANENT DELETION/i)).toBeInTheDocument();
+    expect(screen.getByText(/Step 1 of 2/i)).toBeInTheDocument();
+    const approvalBtn1 = screen.getByRole('button', { name: /Yes, Proceed to Final Approval \(1\/2\)/i });
+    expect(approvalBtn1).toBeInTheDocument();
+    expect(handleDelete).not.toHaveBeenCalled();
+
+    // Click Approval 1 -> advances to Step 2
+    fireEvent.click(approvalBtn1);
+
+    // Step 2: Final Warning and Step 2 approval button should be displayed
+    expect(screen.getByText(/FINAL WARNING: ARE YOU 100% SURE\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Step 2 of 2 \(FINAL\)/i)).toBeInTheDocument();
+    const approvalBtn2 = screen.getByRole('button', { name: /FINAL APPROVAL: Delete ALL Archived Tasks \(2\/2\)/i });
+    expect(approvalBtn2).toBeInTheDocument();
+    expect(handleDelete).not.toHaveBeenCalled();
+
+    // Click Approval 2 -> triggers clear
+    fireEvent.click(approvalBtn2);
+
+    expect(handleDelete).toHaveBeenCalledTimes(2);
+    expect(handleDelete).toHaveBeenNthCalledWith(1, 102);
+    expect(handleDelete).toHaveBeenNthCalledWith(2, 101);
+});
+
+test('allows canceling archive deletion at step 1 or step 2', () => {
+    const handleDelete = jest.fn();
+    render(
+        <ArchiveModal
+            archived={sampleArchivedTasks}
+            projects={sampleProjects}
+            onRestore={jest.fn()}
+            onDelete={handleDelete}
+            onUpdate={jest.fn()}
+            onClose={jest.fn()}
+        />
+    );
+
+    // Click initial button -> Step 1
+    fireEvent.click(screen.getByRole('button', { name: /Delete ALL Archived Tasks/i }));
+    expect(screen.getByText(/Step 1 of 2/i)).toBeInTheDocument();
+
+    // Click Cancel -> reverts to step 0
+    fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+    expect(screen.queryByText(/Step 1 of 2/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Delete ALL Archived Tasks/i })).toBeInTheDocument();
+    expect(handleDelete).not.toHaveBeenCalled();
+});
+

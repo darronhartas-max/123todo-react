@@ -350,37 +350,57 @@ export const useTasks = () => {
             const fromIndex = prev.findIndex(t => t.id === draggedId);
             if (fromIndex === -1) return prev;
 
-            const newTasks = [...prev];
-            const [movedTask] = newTasks.splice(fromIndex, 1);
-
             // Handle dropping directly onto a priority section header or background
             if (typeof targetId === 'string' && targetId.startsWith('priority-')) {
-                const newPriority = parseInt(targetId.split('-')[1]);
-                if ([1, 2, 3, 4].includes(newPriority)) {
-                    movedTask.priority = newPriority;
+                const newPriority = parseInt(targetId.split('-')[1], 10);
+                if (![1, 2, 3, 4].includes(newPriority)) return prev;
+
+                const newTasks = [...prev];
+                const [movedTask] = newTasks.splice(fromIndex, 1);
+                movedTask.priority = newPriority;
+
+                // Insert at the end of the matching priority group
+                let lastPriorityIdx = -1;
+                for (let i = 0; i < newTasks.length; i++) {
+                    if (newTasks[i].priority === newPriority) {
+                        lastPriorityIdx = i;
+                    }
                 }
-                const targetIdx = newTasks.findIndex(t => t.priority === movedTask.priority);
-                if (targetIdx > -1) {
-                    newTasks.splice(targetIdx, 0, movedTask);
+                if (lastPriorityIdx > -1) {
+                    newTasks.splice(lastPriorityIdx + 1, 0, movedTask);
                 } else {
-                    newTasks.unshift(movedTask);
+                    let insertIdx = newTasks.findIndex(t => t.priority > newPriority);
+                    if (insertIdx === -1) insertIdx = newTasks.length;
+                    newTasks.splice(insertIdx, 0, movedTask);
                 }
                 return newTasks;
             }
 
-            // Handle standard task-to-task sorting
-            const toIndex = newTasks.findIndex(t => t.id === targetId);
-            if (toIndex > -1) {
-                const targetTask = newTasks[toIndex];
-                // Update priority to match the target task's section
-                movedTask.priority = targetTask.priority;
-                newTasks.splice(toIndex, 0, movedTask);
-                return newTasks;
-            } else {
-                // Fallback: put it back where it was
+            // Handle standard task-to-task reordering
+            const targetIndex = prev.findIndex(t => t.id === targetId);
+            if (targetIndex === -1 || fromIndex === targetIndex) return prev;
+
+            const newTasks = [...prev];
+            const [movedTask] = newTasks.splice(fromIndex, 1);
+            
+            const targetTask = prev[targetIndex];
+            movedTask.priority = targetTask.priority;
+
+            const newTargetIndex = newTasks.findIndex(t => t.id === targetId);
+            if (newTargetIndex === -1) {
                 newTasks.splice(fromIndex, 0, movedTask);
                 return newTasks;
             }
+
+            if (fromIndex < targetIndex) {
+                // Dragging down -> place after targetTask
+                newTasks.splice(newTargetIndex + 1, 0, movedTask);
+            } else {
+                // Dragging up -> place before targetTask
+                newTasks.splice(newTargetIndex, 0, movedTask);
+            }
+
+            return newTasks;
         });
         setTimestamp(Date.now());
     }, []);

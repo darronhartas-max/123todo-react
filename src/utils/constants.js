@@ -81,9 +81,21 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.14';
+export const APP_VERSION = '2.5.16';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.16': [
+    { title: '🛡️ Archive Deletion 2-Stage Approval:', desc: 'Added prominent visual warning banner and 2-step confirmation buttons before clearing archived tasks.' },
+    { title: '🖐️ Drag & Drop Task Reordering:', desc: 'Restored smooth HTML5 drag-and-drop task reordering across list sections and On Hold tasks.' },
+    { title: '📌 Top Placement for New Tasks:', desc: 'Newly created tasks now automatically appear at the top of their respective item list section.' },
+    { title: '🧹 Todoist CSV Import Metadata Filter:', desc: 'Automatically filters out Todoist CSV export metadata rows (such as view_style=list).' },
+    { title: '📊 Projects Dropdown Task Badges:', desc: 'Displays active task count badges (e.g. All (12), Work (5)) in the projects drop-down selector and option list.' },
+    { title: '🎨 Configurable Light Mode Tones:', desc: 'Introduced 3 light mode background tones (Bright, Soft, Muted) under Settings ➔ Appearance to reduce eye strain.' },
+    { title: '📐 Streamlined Task List Layout:', desc: 'Removed leading + note toggle symbol button to save space and enhance task list appearance.' }
+  ],
+  '2.5.15': [
+    { title: '📐 Open Archive Range-Left Alignment:', desc: 'Aligned Open Archive section button range-left to match On Hold and Scheduled headings.' }
+  ],
   '2.5.14': [
     { title: '🎯 Task Drag & Drop Position Persistence Fix:', desc: 'Guarantees custom reordered task positions stay permanently saved during 2-way background Google Drive sync.' }
   ],

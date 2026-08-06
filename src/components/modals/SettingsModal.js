@@ -237,6 +237,8 @@ const SettingsModal = ({
     setLayoutWidth,
     themeMode,
     setThemeMode,
+    lightModeTone = 'soft',
+    setLightModeTone,
     swipeSettings,
     onUpdateSwipeSettings,
     onCheckForUpdates,
@@ -878,6 +880,39 @@ const SettingsModal = ({
                                             onClick={() => setThemeMode('dark')}
                                         >
                                             Dark
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Light Mode Background Tone */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Light Mode Background Tone</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Adjust background tone in light mode to reduce glare and eye strain
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(lightModeTone === 'bright')}
+                                            onClick={() => setLightModeTone && setLightModeTone('bright')}
+                                            title="Bright (Pure White background)"
+                                        >
+                                            Bright
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(lightModeTone === 'soft')}
+                                            onClick={() => setLightModeTone && setLightModeTone('soft')}
+                                            title="Soft (Warm Light Grey - Low Eye Strain)"
+                                        >
+                                            Soft
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(lightModeTone === 'muted')}
+                                            onClick={() => setLightModeTone && setLightModeTone('muted')}
+                                            title="Muted (Cozy Low-Glare Grey)"
+                                        >
+                                            Muted
                                         </button>
                                     </div>
                                 </div>

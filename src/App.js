@@ -177,6 +177,9 @@ const TodoApp = () => {
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
+  const [lightModeTone, setLightModeToneState] = useState(() => {
+    return localStorage.getItem('123TodoLightModeTone') || 'soft';
+  });
   const [dateFormat, setDateFormatState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT;
   });
@@ -200,9 +203,13 @@ const TodoApp = () => {
     setLayoutWidthState(val);
     localStorage.setItem('123TodoLayoutWidth', val);
   };
-  const setThemeMode = (val) => {
-    setThemeModeState(val);
-    localStorage.setItem('123TodoThemeMode', val);
+  const setThemeMode = (mode) => {
+    setThemeModeState(mode);
+    localStorage.setItem('123TodoThemeMode', mode);
+  };
+  const setLightModeTone = (tone) => {
+    setLightModeToneState(tone);
+    localStorage.setItem('123TodoLightModeTone', tone);
   };
   const setDateFormat = (val) => {
     setDateFormatState(val);
@@ -336,6 +343,9 @@ const TodoApp = () => {
       } else if (themeMode === 'dark') {
         root.classList.add('theme-dark');
       }
+
+      root.classList.remove('light-tone-bright', 'light-tone-soft', 'light-tone-muted');
+      root.classList.add(`light-tone-${lightModeTone}`);
       
       setIsDark(darkActive);
     };
@@ -348,7 +358,7 @@ const TodoApp = () => {
       media.addEventListener('change', listener);
       return () => media.removeEventListener('change', listener);
     }
-  }, [themeMode]);
+  }, [themeMode, lightModeTone]);
 
   const handleOpenRestoreShadow = () => {
     const shadowRaw = localStorage.getItem('123TodoShadowBackup');
@@ -423,19 +433,26 @@ const TodoApp = () => {
   // Drag and drop handlers
   const handleDragStart = (e, taskId) => {
     setDraggedId(taskId);
-    e.dataTransfer.effectAllowed = 'move';
+    if (e && e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      try {
+        e.dataTransfer.setData('text/plain', String(taskId));
+      } catch (err) {}
+    }
   };
 
   const handleDragOver = (e, targetId) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    if (e) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    }
     if (draggedId && draggedId !== targetId) {
       setDragOverId(targetId);
     }
   };
 
   const handleDrop = (e, targetId) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (draggedId && draggedId !== targetId) {
       reorderTasks(draggedId, targetId);
     }
@@ -487,12 +504,18 @@ const TodoApp = () => {
         }
       }
 
-      const projectTasks = ip.tasks.map(t => ({
-        text: t.text,
-        priority: t.priority,
-        projectId: projectId,
-        notes: t.notes || ''
-      }));
+      const projectTasks = ip.tasks
+        .filter(t => {
+          if (!t || !t.text) return false;
+          const txt = t.text.toLowerCase();
+          return !txt.startsWith('view_style') && !txt.includes('view_style=');
+        })
+        .map(t => ({
+          text: t.text,
+          priority: t.priority,
+          projectId: projectId,
+          notes: t.notes || ''
+        }));
 
       allTasksToImport.push(...projectTasks);
     });
@@ -683,6 +706,7 @@ const TodoApp = () => {
 
           <ProjectTabs
             projects={projects}
+            tasks={activeTasks}
             currentProjectId={currentProjectId}
             onSelect={setCurrentProjectId}
             onAdd={addProject}
@@ -741,29 +765,23 @@ const TodoApp = () => {
                 {showOnHold ? 'Hide' : 'Show'} On Hold ({onHoldTasksFiltered.length})
               </button>
               {showOnHold && (
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                  <AnimatePresence mode="popLayout">
-                    {onHoldTasksFiltered.map(task => {
-                      const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                        p.name.toLowerCase() === task.projectId?.toLowerCase()
-                      );
-                      return (
-                        <TaskItem
-                          key={task.id}
-                          task={task}
-                          projectColor={project?.color}
-                          onComplete={handleCompleteTask}
-                          onEdit={setEditingTask}
-                          onUpdate={updateTask}
-                          swipeSettings={swipeSettings}
-                          onSwipeAction={handleSwipeAction}
-                          dateFormat={dateFormat}
-                        />
-                      );
-                    })}
-                  </AnimatePresence>
-                </ul>
+                <PrioritySection
+                  priority={4}
+                  tasks={filteredTasks}
+                  projects={[...DEFAULT_PROJECTS, ...projects]}
+                  onComplete={handleCompleteTask}
+                  onEdit={setEditingTask}
+                  onUpdate={updateTask}
+                  handleDragStart={handleDragStart}
+                  handleDragOver={handleDragOver}
+                  handleDrop={handleDrop}
+                  handleDragEnd={handleDragEnd}
+                  draggedId={draggedId}
+                  dragOverId={dragOverId}
+                  swipeSettings={swipeSettings}
+                  onSwipeAction={handleSwipeAction}
+                  dateFormat={dateFormat}
+                />
               )}
             </div>
           )}
@@ -808,7 +826,7 @@ const TodoApp = () => {
           <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
             <button
               onClick={() => setShowArchive(true)}
-              style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '8px' }}
             >
               <Archive size={16} />
               Open Archive ({archived.length})
@@ -983,6 +1001,8 @@ const TodoApp = () => {
         setLayoutWidth={setLayoutWidth}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
+        lightModeTone={lightModeTone}
+        setLightModeTone={setLightModeTone}
         swipeSettings={swipeSettings}
         onUpdateSwipeSettings={updateSwipeSettings}
         onCheckForUpdates={handleManualCheckForUpdates}

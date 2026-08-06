@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Plus, Minus, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
@@ -16,7 +16,6 @@ const ACTION_ICONS = {
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK' }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [showNotes, setShowNotes] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
 
@@ -495,24 +494,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    {task.notes && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setShowNotes(!showNotes); }}
-                            style={{
-                                ...styles.actionBtn,
-                                marginLeft: '0',
-                                marginRight: '4px',
-                                color: 'var(--accent-color)',
-                                width: '36px',
-                                height: '36px',
-                                minWidth: '36px',
-                                background: 'rgba(37, 99, 235, 0.05)'
-                            }}
-                            title={showNotes ? "Hide Notes" : "Show Notes"}
-                        >
-                            {showNotes ? <Minus size={21} /> : <Plus size={21} />}
-                        </button>
-                    )}
                     <span style={styles.taskText}>{task.text}</span>
                 </div>
 
@@ -651,17 +632,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 )}
 
-                {showNotes && task.notes && (
+                {showFullDetails && task.notes && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         style={{
-                            fontSize: '1.1rem',
+                            fontSize: '0.92rem',
                             color: 'var(--muted-text)',
                             marginTop: '8px',
-                            padding: '10px 12px',
+                            padding: '8px 12px',
                             background: 'rgba(0,0,0,0.03)',
                             borderRadius: '6px',
                             borderLeft: '3px solid var(--accent-color)',
