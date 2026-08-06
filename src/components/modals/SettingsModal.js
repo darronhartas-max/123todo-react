@@ -1006,12 +1006,12 @@ const SettingsModal = ({
                                      </div>
                                  </div>
 
-                                 {/* Voice Input Commands & Tips */}
+                                 {/* Voice Input & Voice Notes */}
                                  <div style={styles.settingRow}>
                                      <div style={styles.settingLabel}>
-                                         <span>🎙️ Voice Input & Commands</span>
+                                         <span>🎙️ Voice Input & Voice Notes</span>
                                          <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Tap the Voice button when adding tasks. Speaks natural language commands with automatic priority & project parsing.
+                                             Tap the Voice buttons when adding or editing tasks to speak naturally. Speech automatically appends to existing text so you can pause or think freely without losing progress.
                                          </span>
                                      </div>
                                      <div style={{
@@ -1024,12 +1024,12 @@ const SettingsModal = ({
                                          lineHeight: '1.5'
                                      }}>
                                          <div style={{ fontWeight: '700', marginBottom: '6px', color: 'var(--accent-color)' }}>
-                                             Examples of Voice Commands:
+                                             Voice Input Features:
                                          </div>
                                          <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)' }}>
-                                             <li><strong>"Buy milk and bread priority 1 project Shopping"</strong> ➔ Task: <em>Buy milk and bread</em> | Priority: <em>Must Do (P1)</em> | Project: <em>Shopping</em></li>
-                                             <li><strong>"Finish quarterly report in Work"</strong> ➔ Task: <em>Finish quarterly report</em> | Priority: <em>Must Do (P1)</em> | Project: <em>Work</em></li>
-                                             <li><strong>"Call doctor"</strong> ➔ Task: <em>Call doctor</em> | Priority: <em>Must Do (P1 - Default)</em> | Project: <em>Active Project</em></li>
+                                             <li><strong>Voice Task Input</strong>: Speaks new tasks directly into the title field. New voice tasks automatically default to <strong>Top Priority (Priority 1)</strong> and the selected project.</li>
+                                             <li><strong>Voice Notes Input</strong>: Tap <strong>Voice Notes</strong> on any task to dictate long descriptions, links, or detailed instructions.</li>
+                                             <li><strong>Continuous Dictation & Appending</strong>: Stalling or pausing while thinking won't erase your words—new speech seamlessly appends to your existing text.</li>
                                          </ul>
                                      </div>
                                  </div>

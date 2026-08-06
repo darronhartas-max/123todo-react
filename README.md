@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.2 (Current)
+### v2.5.3 (Current)
+- **Voice Notes Dictation & Appending**: Added 🎙️ Voice Notes button to dictate detailed notes and instructions directly into tasks. Enables continuous dictation and text appending so pauses while thinking don't cut off speech recording. All voice tasks automatically default to Top Priority (Priority 1) and your active project.
+
+### v2.5.2
 - **Seamless 2-Way Multi-Device Sync**: Integrated a 2-way dataset merge engine (`syncUtils.js`) ensuring new tasks, completed tasks, or projects added offline on any device (laptop, phone) are combined without data loss or overwrites.
 
 ### v2.5.1

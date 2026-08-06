@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { Plus, Minus, Mic, MicOff } from 'lucide-react';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
-import { isSpeechRecognitionSupported, parseVoiceTask } from '../../utils/voiceUtils';
+import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -40,84 +40,62 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const hasOpenedRef = useRef(false);
 
     // Voice Input State
-    const [isListening, setIsListening] = useState(false);
+    const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
     const [voiceStatus, setVoiceStatus] = useState('');
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
 
-    const toggleVoiceInput = () => {
+    const stopVoice = () => {
+        if (recognitionRef.current) {
+            try { recognitionRef.current.stop(); } catch {}
+        }
+        recognitionRef.current = null;
+        setListeningTarget(null);
+    };
+
+    const toggleVoiceInput = (targetField = 'title') => {
         if (!speechSupported) {
             setVoiceStatus('Voice input is not supported in this browser.');
             setTimeout(() => setVoiceStatus(''), 4000);
             return;
         }
 
-        if (isListening) {
-            if (recognitionRef.current) {
-                try { recognitionRef.current.stop(); } catch {}
-            }
-            setIsListening(false);
+        if (listeningTarget === targetField) {
+            stopVoice();
             setVoiceStatus('');
             return;
         }
 
-        try {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
+        stopVoice();
 
-            recognition.onstart = () => {
-                setIsListening(true);
-                setVoiceStatus('🎙️ Listening... Speak task (e.g. "Buy milk priority 1 project Shopping")');
-            };
+        // Voice task input defaults to Top Priority (Priority 1 / Must Do)
+        if (targetField === 'title') {
+            setPriority(1);
+        }
 
-            recognition.onresult = (event) => {
-                const currentTranscript = Array.from(event.results)
-                    .map(result => result[0].transcript)
-                    .join('');
+        const initialVal = targetField === 'title' ? text : notes;
 
-                if (currentTranscript) {
-                    const parsed = parseVoiceTask(currentTranscript, projects, projectId);
-                    if (parsed.taskText) {
-                        setText(parsed.taskText);
-                    }
-                    if (parsed.priority) {
-                        setPriority(parsed.priority);
-                    }
-                    if (parsed.projectId) {
-                        setProjectId(parsed.projectId);
-                    }
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                setIsListening(false);
-                if (event.error === 'not-allowed') {
-                    setVoiceStatus('⚠️ Microphone permission denied.');
-                } else if (event.error === 'no-speech') {
-                    setVoiceStatus('No speech detected. Tap mic to try again.');
+        const rec = startVoiceDictation({
+            initialText: initialVal,
+            onTranscript: (updatedText) => {
+                if (targetField === 'title') {
+                    setText(updatedText);
                 } else {
-                    setVoiceStatus(`Voice error: ${event.error}`);
+                    setNotes(updatedText);
                 }
-                setTimeout(() => setVoiceStatus(''), 4000);
-            };
+            },
+            onStatusChange: (statusMsg) => {
+                setVoiceStatus(statusMsg);
+            },
+            onEnd: () => {
+                setListeningTarget(null);
+                recognitionRef.current = null;
+            }
+        });
 
-            recognition.onend = () => {
-                setIsListening(false);
-                setVoiceStatus('✨ Voice input captured!');
-                setTimeout(() => setVoiceStatus(''), 3000);
-            };
-
-            recognitionRef.current = recognition;
-            recognition.start();
-        } catch (e) {
-            console.error('Failed to start speech recognition:', e);
-            setIsListening(false);
-            setVoiceStatus('Voice recognition error.');
-            setTimeout(() => setVoiceStatus(''), 3000);
+        if (rec) {
+            recognitionRef.current = rec;
+            setListeningTarget(targetField);
         }
     };
 
@@ -306,25 +284,25 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 }}>
                     <button
                         type="button"
-                        onClick={toggleVoiceInput}
-                        title={isListening ? "Stop Listening" : (speechSupported ? "Click to speak task" : "Voice input not supported")}
+                        onClick={() => toggleVoiceInput('title')}
+                        title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to add or append to task title" : "Voice input not supported")}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
                             padding: '4px 10px',
                             borderRadius: '16px',
-                            border: `1.5px solid ${isListening ? '#ef4444' : 'var(--border-color)'}`,
-                            background: isListening ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                            color: isListening ? '#ef4444' : 'var(--text-color)',
+                            border: `1.5px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
+                            background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                            color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
                             cursor: 'pointer',
                             fontSize: '0.82rem',
                             fontWeight: '600',
                             transition: 'all 0.2s ease',
-                            boxShadow: isListening ? '0 0 10px rgba(239, 68, 68, 0.4)' : 'none'
+                            boxShadow: listeningTarget === 'title' ? '0 0 10px rgba(239, 68, 68, 0.4)' : 'none'
                         }}
                     >
-                        {isListening ? (
+                        {listeningTarget === 'title' ? (
                             <>
                                 <MicOff size={14} style={{ animation: 'pulse 1.2s infinite' }} />
                                 <span>Listening...</span>
@@ -332,7 +310,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         ) : (
                             <>
                                 <Mic size={14} color="var(--accent-color)" />
-                                <span>Voice</span>
+                                <span>Voice Task</span>
                             </>
                         )}
                     </button>
@@ -353,8 +331,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     borderRadius: '6px',
                     marginTop: '6px',
                     marginBottom: '4px',
-                    background: isListening ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
-                    color: isListening ? '#ef4444' : 'var(--accent-color)',
+                    background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
+                    color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
@@ -406,19 +384,36 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
             {showNotes && (
                 <div style={{ marginTop: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--muted-text)' }}>Notes</label>
+                        <button
+                            type="button"
+                            onClick={() => toggleVoiceInput('notes')}
+                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to add/append notes" : "Voice input not supported")}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
+                                background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                color: listeningTarget === 'notes' ? '#ef4444' : 'var(--text-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {listeningTarget === 'notes' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
+                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
+                        </button>
+                    </div>
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         onInput={handleInput}
-                        placeholder="Add unlimited text..."
-                        style={{
-                            ...styles.taskInput,
-                            minHeight: '80px',
-                            maxHeight: '200px',
-                            fontSize: '1.1rem',
-                            borderColor: 'var(--border-color)',
-                            overflowY: 'auto'
-                        }}
+                        placeholder="Add notes..."
+                        style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
                     />
                 </div>
             )}

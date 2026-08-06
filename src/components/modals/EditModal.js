@@ -1,12 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { Mic, MicOff } from 'lucide-react';
+import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task });
     
+    // Voice Input State
+    const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
+    const [voiceStatus, setVoiceStatus] = useState('');
+    const recognitionRef = useRef(null);
+    const speechSupported = isSpeechRecognitionSupported();
+
+    const stopVoice = () => {
+        if (recognitionRef.current) {
+            try { recognitionRef.current.stop(); } catch {}
+        }
+        recognitionRef.current = null;
+        setListeningTarget(null);
+    };
+
+    const toggleVoiceInput = (targetField = 'notes') => {
+        if (!speechSupported) {
+            setVoiceStatus('Voice input is not supported in this browser.');
+            setTimeout(() => setVoiceStatus(''), 4000);
+            return;
+        }
+
+        if (listeningTarget === targetField) {
+            stopVoice();
+            setVoiceStatus('');
+            return;
+        }
+
+        stopVoice();
+
+        const initialVal = targetField === 'title' ? (editingTask.text || '') : (editingTask.notes || '');
+
+        const rec = startVoiceDictation({
+            initialText: initialVal,
+            onTranscript: (updatedText) => {
+                setEditingTask(prev => ({
+                    ...prev,
+                    [targetField === 'title' ? 'text' : 'notes']: updatedText
+                }));
+            },
+            onStatusChange: (statusMsg) => {
+                setVoiceStatus(statusMsg);
+            },
+            onEnd: () => {
+                setListeningTarget(null);
+                recognitionRef.current = null;
+            }
+        });
+
+        if (rec) {
+            recognitionRef.current = rec;
+            setListeningTarget(targetField);
+        }
+    };
+
     // Subtask states
     const [showSubtasks, setShowSubtasks] = useState(!!task.subtasks && task.subtasks.length > 0);
     const [subtasks, setSubtasks] = useState(task.subtasks || []);
@@ -129,6 +185,45 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     return (
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
             <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--muted-text)' }}>Task Title</label>
+                    <button
+                        type="button"
+                        onClick={() => toggleVoiceInput('title')}
+                        title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
+                            background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                            color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
+                            cursor: 'pointer',
+                            fontSize: '0.78rem',
+                            fontWeight: '600'
+                        }}
+                    >
+                        {listeningTarget === 'title' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
+                        <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice Title'}</span>
+                    </button>
+                </div>
+
+                {voiceStatus && (
+                    <div style={{
+                        fontSize: '0.8rem',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        marginBottom: '6px',
+                        background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
+                        color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
+                        fontWeight: '600'
+                    }}>
+                        {voiceStatus}
+                    </div>
+                )}
+
                 <textarea
                     autoFocus
                     value={editingTask.text}
@@ -190,8 +285,29 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                 </div>
 
                 <div style={{ marginBottom: '8px' }}>
-                    <div style={{ marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)' }}>Notes</label>
+                        <button
+                            type="button"
+                            onClick={() => toggleVoiceInput('notes')}
+                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
+                                background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                color: listeningTarget === 'notes' ? '#ef4444' : 'var(--text-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {listeningTarget === 'notes' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
+                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
+                        </button>
                     </div>
                     <textarea
                         value={editingTask.notes || ''}
