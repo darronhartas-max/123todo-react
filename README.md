@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.9 (Current)
+### v2.5.10 (Current)
+- **Project Deletion 2-Way Sync Fix**: Added persistent `deletedProjects` tombstone tracking so deleted custom projects remain permanently removed across all synced devices during 2-way Google Drive sync.
+
+### v2.5.9
 - **Font Settings Persistence**: Fixed font size persistence across app reloads and version updates by replacing legacy px-to-pt migration logic with a valid pt range check (8pt–24pt).
 - **Full-Screen Archive Search Modal**: Replaced cramped 200px inline list with a full-screen, responsive `ArchiveModal` featuring real-time search, project filtering, and sorting (recently completed first).
 - **Sync Task Restoration Fix**: Fixed 2-way sync conflict resolution so tasks restored from the Archive remain active across devices without falling back into the Archive.

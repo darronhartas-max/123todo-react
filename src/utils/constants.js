@@ -22,7 +22,8 @@ export const STORAGE_KEYS = {
   TIMESTAMP: '123TodoTimestamp',
   SWIPE_SETTINGS: '123TodoSwipeSettings',
   DATE_FORMAT: '123TodoDateFormat',
-  TASK_LENGTH_LIMIT: '123TodoTaskLengthLimit'
+  TASK_LENGTH_LIMIT: '123TodoTaskLengthLimit',
+  DELETED_PROJECTS: '123TodoDeletedProjects'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -79,9 +80,12 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.9';
+export const APP_VERSION = '2.5.10';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.10': [
+    { title: '🗑️ Project Deletion Sync Fix:', desc: 'Guarantees deleted custom projects remain permanently deleted across all connected devices during 2-way Google Drive sync.' }
+  ],
   '2.5.9': [
     { title: '🔤 Font Settings Persistence:', desc: 'Guarantees text size and typography settings remain saved across page reloads and version updates.' },
     { title: '📦 Full-Screen Archive Search:', desc: 'Spacious full-screen Archive modal with instant keyword search, project filters, and sorting.' },

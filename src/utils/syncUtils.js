@@ -15,6 +15,10 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const localProjects = Array.isArray(localData.projects) ? localData.projects : [];
   const remoteProjects = Array.isArray(remoteData.projects) ? remoteData.projects : [];
 
+  const localDeletedProjects = Array.isArray(localData.deletedProjects) ? localData.deletedProjects : [];
+  const remoteDeletedProjects = Array.isArray(remoteData.deletedProjects) ? remoteData.deletedProjects : [];
+  const mergedDeletedProjects = Array.from(new Set([...localDeletedProjects, ...remoteDeletedProjects]));
+
   // 1. Merge Projects
   const projectMap = new Map();
   // Ensure default General project exists
@@ -22,6 +26,7 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
 
   [...remoteProjects, ...localProjects].forEach(p => {
     if (!p || !p.id || p.id === 'all') return;
+    if (mergedDeletedProjects.includes(p.id)) return; // Ignore deleted project
     if (!projectMap.has(p.id)) {
       projectMap.set(p.id, { ...p });
     } else {
@@ -151,6 +156,7 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
     tasks: finalTasks,
     archived: finalArchived,
     projects: mergedProjects,
+    deletedProjects: mergedDeletedProjects,
     counter: currentCounter,
     timestamp: Date.now()
   };

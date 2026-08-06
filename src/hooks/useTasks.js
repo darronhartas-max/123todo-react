@@ -58,6 +58,14 @@ export const useTasks = () => {
     const [tasks, setTasks] = useState([]);
     const [archived, setArchived] = useState([]);
     const [projects, setProjects] = useState([]);
+    const [deletedProjects, setDeletedProjects] = useState(() => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEYS.DELETED_PROJECTS);
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
+    });
     const [counter, setCounter] = useState(0);
     const [timestamp, setTimestamp] = useState(Date.now());
     const [isLoaded, setIsLoaded] = useState(false);
@@ -163,6 +171,7 @@ export const useTasks = () => {
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
         localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+        localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
         localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
         localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
 
@@ -355,6 +364,7 @@ export const useTasks = () => {
 
     const addProject = useCallback((name, color) => {
         const id = name.toLowerCase().replace(/\s+/g, '-');
+        setDeletedProjects(prev => prev.filter(dpId => dpId !== id));
         if (projects.some(p => p.id === id)) return id;
 
         const newProject = { id, name, color };
@@ -371,6 +381,7 @@ export const useTasks = () => {
     const deleteProject = useCallback((id, targetProjectId = 'general') => {
         if (id === 'all') return; // Only 'all' is protected now
         setProjects(prev => prev.filter(p => p.id !== id));
+        setDeletedProjects(prev => Array.from(new Set([...prev, id])));
         // Reset tasks in this project to the target project (defaults to general)
         setTasks(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
         setArchived(prev => prev.map(t => t.projectId === id ? { ...t, projectId: targetProjectId } : t));
@@ -414,6 +425,9 @@ export const useTasks = () => {
         setTasks(sanitized.tasks);
         setArchived(sanitized.archived);
         setProjects(mappedProjects);
+        if (Array.isArray(data.deletedProjects)) {
+            setDeletedProjects(data.deletedProjects);
+        }
         setCounter(sanitized.counter);
         if (data.timestamp) setTimestamp(data.timestamp);
 
@@ -469,6 +483,7 @@ export const useTasks = () => {
         tasks,
         archived,
         projects,
+        deletedProjects,
         counter,
         timestamp,
         addTask,

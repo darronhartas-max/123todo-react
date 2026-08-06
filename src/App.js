@@ -33,7 +33,7 @@ import { getTodayDateString } from './utils/dateUtils';
 
 const TodoApp = () => {
   const {
-    tasks, archived, projects, counter, timestamp, addTask, completeTask, deleteArchivedTask,
+    tasks, archived, projects, deletedProjects, counter, timestamp, addTask, completeTask, deleteArchivedTask,
     restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, moveProject, reorderProjects,
     importData, bulkAddTasks
   } = useTasks();
@@ -45,7 +45,7 @@ const TodoApp = () => {
 
   const {
     isAuthed, syncStatus, isSyncDropped, isOffline, dismissSyncDropped, passphrase, setPassphrase, signIn, signOut, performSync
-  } = useGoogleDriveSync({ tasks, archived, projects, counter, timestamp }, importData);
+  } = useGoogleDriveSync({ tasks, archived, projects, deletedProjects, counter, timestamp }, importData);
 
   const {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
