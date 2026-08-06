@@ -24,12 +24,14 @@ import UpdatedModal from './components/modals/UpdatedModal';
 import ExportModal from './components/modals/ExportModal';
 import SharePromptModal from './components/modals/SharePromptModal';
 import ArchiveModal from './components/modals/ArchiveModal';
+import AdminStatsModal from './components/modals/AdminStatsModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
+import { recordVisit, recordPWAInstall } from './utils/telemetry';
 
 const TodoApp = () => {
   const {
@@ -153,7 +155,15 @@ const TodoApp = () => {
         localStorage.setItem('share_modal_first_used', Date.now().toString());
       }
     } catch (e) {}
+
+    // Record privacy-preserving visit telemetry
+    recordVisit();
+    const handleInstall = () => recordPWAInstall();
+    window.addEventListener('appinstalled', handleInstall);
+    return () => window.removeEventListener('appinstalled', handleInstall);
   }, []);
+
+  const [showAdminStats, setShowAdminStats] = useState(false);
 
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
@@ -1013,6 +1023,12 @@ const TodoApp = () => {
         setTaskLengthLimit={setTaskLengthLimit}
         isBoldFont={isBoldFont}
         setIsBoldFont={setIsBoldFont}
+        onOpenAdminStats={() => setShowAdminStats(true)}
+      />
+
+      <AdminStatsModal
+        isOpen={showAdminStats}
+        onClose={() => setShowAdminStats(false)}
       />
 
       <AnimatePresence>

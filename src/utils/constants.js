@@ -81,9 +81,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.16';
+export const APP_VERSION = '2.5.17';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.17': [
+    { title: '🔒 Private Admin Analytics Portal:', desc: 'Added a password-protected private Admin Analytics Portal with visual trend charts for website visits, PWA downloads, and standalone app opens.' },
+    { title: '🛡️ 100% Privacy-Preserving Telemetry:', desc: 'Zero cookies used, no IP addresses or personal data logged, fully GDPR/CCPA compliant out of the box.' }
+  ],
   '2.5.16': [
     { title: '🛡️ Archive Deletion 2-Stage Approval:', desc: 'Added prominent visual warning banner and 2-step confirmation buttons before clearing archived tasks.' },
     { title: '🖐️ Drag & Drop Task Reordering:', desc: 'Restored smooth HTML5 drag-and-drop task reordering across list sections and On Hold tasks.' },

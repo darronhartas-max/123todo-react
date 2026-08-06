@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
 
@@ -248,7 +248,8 @@ const SettingsModal = ({
     taskLengthLimit = '250',
     setTaskLengthLimit,
     isBoldFont = false,
-    setIsBoldFont
+    setIsBoldFont,
+    onOpenAdminStats
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -632,6 +633,26 @@ const SettingsModal = ({
                             <Keyboard size={18} />
                             Shortcuts
                         </button>
+                        {onOpenAdminStats && (
+                            <button
+                                style={{
+                                    ...styles.tabBtn(false),
+                                    marginTop: 'auto',
+                                    color: 'var(--muted-text)',
+                                    borderTop: '1px solid var(--border-color)',
+                                    paddingTop: '12px',
+                                    borderRadius: '0',
+                                    fontWeight: '600'
+                                }}
+                                onClick={() => {
+                                    onOpenAdminStats();
+                                }}
+                                title="Open Private Admin Portal"
+                            >
+                                <Lock size={16} />
+                                Admin Portal
+                            </button>
+                        )}
                     </div>
 
                     <div style={styles.content}>

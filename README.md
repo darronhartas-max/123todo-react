@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.16 (Current)
+### v2.5.17 (Current)
+- **Private Admin Analytics Portal**: Password-protected private Admin Portal with interactive SVG trend charts for website visits, PWA downloads, and standalone app launches.
+- **100% Privacy-Preserving Telemetry**: Zero cookies, no IP addresses logged, fully GDPR/CCPA compliant out of the box.
+
+### v2.5.16
 - **Archive Deletion 2-Stage Confirmation**: Added a prominent visual warning banner and 2-step approval buttons before permanently clearing archived tasks (`Delete ALL Archived Tasks`).
 - **Drag & Drop Task Reordering**: Restored smooth HTML5 drag-and-drop task reordering across priority list sections and On Hold tasks.
 - **Top Placement for New Tasks**: Newly created tasks now automatically appear at the top of their respective item list section.
