@@ -495,10 +495,19 @@ const TodoApp = () => {
 
   const handleDrop = (e, targetId) => {
     if (e) e.preventDefault();
-    if (draggedId && draggedId !== targetId) {
-      reorderTasks(draggedId, targetId);
+    let sourceId = draggedId;
+    if (!sourceId && e && e.dataTransfer) {
+      try {
+        const raw = e.dataTransfer.getData('text/plain');
+        if (raw) sourceId = raw;
+      } catch (err) {}
+    }
+
+    if (sourceId && String(sourceId) !== String(targetId)) {
+      reorderTasks(sourceId, targetId);
     }
     setDragOverId(null);
+    setDraggedId(null);
   };
 
   const handleDragEnd = (e) => {

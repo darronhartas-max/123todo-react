@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.22 (Current)
+### v2.5.23 (Current)
+- **Cross-Priority Drag & Drop Fix**: Fixed type-coercion ID comparison bug in HTML5 drag and drop handlers, ensuring tasks stay locked in place after reordering across priority groups.
+
+### v2.5.22
 - **App Health & Friction Tracking**: Added 100% anonymous browser error and sync drop monitoring to detect friction in the wild.
 - **Feature Adoption Metrics**: Added privacy-preserving feature usage metrics for Voice Input, Cloud Drive Sync, Todoist Imports, and Search.
 

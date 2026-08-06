@@ -93,4 +93,22 @@ describe('useTasks - reorderTasks drag and drop', () => {
         const onHoldTasks = result.current.tasks.filter(t => t.priority === 4);
         expect(onHoldTasks.map(t => t.id)).toEqual([402, 401]);
     });
+
+    test('handles string and number ID mismatch gracefully during drag and drop', () => {
+        const initialTasks = [
+            { id: 10, text: 'Task A', priority: 1, projectId: 'general' },
+            { id: 20, text: 'Task B', priority: 3, projectId: 'general' }
+        ];
+        localStorage.setItem('123TodoTasks', JSON.stringify(initialTasks));
+
+        const { result } = renderHook(() => useTasks());
+
+        // Drag Task B (id 20) with string ID '20' onto Task A (id 10) with number ID 10
+        act(() => {
+            result.current.reorderTasks('20', 10);
+        });
+
+        const moved = result.current.tasks.find(t => String(t.id) === '20');
+        expect(moved.priority).toBe(1);
+    });
 });
