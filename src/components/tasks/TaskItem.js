@@ -398,7 +398,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
 
             <motion.li
-                layout
+                layout={false}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, x: swipeOffset }}
                 exit={{ opacity: 0, scale: 0.95 }}

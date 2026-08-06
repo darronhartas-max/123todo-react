@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.23 (Current)
+### v2.5.24 (Current)
+- **Drag & Drop Position & Spring-Back Fix**: Aligned insertion index to the visual drop indicator line and disabled Framer Motion layout animation interference during native drag-and-drop.
+
+### v2.5.23
 - **Cross-Priority Drag & Drop Fix**: Fixed type-coercion ID comparison bug in HTML5 drag and drop handlers, ensuring tasks stay locked in place after reordering across priority groups.
 
 ### v2.5.22

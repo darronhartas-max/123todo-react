@@ -21,7 +21,7 @@ describe('useTasks - reorderTasks drag and drop', () => {
             result.current.reorderTasks(1, 2);
         });
 
-        expect(result.current.tasks.map(t => t.id)).toEqual([2, 1, 3]);
+        expect(result.current.tasks.map(t => t.id)).toEqual([1, 2, 3]);
     });
 
     test('reorders tasks within the same priority section when dragged up', () => {

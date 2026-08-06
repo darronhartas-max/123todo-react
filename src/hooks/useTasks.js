@@ -390,14 +390,8 @@ export const useTasks = () => {
                 return newTasks;
             }
 
-            if (fromIndex < targetIndex) {
-                // Dragging down -> place after targetTask
-                newTasks.splice(newTargetIndex + 1, 0, movedTask);
-            } else {
-                // Dragging up -> place before targetTask
-                newTasks.splice(newTargetIndex, 0, movedTask);
-            }
-
+            // Always insert at target item index (matching where the visual drop indicator line is shown)
+            newTasks.splice(newTargetIndex, 0, movedTask);
             return newTasks;
         });
         setTimestamp(Date.now());
