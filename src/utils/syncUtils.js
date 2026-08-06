@@ -53,29 +53,39 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
       archivedMap.set(key, t);
     } else {
       const existing = archivedMap.get(key);
-      if ((t.completedAt || 0) >= (existing.completedAt || 0)) {
+      if ((t.completedAt || t.updatedAt || 0) >= (existing.completedAt || existing.updatedAt || 0)) {
         archivedMap.set(key, { ...existing, ...t });
       }
     }
   });
 
-  const archivedContentKeys = new Set(
-    Array.from(archivedMap.values()).map(t => getTaskKey(t)).filter(Boolean)
-  );
-
-  // 3. Merge Active Tasks
+  // 3. Merge Active Tasks & Resolve Active vs Archived Conflicts
   const activeTaskMap = new Map();
 
   [...remoteTasks, ...localTasks].forEach(t => {
     if (!t || !t.text) return;
     const contentKey = getTaskKey(t);
-
-    // If task has been archived on either device, treat as archived
-    if (contentKey && archivedContentKeys.has(contentKey)) {
-      return;
-    }
-
     const key = t.id ? `id_${t.id}` : contentKey;
+
+    // Check if task exists in archivedMap (by ID or content key)
+    const archivedKey = (t.id && archivedMap.has(`id_${t.id}`)) 
+      ? `id_${t.id}` 
+      : (contentKey && archivedMap.has(contentKey) ? contentKey : null);
+
+    if (archivedKey) {
+      const archivedTask = archivedMap.get(archivedKey);
+      const isLocallyActive = localTasks.some(lt => lt.id === t.id || (contentKey && getTaskKey(lt) === contentKey));
+      const activeTimestamp = t.restoredAt || t.updatedAt || (isLocallyActive ? (localData.timestamp || Date.now()) : 0);
+      const archivedTimestamp = archivedTask.completedAt || archivedTask.updatedAt || 0;
+
+      if (activeTimestamp >= archivedTimestamp) {
+        // Active/Restored version is newer than or equal to archived completion -> Active WINS
+        archivedMap.delete(archivedKey);
+      } else {
+        // Archived version is newer -> Remains archived
+        return;
+      }
+    }
 
     if (!activeTaskMap.has(key)) {
       activeTaskMap.set(key, t);
@@ -91,7 +101,8 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
         scheduledDate: t.scheduledDate || existing.scheduledDate,
         subtasks: (t.subtasks && t.subtasks.length > 0) ? t.subtasks : (existing.subtasks || []),
         isRecurring: t.isRecurring !== undefined ? t.isRecurring : existing.isRecurring,
-        recurrence: t.recurrence || existing.recurrence
+        recurrence: t.recurrence || existing.recurrence,
+        restoredAt: t.restoredAt || existing.restoredAt
       };
       activeTaskMap.set(key, mergedTask);
     }

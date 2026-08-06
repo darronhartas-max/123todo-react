@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Archive } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import SocialShare from './components/layout/SocialShare';
@@ -23,6 +23,7 @@ import SyncDroppedModal from './components/modals/SyncDroppedModal';
 import UpdatedModal from './components/modals/UpdatedModal';
 import ExportModal from './components/modals/ExportModal';
 import SharePromptModal from './components/modals/SharePromptModal';
+import ArchiveModal from './components/modals/ArchiveModal';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -157,8 +158,13 @@ const TodoApp = () => {
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
     const saved = localStorage.getItem('123TodoFontSize');
-    if (saved && parseInt(saved) >= 14) return 12; // Migrate px to pt default
-    return saved ? parseInt(saved) : 12;
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= 8 && parsed <= 24) {
+        return parsed;
+      }
+    }
+    return 12;
   });
   const [density, setDensityState] = useState(() => {
     return localStorage.getItem('123TodoDensity') || 'compact';
@@ -500,14 +506,13 @@ const TodoApp = () => {
     setShowTodoistImport(false);
   };
 
-  const onRestoreRequest = (id) => {
-    const priority = prompt('Restore to priority: 1 (Must Do), 2 (Should Do), 3 (Could Do), or 4 (On Hold)', '1');
-    const p = parseInt(priority);
-    if ([1, 2, 3, 4].includes(p)) {
-      restoreTask(id, p);
-    } else {
-      alert('Invalid priority');
+  const onRestoreRequest = (id, targetPriority) => {
+    if (targetPriority && [1, 2, 3, 4].includes(parseInt(targetPriority))) {
+      restoreTask(id, parseInt(targetPriority));
+      return;
     }
+    const taskToRestore = archived.find(t => t.id === id);
+    restoreTask(id, taskToRestore?.priority || 1);
   };
 
   const handleDeleteProjectRequest = (id) => {
@@ -803,34 +808,12 @@ const TodoApp = () => {
 
           <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
             <button
-              onClick={() => setShowArchive(!showArchive)}
-              style={{ ...styles.toggleBtn, color: '#667eea' }}
+              onClick={() => setShowArchive(true)}
+              style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              {showArchive ? 'Hide' : 'Show'} Archive ({filteredArchived.length})
+              <Archive size={18} />
+              Open Full-Screen Archive ({archived.length})
             </button>
-            {showArchive && (
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
-                <AnimatePresence mode="popLayout">
-                  {filteredArchived.map(task => {
-                    const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                      p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                      p.name.toLowerCase() === task.projectId?.toLowerCase()
-                    );
-                    return (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        projectColor={project?.color}
-                        isArchived={true}
-                        onRestore={onRestoreRequest}
-                        onDelete={deleteArchivedTask}
-                        onUpdate={updateTask}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </ul>
-            )}
           </div>
         </div>
 
@@ -901,6 +884,18 @@ const TodoApp = () => {
           data={{ tasks, archived, projects }}
           onClose={() => setShowExportModal(false)}
           onRecordBackup={recordBackup}
+        />
+      )}
+
+      {showArchive && (
+        <ArchiveModal
+          archived={archived}
+          projects={projects}
+          onRestore={onRestoreRequest}
+          onDelete={deleteArchivedTask}
+          onUpdate={updateTask}
+          onClose={() => setShowArchive(false)}
+          dateFormat={dateFormat}
         />
       )}
 

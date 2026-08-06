@@ -297,7 +297,12 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.8 (Current)
+### v2.5.9 (Current)
+- **Font Settings Persistence**: Fixed font size persistence across app reloads and version updates by replacing legacy px-to-pt migration logic with a valid pt range check (8pt–24pt).
+- **Full-Screen Archive Search Modal**: Replaced cramped 200px inline list with a full-screen, responsive `ArchiveModal` featuring real-time search, project filtering, and sorting (recently completed first).
+- **Sync Task Restoration Fix**: Fixed 2-way sync conflict resolution so tasks restored from the Archive remain active across devices without falling back into the Archive.
+
+### v2.5.8
 - **Pull-to-Refresh Gesture Lock**: Added vertical scroll detection in `TaskItem.js` to prevent page pull-to-refresh gestures from accidentally triggering horizontal swipe-to-archive task actions.
 - **Archive Visibility Fix**: Updated swipe delete handling and archive filtering so archived tasks are correctly moved to the `archived` array and displayed in the Archive section.
 

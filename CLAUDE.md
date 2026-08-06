@@ -3,7 +3,7 @@
 ## Overview
 **123 ToDo** is a React Progressive Web App (PWA) for task management featuring drag-and-drop, customizable swipe gestures, Google Drive end-to-end encrypted sync, subtasks/recurrence, and Todoist CSV imports.
 
-- **Version**: v2.5.8
+- **Version**: v2.5.9
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **Live URLs**:
   - Primary: https://app.123todo.com
@@ -55,6 +55,7 @@ Whenever bumping the application version (`APP_VERSION`):
 - **Projects**: Custom project tabs with color bands, HTML5 drag-and-drop project reordering in Settings (`GripVertical`).
 - **Updates**: Persistent version upgrade tracking (`123Todo_Last_Seen_Version`), automatic PWA update banner + 1-click "Check for Updates" control in Footer & Settings header (`v2.5.8`).
 - **Voice Task & Voice Notes**: Web Speech API continuous dictation with spoken punctuation recognition ("full stop", "comma", "question mark", etc.) & overwrite-proof speech buffer (`v2.5.5`).
+- **Font Persistence & Full-Screen Archive Modal**: Font size setting persistence across reloads, full-screen responsive `ArchiveModal` with real-time search & project filters, and 2-way sync task restoration fix (`v2.5.9`).
 - **Gesture Lock & Archive Fix**: Vertical scroll/pull-to-refresh gesture lockout & 100% complete archive visibility (`v2.5.8`).
 - **Date Format Preference**: User configurable date ordering (`UK`, `US`, `ISO`, `UK Text`, `US Text`) under Settings ➔ Appearance (`v2.4.17`).
 - **Task Description Length Preference**: User customizable task description length (`250` chars default or `Unlimited`) under Settings ➔ Appearance (`v2.5.0`).

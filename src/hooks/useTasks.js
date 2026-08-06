@@ -279,9 +279,12 @@ export const useTasks = () => {
 
             const newArchived = [...prev];
             const [task] = newArchived.splice(taskIndex, 1);
+            const now = Date.now();
             const restoredTask = {
                 ...task,
-                priority
+                priority: (priority !== undefined && [1, 2, 3, 4].includes(priority)) ? priority : (task.priority || 1),
+                restoredAt: now,
+                updatedAt: now
             };
             delete restoredTask.completedAt;
 
