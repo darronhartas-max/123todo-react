@@ -1,6 +1,8 @@
 // This optional code is used to register a service worker.
 // register() is not called by default.
 
+import { APP_VERSION } from './utils/constants';
+
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -139,8 +141,23 @@ export async function checkForUpdates(forceSimulate = false) {
         return { success: true, updated: true, simulated: true };
     }
 
-    if ('serviceWorker' in navigator) {
+    try {
+        let remoteVersion = null;
         try {
+            // Direct cache-busted request to version.json bypassing browser/SW cache
+            const res = await fetch(`/version.json?t=${Date.now()}`, {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                remoteVersion = data.version;
+            }
+        } catch (e) {
+            console.warn('Could not fetch version.json:', e);
+        }
+
+        if ('serviceWorker' in navigator) {
             const registration = await navigator.serviceWorker.ready;
             if (registration) {
                 await registration.update();
@@ -148,7 +165,7 @@ export async function checkForUpdates(forceSimulate = false) {
                 if (registration.waiting && navigator.serviceWorker.controller) {
                     const event = new CustomEvent('swUpdateAvailable', { detail: registration });
                     window.dispatchEvent(event);
-                    return { success: true, updated: true, registration };
+                    return { success: true, updated: true, registration, remoteVersion };
                 }
 
                 if (registration.installing) {
@@ -157,18 +174,32 @@ export async function checkForUpdates(forceSimulate = false) {
                             if (this.state === 'installed' && navigator.serviceWorker.controller) {
                                 const event = new CustomEvent('swUpdateAvailable', { detail: registration });
                                 window.dispatchEvent(event);
-                                resolve({ success: true, updated: true, registration });
+                                resolve({ success: true, updated: true, registration, remoteVersion });
                             }
                         };
-                        setTimeout(() => resolve({ success: true, updated: false, registration }), 3000);
+                        setTimeout(() => resolve({ success: true, updated: remoteVersion ? remoteVersion !== APP_VERSION : false, registration, remoteVersion }), 3000);
                     });
                 }
-                return { success: true, updated: false, registration };
+
+                // If remote version exists and is newer than APP_VERSION, notify UI that an update is available!
+                if (remoteVersion && remoteVersion !== APP_VERSION) {
+                    const event = new CustomEvent('swUpdateAvailable', { detail: registration });
+                    window.dispatchEvent(event);
+                    return { success: true, updated: true, registration, remoteVersion };
+                }
+
+                return { success: true, updated: false, registration, remoteVersion };
             }
-        } catch (error) {
-            console.error('Failed to check for service worker updates:', error);
-            return { success: false, error };
         }
+
+        if (remoteVersion && remoteVersion !== APP_VERSION) {
+            const event = new CustomEvent('swUpdateAvailable', { detail: null });
+            window.dispatchEvent(event);
+            return { success: true, updated: true, remoteVersion };
+        }
+    } catch (error) {
+        console.error('Failed to check for service worker updates:', error);
+        return { success: false, error };
     }
     return { success: false, error: 'No Service Worker' };
 }

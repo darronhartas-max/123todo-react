@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.24 (Current)
+### v2.5.25 (Current)
+- **Cache-Busted PWA Update Engine**: Added direct cache-busted version checking via `version.json` so desktops and mobiles never get stuck on stale cached PWA builds.
+
+### v2.5.24
 - **Drag & Drop Position & Spring-Back Fix**: Aligned insertion index to the visual drop indicator line and disabled Framer Motion layout animation interference during native drag-and-drop.
 
 ### v2.5.23

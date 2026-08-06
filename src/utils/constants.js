@@ -81,9 +81,12 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.24';
+export const APP_VERSION = '2.5.25';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.25': [
+    { title: '⚡ Cache-Busted PWA Update Engine:', desc: 'Added direct cache-busted version checking via version.json so desktops and mobiles never get stuck on stale cached PWA builds.' }
+  ],
   '2.5.24': [
     { title: '🖐️ Smooth Drag & Drop Drop Position Fix:', desc: 'Aligned task reordering insertion to target drop indicator line and disabled Framer Motion layout spring-back interference.' }
   ],
