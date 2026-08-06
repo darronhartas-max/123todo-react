@@ -243,12 +243,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    paddingLeft: `${Math.max(14, Math.min(28, swipeOffset * 0.3))}px`,
+                    paddingLeft: `${Math.max(8, Math.min(16, swipeOffset * 0.2))}px`,
                     borderRadius: '6px',
                     color: '#ffffff',
                     fontWeight: isRightArmed ? '800' : '700',
-                    fontSize: '0.95rem',
-                    gap: '10px',
+                    fontSize: '0.88rem',
+                    gap: '6px',
                     pointerEvents: 'none',
                     zIndex: 1,
                     transition: 'background 0.15s ease',
@@ -256,7 +256,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 }}>
                     <motion.div
                         animate={{
-                            scale: isRightArmed ? 1.35 : (0.85 + rightProgress * 0.25),
+                            scale: isRightArmed ? 1.25 : (0.85 + rightProgress * 0.25),
                             rotate: isRightArmed ? [0, -10, 0] : 0
                         }}
                         transition={{ type: "spring", stiffness: 550, damping: 18 }}
@@ -264,21 +264,21 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '38px',
-                            height: '38px',
+                            width: '30px',
+                            height: '30px',
                             borderRadius: '50%',
                             background: isRightArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
                             boxShadow: isRightArmed ? '0 0 14px rgba(255, 255, 255, 0.6)' : 'none',
                             flexShrink: 0
                         }}
                     >
-                        {RightIcon && <RightIcon size={22} color="#ffffff" />}
+                        {RightIcon && <RightIcon size={18} color="#ffffff" />}
                     </motion.div>
                     <motion.span
                         animate={{
-                            opacity: Math.min(1, rightProgress * 3),
+                            opacity: Math.min(1, Math.abs(swipeOffset) / 10),
                             x: isRightArmed ? 4 : 0,
-                            scale: isRightArmed ? 1.08 : 1
+                            scale: isRightArmed ? 1.05 : 1
                         }}
                         transition={{ duration: 0.12 }}
                         style={{
@@ -289,7 +289,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
+                        {rightSwipeAction.actionHint || rightSwipeAction.label}
                     </motion.span>
 
                     {/* Threshold Snap Notch Marker line */}
@@ -320,12 +320,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    paddingRight: `${Math.max(14, Math.min(28, Math.abs(swipeOffset) * 0.3))}px`,
+                    paddingRight: `${Math.max(8, Math.min(16, Math.abs(swipeOffset) * 0.2))}px`,
                     borderRadius: '6px',
                     color: '#ffffff',
                     fontWeight: isLeftArmed ? '800' : '700',
-                    fontSize: '0.95rem',
-                    gap: '10px',
+                    fontSize: '0.88rem',
+                    gap: '6px',
                     pointerEvents: 'none',
                     zIndex: 1,
                     transition: 'background 0.15s ease',
@@ -333,9 +333,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 }}>
                     <motion.span
                         animate={{
-                            opacity: Math.min(1, leftProgress * 3),
+                            opacity: Math.min(1, Math.abs(swipeOffset) / 10),
                             x: isLeftArmed ? -4 : 0,
-                            scale: isLeftArmed ? 1.08 : 1
+                            scale: isLeftArmed ? 1.05 : 1
                         }}
                         transition={{ duration: 0.12 }}
                         style={{
@@ -346,11 +346,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
+                        {leftSwipeAction.actionHint || leftSwipeAction.label}
                     </motion.span>
                     <motion.div
                         animate={{
-                            scale: isLeftArmed ? 1.35 : (0.85 + leftProgress * 0.25),
+                            scale: isLeftArmed ? 1.25 : (0.85 + leftProgress * 0.25),
                             rotate: isLeftArmed ? [0, 10, 0] : 0
                         }}
                         transition={{ type: "spring", stiffness: 550, damping: 18 }}
@@ -358,15 +358,15 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '38px',
-                            height: '38px',
+                            width: '30px',
+                            height: '30px',
                             borderRadius: '50%',
                             background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
                             boxShadow: isLeftArmed ? '0 0 14px rgba(255, 255, 255, 0.6)' : 'none',
                             flexShrink: 0
                         }}
                     >
-                        {LeftIcon && <LeftIcon size={22} color="#ffffff" />}
+                        {LeftIcon && <LeftIcon size={18} color="#ffffff" />}
                     </motion.div>
 
                     {/* Threshold Snap Notch Marker line */}

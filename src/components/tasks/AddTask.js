@@ -3,7 +3,8 @@ import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants
 import { Plus, Minus } from 'lucide-react';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 
-const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK' }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
+    const isUnlimited = taskLengthLimit === 'unlimited';
     const getInitialProjectId = () => {
         const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
         const isValid = (id) => projects.some(p => p.id === id);
@@ -225,7 +226,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         color: '#6b7280',
                         fontWeight: '500'
                     }}>
-                        {text.length}/{MAX_TASK_LENGTH}
+                        {isUnlimited ? `${text.length} chars` : `${text.length}/${MAX_TASK_LENGTH}`}
                     </div>
                 </div>
             </div>
@@ -243,7 +244,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 }}
                 placeholder="What needs to be done?"
                 style={styles.taskInput}
-                maxLength={MAX_TASK_LENGTH}
+                maxLength={isUnlimited ? undefined : MAX_TASK_LENGTH}
             />
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
@@ -286,15 +287,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             overflowY: 'auto'
                         }}
                     />
-                    <div style={{
-                        fontSize: '0.85rem',
-                        color: 'var(--muted-text)',
-                        textAlign: 'right',
-                        marginTop: '2px',
-                        fontWeight: '500'
-                    }}>
-                        📝 {notes.length} chars
-                    </div>
                 </div>
             )}
 

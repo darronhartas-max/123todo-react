@@ -92,7 +92,7 @@ npm run build
 
 ### Adding Tasks & Enhanced Features
 1. Click the **➕ Add Task** button in the header or priority section.
-2. **Task Title**: Type a concise task title (up to 200 characters for quick dashboard scanning).
+2. **Task Title & Description Length**: Type a concise task title (default 250 characters, or set to Unlimited in Settings ➔ Appearance for longer task descriptions).
 3. **Priority & Project**: Select a Priority level (*Must Do, Should Do, Could Do, On Hold*) and assign a color-coded **Project**.
 4. **Unlimited Notes**: Expand **Notes** to write detailed descriptions, paste links, or store long instructions with zero length limits.
 5. **Subtasks & Checklists**: Click **📋 Subtasks** to break down large tasks into smaller step-by-step checklists.
@@ -136,8 +136,8 @@ npm run build
    - Could Do: Future tasks or low-priority items
    - On Hold: Tasks waiting on external factors
 
-2. **Punchy Titles & Unlimited In-App Notes**
-   - Keep task titles concise (up to 200 characters) for fast dashboard scanning
+2. **Punchy Titles, Custom Character Limits & Unlimited Notes**
+   - Keep task titles concise (250 characters by default, or set to Unlimited in Settings ➔ Appearance) for fast dashboard scanning
    - Attach **unlimited text Notes** to any task for rich descriptions, instructions, links, or documentation—no external note tools required!
 
 3. **Break Down Big Tasks with Subtask Checklists**
@@ -297,7 +297,16 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.4.16 (Current)
+### v2.5.0 (Current)
+- **Customizable Task Description Length**: Added an Appearance setting allowing users to switch between the default 250-character limit (encouraging concise tasks) and Unlimited mode.
+- **Sleeker Swipe Action Reveal Hints**: Made swipe action reveal indicators more compact and instantly visible upon initiating a swipe.
+- **Streamlined Notes Field UI**: Cleaned up notes field character counter elements for a cleaner, clutter-free modal editing experience.
+
+### v2.4.17
+- **Todoist-Style Swipe Gestures**: Dual-stage visual feedback with solid color fills, spring action icons, and physical rubber-band damping.
+- **Date Format Order Preference**: Choose UK (DD/MM/YYYY), US (MM/DD/YYYY), ISO (YYYY-MM-DD), or Short Text date styles under Settings ➔ Appearance.
+
+### v2.4.16
 - **Interactive Todoist Migration Guide Modal**: Created a dedicated `TodoistGuideModal` linked directly from import selection and Todoist wizard dialogs.
 - **Search Engine Optimization (SEO)**: Integrated Schema.org `JSON-LD` structured data, high-intent titles, meta descriptions, Open Graph, and Twitter Cards for Google rich snippets.
 - **Comprehensive User Guide & Copy Revisions**: Updated landing page copy for unlimited task notes, subtask checklists, and custom typography/spacing density.

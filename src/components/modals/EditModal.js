@@ -3,7 +3,8 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 
-const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK' }) => {
+const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
+    const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task });
     
     // Subtask states
@@ -134,7 +135,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK' }) => {
                     onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                     onInput={handleInput}
                     style={styles.textarea}
-                    maxLength={Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
+                    maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
                     ref={(textarea) => {
                         if (textarea) {
                             textarea.style.height = 'auto';
@@ -205,9 +206,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK' }) => {
                             }
                         }}
                     />
-                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)', marginTop: '2px', textAlign: 'right' }}>
-                        📝 {(editingTask.notes || '').length} chars
-                    </div>
                 </div>
 
                 {/* Subtask and Scheduling triggers */}
@@ -485,7 +483,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK' }) => {
                 )}
 
                 <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '12px' }}>
-                    {editingTask.text.length}/{MAX_TASK_LENGTH}
+                    {isUnlimited ? `${editingTask.text.length} chars` : `${editingTask.text.length}/${MAX_TASK_LENGTH}`}
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>

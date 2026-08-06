@@ -27,7 +27,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } f
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 
 const TodoApp = () => {
@@ -174,6 +174,9 @@ const TodoApp = () => {
   const [dateFormat, setDateFormatState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT;
   });
+  const [taskLengthLimit, setTaskLengthLimitState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT;
+  });
   const [isDark, setIsDark] = useState(false);
 
   const setFontSize = (size) => {
@@ -198,6 +201,14 @@ const TodoApp = () => {
       localStorage.setItem(STORAGE_KEYS.DATE_FORMAT, val);
     } catch (e) {
       console.error('Failed to save date format:', e);
+    }
+  };
+  const setTaskLengthLimit = (val) => {
+    setTaskLengthLimitState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.TASK_LENGTH_LIMIT, val);
+    } catch (e) {
+      console.error('Failed to save task length limit preference:', e);
     }
   };
 
@@ -607,6 +618,7 @@ const TodoApp = () => {
           projects={availableProjects}
           defaultProjectId={currentProjectId}
           dateFormat={dateFormat}
+          taskLengthLimit={taskLengthLimit}
         />
 
         <div style={{
@@ -847,6 +859,7 @@ const TodoApp = () => {
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
           dateFormat={dateFormat}
+          taskLengthLimit={taskLengthLimit}
         />
       )}
 
@@ -890,6 +903,7 @@ const TodoApp = () => {
           onClose={() => setShowTodoistImport(false)}
           onImport={handleTodoistImportData}
           onOpenGuide={() => setShowTodoistGuide(true)}
+          taskLengthLimit={taskLengthLimit}
         />
       )}
 
@@ -961,6 +975,8 @@ const TodoApp = () => {
         updateCheckStatus={updateCheckStatus}
         dateFormat={dateFormat}
         setDateFormat={setDateFormat}
+        taskLengthLimit={taskLengthLimit}
+        setTaskLengthLimit={setTaskLengthLimit}
       />
 
       <AnimatePresence>

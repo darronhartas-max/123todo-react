@@ -125,27 +125,27 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                         ? (rightSwipeAction.activeBg || rightSwipeAction.color) 
                         : `linear-gradient(90deg, ${rightSwipeAction.color}e6 0%, ${rightSwipeAction.color}b3 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-                    paddingLeft: `${Math.max(14, Math.min(28, swipeOffset * 0.3))}px`,
+                    paddingLeft: `${Math.max(8, Math.min(16, swipeOffset * 0.2))}px`,
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontWeight: isRightArmed ? '800' : '700',
-                    fontSize: '0.95rem',
-                    gap: '10px',
+                    fontSize: '0.88rem',
+                    gap: '6px',
                     zIndex: 1,
                     transition: 'background 0.15s ease'
                 }}>
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '34px', height: '34px', borderRadius: '50%',
+                        width: '30px', height: '30px', borderRadius: '50%',
                         background: isRightArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
                         transform: isRightArmed ? 'scale(1.25)' : `scale(${0.85 + rightProgress * 0.25})`,
                         transition: 'transform 0.15s ease',
                         flexShrink: 0
                     }}>
-                        {RightIcon && <RightIcon size={20} color="#ffffff" />}
+                        {RightIcon && <RightIcon size={18} color="#ffffff" />}
                     </div>
-                    <span style={{ opacity: Math.min(1, rightProgress * 3), fontWeight: '700', whiteSpace: 'nowrap' }}>
-                        {isRightArmed ? (rightSwipeAction.actionHint || rightSwipeAction.label) : rightSwipeAction.label}
+                    <span style={{ opacity: Math.min(1, Math.abs(swipeOffset) / 10), fontWeight: '700', whiteSpace: 'nowrap' }}>
+                        {rightSwipeAction.actionHint || rightSwipeAction.label}
                     </span>
                     {!isRightArmed && (
                         <div style={{ position: 'absolute', left: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
@@ -159,27 +159,27 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                         ? (leftSwipeAction.activeBg || leftSwipeAction.color) 
                         : `linear-gradient(270deg, ${leftSwipeAction.color}e6 0%, ${leftSwipeAction.color}b3 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-                    paddingRight: `${Math.max(14, Math.min(28, Math.abs(swipeOffset) * 0.3))}px`,
+                    paddingRight: `${Math.max(8, Math.min(16, Math.abs(swipeOffset) * 0.2))}px`,
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontWeight: isLeftArmed ? '800' : '700',
-                    fontSize: '0.95rem',
-                    gap: '10px',
+                    fontSize: '0.88rem',
+                    gap: '6px',
                     zIndex: 1,
                     transition: 'background 0.15s ease'
                 }}>
-                    <span style={{ opacity: Math.min(1, leftProgress * 3), fontWeight: '700', whiteSpace: 'nowrap' }}>
-                        {isLeftArmed ? (leftSwipeAction.actionHint || leftSwipeAction.label) : leftSwipeAction.label}
+                    <span style={{ opacity: Math.min(1, Math.abs(swipeOffset) / 10), fontWeight: '700', whiteSpace: 'nowrap' }}>
+                        {leftSwipeAction.actionHint || leftSwipeAction.label}
                     </span>
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '34px', height: '34px', borderRadius: '50%',
+                        width: '30px', height: '30px', borderRadius: '50%',
                         background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
                         transform: isLeftArmed ? 'scale(1.25)' : `scale(${0.85 + leftProgress * 0.25})`,
                         transition: 'transform 0.15s ease',
                         flexShrink: 0
                     }}>
-                        {LeftIcon && <LeftIcon size={20} color="#ffffff" />}
+                        {LeftIcon && <LeftIcon size={18} color="#ffffff" />}
                     </div>
                     {!isLeftArmed && (
                         <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
@@ -242,7 +242,9 @@ const SettingsModal = ({
     onCheckForUpdates,
     updateCheckStatus = 'idle',
     dateFormat = 'UK',
-    setDateFormat
+    setDateFormat,
+    taskLengthLimit = '250',
+    setTaskLengthLimit
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -951,6 +953,52 @@ const SettingsModal = ({
                                                      </div>
                                                      <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'monospace' }}>
                                                          {fmt.example}
+                                                     </div>
+                                                 </div>
+                                             );
+                                         })}
+                                     </div>
+                                 </div>
+
+                                 {/* Task Description Character Limit */}
+                                 <div style={styles.settingRow}>
+                                     <div style={styles.settingLabel}>
+                                         <span>Task Description Character Limit</span>
+                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                             Set limit for task descriptions (250 chars default encourages concise tasks)
+                                         </span>
+                                     </div>
+                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                         {[
+                                             { id: '250', label: '250 Characters (Default)', desc: 'Encourages concise task details' },
+                                             { id: 'unlimited', label: 'Unlimited', desc: 'No length restriction' }
+                                         ].map(opt => {
+                                             const isSelected = (taskLengthLimit || '250') === opt.id;
+                                             return (
+                                                 <div
+                                                     key={opt.id}
+                                                     onClick={() => setTaskLengthLimit && setTaskLengthLimit(opt.id)}
+                                                     style={{
+                                                         padding: '10px 12px',
+                                                         borderRadius: '8px',
+                                                         border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                         background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                         cursor: 'pointer',
+                                                         display: 'flex',
+                                                         flexDirection: 'column',
+                                                         gap: '2px',
+                                                         transition: 'all 0.15s ease'
+                                                     }}
+                                                 >
+                                                     <div style={{
+                                                         fontSize: '0.85rem',
+                                                         fontWeight: isSelected ? '700' : '600',
+                                                         color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                     }}>
+                                                         {opt.label}
+                                                     </div>
+                                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>
+                                                         {opt.desc}
                                                      </div>
                                                  </div>
                                              );

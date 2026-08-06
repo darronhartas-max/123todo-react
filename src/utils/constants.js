@@ -21,7 +21,8 @@ export const STORAGE_KEYS = {
   LAST_SHADOW_TIME: '123TodoLastShadowTime',
   TIMESTAMP: '123TodoTimestamp',
   SWIPE_SETTINGS: '123TodoSwipeSettings',
-  DATE_FORMAT: '123TodoDateFormat'
+  DATE_FORMAT: '123TodoDateFormat',
+  TASK_LENGTH_LIMIT: '123TodoTaskLengthLimit'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -35,10 +36,10 @@ export const DATE_FORMAT_OPTIONS = [
 export const DEFAULT_DATE_FORMAT = 'UK';
 
 export const SWIPE_ACTIONS = {
-  complete: { label: 'Complete Task', actionHint: 'Release to Complete', icon: 'CheckSquare', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', activeBg: '#10b981', activeColor: '#ffffff' },
-  delete: { label: 'Delete Task', actionHint: 'Release to Delete', icon: 'Trash2', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', activeBg: '#ef4444', activeColor: '#ffffff' },
-  priority_4: { label: 'On Hold (P4)', actionHint: 'Release for P4', icon: 'PauseCircle', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.15)', activeBg: '#9333ea', activeColor: '#ffffff' },
-  edit: { label: 'Edit Task', actionHint: 'Release to Edit', icon: 'Edit2', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)', activeBg: '#2563eb', activeColor: '#ffffff' },
+  complete: { label: 'Complete Task', actionHint: 'Complete', icon: 'CheckSquare', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', activeBg: '#10b981', activeColor: '#ffffff' },
+  delete: { label: 'Delete Task', actionHint: 'Delete', icon: 'Trash2', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', activeBg: '#ef4444', activeColor: '#ffffff' },
+  priority_4: { label: 'On Hold (P4)', actionHint: 'Hold (P4)', icon: 'PauseCircle', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.15)', activeBg: '#9333ea', activeColor: '#ffffff' },
+  edit: { label: 'Edit Task', actionHint: 'Edit', icon: 'Edit2', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)', activeBg: '#2563eb', activeColor: '#ffffff' },
   none: { label: 'None (Disabled)', actionHint: '', icon: 'Slash', color: '#9ca3af', bg: 'transparent', activeBg: 'transparent', activeColor: '#9ca3af' }
 };
 
@@ -73,13 +74,19 @@ export const DEFAULT_PROJECTS = [
   { id: 'all', name: 'All', color: '#6b7280' }
 ];
 
-export const MAX_TASK_LENGTH = 200;
+export const MAX_TASK_LENGTH = 250;
+export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.4.17';
+export const APP_VERSION = '2.5.0';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.0': [
+    { title: '📏 Custom Task Description Length:', desc: 'Set your preferred task description length under Settings ➔ Appearance (250 characters default or Unlimited).' },
+    { title: '👈 Compact Swipe Reveal Visuals:', desc: 'Sleeker, faster visual swipe reveal hints that appear immediately upon starting a swipe gesture.' },
+    { title: '✨ Streamlined Task Notes UI:', desc: 'Optimized Notes field layout for a clean, distraction-free editing experience.' }
+  ],
   '2.4.17': [
     { title: '👉 Todoist-Style Swipe Gestures:', desc: 'Dual-stage visual feedback with solid color fills, spring action icons, and physical rubber-band damping.' },
     { title: '📅 Date Format Order Preference:', desc: 'Choose UK (DD/MM/YYYY), US (MM/DD/YYYY), ISO (YYYY-MM-DD), or Short Text date styles under Settings ➔ Appearance.' },
