@@ -95,3 +95,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 :root.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.9) brightness(1.5);
 }
+
+/* Bold Font Mode Override */
+html.bold-font-active,
+html.bold-font-active body,
+html.bold-font-active input,
+html.bold-font-active textarea,
+html.bold-font-active select,
+html.bold-font-active button,
+html.bold-font-active span,
+html.bold-font-active p,
+html.bold-font-active label,
+html.bold-font-active div,
+html.bold-font-active a,
+html.bold-font-active li {
+  font-weight: 600 !important;
+}
+
+html.bold-font-active h1,
+html.bold-font-active h2,
+html.bold-font-active h3,
+html.bold-font-active h4,
+html.bold-font-active strong,
+html.bold-font-active b {
+  font-weight: 800 !important;
+}

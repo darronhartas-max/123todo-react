@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.5 (Current)
+### v2.5.6 (Current)
+- **Bold Text Typography Setting**: Added a toggle checkbox in Settings ➔ Appearance for high-contrast bold typography across all tasks, menus, and notes.
+- **Compact Density & Theme Defaults**: New users now default to Compact Density with refined bottom padding on task items and System Theme Mode.
+
+### v2.5.5
 - **Spoken Punctuation Recognition**: Converts spoken punctuation phrases like "full stop", "comma", "question mark", "exclamation mark", "colon", "semi colon", and "new line" directly into actual punctuation marks.
 - **Overwrite-Proof Speech Buffer**: Dictation uses a locked speech-accumulation buffer so long pauses or thinking breaks while speaking never truncate or overwrite previously spoken text.
 

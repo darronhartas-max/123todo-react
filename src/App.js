@@ -161,7 +161,7 @@ const TodoApp = () => {
     return saved ? parseInt(saved) : 12;
   });
   const [density, setDensityState] = useState(() => {
-    return localStorage.getItem('123TodoDensity') || 'cozy';
+    return localStorage.getItem('123TodoDensity') || 'compact';
   });
   const [layoutWidth, setLayoutWidthState] = useState(() => {
     const saved = localStorage.getItem('123TodoLayoutWidth');
@@ -176,6 +176,9 @@ const TodoApp = () => {
   });
   const [taskLengthLimit, setTaskLengthLimitState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT;
+  });
+  const [isBoldFont, setIsBoldFontState] = useState(() => {
+    return localStorage.getItem('123TodoBoldFont') === 'true';
   });
   const [isDark, setIsDark] = useState(false);
 
@@ -211,22 +214,39 @@ const TodoApp = () => {
       console.error('Failed to save task length limit preference:', e);
     }
   };
+  const setIsBoldFont = (val) => {
+    setIsBoldFontState(val);
+    try {
+      localStorage.setItem('123TodoBoldFont', val ? 'true' : 'false');
+    } catch (e) {
+      console.error('Failed to save bold font preference:', e);
+    }
+  };
 
   // Apply visual styling settings to root element
+  useEffect(() => {
+    if (isBoldFont) {
+      document.documentElement.classList.add('bold-font-active');
+    } else {
+      document.documentElement.classList.remove('bold-font-active');
+    }
+  }, [isBoldFont]);
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}pt`;
   }, [fontSize]);
 
   useEffect(() => {
     if (density === 'compact') {
-      document.documentElement.style.setProperty('--task-padding', '4px 10px');
-      document.documentElement.style.setProperty('--task-padding-top', '6px');
-      document.documentElement.style.setProperty('--task-margin', '2px');
+      document.documentElement.style.setProperty('--task-padding', '5px 10px 10px 10px');
+      document.documentElement.style.setProperty('--task-padding-top', '5px');
+      document.documentElement.style.setProperty('--task-padding-bottom', '10px');
+      document.documentElement.style.setProperty('--task-margin', '3px');
       document.documentElement.style.setProperty('--task-font-size', '0.95rem');
-      document.documentElement.style.setProperty('--section-margin', '8px');
+      document.documentElement.style.setProperty('--section-margin', '10px');
     } else {
-      document.documentElement.style.setProperty('--task-padding', '12px 16px');
+      document.documentElement.style.setProperty('--task-padding', '12px 16px 14px 16px');
       document.documentElement.style.setProperty('--task-padding-top', '14px');
+      document.documentElement.style.setProperty('--task-padding-bottom', '14px');
       document.documentElement.style.setProperty('--task-margin', '8px');
       document.documentElement.style.setProperty('--task-font-size', '1.1rem');
       document.documentElement.style.setProperty('--section-margin', '20px');
@@ -977,6 +997,8 @@ const TodoApp = () => {
         setDateFormat={setDateFormat}
         taskLengthLimit={taskLengthLimit}
         setTaskLengthLimit={setTaskLengthLimit}
+        isBoldFont={isBoldFont}
+        setIsBoldFont={setIsBoldFont}
       />
 
       <AnimatePresence>

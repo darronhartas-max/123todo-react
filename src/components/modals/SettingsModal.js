@@ -244,7 +244,9 @@ const SettingsModal = ({
     dateFormat = 'UK',
     setDateFormat,
     taskLengthLimit = '250',
-    setTaskLengthLimit
+    setTaskLengthLimit,
+    isBoldFont = false,
+    setIsBoldFont
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -898,6 +900,38 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+
+                                 {/* Bold Font Option */}
+                                 <div style={styles.settingRow}>
+                                     <div style={styles.settingLabel}>
+                                         <span>Bold Text Typography</span>
+                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                             Increase font weight across tasks, menus, and notes for enhanced high contrast readability
+                                         </span>
+                                     </div>
+                                     <label style={{
+                                         display: 'flex',
+                                         alignItems: 'center',
+                                         gap: '8px',
+                                         cursor: 'pointer',
+                                         fontWeight: '600',
+                                         color: 'var(--text-color)',
+                                         fontSize: '0.95rem'
+                                     }}>
+                                         <input
+                                             type="checkbox"
+                                             checked={isBoldFont}
+                                             onChange={(e) => setIsBoldFont && setIsBoldFont(e.target.checked)}
+                                             style={{
+                                                 width: '18px',
+                                                 height: '18px',
+                                                 accentColor: 'var(--accent-color)',
+                                                 cursor: 'pointer'
+                                             }}
+                                         />
+                                         <span>Enable Bold Text</span>
+                                     </label>
+                                 </div>
 
                                  {/* Layout Width Constraint */}
                                 <div style={styles.settingRow}>

@@ -171,6 +171,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             position: 'relative',
             alignItems: 'flex-start',
             paddingTop: 'var(--task-padding-top, 12px)',
+            paddingBottom: 'var(--task-padding-bottom, 12px)',
             opacity: isDragging ? 0.35 : 1,
             boxShadow: isDragging ? 'none' : 'none'
         },
