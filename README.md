@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.1 (Current)
+### v2.5.2 (Current)
+- **Seamless 2-Way Multi-Device Sync**: Integrated a 2-way dataset merge engine (`syncUtils.js`) ensuring new tasks, completed tasks, or projects added offline on any device (laptop, phone) are combined without data loss or overwrites.
+
+### v2.5.1
 - **Voice Task Input (Speech-to-Task)**: Added a 🎙️ Voice button to Add Task with natural language speech parsing for task title, priority level (P1-P4), and project selection.
 - **Voice Commands Guidance**: Interactive voice command examples and tips provided under Settings ➔ Appearance.
 

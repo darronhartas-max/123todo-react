@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { encryptData, decryptData } from '../utils/crypto';
+import { mergeSyncDatasets } from '../utils/syncUtils';
 
 // The Client ID from the Google Cloud Console
 const CLIENT_ID = '831861694055-fco4oka90dc7npbglscjad0prqpeu2oh.apps.googleusercontent.com';
@@ -62,11 +63,8 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             const searchData = await searchRes.json();
             
             const remoteFile = searchData.files && searchData.files.length > 0 ? searchData.files[0] : null;
-            let remoteTimestamp = 0;
             if (remoteFile) {
                 syncFileIdRef.current = remoteFile.id;
-                // Use description field (exact local timestamp), falling back to modifiedTime if not set
-                remoteTimestamp = parseInt(remoteFile.description, 10) || new Date(remoteFile.modifiedTime).getTime();
             }
 
             const currentLocalData = localDataRef.current;
@@ -113,32 +111,31 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                 return await res.json();
             };
 
-            if (isInitial && remoteFile) {
-                 const fileData = await downloadSyncFile(remoteFile.id);
-                 if (!fileData) return; // 401 handled
-                 if (fileData && fileData.payload) {
-                     const decrypted = await decryptData(fileData.payload, passphrase);
-                     if (decrypted.timestamp > localTimestamp || localTimestamp === 0) {
-                         importDataCallback(decrypted);
-                     } else if (localTimestamp > decrypted.timestamp) {
-                         const encrypted = await encryptData(currentLocalData, passphrase);
-                         await uploadSyncFile(encrypted, remoteFile.id);
-                     }
-                 }
-            } else if (localTimestamp > remoteTimestamp) {
-                // PUSH local changes to cloud
-                const encrypted = await encryptData(currentLocalData, passphrase);
-                const updatedFile = await uploadSyncFile(encrypted, syncFileIdRef.current);
-                if (updatedFile) {
-                    syncFileIdRef.current = updatedFile.id;
-                }
-            } else if (remoteTimestamp > localTimestamp && remoteFile) {
-                // PULL cloud changes to local
+            if (remoteFile) {
                 const fileData = await downloadSyncFile(remoteFile.id);
                 if (!fileData) return; // 401 handled
                 if (fileData && fileData.payload) {
                     const decrypted = await decryptData(fileData.payload, passphrase);
-                    importDataCallback(decrypted);
+                    
+                    // 2-Way Merge local dataset and remote Google Drive dataset
+                    const mergedData = mergeSyncDatasets(currentLocalData, decrypted);
+                    
+                    // Apply merged dataset to local application state
+                    importDataCallback(mergedData);
+                    
+                    // Re-encrypt and update Google Drive with the merged dataset so all devices stay in sync
+                    const encrypted = await encryptData(mergedData, passphrase);
+                    const updatedFile = await uploadSyncFile(encrypted, remoteFile.id);
+                    if (updatedFile) {
+                        syncFileIdRef.current = updatedFile.id;
+                    }
+                }
+            } else {
+                // No remote file exists yet: upload current local data as initial cloud sync file
+                const encrypted = await encryptData(currentLocalData, passphrase);
+                const updatedFile = await uploadSyncFile(encrypted, null);
+                if (updatedFile) {
+                    syncFileIdRef.current = updatedFile.id;
                 }
             }
             

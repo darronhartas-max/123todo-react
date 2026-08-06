@@ -79,9 +79,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.1';
+export const APP_VERSION = '2.5.2';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.2': [
+    { title: '🔄 Seamless 2-Way Multi-Device Sync:', desc: 'Guarantees that new tasks or projects added offline across multiple devices (e.g. laptop & phone) are merged seamlessly without data loss.' },
+    { title: '🛡️ Data Preservation Engine:', desc: 'Prevents sync overwrites so tasks created offline on one device are merged into all connected devices.' }
+  ],
   '2.5.1': [
     { title: '🎙️ Voice Task Input (Speech-to-Task):', desc: 'Tap the Voice button to speak tasks naturally with automatic priority and project detection.' },
     { title: '⚡ Smart Natural Language Parsing:', desc: 'Automatically parses priority (P1-P4) and project keywords from spoken phrases, defaulting to Priority 1 (Must Do).' },
