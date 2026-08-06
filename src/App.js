@@ -613,8 +613,8 @@ const TodoApp = () => {
       background: 'transparent',
       border: 'none',
       cursor: 'pointer',
-      fontSize: '1.1rem',
-      fontWeight: '600',
+      fontSize: '0.88rem',
+      fontWeight: '700',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',
       padding: '6px 12px',
@@ -810,8 +810,8 @@ const TodoApp = () => {
               onClick={() => setShowArchive(true)}
               style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              <Archive size={18} />
-              Open Full-Screen Archive ({archived.length})
+              <Archive size={16} />
+              Open Archive ({archived.length})
             </button>
           </div>
         </div>

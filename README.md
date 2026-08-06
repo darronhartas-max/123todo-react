@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.10 (Current)
+### v2.5.11 (Current)
+- **Archive Button & Title Wording**: Simplified the archive button text to "Open Archive" for cleaner UI layout.
+- **Header Typography Refinement**: Reduced font sizes for Archive, Scheduled, and On Hold section titles to align visually with standard priority headers.
+
+### v2.5.10
 - **Project Deletion 2-Way Sync Fix**: Added persistent `deletedProjects` tombstone tracking so deleted custom projects remain permanently removed across all synced devices during 2-way Google Drive sync.
 
 ### v2.5.9
