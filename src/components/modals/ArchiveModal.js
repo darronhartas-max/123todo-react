@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Search, X, RotateCcw, Trash2, Calendar, Filter, ArrowUpDown, Check, AlertCircle, Plus, Minus } from 'lucide-react';
-import { COMMON_STYLES } from '../../utils/styles';
+import { Archive, Search, X, Trash2, Calendar, Filter, ArrowUpDown, Check } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';

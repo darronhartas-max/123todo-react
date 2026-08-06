@@ -408,7 +408,6 @@ const TodoApp = () => {
 
   const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
   const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));
-  const filteredArchived = filteredBySearch(archived);
 
   const activeTasksCount = activeTasks.filter(t => t.priority <= 3).length;
   const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
