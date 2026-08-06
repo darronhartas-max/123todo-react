@@ -81,9 +81,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.17';
+export const APP_VERSION = '2.5.18';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.18': [
+    { title: '🔒 Secret URL Admin Portal Access:', desc: 'Restricted Admin Analytics Portal access exclusively to secret URL parameter (?admin=1) with zero public UI footprint.' },
+    { title: '🚀 VPS Deployment Automation Fix:', desc: 'Refreshed deployment trigger sequence to guarantee clean VPS container builds.' }
+  ],
   '2.5.17': [
     { title: '🔒 Private Admin Analytics Portal:', desc: 'Added a password-protected private Admin Analytics Portal with visual trend charts for website visits, PWA downloads, and standalone app opens.' },
     { title: '🛡️ 100% Privacy-Preserving Telemetry:', desc: 'Zero cookies used, no IP addresses or personal data logged, fully GDPR/CCPA compliant out of the box.' }

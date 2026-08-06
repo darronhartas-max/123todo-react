@@ -297,7 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.17 (Current)
+### v2.5.18 (Current)
+- **Secret URL Admin Access**: Restricted Admin Analytics Portal access exclusively to secret URL parameters (`?admin=1`) with zero public UI footprint.
+- **VPS Deployment Trigger**: Refreshed automated VPS deployment workflow.
+
+### v2.5.17
 - **Private Admin Analytics Portal**: Password-protected private Admin Portal with interactive SVG trend charts for website visits, PWA downloads, and standalone app launches.
 - **100% Privacy-Preserving Telemetry**: Zero cookies, no IP addresses logged, fully GDPR/CCPA compliant out of the box.
 
