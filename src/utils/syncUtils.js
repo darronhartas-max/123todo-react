@@ -112,18 +112,23 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
       activeTaskMap.set(key, t);
     } else {
       const existing = activeTaskMap.get(key);
-      // Merge updates: retain subtasks, notes, recurrence, scheduling, and priority updates
+      const existingTimestamp = existing.updatedAt || existing.restoredAt || 0;
+      const tTimestamp = t.updatedAt || t.restoredAt || 0;
+      const primaryTask = tTimestamp > existingTimestamp ? t : existing;
+      const secondaryTask = primaryTask === t ? existing : t;
+
       const mergedTask = {
-        ...existing,
-        ...t,
-        notes: (t.notes && t.notes.trim()) ? t.notes : (existing.notes || ''),
-        priority: t.priority !== undefined ? t.priority : existing.priority,
-        projectId: t.projectId || t.categoryId || existing.projectId || 'general',
-        scheduledDate: t.scheduledDate || existing.scheduledDate,
-        subtasks: (t.subtasks && t.subtasks.length > 0) ? t.subtasks : (existing.subtasks || []),
-        isRecurring: t.isRecurring !== undefined ? t.isRecurring : existing.isRecurring,
-        recurrence: t.recurrence || existing.recurrence,
-        restoredAt: t.restoredAt || existing.restoredAt
+        ...secondaryTask,
+        ...primaryTask,
+        notes: primaryTask.notes !== undefined ? primaryTask.notes : secondaryTask.notes,
+        priority: primaryTask.priority !== undefined ? primaryTask.priority : secondaryTask.priority,
+        projectId: primaryTask.projectId || primaryTask.categoryId || secondaryTask.projectId || 'general',
+        scheduledDate: primaryTask.scheduledDate !== undefined ? primaryTask.scheduledDate : secondaryTask.scheduledDate,
+        subtasks: primaryTask.subtasks !== undefined ? primaryTask.subtasks : secondaryTask.subtasks,
+        isRecurring: primaryTask.isRecurring !== undefined ? primaryTask.isRecurring : secondaryTask.isRecurring,
+        recurrence: primaryTask.recurrence !== undefined ? primaryTask.recurrence : secondaryTask.recurrence,
+        restoredAt: primaryTask.restoredAt || secondaryTask.restoredAt,
+        updatedAt: Math.max(primaryTask.updatedAt || 0, secondaryTask.updatedAt || 0) || undefined
       };
       activeTaskMap.set(key, mergedTask);
     }

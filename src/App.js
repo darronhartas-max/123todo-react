@@ -207,9 +207,6 @@ const TodoApp = () => {
     }
     return 12;
   });
-  const [density, setDensityState] = useState(() => {
-    return localStorage.getItem('123TodoDensity') || 'compact';
-  });
   const [layoutWidth, setLayoutWidthState] = useState(() => {
     const saved = localStorage.getItem('123TodoLayoutWidth');
     if (saved === '800px' || saved === '1200px') return '480px';
@@ -235,10 +232,6 @@ const TodoApp = () => {
   const setFontSize = (size) => {
     setFontSizeState(size);
     localStorage.setItem('123TodoFontSize', size.toString());
-  };
-  const setDensity = (val) => {
-    setDensityState(val);
-    localStorage.setItem('123TodoDensity', val);
   };
   const setLayoutWidth = (val) => {
     setLayoutWidthState(val);
@@ -290,22 +283,13 @@ const TodoApp = () => {
   }, [fontSize]);
 
   useEffect(() => {
-    if (density === 'compact') {
-      document.documentElement.style.setProperty('--task-padding', '5px 10px 10px 10px');
-      document.documentElement.style.setProperty('--task-padding-top', '5px');
-      document.documentElement.style.setProperty('--task-padding-bottom', '10px');
-      document.documentElement.style.setProperty('--task-margin', '3px');
-      document.documentElement.style.setProperty('--task-font-size', '0.95rem');
-      document.documentElement.style.setProperty('--section-margin', '10px');
-    } else {
-      document.documentElement.style.setProperty('--task-padding', '12px 16px 14px 16px');
-      document.documentElement.style.setProperty('--task-padding-top', '14px');
-      document.documentElement.style.setProperty('--task-padding-bottom', '14px');
-      document.documentElement.style.setProperty('--task-margin', '8px');
-      document.documentElement.style.setProperty('--task-font-size', '1.1rem');
-      document.documentElement.style.setProperty('--section-margin', '20px');
-    }
-  }, [density]);
+    document.documentElement.style.setProperty('--task-padding', '8px 12px 10px 12px');
+    document.documentElement.style.setProperty('--task-padding-top', '8px');
+    document.documentElement.style.setProperty('--task-padding-bottom', '10px');
+    document.documentElement.style.setProperty('--task-margin', '4px');
+    document.documentElement.style.setProperty('--task-font-size', '1.05rem');
+    document.documentElement.style.setProperty('--section-margin', '12px');
+  }, []);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -1046,8 +1030,6 @@ const TodoApp = () => {
         onReorderProjects={reorderProjects}
         fontSize={fontSize}
         setFontSize={setFontSize}
-        density={density}
-        setDensity={setDensity}
         layoutWidth={layoutWidth}
         setLayoutWidth={setLayoutWidth}
         themeMode={themeMode}

@@ -208,10 +208,11 @@ export const useTasks = () => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tasks, archived, projects, counter, isLoaded]);
+    }, [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp, isLoaded]);
 
     const addTask = useCallback((text, priority, projectId = 'general', notes = '', extraFields = {}) => {
         const newId = counter + 1;
+        const now = Date.now();
         const newTask = {
             id: newId,
             text: text.trim(),
@@ -224,19 +225,20 @@ export const useTasks = () => {
             subtasks: extraFields.subtasks || [],
             isRecurring: extraFields.isRecurring || false,
             recurrence: extraFields.recurrence || null,
-            completedAt: null
+            completedAt: null,
+            updatedAt: now
         };
 
         setCounter(newId);
         setTasks(prev => [newTask, ...prev]);
-        setTimestamp(Date.now());
+        setTimestamp(now);
     }, [counter]);
 
     const completeTask = useCallback((id) => {
         let spawnedTask = null;
 
         setTasks(prev => {
-            const taskIndex = prev.findIndex(t => t.id === id);
+            const taskIndex = prev.findIndex(t => String(t.id) === String(id));
             if (taskIndex === -1) return prev;
 
             const newTasks = [...prev];
@@ -245,7 +247,8 @@ export const useTasks = () => {
                 ...task,
                 isRecurring: false,
                 recurrence: null,
-                completedAt: Date.now()
+                completedAt: Date.now(),
+                updatedAt: Date.now()
             };
 
             setArchived(arch => [completedTask, ...arch]);
@@ -265,7 +268,8 @@ export const useTasks = () => {
                         scheduledDate: nextDate,
                         deferCount: 0,
                         subtasks: resetSubtasks,
-                        completedAt: null
+                        completedAt: null,
+                        updatedAt: Date.now()
                     };
                 }
             }
@@ -287,7 +291,7 @@ export const useTasks = () => {
 
     const deleteArchivedTask = useCallback((id) => {
         setArchived(prevArchived => {
-            const taskToDelete = prevArchived.find(t => t.id === id);
+            const taskToDelete = prevArchived.find(t => String(t.id) === String(id));
             if (taskToDelete) {
                 const keysToAdd = [`id_${id}`];
                 const cleanText = (taskToDelete.text || '').trim().toLowerCase();
@@ -297,15 +301,15 @@ export const useTasks = () => {
             } else {
                 setDeletedTaskKeys(prev => Array.from(new Set([...prev, `id_${id}`])));
             }
-            return prevArchived.filter(t => t.id !== id);
+            return prevArchived.filter(t => String(t.id) !== String(id));
         });
-        setTasks(prevTasks => prevTasks.filter(t => t.id !== id));
+        setTasks(prevTasks => prevTasks.filter(t => String(t.id) !== String(id)));
         setTimestamp(Date.now());
     }, []);
 
     const restoreTask = useCallback((id, priority) => {
         setArchived(prev => {
-            const taskIndex = prev.findIndex(t => t.id === id);
+            const taskIndex = prev.findIndex(t => String(t.id) === String(id));
             if (taskIndex === -1) return prev;
 
             const newArchived = [...prev];
@@ -328,8 +332,9 @@ export const useTasks = () => {
 
     const updateTask = useCallback((id, updates) => {
         const today = getTodayDateString();
+        const now = Date.now();
         setTasks(prev => prev.map(task => {
-            if (task.id === id) {
+            if (String(task.id) === String(id)) {
                 const finalUpdates = { ...updates };
                 const oldIsActive = !task.scheduledDate || task.scheduledDate <= today;
                 const newIsFuture = updates.scheduledDate && updates.scheduledDate > today;
@@ -338,15 +343,16 @@ export const useTasks = () => {
                     finalUpdates.deferCount = (task.deferCount || 0) + 1;
                 }
                 
-                return { ...task, ...finalUpdates, isSample: false };
+                return { ...task, ...finalUpdates, updatedAt: now, isSample: false };
             }
             return task;
         }));
-        setTimestamp(Date.now());
+        setTimestamp(now);
     }, []);
 
     const reorderTasks = useCallback((draggedId, targetId) => {
         if (!draggedId || !targetId) return;
+        const now = Date.now();
         setTasks(prev => {
             const dragStr = String(draggedId);
             const targetStr = String(targetId);
@@ -362,6 +368,7 @@ export const useTasks = () => {
                 const newTasks = [...prev];
                 const [movedTask] = newTasks.splice(fromIndex, 1);
                 movedTask.priority = newPriority;
+                movedTask.updatedAt = now;
 
                 // Insert at the top of the target priority section for immediate visual feedback
                 let firstPriorityIdx = newTasks.findIndex(t => t.priority === newPriority);
@@ -380,9 +387,11 @@ export const useTasks = () => {
             if (targetIndex === -1 || fromIndex === targetIndex) return prev;
 
             const targetTask = prev[targetIndex];
+            const isDraggingDown = fromIndex < targetIndex;
             const newTasks = [...prev];
             const [movedTask] = newTasks.splice(fromIndex, 1);
             movedTask.priority = targetTask.priority;
+            movedTask.updatedAt = now;
 
             const newTargetIndex = newTasks.findIndex(t => String(t.id) === targetStr);
             if (newTargetIndex === -1) {
@@ -390,11 +399,13 @@ export const useTasks = () => {
                 return newTasks;
             }
 
-            // Always insert at target item index (matching where the visual drop indicator line is shown)
-            newTasks.splice(newTargetIndex, 0, movedTask);
+            // When dragging down, insert after the target task so it moves past it.
+            // When dragging up, insert before the target task.
+            const insertPosition = isDraggingDown ? newTargetIndex + 1 : newTargetIndex;
+            newTasks.splice(insertPosition, 0, movedTask);
             return newTasks;
         });
-        setTimestamp(Date.now());
+        setTimestamp(now);
     }, []);
 
     const addProject = useCallback((name, color) => {

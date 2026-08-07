@@ -297,8 +297,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.25 (Current)
-- **Cache-Busted PWA Update Engine**: Added direct cache-busted version checking via `version.json` so desktops and mobiles never get stuck on stale cached PWA builds.
+### v2.5.26 (Current)
+- **Drag-and-Drop & Task Edit Persistence Fix**: Fixed downward task reordering index calculation, String vs Number ID coercion, task `updatedAt` timestamps, and LocalStorage state synchronization dependencies.
+- **Refined Edit & Note Modal Layout**: Redesigned the Edit Modal with a compact 440px width, Priority and Project selectors above the task title, Notes directly below the title, and space-efficient subtasks and scheduling editors.
+
+### v2.5.25
 
 ### v2.5.24
 - **Drag & Drop Position & Spring-Back Fix**: Aligned insertion index to the visual drop indicator line and disabled Framer Motion layout animation interference during native drag-and-drop.

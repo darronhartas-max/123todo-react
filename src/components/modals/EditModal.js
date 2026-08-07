@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, Calendar, ListTodo, X } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -25,7 +25,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
     const toggleVoiceInput = (targetField = 'notes') => {
         if (!speechSupported) {
-            setVoiceStatus('Voice input is not supported in this browser.');
+            setVoiceStatus('Voice input not supported in browser.');
             setTimeout(() => setVoiceStatus(''), 4000);
             return;
         }
@@ -123,142 +123,82 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     };
 
     const toggleButtonStyle = (isActive) => ({
-        border: '1px solid var(--accent-color)',
-        color: isActive ? 'white' : 'var(--accent-color)',
+        border: `1px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}`,
+        color: isActive ? 'white' : 'var(--muted-text)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        gap: '4px',
-        fontSize: '1.05rem',
+        gap: '5px',
+        fontSize: '0.82rem',
         fontWeight: '600',
-        padding: '8px 12px',
-        borderRadius: '4px',
-        background: isActive ? 'var(--accent-color)' : 'transparent',
-        transition: 'all 0.2s ease',
+        padding: '5px 10px',
+        borderRadius: '6px',
+        background: isActive ? 'var(--accent-color)' : 'var(--item-bg)',
+        transition: 'all 0.15s ease',
         boxSizing: 'border-box'
     });
 
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
-            padding: '20px',
-            borderRadius: '8px',
-            maxWidth: '95%',
-            width: '500px',
-            maxHeight: '85vh',
+            padding: '16px 18px',
+            borderRadius: '10px',
+            maxWidth: '92%',
+            width: '440px',
+            maxHeight: '88vh',
             overflowY: 'auto',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
             color: 'var(--text-color)',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            border: '1px solid var(--border-color)'
+        },
+        sectionLabel: {
+            fontSize: '0.72rem',
+            fontWeight: '700',
+            color: 'var(--muted-text)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
         },
         textarea: {
             width: '100%',
-            padding: '8px',
-            fontSize: '1.1rem',
+            padding: '8px 10px',
+            fontSize: '0.95rem',
+            lineHeight: '1.45',
             border: '1px solid var(--border-color)',
-            borderRadius: '4px',
+            borderRadius: '6px',
             resize: 'none',
             overflowY: 'auto',
-            marginBottom: '12px',
-            minHeight: '60px',
-            maxHeight: '150px',
+            marginBottom: '10px',
             fontFamily: 'Inter, sans-serif',
             boxSizing: 'border-box',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            outline: 'none'
+            outline: 'none',
+            transition: 'border-color 0.15s ease'
         },
         select: {
             width: '100%',
-            padding: '8px',
-            fontSize: '1.1rem',
+            padding: '5px 8px',
+            fontSize: '0.85rem',
+            fontWeight: '600',
             border: '1px solid var(--border-color)',
-            borderRadius: '4px',
-            marginBottom: '12px',
+            borderRadius: '6px',
             boxSizing: 'border-box',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
-            outline: 'none'
+            outline: 'none',
+            cursor: 'pointer'
         }
     };
 
     return (
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
             <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--muted-text)' }}>Task Title</label>
-                    <button
-                        type="button"
-                        onClick={() => toggleVoiceInput('title')}
-                        title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '2px 8px',
-                            borderRadius: '12px',
-                            border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
-                            background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                            color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
-                            cursor: 'pointer',
-                            fontSize: '0.78rem',
-                            fontWeight: '600'
-                        }}
-                    >
-                        {listeningTarget === 'title' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
-                        <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice Title'}</span>
-                    </button>
-                </div>
-
-                {voiceStatus && (
-                    <div style={{
-                        fontSize: '0.8rem',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        marginBottom: '6px',
-                        background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
-                        color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
-                        fontWeight: '600'
-                    }}>
-                        {voiceStatus}
-                    </div>
-                )}
-
-                <textarea
-                    autoFocus
-                    value={editingTask.text}
-                    onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
-                    onInput={handleInput}
-                    style={styles.textarea}
-                    maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
-                    ref={(textarea) => {
-                        if (textarea) {
-                            textarea.style.height = 'auto';
-                            textarea.style.height = textarea.scrollHeight + 'px';
-                        }
-                    }}
-                />
-
-                {task.deferCount >= 2 && (
-                    <div style={{
-                        padding: '10px 12px',
-                        background: 'rgba(239, 68, 68, 0.05)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        borderRadius: '6px',
-                        color: '#dc2626',
-                        fontSize: '0.9rem',
-                        marginBottom: '12px',
-                        fontWeight: '500',
-                        lineHeight: '1.4',
-                        textAlign: 'left'
-                    }}>
-                        💡 <strong>Is this task too large?</strong> You have deferred this task {task.deferCount} times. Try breaking it down into smaller, bite-sized steps using the <strong>Subtasks</strong> checklist below to make it easier to start!
-                    </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                
+                {/* 1. TOP ROW: Priority and Project Dropdowns (ABOVE Title) */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
                     <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Priority</label>
+                        <div style={{ ...styles.sectionLabel, marginBottom: '3px' }}>Priority</div>
                         <select
                             value={editingTask.priority}
                             onChange={(e) => setEditingTask({ ...editingTask, priority: parseInt(e.target.value) })}
@@ -271,7 +211,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
 
                     <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)', display: 'block', marginBottom: '4px' }}>Project</label>
+                        <div style={{ ...styles.sectionLabel, marginBottom: '3px' }}>Project</div>
                         <select
                             value={editingTask.projectId || 'general'}
                             onChange={(e) => setEditingTask({ ...editingTask, projectId: e.target.value })}
@@ -284,37 +224,55 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 </div>
 
-                <div style={{ marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--muted-text)' }}>Notes</label>
+                {/* Voice Status Alert */}
+                {voiceStatus && (
+                    <div style={{
+                        fontSize: '0.78rem',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        marginBottom: '8px',
+                        background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
+                        color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
+                        fontWeight: '600'
+                    }}>
+                        {voiceStatus}
+                    </div>
+                )}
+
+                {/* 2. TASK TITLE */}
+                <div style={{ marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                        <span style={styles.sectionLabel}>Task Title</span>
                         <button
                             type="button"
-                            onClick={() => toggleVoiceInput('notes')}
-                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                            onClick={() => toggleVoiceInput('title')}
+                            title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '4px',
-                                padding: '2px 8px',
-                                borderRadius: '12px',
-                                border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
-                                background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                color: listeningTarget === 'notes' ? '#ef4444' : 'var(--text-color)',
+                                gap: '3px',
+                                padding: '1px 6px',
+                                borderRadius: '10px',
+                                border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
+                                background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                color: listeningTarget === 'title' ? '#ef4444' : 'var(--muted-text)',
                                 cursor: 'pointer',
-                                fontSize: '0.78rem',
+                                fontSize: '0.72rem',
                                 fontWeight: '600'
                             }}
                         >
-                            {listeningTarget === 'notes' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
-                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
+                            {listeningTarget === 'title' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
+                            <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice'}</span>
                         </button>
                     </div>
+
                     <textarea
-                        value={editingTask.notes || ''}
-                        onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
+                        autoFocus
+                        value={editingTask.text}
+                        onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                         onInput={handleInput}
-                        placeholder="Add unlimited text..."
-                        style={{ ...styles.textarea, minHeight: '60px', fontSize: '1.1rem' }}
+                        style={{ ...styles.textarea, minHeight: '44px', fontWeight: '600', fontSize: '0.98rem' }}
+                        maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';
@@ -324,61 +282,124 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     />
                 </div>
 
-                {/* Subtask and Scheduling triggers */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                {/* 3. NOTES (Directly Below Task Title) */}
+                <div style={{ marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                        <span style={styles.sectionLabel}>Notes</span>
+                        <button
+                            type="button"
+                            onClick={() => toggleVoiceInput('notes')}
+                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                padding: '1px 6px',
+                                borderRadius: '10px',
+                                border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
+                                background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
+                                cursor: 'pointer',
+                                fontSize: '0.72rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
+                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</span>
+                        </button>
+                    </div>
+                    <textarea
+                        value={editingTask.notes || ''}
+                        onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
+                        onInput={handleInput}
+                        placeholder="Add notes or extra details..."
+                        style={{ ...styles.textarea, minHeight: '65px', maxHeight: '130px' }}
+                        ref={(textarea) => {
+                            if (textarea) {
+                                textarea.style.height = 'auto';
+                                textarea.style.height = textarea.scrollHeight + 'px';
+                            }
+                        }}
+                    />
+                </div>
+
+                {/* Defer Alert (if deferred >= 2) */}
+                {task.deferCount >= 2 && (
+                    <div style={{
+                        padding: '6px 10px',
+                        background: 'rgba(239, 68, 68, 0.06)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        borderRadius: '6px',
+                        color: '#dc2626',
+                        fontSize: '0.78rem',
+                        marginBottom: '10px',
+                        lineHeight: '1.35',
+                        textAlign: 'left'
+                    }}>
+                        💡 Deferred {task.deferCount}x. Consider breaking into <strong>Subtasks</strong> below.
+                    </div>
+                )}
+
+                {/* 4. COMPACT SUBTASKS & SCHEDULING TRIGGERS */}
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
                     <button
                         onClick={() => setShowSubtasks(!showSubtasks)}
                         style={toggleButtonStyle(showSubtasks)}
                     >
-                        📋 Subtasks ({subtasks.length})
+                        <ListTodo size={13} />
+                        <span>Subtasks ({subtasks.length})</span>
                     </button>
                     <button
                         onClick={() => setShowSchedule(!showSchedule)}
                         style={toggleButtonStyle(showSchedule)}
                     >
-                        📅 {scheduledDate ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}` : 'Schedule'}
+                        <Calendar size={13} />
+                        <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
                     </button>
                 </div>
 
-                {/* Subtask Editor */}
+                {/* Compact Subtask Editor */}
                 {showSubtasks && (
                     <div style={{
-                        marginBottom: '16px',
-                        padding: '12px',
+                        marginBottom: '10px',
+                        padding: '8px 10px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
                         background: 'var(--item-bg)'
                     }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
-                            📋 Subtasks / Checklist
+                        <div style={{ ...styles.sectionLabel, marginBottom: '6px' }}>
+                            Subtasks Checklist
                         </div>
                         {subtasks.length > 0 && (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 8px 0' }}>
                                 {subtasks.map((st) => (
                                     <li key={st.id} style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
-                                        padding: '8px 0',
-                                        borderBottom: '1px solid rgba(0,0,0,0.03)'
+                                        padding: '3px 0',
+                                        borderBottom: '1px solid var(--border-color)'
                                     }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, cursor: 'pointer', minWidth: 0 }}>
                                             <input
                                                 type="checkbox"
                                                 checked={st.completed}
                                                 onChange={() => {
                                                     setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
                                                 }}
-                                                style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                                                style={{ cursor: 'pointer', width: '13px', height: '13px' }}
                                             />
                                             <span style={{
                                                 textDecoration: st.completed ? 'line-through' : 'none',
                                                 color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                fontSize: '1.05rem'
+                                                fontSize: '0.85rem',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
                                             }}>
                                                 {st.text}
                                             </span>
-                                        </div>
+                                        </label>
                                         <button
                                             onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
                                             style={{
@@ -386,17 +407,17 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 background: 'transparent',
                                                 color: '#ef4444',
                                                 cursor: 'pointer',
-                                                fontSize: '1rem',
-                                                fontWeight: '600'
+                                                padding: '2px 4px'
                                             }}
+                                            title="Delete step"
                                         >
-                                            Delete
+                                            <X size={13} />
                                         </button>
                                     </li>
                                 ))}
                             </ul>
                         )}
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                        <div style={{ display: 'flex', gap: '4px' }}>
                             <input
                                 type="text"
                                 value={newSubtaskText}
@@ -404,12 +425,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 placeholder="Add step..."
                                 style={{
                                     flex: 1,
-                                    padding: '8px 10px',
-                                    fontSize: '1.05rem',
+                                    padding: '4px 8px',
+                                    fontSize: '0.85rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--bg-color)',
-                                    color: 'var(--text-color)'
+                                    color: 'var(--text-color)',
+                                    outline: 'none'
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -421,13 +443,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             <button
                                 onClick={handleAddSubtask}
                                 style={{
-                                    padding: '8px 16px',
+                                    padding: '4px 10px',
                                     background: 'var(--accent-color)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '1.05rem',
+                                    fontSize: '0.82rem',
                                     fontWeight: '600'
                                 }}
                             >
@@ -437,59 +459,55 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                {/* Scheduling and Recurrence Editor */}
+                {/* Compact Schedule and Recurrence Editor */}
                 {showSchedule && (
                     <div style={{
-                        marginBottom: '16px',
-                        padding: '12px',
+                        marginBottom: '10px',
+                        padding: '8px 10px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
                         background: 'var(--item-bg)'
                     }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
-                            📅 Date & Recurrence Scheduling
+                        <div style={{ ...styles.sectionLabel, marginBottom: '6px' }}>
+                            Date & Recurrence
                         </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '150px' }}>
-                                <label style={{ fontSize: '0.95rem', color: 'var(--muted-text)', fontWeight: '500' }}>Start/Scheduled Date</label>
-                                <input
-                                    type="date"
-                                    value={scheduledDate || ''}
-                                    onChange={(e) => setScheduledDate(e.target.value || null)}
-                                    style={{
-                                        padding: '8px 10px',
-                                        fontSize: '1.05rem',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '4px',
-                                        background: 'var(--bg-color)',
-                                        color: 'var(--text-color)',
-                                        width: '100%',
-                                        boxSizing: 'border-box'
-                                    }}
-                                />
-                            </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                            <input
+                                type="date"
+                                value={scheduledDate || ''}
+                                onChange={(e) => setScheduledDate(e.target.value || null)}
+                                style={{
+                                    padding: '4px 8px',
+                                    fontSize: '0.85rem',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '4px',
+                                    background: 'var(--bg-color)',
+                                    color: 'var(--text-color)',
+                                    outline: 'none',
+                                    flex: 1
+                                }}
+                            />
                             {scheduledDate && (
                                 <button
                                     onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                     style={{
-                                        padding: '8px 16px',
-                                        background: 'var(--border-color)',
+                                        padding: '4px 8px',
+                                        background: 'transparent',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontSize: '1.05rem',
-                                        fontWeight: '600',
-                                        marginTop: '22px',
-                                        color: 'var(--text-color)'
+                                        fontSize: '0.78rem',
+                                        color: '#ef4444',
+                                        fontWeight: '600'
                                     }}
                                 >
-                                    Clear Date
+                                    Clear
                                 </button>
                             )}
                         </div>
 
-                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '500' }}>
                                 <input
                                     type="checkbox"
                                     checked={isRecurring}
@@ -499,39 +517,37 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             setScheduledDate(getTodayDateString());
                                         }
                                     }}
-                                    style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                                    style={{ cursor: 'pointer', width: '13px', height: '13px' }}
                                 />
-                                🔁 Repeat this task
+                                <span>Repeat this task</span>
                             </label>
 
                             {isRecurring && (
-                                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '1.05rem' }}>
-                                            <span>Every</span>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={recurrenceFrequency}
-                                                onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
-                                                style={{
-                                                    width: '60px',
-                                                    padding: '6px 8px',
-                                                    fontSize: '1.05rem',
-                                                    border: '1px solid var(--border-color)',
-                                                    borderRadius: '4px',
-                                                    background: 'var(--bg-color)',
-                                                    color: 'var(--text-color)',
-                                                    textAlign: 'center'
-                                                }}
-                                            />
-                                        </div>
+                                <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Every</span>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={recurrenceFrequency}
+                                            onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
+                                            style={{
+                                                width: '45px',
+                                                padding: '3px 6px',
+                                                fontSize: '0.82rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                background: 'var(--bg-color)',
+                                                color: 'var(--text-color)',
+                                                textAlign: 'center'
+                                            }}
+                                        />
                                         <select
                                             value={recurrenceInterval}
                                             onChange={(e) => setRecurrenceInterval(e.target.value)}
                                             style={{
-                                                padding: '6px 10px',
-                                                fontSize: '1.05rem',
+                                                padding: '3px 6px',
+                                                fontSize: '0.82rem',
                                                 border: '1px solid var(--border-color)',
                                                 borderRadius: '4px',
                                                 background: 'var(--bg-color)',
@@ -546,11 +562,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     </div>
 
                                     {recurrenceInterval === 'weeks' && (
-                                        <div style={{ marginTop: '6px' }}>
-                                            <span style={{ fontSize: '0.95rem', color: 'var(--muted-text)', display: 'block', marginBottom: '6px', fontWeight: '500' }}>
-                                                Repeat on specific days:
-                                            </span>
-                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                        <div>
+                                            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
                                                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
                                                     const isSelected = recurrenceDaysOfWeek.includes(idx);
                                                     return (
@@ -566,15 +579,14 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                                 }
                                                                 setRecurrenceDaysOfWeek(updatedDays);
                                                                 
-                                                                // Auto-snap start date to next weekday
                                                                 const baseDate = scheduledDate || getTodayDateString();
                                                                 const snappedDate = adjustStartDateForWeekdays(baseDate, updatedDays);
                                                                 setScheduledDate(snappedDate);
                                                             }}
                                                             style={{
                                                                 flex: 1,
-                                                                padding: '8px 4px',
-                                                                fontSize: '0.95rem',
+                                                                padding: '4px 2px',
+                                                                fontSize: '0.78rem',
                                                                 fontWeight: '700',
                                                                 borderRadius: '4px',
                                                                 cursor: 'pointer',
@@ -582,7 +594,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                                 borderColor: isSelected ? 'var(--accent-color)' : 'var(--border-color)',
                                                                 background: isSelected ? 'var(--accent-color)' : 'var(--bg-color)',
                                                                 color: isSelected ? 'white' : 'var(--text-color)',
-                                                                transition: 'all 0.2s ease'
+                                                                transition: 'all 0.15s ease'
                                                             }}
                                                         >
                                                             {day[0]}
@@ -598,39 +610,46 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '12px' }}>
-                    {isUnlimited ? `${editingTask.text.length} chars` : `${editingTask.text.length}/${MAX_TASK_LENGTH}`}
-                </div>
+                {/* 5. FOOTER ACTIONS & CHAR COUNT */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)' }}>
+                        {isUnlimited ? `${editingTask.text.length} chars` : `${editingTask.text.length}/${MAX_TASK_LENGTH}`}
+                    </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: '8px 16px',
-                            fontSize: '1.1rem',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            background: '#e5e7eb',
-                            color: '#333'
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        style={{
-                            padding: '8px 16px',
-                            fontSize: '1.1rem',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            background: '#2563eb',
-                            color: '#fff'
-                        }}
-                    >
-                        Save
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '5px 12px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                color: 'var(--text-color)'
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleSave}
+                            style={{
+                                padding: '5px 14px',
+                                fontSize: '0.85rem',
+                                fontWeight: '700',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                background: 'var(--accent-color)',
+                                color: '#ffffff'
+                            }}
+                        >
+                            Save
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

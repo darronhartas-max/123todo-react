@@ -21,7 +21,7 @@ describe('useTasks - reorderTasks drag and drop', () => {
             result.current.reorderTasks(1, 2);
         });
 
-        expect(result.current.tasks.map(t => t.id)).toEqual([1, 2, 3]);
+        expect(result.current.tasks.map(t => t.id)).toEqual([2, 1, 3]);
     });
 
     test('reorders tasks within the same priority section when dragged up', () => {
@@ -110,5 +110,28 @@ describe('useTasks - reorderTasks drag and drop', () => {
 
         const moved = result.current.tasks.find(t => String(t.id) === '20');
         expect(moved.priority).toBe(1);
+    });
+
+    test('updates task details and handles string ID mismatch gracefully', () => {
+        const initialTasks = [
+            { id: 1, text: 'Old Task Title', priority: 1, projectId: 'general', notes: 'Old Notes' }
+        ];
+        localStorage.setItem('123TodoTasks', JSON.stringify(initialTasks));
+
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.updateTask('1', { text: 'New Task Title', notes: 'Updated Notes', priority: 2 });
+        });
+
+        const updated = result.current.tasks.find(t => t.id === 1);
+        expect(updated.text).toBe('New Task Title');
+        expect(updated.notes).toBe('Updated Notes');
+        expect(updated.priority).toBe(2);
+        expect(updated.updatedAt).toBeDefined();
+
+        // Verify localStorage persistence
+        const saved = JSON.parse(localStorage.getItem('123TodoTasks'));
+        expect(saved[0].text).toBe('New Task Title');
     });
 });

@@ -231,8 +231,6 @@ const SettingsModal = ({
     onReorderProjects,
     fontSize,
     setFontSize,
-    density,
-    setDensity,
     layoutWidth,
     setLayoutWidth,
     themeMode,
@@ -914,25 +912,6 @@ const SettingsModal = ({
                                             title="Muted (Cozy Low-Glare Grey)"
                                         >
                                             Muted
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Density Selection */}
-                                <div style={styles.settingRow}>
-                                    <div style={styles.settingLabel}>Spacing Density</div>
-                                    <div style={styles.segmentContainer}>
-                                        <button
-                                            style={styles.segmentBtn(density === 'cozy')}
-                                            onClick={() => setDensity('cozy')}
-                                        >
-                                            Cozy
-                                        </button>
-                                        <button
-                                            style={styles.segmentBtn(density === 'compact')}
-                                            onClick={() => setDensity('compact')}
-                                        >
-                                            Compact
                                         </button>
                                     </div>
                                 </div>

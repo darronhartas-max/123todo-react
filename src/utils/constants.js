@@ -81,9 +81,13 @@ export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.25';
+export const APP_VERSION = '2.5.26';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.26': [
+    { title: '🖐️ Drag-and-Drop & Task Edit Persistence Fix:', desc: 'Fixed downward task reordering index calculations, task updatedAt timestamp tracking, and LocalStorage state synchronization dependencies.' },
+    { title: '📝 Refined Edit & Note Modal Layout:', desc: 'Redesigned the edit modal with a compact 440px width, Priority and Project selectors above title, and Notes directly below title.' }
+  ],
   '2.5.25': [
     { title: '⚡ Cache-Busted PWA Update Engine:', desc: 'Added direct cache-busted version checking via version.json so desktops and mobiles never get stuck on stale cached PWA builds.' }
   ],
