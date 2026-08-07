@@ -147,14 +147,15 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
             background: 'var(--surface-color)',
             padding: '16px 18px',
             borderRadius: '10px',
-            maxWidth: '92%',
-            width: '440px',
-            maxHeight: '88vh',
+            maxWidth: '94%',
+            width: (isTitleExpanded || isNotesExpanded) ? '580px' : '440px',
+            maxHeight: (isTitleExpanded || isNotesExpanded) ? '92vh' : '88vh',
             overflowY: 'auto',
             boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
             color: 'var(--text-color)',
             boxSizing: 'border-box',
-            border: '1px solid var(--border-color)'
+            border: '1px solid var(--border-color)',
+            transition: 'width 0.2s ease, max-height 0.2s ease'
         },
         sectionLabel: {
             fontSize: '0.72rem',
@@ -321,8 +322,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onInput={handleInput}
                         style={{
                             ...styles.textarea,
-                            minHeight: isTitleExpanded ? '140px' : '48px',
-                            maxHeight: isTitleExpanded ? '280px' : '150px',
+                            minHeight: isTitleExpanded ? '200px' : '48px',
+                            maxHeight: isTitleExpanded ? '400px' : '150px',
                             fontWeight: '400',
                             fontSize: '0.98rem'
                         }}
@@ -330,7 +331,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';
-                                textarea.style.height = Math.min(textarea.scrollHeight, isTitleExpanded ? 280 : 150) + 'px';
+                                textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isTitleExpanded ? 200 : 48), isTitleExpanded ? 400 : 150) + 'px';
                             }
                         }}
                     />
@@ -413,13 +414,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         placeholder="Add notes or extra details..."
                         style={{
                             ...styles.textarea,
-                            minHeight: isNotesExpanded ? '180px' : '85px',
-                            maxHeight: isNotesExpanded ? '320px' : '180px'
+                            minHeight: isNotesExpanded ? '240px' : '85px',
+                            maxHeight: isNotesExpanded ? '480px' : '180px'
                         }}
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';
-                                textarea.style.height = Math.min(textarea.scrollHeight, isNotesExpanded ? 320 : 180) + 'px';
+                                textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180) + 'px';
                             }
                         }}
                     />
