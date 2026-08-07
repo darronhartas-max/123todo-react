@@ -272,7 +272,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                         onInput={handleInput}
                         style={{ ...styles.textarea, minHeight: '44px', fontWeight: '400', fontSize: '0.98rem' }}
-                        maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH, (editingTask.text || '').length)}
+                        maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';

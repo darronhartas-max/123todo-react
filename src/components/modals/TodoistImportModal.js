@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { COMMON_STYLES } from '../../utils/styles';
-import { PROJECT_COLORS, MAX_TASK_LENGTH } from '../../utils/constants';
+import { PROJECT_COLORS } from '../../utils/constants';
 import { X, FileText, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Layers, Info, ShieldCheck } from 'lucide-react';
 
 // ─── Step identifiers ───────────────────────────────────────────────────────
@@ -79,8 +79,7 @@ const findBestMatch = (csvName, existingProjects) => {
 };
 
 /** Parse a Todoist CSV file text into a structured project object */
-const parseTodoistFile = (filename, text, taskLengthLimit = '250') => {
-    const isUnlimited = taskLengthLimit === 'unlimited';
+const parseTodoistFile = (filename, text) => {
     const projectName = filename.replace(/\.[^/.]+$/, '');
     const rows = parseCSV(text);
     if (rows.length < 2) return { name: projectName, tasks: [], warnings: ['File appears empty'] };
@@ -137,14 +136,8 @@ const parseTodoistFile = (filename, text, taskLengthLimit = '250') => {
         const indent = indentIdx !== -1 ? parseInt(row[indentIdx] || '1') : 1;
         const prefix = indent > 1 ? '↳ '.repeat(indent - 1) : '';
 
-        // If content exceeds MAX_TASK_LENGTH chars (and not unlimited mode), preserve full original title in notes
-        if (!isUnlimited && content.length > MAX_TASK_LENGTH) {
-            const headline = content.slice(0, MAX_TASK_LENGTH - 3) + '...';
-            notes = `Full Task Title:\n${content}${notes ? '\n\n' + notes : ''}`;
-            tasks.push({ text: prefix + headline, notes, priority });
-        } else {
-            tasks.push({ text: prefix + content, notes, priority });
-        }
+        // Preserve full original task content and notes from Todoist
+        tasks.push({ text: prefix + content, notes, priority });
     });
 
     if (tasks.length === 0) warnings.push('No importable tasks found (sections/notes excluded).');

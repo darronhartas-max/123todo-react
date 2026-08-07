@@ -355,7 +355,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 }}
                 placeholder="What needs to be done?"
                 style={styles.taskInput}
-                maxLength={isUnlimited ? undefined : MAX_TASK_LENGTH}
+                maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (text || '').length + 500)}
             />
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>

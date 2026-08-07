@@ -300,8 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.0 (Current)
-- **123 ToDo v2.6.0 Milestone Release**: Major feature & stability update:
+### v2.6.1 (Current)
+- **Task Text Editing & Todoist Import Fix**: Resolved character limit blocking when editing imported or long tasks, ensuring full text editing freedom without browser input locks.
+
+### v2.6.0
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.
