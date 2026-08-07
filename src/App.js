@@ -283,7 +283,7 @@ const TodoApp = () => {
   }, [fontSize]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--task-padding', '8px 12px 10px 12px');
+    document.documentElement.style.setProperty('--task-padding', '8px 6px 10px 10px');
     document.documentElement.style.setProperty('--task-padding-top', '8px');
     document.documentElement.style.setProperty('--task-padding-bottom', '10px');
     document.documentElement.style.setProperty('--task-margin', '4px');

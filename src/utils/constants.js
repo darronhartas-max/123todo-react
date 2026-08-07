@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.6.2';
+export const APP_VERSION = '2.6.3';
 
 export const RELEASE_CHANGELOG = {
+  '2.6.3': [
+    { title: '📏 Expanded Task Text Width:', desc: 'Reduced check box padding and right action margins to maximize horizontal text space on each task item.' }
+  ],
   '2.6.2': [
     { title: '🔍 Expanded Focus & Notes Editor:', desc: 'Added inline height expansion controls and a spacious full-screen Focus Canvas Overlay with word, character, and line count metrics for reviewing and editing large task descriptions and notes.' }
   ],

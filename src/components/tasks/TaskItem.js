@@ -206,15 +206,16 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             border: 'none',
             fontSize: '1.1rem',
             cursor: 'pointer',
-            marginLeft: '8px',
+            marginLeft: '2px',
             borderRadius: '50%',
-            padding: '6px',
+            padding: '2px',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '32px',
-            height: '32px'
+            width: '26px',
+            height: '26px',
+            flexShrink: 0
         }
     };
 
@@ -681,7 +682,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
             </div>
 
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '2px' }}>
                 {isArchived ? (
                     <button
                         onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}
