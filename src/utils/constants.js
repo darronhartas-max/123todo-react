@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.30';
+export const APP_VERSION = '2.5.31';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.31': [
+    { title: '✨ Refined Update Notification Card:', desc: 'Redesigned the new version update prompt into a clean, glassmorphic card with Framer Motion entry animations and subtle accent typography.' }
+  ],
   '2.5.30': [
     { title: '🎨 Default Muted Light Theme:', desc: 'Set Muted tone (Subdued Cozy Grey with Zero Glare) as the default light theme mode for new users.' }
   ],
