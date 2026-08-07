@@ -76,23 +76,23 @@ const WelcomeModal = ({ onAccept }) => {
                     padding: '20px',
                     margin: '20px 0',
                     textAlign: 'left',
-                    fontSize: '1rem',
+                    fontSize: '0.95rem',
                     lineHeight: '1.5'
                 }}>
                     <h4 style={{ margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '1.1rem', fontWeight: '600' }}>
-                        🛡️ Important Notice - Terms of Use
+                        🛡️ Important Notice & Legal Policy Summary
                     </h4>
+                    <p style={{ margin: '0 0 8px 0', color: 'var(--muted-text)' }}>
+                        <strong>Privacy & Security:</strong> Tasks are stored 100% locally in your browser. Optional cloud sync uses end-to-end zero-knowledge encryption directly to your Google Drive. Voice dictation processes audio natively in your browser with zero server recording.
+                    </p>
                     <p style={{ margin: '0 0 8px 0', color: 'var(--muted-text)' }}>
                         <strong>Use at Your Own Risk:</strong> This application is provided "as is" without warranties. You use this software entirely at your own risk.
                     </p>
                     <p style={{ margin: '0 0 8px 0', color: 'var(--muted-text)' }}>
-                        <strong>Data Responsibility:</strong> You are solely responsible for backing up your data. We recommend regular exports of your tasks.
-                    </p>
-                    <p style={{ margin: '0 0 8px 0', color: 'var(--muted-text)' }}>
-                        <strong>Local Storage:</strong> Your data is stored locally in your browser and may be lost due to browser settings, updates, or other factors beyond our control.
+                        <strong>Data Responsibility:</strong> You are solely responsible for backing up your tasks. Regular JSON exports or Google Drive sync are strongly recommended.
                     </p>
                     <p style={{ margin: '0', color: 'var(--muted-text)' }}>
-                        For complete terms: <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>www.123todo.com/terms</a>
+                        Full Terms & Privacy Policy: <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>www.123todo.com/terms</a> • <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>www.123todo.com/privacy</a>
                     </p>
                 </div>
 

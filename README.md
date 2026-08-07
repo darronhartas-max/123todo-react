@@ -187,14 +187,17 @@ npm run build
 
 ### Data Storage & Privacy
 - **Local-First Storage**: Tasks are stored locally in your browser (`localStorage`).
-- **Zero Third-Party Servers**: No task data is ever collected, tracked, or sent to vendor servers.
-- **Optional Encrypted Cloud Sync**: When Google Drive Sync is enabled, data is encrypted on your device (AES-256-GCM) and synced directly to your personal Google account.
+- **Zero Third-Party Servers**: No task data, notes, subtasks, or personal information is ever collected, tracked, or sent to vendor servers.
+- **Voice Dictation Privacy**: Voice input processes speech 100% natively in your browser via the Web Speech API — zero audio files or recordings are transmitted or saved.
+- **Optional Encrypted Cloud Sync**: When Google Drive Sync is enabled, data is encrypted on your device using AES-256-GCM zero-knowledge encryption and synced directly to your personal Google Drive account.
+- **100% Privacy-Preserving Telemetry**: Feature adoption and error tracking metrics are completely anonymous (0 cookies used, 0 IP addresses logged, 0 personal identifiers).
 - **Safety Features**: 24-hour automatic internal Shadow Backups and Persistent Storage API protection help safeguard your data.
 
 ### Terms of Use
 - This app is provided "as is" without warranties.
 - Use entirely at your own risk.
-- Full terms: https://www.123todo.com/terms
+- Terms of Use: https://www.123todo.com/terms
+- Privacy Policy: https://www.123todo.com/privacy
 
 ### Browser Storage & Protection Guidance
 - **Google Drive Sync**: Enable cloud sync for automatic, zero-knowledge encrypted backups. If browser cache is ever cleared, signing back in restores all tasks instantly.
@@ -297,10 +300,17 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.32 (Current)
-- **Full-Height Projects Dropdown**: Expanded the main Projects dropdown popup to display all projects down to the last item without forced scrollbars.
+### v2.6.0 (Current)
+- **123 ToDo v2.6.0 Milestone Release**: Major feature & stability update:
+  - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
+  - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
+  - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.
+  - **Drag-and-Drop & Completion Persistence**: Fixed downward reordering mathematics, string/number ID coercion, and completion timer unmount cleanup.
+  - **Default Muted Light Theme**: Set Muted tone (Subdued Cozy Grey with Zero Glare) as the default theme for new users.
+  - **Full-Height Projects Dropdown**: Expanded the main Projects dropdown popup to display all projects down to the last item without forced scrollbars.
+  - **Refined Update Notification Card**: Redesigned update notification into a glassmorphic card with Framer Motion entry animations.
 
-### v2.5.31
+### v2.5.32
 - **Refined Update Notification Card**: Redesigned the new version update prompt into a clean, glassmorphic card with Framer Motion entry animations and subtle accent typography.
 
 ### v2.5.30
