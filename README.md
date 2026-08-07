@@ -297,12 +297,15 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.27 (Current)
+### v2.5.28 (Current)
+- **Standard Font Weight Adjustment**: Adjusted standard text font weight to regular 400 for crisp, clean non-bold text when Bold Typography mode is disabled.
+
+### v2.5.27
 - **Quick "Next Week" Scheduling Button**: Added 1-click "Next Week" quick scheduling buttons across Edit Modal, Add Task modal, and inline quick defer controls.
 
 ### v2.5.26
-
-### v2.5.25
+- **Drag-and-Drop & Task Edit Persistence Fix**: Fixed downward task reordering index calculation, String vs Number ID coercion, task `updatedAt` timestamps, and LocalStorage state synchronization dependencies.
+- **Refined Edit & Note Modal Layout**: Redesigned the Edit Modal with a compact 440px width, Priority and Project selectors above the task title, Notes directly below the title, and space-efficient subtasks and scheduling editors.
 
 ### v2.5.24
 - **Drag & Drop Position & Spring-Back Fix**: Aligned insertion index to the visual drop indicator line and disabled Framer Motion layout animation interference during native drag-and-drop.

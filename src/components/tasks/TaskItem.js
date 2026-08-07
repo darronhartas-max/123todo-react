@@ -196,7 +196,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             wordWrap: 'break-word',
             whiteSpace: 'normal',
             textAlign: 'left',
-            fontWeight: '500'
+            fontWeight: '400'
         },
         actionBtn: {
             background: 'transparent',
