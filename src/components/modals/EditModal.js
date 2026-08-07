@@ -3,19 +3,24 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check } from 'lucide-react';
+import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check, ChevronDown } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task });
     
-    // Voice & Expanded Editor State
+    // Voice, Dropdowns & Expanded Editor State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
     const [voiceStatus, setVoiceStatus] = useState('');
     const [isTitleExpanded, setIsTitleExpanded] = useState(false);
     const [isNotesExpanded, setIsNotesExpanded] = useState(false);
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
+    const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+    const [isProjectOpen, setIsProjectOpen] = useState(false);
+
+    const activePriority = PRIORITIES[editingTask.priority] || PRIORITIES[3];
+    const activeProject = (projects || []).find(p => p.id === (editingTask.projectId || 'general')) || { id: 'general', name: 'General', color: '#6b7280' };
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
 
@@ -200,32 +205,193 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
             <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 
-                {/* 1. TOP ROW: Priority and Project Dropdowns (ABOVE Title) */}
+                {/* 1. TOP ROW: Color-Coded Priority and Project Dropdowns */}
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '3px' }}>Priority</div>
-                        <select
-                            value={editingTask.priority}
-                            onChange={(e) => setEditingTask({ ...editingTask, priority: parseInt(e.target.value) })}
-                            style={styles.select}
+                    {/* Priority Custom Dropdown */}
+                    <div style={{ flex: 1, position: 'relative' }}>
+                        <div style={{ ...styles.sectionLabel, marginBottom: '4px' }}>Priority</div>
+                        <button
+                            type="button"
+                            onClick={() => { setIsPriorityOpen(!isPriorityOpen); setIsProjectOpen(false); }}
+                            style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                border: `1.5px solid ${activePriority.color}`,
+                                background: `${activePriority.color}15`,
+                                color: activePriority.color,
+                                fontSize: '0.88rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                boxSizing: 'border-box',
+                                outline: 'none',
+                                transition: 'all 0.15s ease'
+                            }}
                         >
-                            {Object.entries(PRIORITIES).map(([value, config]) => (
-                                <option key={value} value={value}>{config.label}</option>
-                            ))}
-                        </select>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                                <span style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: activePriority.color,
+                                    boxShadow: `0 0 6px ${activePriority.color}`,
+                                    flexShrink: 0
+                                }} />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {activePriority.label}
+                                </span>
+                            </div>
+                            <ChevronDown size={14} style={{ color: activePriority.color, flexShrink: 0 }} />
+                        </button>
+
+                        {isPriorityOpen && (
+                            <>
+                                <div onClick={() => setIsPriorityOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} />
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 4px)',
+                                    left: 0, right: 0,
+                                    background: 'var(--surface-color)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '6px',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                    zIndex: 100,
+                                    overflow: 'hidden',
+                                    padding: '4px 0'
+                                }}>
+                                    {Object.entries(PRIORITIES).map(([val, conf]) => {
+                                        const isSel = parseInt(val) === editingTask.priority;
+                                        return (
+                                            <div
+                                                key={val}
+                                                onClick={() => {
+                                                    setEditingTask({ ...editingTask, priority: parseInt(val) });
+                                                    setIsPriorityOpen(false);
+                                                }}
+                                                style={{
+                                                    padding: '7px 10px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: isSel ? '700' : '600',
+                                                    color: isSel ? conf.color : 'var(--text-color)',
+                                                    background: isSel ? `${conf.color}18` : 'transparent',
+                                                    cursor: 'pointer',
+                                                    transition: 'background 0.15s ease'
+                                                }}
+                                            >
+                                                <span style={{
+                                                    width: '8px',
+                                                    height: '8px',
+                                                    borderRadius: '50%',
+                                                    background: conf.color,
+                                                    boxShadow: `0 0 4px ${conf.color}`,
+                                                    flexShrink: 0
+                                                }} />
+                                                <span>{conf.label}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
                     </div>
 
-                    <div style={{ flex: 1 }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '3px' }}>Project</div>
-                        <select
-                            value={editingTask.projectId || 'general'}
-                            onChange={(e) => setEditingTask({ ...editingTask, projectId: e.target.value })}
-                            style={styles.select}
+                    {/* Project Custom Dropdown */}
+                    <div style={{ flex: 1, position: 'relative' }}>
+                        <div style={{ ...styles.sectionLabel, marginBottom: '4px' }}>Project</div>
+                        <button
+                            type="button"
+                            onClick={() => { setIsProjectOpen(!isProjectOpen); setIsPriorityOpen(false); }}
+                            style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                border: `1.5px solid ${activeProject.color || '#6b7280'}`,
+                                background: `${activeProject.color || '#6b7280'}15`,
+                                color: activeProject.color || 'var(--text-color)',
+                                fontSize: '0.88rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                boxSizing: 'border-box',
+                                outline: 'none',
+                                transition: 'all 0.15s ease'
+                            }}
                         >
-                            {projects.map(p => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                                <span style={{
+                                    width: '4px',
+                                    height: '12px',
+                                    borderRadius: '2px',
+                                    background: activeProject.color || '#6b7280',
+                                    flexShrink: 0
+                                }} />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {activeProject.name}
+                                </span>
+                            </div>
+                            <ChevronDown size={14} style={{ color: activeProject.color || 'var(--muted-text)', flexShrink: 0 }} />
+                        </button>
+
+                        {isProjectOpen && (
+                            <>
+                                <div onClick={() => setIsProjectOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} />
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 4px)',
+                                    left: 0, right: 0,
+                                    background: 'var(--surface-color)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '6px',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                    zIndex: 100,
+                                    maxHeight: '220px',
+                                    overflowY: 'auto',
+                                    padding: '4px 0'
+                                }}>
+                                    {(projects || []).map(p => {
+                                        const isSel = p.id === (editingTask.projectId || 'general');
+                                        return (
+                                            <div
+                                                key={p.id}
+                                                onClick={() => {
+                                                    setEditingTask({ ...editingTask, projectId: p.id });
+                                                    setIsProjectOpen(false);
+                                                }}
+                                                style={{
+                                                    padding: '7px 10px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: isSel ? '700' : '600',
+                                                    color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
+                                                    background: isSel ? `${p.color || '#6b7280'}18` : 'transparent',
+                                                    cursor: 'pointer',
+                                                    transition: 'background 0.15s ease'
+                                                }}
+                                            >
+                                                <span style={{
+                                                    width: '4px',
+                                                    height: '12px',
+                                                    borderRadius: '2px',
+                                                    background: p.color || '#6b7280',
+                                                    flexShrink: 0
+                                                }} />
+                                                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 

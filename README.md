@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.4 (Current)
-- **Significantly Expanded Modal Viewing Canvas**: Increased in-modal textarea height up to 480px and dynamically widened the edit modal container to 580px width when Expand mode is activated.
+### v2.6.5 (Current)
+- **Color-Coded Priority & Project Selectors**: Replaced native dropdowns in the Edit Modal with custom color-coded selectors featuring glowing priority dot badges and project accent color bands.
 
-### v2.6.3
+### v2.6.4
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.
