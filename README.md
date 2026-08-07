@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.1 (Current)
-- **Task Text Editing & Todoist Import Fix**: Resolved character limit blocking when editing imported or long tasks, ensuring full text editing freedom without browser input locks.
+### v2.6.2 (Current)
+- **Expanded Focus & Notes Editor**: Added inline height expansion controls and a spacious full-screen Focus Canvas Overlay with word, character, and line count metrics for reviewing and editing large task descriptions and notes.
 
-### v2.6.0
+### v2.6.1
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

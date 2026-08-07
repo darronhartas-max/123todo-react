@@ -2,16 +2,20 @@ import React, { useState, useRef } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
-import { Mic, MicOff, Calendar, ListTodo, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task });
     
-    // Voice Input State
+    // Voice & Expanded Editor State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
     const [voiceStatus, setVoiceStatus] = useState('');
+    const [isTitleExpanded, setIsTitleExpanded] = useState(false);
+    const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+    const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
 
@@ -241,29 +245,73 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                 {/* 2. TASK TITLE */}
                 <div style={{ marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                        <span style={styles.sectionLabel}>Task Title</span>
-                        <button
-                            type="button"
-                            onClick={() => toggleVoiceInput('title')}
-                            title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '3px',
-                                padding: '1px 6px',
-                                borderRadius: '10px',
-                                border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
-                                background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                color: listeningTarget === 'title' ? '#ef4444' : 'var(--muted-text)',
-                                cursor: 'pointer',
-                                fontSize: '0.72rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            {listeningTarget === 'title' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
-                            <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice'}</span>
-                        </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={styles.sectionLabel}>Task Title / Description</span>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                                type="button"
+                                onClick={() => toggleVoiceInput('title')}
+                                title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
+                                    background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                    color: listeningTarget === 'title' ? '#ef4444' : 'var(--muted-text)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {listeningTarget === 'title' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
+                                <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsTitleExpanded(!isTitleExpanded)}
+                                title={isTitleExpanded ? "Collapse height" : "Expand height in modal"}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--border-color)',
+                                    background: isTitleExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                    color: isTitleExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {isTitleExpanded ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
+                                <span>{isTitleExpanded ? 'Compact' : 'Expand'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setExpandedOverlayField('title')}
+                                title="Open Full Screen Focus Editor for Task Title"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--accent-color)',
+                                    background: 'var(--accent-bg)',
+                                    color: 'var(--accent-color)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                <Maximize2 size={10} />
+                                <span>Focus Editor</span>
+                            </button>
+                        </div>
                     </div>
 
                     <textarea
@@ -271,12 +319,18 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         value={editingTask.text}
                         onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                         onInput={handleInput}
-                        style={{ ...styles.textarea, minHeight: '44px', fontWeight: '400', fontSize: '0.98rem' }}
+                        style={{
+                            ...styles.textarea,
+                            minHeight: isTitleExpanded ? '140px' : '48px',
+                            maxHeight: isTitleExpanded ? '280px' : '150px',
+                            fontWeight: '400',
+                            fontSize: '0.98rem'
+                        }}
                         maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';
-                                textarea.style.height = textarea.scrollHeight + 'px';
+                                textarea.style.height = Math.min(textarea.scrollHeight, isTitleExpanded ? 280 : 150) + 'px';
                             }
                         }}
                     />
@@ -284,40 +338,88 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                 {/* 3. NOTES (Directly Below Task Title) */}
                 <div style={{ marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={styles.sectionLabel}>Notes</span>
-                        <button
-                            type="button"
-                            onClick={() => toggleVoiceInput('notes')}
-                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '3px',
-                                padding: '1px 6px',
-                                borderRadius: '10px',
-                                border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
-                                background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
-                                cursor: 'pointer',
-                                fontSize: '0.72rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
-                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</span>
-                        </button>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                                type="button"
+                                onClick={() => toggleVoiceInput('notes')}
+                                title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
+                                    background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                    color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
+                                <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                                title={isNotesExpanded ? "Collapse height" : "Expand height in modal"}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--border-color)',
+                                    background: isNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                    color: isNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {isNotesExpanded ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
+                                <span>{isNotesExpanded ? 'Compact' : 'Expand'}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setExpandedOverlayField('notes')}
+                                title="Open Full Screen Focus Editor for Notes"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    padding: '1px 6px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--accent-color)',
+                                    background: 'var(--accent-bg)',
+                                    color: 'var(--accent-color)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                <Maximize2 size={10} />
+                                <span>Focus Editor</span>
+                            </button>
+                        </div>
                     </div>
                     <textarea
                         value={editingTask.notes || ''}
                         onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                         onInput={handleInput}
                         placeholder="Add notes or extra details..."
-                        style={{ ...styles.textarea, minHeight: '65px', maxHeight: '130px' }}
+                        style={{
+                            ...styles.textarea,
+                            minHeight: isNotesExpanded ? '180px' : '85px',
+                            maxHeight: isNotesExpanded ? '320px' : '180px'
+                        }}
                         ref={(textarea) => {
                             if (textarea) {
                                 textarea.style.height = 'auto';
-                                textarea.style.height = textarea.scrollHeight + 'px';
+                                textarea.style.height = Math.min(textarea.scrollHeight, isNotesExpanded ? 320 : 180) + 'px';
                             }
                         }}
                     />
@@ -671,6 +773,154 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         </button>
                     </div>
                 </div>
+
+                {/* 6. EXPANDED FOCUS CANVAS OVERLAY FOR LARGE NOTES / DESCRIPTIONS */}
+                {expandedOverlayField && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 10000,
+                        background: 'rgba(0, 0, 0, 0.65)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '16px'
+                    }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                            style={{
+                                background: 'var(--surface-color)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '14px',
+                                width: '640px',
+                                maxWidth: '96vw',
+                                maxHeight: '85vh',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: '20px 22px',
+                                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.35)',
+                                color: 'var(--text-color)',
+                                boxSizing: 'border-box'
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <FileText size={20} color="var(--accent-color)" />
+                                    <span style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-color)' }}>
+                                        Focus Editor — {expandedOverlayField === 'title' ? 'Task Description' : 'Notes'}
+                                    </span>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleVoiceInput(expandedOverlayField)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            padding: '4px 10px',
+                                            borderRadius: '12px',
+                                            border: `1px solid ${listeningTarget === expandedOverlayField ? '#ef4444' : 'var(--border-color)'}`,
+                                            background: listeningTarget === expandedOverlayField ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                            color: listeningTarget === expandedOverlayField ? '#ef4444' : 'var(--muted-text)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.8rem',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        {listeningTarget === expandedOverlayField ? <MicOff size={14} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={14} color="var(--accent-color)" />}
+                                        <span>{listeningTarget === expandedOverlayField ? 'Listening...' : 'Voice Dictation'}</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setExpandedOverlayField(null)}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: 'var(--muted-text)',
+                                            display: 'flex',
+                                            padding: '4px'
+                                        }}
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <textarea
+                                autoFocus
+                                value={expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')}
+                                onChange={(e) => setEditingTask({
+                                    ...editingTask,
+                                    [expandedOverlayField === 'title' ? 'text' : 'notes']: e.target.value
+                                })}
+                                placeholder={expandedOverlayField === 'title' ? 'Enter full task description...' : 'Add rich notes, bullet points, or extra details...'}
+                                style={{
+                                    width: '100%',
+                                    flex: 1,
+                                    minHeight: '320px',
+                                    maxHeight: '52vh',
+                                    padding: '14px 16px',
+                                    fontSize: '1rem',
+                                    lineHeight: '1.6',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '8px',
+                                    resize: 'vertical',
+                                    background: 'var(--bg-color)',
+                                    color: 'var(--text-color)',
+                                    outline: 'none',
+                                    fontFamily: 'Inter, sans-serif',
+                                    boxSizing: 'border-box'
+                                }}
+                            />
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px' }}>
+                                <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', display: 'flex', gap: '14px' }}>
+                                    <span>
+                                        Chars: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).length}</strong>
+                                    </span>
+                                    <span>
+                                        Words: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).trim().split(/\s+/).filter(Boolean).length}</strong>
+                                    </span>
+                                    <span>
+                                        Lines: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).split('\n').length}</strong>
+                                    </span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setExpandedOverlayField(null)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '7px 18px',
+                                        background: 'var(--accent-color)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        fontWeight: '600',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                                    }}
+                                >
+                                    <Check size={16} />
+                                    <span>Done Editing</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
             </div>
         </div>
     );
