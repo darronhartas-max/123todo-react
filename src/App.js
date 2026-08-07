@@ -29,7 +29,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } f
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 
@@ -216,7 +216,7 @@ const TodoApp = () => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
   const [lightModeTone, setLightModeToneState] = useState(() => {
-    return localStorage.getItem('123TodoLightModeTone') || 'soft';
+    return localStorage.getItem('123TodoLightModeTone') || DEFAULT_LIGHT_MODE_TONE;
   });
   const [dateFormat, setDateFormatState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT;

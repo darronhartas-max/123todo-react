@@ -78,12 +78,16 @@ export const DEFAULT_PROJECTS = [
 
 export const MAX_TASK_LENGTH = 250;
 export const DEFAULT_TASK_LENGTH_LIMIT = '250';
+export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.5.29';
+export const APP_VERSION = '2.5.30';
 
 export const RELEASE_CHANGELOG = {
+  '2.5.30': [
+    { title: '🎨 Default Muted Light Theme:', desc: 'Set Muted tone (Subdued Cozy Grey with Zero Glare) as the default light theme mode for new users.' }
+  ],
   '2.5.29': [
     { title: '✅ Task Completion Persistence & Sync Conflict Fix:', desc: 'Fixed active vs archived conflict resolution during dataset merges and unmount cleanup in task completion timer so completed tasks never re-appear in active lists.' }
   ],

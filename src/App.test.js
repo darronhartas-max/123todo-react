@@ -25,3 +25,11 @@ test('applies light mode background tone class to document root from localStorag
   expect(document.documentElement.classList.contains('light-tone-muted')).toBe(true);
 });
 
+test('defaults to muted light mode tone for new users when no localStorage setting exists', () => {
+  localStorage.removeItem('123TodoLightModeTone');
+
+  render(<App />);
+
+  expect(document.documentElement.classList.contains('light-tone-muted')).toBe(true);
+});
+
