@@ -297,11 +297,13 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.31 (Current)
+### v2.5.32 (Current)
+- **Full-Height Projects Dropdown**: Expanded the main Projects dropdown popup to display all projects down to the last item without forced scrollbars.
+
+### v2.5.31
 - **Refined Update Notification Card**: Redesigned the new version update prompt into a clean, glassmorphic card with Framer Motion entry animations and subtle accent typography.
 
 ### v2.5.30
-- **Default Muted Light Theme**: Set Muted tone (Subdued Cozy Grey with Zero Glare) as the default light theme mode for new users.
 
 ### v2.5.29
 - **Task Completion Persistence & Sync Conflict Fix**: Fixed active vs archived task conflict resolution during dataset merges and ensured unmount cleanup in task completion timer executes completion immediately so completed tasks never re-appear in active lists.

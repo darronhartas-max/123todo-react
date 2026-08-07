@@ -93,9 +93,9 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             borderRadius: '6px',
             boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
             zIndex: 100,
-            maxHeight: '320px',
+            maxHeight: 'calc(100vh - 120px)',
             overflowY: 'auto',
-            padding: '2px 0'
+            padding: '4px 0'
         },
         customOption: (isActive, color) => ({
             padding: '6px 12px',
