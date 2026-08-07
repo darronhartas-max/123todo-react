@@ -112,5 +112,33 @@ test('preserves user reordered task sequence when local timestamp is newer', () 
     expect(merged.tasks[1].id).toBe(1);
 });
 
+test('keeps task in archived when local task is completed and remote still contains active task', () => {
+    const localData = {
+        tasks: [],
+        archived: [
+            { id: 5, text: 'Clean Office', priority: 2, projectId: 'general', completedAt: 1700000500000, updatedAt: 1700000500000 }
+        ],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        counter: 5,
+        timestamp: 1700000500000
+    };
+
+    const remoteData = {
+        tasks: [
+            { id: 5, text: 'Clean Office', priority: 2, projectId: 'general', updatedAt: 1700000100000 }
+        ],
+        archived: [],
+        projects: [{ id: 'general', name: 'General', color: '#285a82' }],
+        counter: 5,
+        timestamp: 1700000100000
+    };
+
+    const merged = mergeSyncDatasets(localData, remoteData);
+
+    expect(merged.tasks).toHaveLength(0);
+    expect(merged.archived).toHaveLength(1);
+    expect(merged.archived[0].id).toBe(5);
+});
+
 
 

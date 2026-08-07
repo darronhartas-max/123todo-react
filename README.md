@@ -297,7 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.28 (Current)
+### v2.5.29 (Current)
+- **Task Completion Persistence & Sync Conflict Fix**: Fixed active vs archived task conflict resolution during dataset merges and ensured unmount cleanup in task completion timer executes completion immediately so completed tasks never re-appear in active lists.
+
+### v2.5.28
 - **Standard Font Weight Adjustment**: Adjusted standard text font weight to regular 400 for crisp, clean non-bold text when Bold Typography mode is disabled.
 
 ### v2.5.27

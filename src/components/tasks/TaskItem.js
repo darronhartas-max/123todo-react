@@ -132,6 +132,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         } else {
             setIsChecked(true);
             archiveTimeoutRef.current = setTimeout(() => {
+                archiveTimeoutRef.current = null;
                 onComplete(task.id);
             }, 600);
         }
@@ -141,9 +142,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         return () => {
             if (archiveTimeoutRef.current) {
                 clearTimeout(archiveTimeoutRef.current);
+                archiveTimeoutRef.current = null;
+                onComplete(task.id);
             }
         };
-    }, []);
+    }, [onComplete, task.id]);
 
 
 

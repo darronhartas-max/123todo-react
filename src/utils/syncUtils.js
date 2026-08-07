@@ -95,15 +95,20 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
 
     if (archivedKey) {
       const archivedTask = archivedMap.get(archivedKey);
-      const isLocallyActive = localTasks.some(lt => lt.id === t.id || (contentKey && getTaskKey(lt) === contentKey));
-      const activeTimestamp = t.restoredAt || t.updatedAt || (isLocallyActive ? (localData.timestamp || Date.now()) : 0);
       const archivedTimestamp = archivedTask.completedAt || archivedTask.updatedAt || 0;
+      const restoredTimestamp = t.restoredAt || 0;
+      const updatedTimestamp = t.updatedAt || 0;
 
-      if (activeTimestamp >= archivedTimestamp) {
-        // Active/Restored version is newer than or equal to archived completion -> Active WINS
+      // Active task ONLY wins over archived task if it was explicitly restored after archiving (restoredAt >= archivedTimestamp)
+      // OR if it was updated strictly AFTER the task was archived (updatedAt > archivedTimestamp).
+      const activeWins = (restoredTimestamp > 0 && restoredTimestamp >= archivedTimestamp) || 
+                         (updatedTimestamp > 0 && updatedTimestamp > archivedTimestamp);
+
+      if (activeWins) {
+        // Active/Restored version is newer than archived completion -> Active WINS
         archivedMap.delete(archivedKey);
       } else {
-        // Archived version is newer -> Remains archived
+        // Archived version is newer or equal -> Remains archived
         return;
       }
     }

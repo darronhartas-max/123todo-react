@@ -251,7 +251,7 @@ export const useTasks = () => {
                 updatedAt: Date.now()
             };
 
-            setArchived(arch => [completedTask, ...arch]);
+            setArchived(arch => [completedTask, ...arch.filter(a => String(a.id) !== String(id))]);
 
             if (task.isRecurring && task.recurrence) {
                 const baseDate = task.scheduledDate || new Date().toISOString().split('T')[0];
