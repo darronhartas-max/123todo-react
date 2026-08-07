@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
-import { formatDisplayDate } from '../../utils/dateUtils';
+import { formatDisplayDate, getNextWeekDateString } from '../../utils/dateUtils';
 
 const ACTION_ICONS = {
     CheckSquare,
@@ -586,6 +586,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 outline: 'none'
                             }}
                         />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                onUpdate(task.id, { scheduledDate: getNextWeekDateString() });
+                                setShowQuickSchedule(false);
+                            }}
+                            style={{
+                                border: '1px solid var(--accent-color)',
+                                background: 'var(--accent-bg)',
+                                color: 'var(--accent-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600',
+                                padding: '3px 7px',
+                                borderRadius: '4px',
+                                whiteSpace: 'nowrap'
+                            }}
+                            title="Defer task for 7 days"
+                        >
+                            📅 Next Week
+                        </button>
                         <button
                             onClick={() => setShowQuickSchedule(false)}
                             style={{

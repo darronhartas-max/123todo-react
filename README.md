@@ -297,9 +297,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.5.26 (Current)
-- **Drag-and-Drop & Task Edit Persistence Fix**: Fixed downward task reordering index calculation, String vs Number ID coercion, task `updatedAt` timestamps, and LocalStorage state synchronization dependencies.
-- **Refined Edit & Note Modal Layout**: Redesigned the Edit Modal with a compact 440px width, Priority and Project selectors above the task title, Notes directly below the title, and space-efficient subtasks and scheduling editors.
+### v2.5.27 (Current)
+- **Quick "Next Week" Scheduling Button**: Added 1-click "Next Week" quick scheduling buttons across Edit Modal, Add Task modal, and inline quick defer controls.
+
+### v2.5.26
 
 ### v2.5.25
 

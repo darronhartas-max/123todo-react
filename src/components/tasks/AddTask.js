@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { Plus, Minus, Mic, MicOff } from 'lucide-react';
-import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -525,7 +525,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
                         📅 Date & Recurrence Scheduling
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '10px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '150px' }}>
                             <label style={{ fontSize: '0.95rem', color: 'var(--muted-text)', fontWeight: '500' }}>Start/Scheduled Date</label>
                             <input
@@ -544,8 +544,27 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 }}
                             />
                         </div>
+                        <button
+                            type="button"
+                            onClick={() => setScheduledDate(getNextWeekDateString())}
+                            style={{
+                                padding: '8px 14px',
+                                background: 'var(--accent-bg)',
+                                border: '1px solid var(--accent-color)',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                color: 'var(--accent-color)',
+                                fontWeight: '600',
+                                whiteSpace: 'nowrap'
+                            }}
+                            title="Schedule for 7 days from today"
+                        >
+                            📅 Next Week
+                        </button>
                         {scheduledDate && (
                             <button
+                                type="button"
                                 onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                 style={{
                                     padding: '8px 16px',
@@ -555,11 +574,10 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                     cursor: 'pointer',
                                     fontSize: '1.05rem',
                                     fontWeight: '600',
-                                    marginTop: '22px',
                                     color: '#333'
                                 }}
                             >
-                                Clear Date
+                                Clear
                             </button>
                         )}
                     </div>

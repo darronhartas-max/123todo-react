@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { Mic, MicOff, Calendar, ListTodo, X } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
@@ -471,7 +471,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         <div style={{ ...styles.sectionLabel, marginBottom: '6px' }}>
                             Date & Recurrence
                         </div>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
                             <input
                                 type="date"
                                 value={scheduledDate || ''}
@@ -484,11 +484,31 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     background: 'var(--bg-color)',
                                     color: 'var(--text-color)',
                                     outline: 'none',
-                                    flex: 1
+                                    flex: 1,
+                                    minWidth: '120px'
                                 }}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setScheduledDate(getNextWeekDateString())}
+                                style={{
+                                    padding: '4px 8px',
+                                    background: 'var(--accent-bg)',
+                                    border: '1px solid var(--accent-color)',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.78rem',
+                                    color: 'var(--accent-color)',
+                                    fontWeight: '600',
+                                    whiteSpace: 'nowrap'
+                                }}
+                                title="Schedule for 7 days from today"
+                            >
+                                📅 Next Week
+                            </button>
                             {scheduledDate && (
                                 <button
+                                    type="button"
                                     onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                     style={{
                                         padding: '4px 8px',

@@ -14,6 +14,15 @@ export const getTodayDateString = () => {
 };
 
 /**
+ * Returns next week's date (7 days from today) in local YYYY-MM-DD format.
+ */
+export const getNextWeekDateString = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return formatDateString(d);
+};
+
+/**
  * Parses a YYYY-MM-DD string into a local Date object.
  */
 export const parseDateString = (dateStr) => {
