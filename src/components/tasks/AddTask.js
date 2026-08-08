@@ -98,16 +98,21 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             onTranscript: (updatedText, isSubmitCommand) => {
                 if (targetField === 'title') {
                     setText(updatedText);
-                    if (isSubmitCommand && updatedText.trim().length > 0) {
-                        stopVoice();
-                        setVoiceStatus('🚀 Auto-submitting task...');
-                        setTimeout(() => {
-                            handleSubmit(updatedText);
-                            setVoiceStatus('');
-                        }, 200);
-                    }
                 } else {
                     setNotes(updatedText);
+                }
+
+                if (isSubmitCommand) {
+                    stopVoice();
+                    setVoiceStatus('🚀 Auto-submitting task...');
+                    setTimeout(() => {
+                        if (targetField === 'title') {
+                            if (updatedText.trim().length > 0) handleSubmit(updatedText);
+                        } else {
+                            handleSubmit(text, updatedText);
+                        }
+                        setVoiceStatus('');
+                    }, 200);
                 }
             },
             onStatusChange: (statusMsg) => {
@@ -147,9 +152,11 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         }
     }, [isOpen, defaultProjectId, projects]);
 
-    const handleSubmit = (overrideText) => {
+    const handleSubmit = (overrideText, overrideNotes) => {
         const taskTitle = typeof overrideText === 'string' ? overrideText : text;
-        if (!taskTitle.trim()) return;
+        const taskNotes = typeof overrideNotes === 'string' ? overrideNotes : notes;
+        if (!taskTitle.trim() && !taskNotes.trim()) return;
+        const finalTitle = taskTitle.trim() || 'Untitled Task';
         const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
         
         // Build recurrence rule if recurring is selected
@@ -169,7 +176,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             };
         }
 
-        onAdd(taskTitle, priority, finalProjectId, notes.trim(), {
+        onAdd(finalTitle, priority, finalProjectId, taskNotes.trim(), {
             scheduledDate: finalScheduledDate,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,

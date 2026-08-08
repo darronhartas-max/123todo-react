@@ -58,7 +58,7 @@ describe('voiceUtils - processVoiceCommands', () => {
     expect(processVoiceCommands('buy milk clear all').text).toBe('');
   });
 
-  test('detects spoken auto-submit commands (add task) and appends full stop', () => {
+  test('detects spoken auto-submit commands (add task, add note) and appends full stop', () => {
     const res1 = processVoiceCommands('Buy fresh organic sourdough bread add task');
     expect(res1.text).toBe('Buy fresh organic sourdough bread.');
     expect(res1.isSubmitCommand).toBe(true);
@@ -70,5 +70,13 @@ describe('voiceUtils - processVoiceCommands', () => {
     const res3 = processVoiceCommands('Is the store open? add task');
     expect(res3.text).toBe('Is the store open?');
     expect(res3.isSubmitCommand).toBe(true);
+
+    const res4 = processVoiceCommands('Remember to check water meter add note');
+    expect(res4.text).toBe('Remember to check water meter.');
+    expect(res4.isSubmitCommand).toBe(true);
+
+    const res5 = processVoiceCommands('Meeting agenda notes save note');
+    expect(res5.text).toBe('Meeting agenda notes.');
+    expect(res5.isSubmitCommand).toBe(true);
   });
 });

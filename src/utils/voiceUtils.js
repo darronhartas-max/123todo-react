@@ -137,8 +137,8 @@ export const processVoiceCommands = (text) => {
   let processed = text;
   let isSubmitCommand = false;
 
-  // 1. Check for spoken submit command ("add task", "submit task", "save task")
-  const submitRegex = /\b(add\s*task|submit\s*task|save\s*task)\b/gi;
+  // 1. Check for spoken submit command ("add task", "submit task", "save task", "add note", "submit note", "save note")
+  const submitRegex = /\b(add\s*task|submit\s*task|save\s*task|add\s*note|submit\s*note|save\s*note)\b/gi;
   if (submitRegex.test(processed)) {
     isSubmitCommand = true;
     processed = processed.replace(submitRegex, '').trim();
