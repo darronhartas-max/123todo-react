@@ -122,12 +122,21 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     };
 
     const onCompleteRef = React.useRef(onComplete);
+    const lastCompleteTimeRef = React.useRef(0);
+
     React.useEffect(() => {
         onCompleteRef.current = onComplete;
     }, [onComplete]);
 
     const handleComplete = (e) => {
-        e.stopPropagation();
+        if (e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault && e.cancelable) e.preventDefault();
+        }
+        const now = Date.now();
+        if (now - lastCompleteTimeRef.current < 350) return;
+        lastCompleteTimeRef.current = now;
+
         if (isChecked) {
             setIsChecked(false);
             if (archiveTimeoutRef.current) {
@@ -730,10 +739,22 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         )}
                         <motion.button
                             onClick={handleComplete}
+                            onTouchStart={(e) => e.stopPropagation()}
+                            onTouchEnd={(e) => {
+                                e.stopPropagation();
+                                handleComplete(e);
+                            }}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onPointerUp={(e) => e.stopPropagation()}
                             style={{
                                 ...styles.actionBtn,
+                                minWidth: '40px',
+                                minHeight: '40px',
+                                width: '40px',
+                                height: '40px',
+                                touchAction: 'manipulation',
                                 color: isChecked ? '#10b981' : 'var(--muted-text)',
-                                background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                                background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent'
                             }}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
