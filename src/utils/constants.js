@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.7.1';
+export const APP_VERSION = '2.7.2';
 
 export const RELEASE_CHANGELOG = {
+  '2.7.2': [
+    { title: '🏆 Minimalist Milestone Congratulations Modal:', desc: 'Redesigned the task completion milestone modal to align perfectly with the clean, modern aesthetic of the application, featuring theme variables, Framer Motion entry animations, and sharp stat cards.' }
+  ],
   '2.7.1': [
     { title: '📜 Live Dictation Auto-Scroll & Viewport Tracking:', desc: 'Added auto-expanding height and scrollTop tracking so newly spoken words/lines are always clearly visible at the bottom of the input canvas during voice dictation.' }
   ],
