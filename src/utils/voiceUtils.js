@@ -139,6 +139,11 @@ export const processVoiceCommands = (text) => {
   if (submitRegex.test(processed)) {
     isSubmitCommand = true;
     processed = processed.replace(submitRegex, '').trim();
+
+    // Add full stop at end of sentence if no terminal punctuation exists
+    if (processed.length > 0 && !/[.,?!:;]$/.test(processed)) {
+      processed += '.';
+    }
   }
 
   // 2. Check for "clear all" or "delete all"
@@ -179,7 +184,7 @@ export const processVoiceCommands = (text) => {
 
 /**
  * Starts continuous speech recognition and appends transcript to existing text.
- * Uses a locked final-transcript buffer so pauses/stalls while thinking NEVER delete or overwrite existing text.
+ * Uses continuous auto-restart so user pauses while thinking NEVER cut off listening.
  */
 export const startVoiceDictation = ({
   initialText = '',
@@ -193,7 +198,8 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const baseText = (initialText || '').trim();
+  let currentBaseText = (initialText || '').trim();
+  let latestCapturedText = currentBaseText;
   let isActive = true;
 
   try {
@@ -226,7 +232,7 @@ export const startVoiceDictation = ({
       let speechText = mergeBaseAndTranscript(cleanFinal, cleanInterim);
 
       // Smart merge base text + speech transcript (prevents all text duplication)
-      let combined = mergeBaseAndTranscript(baseText, speechText);
+      let combined = mergeBaseAndTranscript(currentBaseText, speechText);
 
       // Process spoken editing & auto-submit commands
       const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
@@ -237,27 +243,39 @@ export const startVoiceDictation = ({
         finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
       }
 
+      latestCapturedText = finalText;
       onTranscript(finalText, isSubmitCommand);
     };
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed') {
+        isActive = false;
         onStatusChange('⚠️ Microphone permission denied.');
-      } else if (event.error === 'no-speech') {
-        onStatusChange('No speech detected.');
-      } else {
-        onStatusChange(`Voice status: ${event.error}`);
+        setTimeout(() => onStatusChange(''), 4000);
+        if (onEnd) onEnd();
       }
-      setTimeout(() => onStatusChange(''), 4000);
-      if (onEnd) onEnd();
     };
 
     recognition.onend = () => {
       if (isActive) {
-        onStatusChange('✨ Voice input captured!');
-        setTimeout(() => onStatusChange(''), 3000);
+        // Continuous mode: if browser stops on pause/silence timeout, auto-restart with latest text
+        currentBaseText = latestCapturedText;
+        try {
+          recognition.start();
+          return;
+        } catch (e) {
+          setTimeout(() => {
+            if (isActive) {
+              try { recognition.start(); } catch {}
+            }
+          }, 100);
+          return;
+        }
       }
+
+      onStatusChange('✨ Voice input captured!');
+      setTimeout(() => onStatusChange(''), 3000);
       if (onEnd) onEnd();
     };
 

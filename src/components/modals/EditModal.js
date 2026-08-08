@@ -83,11 +83,19 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
         const rec = startVoiceDictation({
             initialText: initialVal,
-            onTranscript: (updatedText) => {
+            onTranscript: (updatedText, isSubmitCommand) => {
                 setEditingTask(prev => ({
                     ...prev,
                     [targetField === 'title' ? 'text' : 'notes']: updatedText
                 }));
+                if (isSubmitCommand && updatedText.trim().length > 0) {
+                    stopVoice();
+                    setVoiceStatus('🚀 Auto-saving task...');
+                    setTimeout(() => {
+                        handleSave();
+                        setVoiceStatus('');
+                    }, 200);
+                }
             },
             onStatusChange: (statusMsg) => {
                 setVoiceStatus(statusMsg);
