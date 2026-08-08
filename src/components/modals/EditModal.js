@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
+import { Mic, MicOff, X, Maximize2, Minimize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -506,31 +506,36 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     />
                 </div>
 
-                {/* 3. NOTES (Compacted to Button when no notes exist, like AddTask) */}
-                {!showNotes && (!editingTask.notes || editingTask.notes.trim().length === 0) ? (
-                    <div style={{ marginBottom: '10px' }}>
-                        <button
-                            type="button"
-                            onClick={() => setShowNotes(true)}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '4px 10px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--item-bg)',
-                                color: 'var(--accent-color)',
-                                cursor: 'pointer',
-                                fontSize: '0.82rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            <Plus size={14} />
-                            <span>Notes</span>
-                        </button>
-                    </div>
-                ) : (
+                {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, and Schedule on the SAME line */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <button
+                        type="button"
+                        onClick={() => setShowNotes(!showNotes)}
+                        style={toggleButtonStyle(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0))}
+                    >
+                        {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) ? <Minus size={13} /> : <Plus size={13} />}
+                        <span>Notes</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setShowSubtasks(!showSubtasks)}
+                        style={toggleButtonStyle(showSubtasks || subtasks.length > 0)}
+                    >
+                        {showSubtasks ? <Minus size={13} /> : <Plus size={13} />}
+                        <span>Subtasks ({subtasks.length})</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setShowSchedule(!showSchedule)}
+                        style={toggleButtonStyle(showSchedule || Boolean(scheduledDate))}
+                    >
+                        {showSchedule ? <Minus size={13} /> : <Plus size={13} />}
+                        <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
+                    </button>
+                </div>
+
+                {/* Notes Editor (Visible when Notes button is active or notes exist) */}
+                {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) && (
                     <div style={{ marginBottom: '10px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -655,24 +660,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         💡 Deferred {task.deferCount}x. Consider breaking into <strong>Subtasks</strong> below.
                     </div>
                 )}
-
-                {/* 4. COMPACT SUBTASKS & SCHEDULING TRIGGERS */}
-                <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                    <button
-                        onClick={() => setShowSubtasks(!showSubtasks)}
-                        style={toggleButtonStyle(showSubtasks)}
-                    >
-                        <ListTodo size={13} />
-                        <span>Subtasks ({subtasks.length})</span>
-                    </button>
-                    <button
-                        onClick={() => setShowSchedule(!showSchedule)}
-                        style={toggleButtonStyle(showSchedule)}
-                    >
-                        <Calendar size={13} />
-                        <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
-                    </button>
-                </div>
 
                 {/* Compact Subtask Editor */}
                 {showSubtasks && (
