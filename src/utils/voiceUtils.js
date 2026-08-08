@@ -12,18 +12,18 @@ export const isSpeechRecognitionSupported = () => {
 /**
  * Maps spoken punctuation phrases to actual punctuation marks and formats spacing cleanly.
  * Examples:
- * - "buy milk full stop call John comma tomorrow" -> "buy milk. call John, tomorrow"
- * - "is task done question mark yes exclamation mark" -> "is task done? yes!"
+ * - "buy milk full stop call John comma tomorrow" -> "buy milk. Call John, tomorrow"
+ * - "is task done question mark yes exclamation mark" -> "is task done? Yes!"
  */
 export const formatSpokenPunctuation = (text) => {
   if (!text || typeof text !== 'string') return text;
 
   let formatted = text
     // Spoken punctuation replacements
-    .replace(/\b(full\s*stop|period)\b/gi, '.')
+    .replace(/\b(full\s*stop|fullstop|period|dot)\b/gi, '.')
     .replace(/\b(comma)\b/gi, ',')
-    .replace(/\b(question\s*mark)\b/gi, '?')
-    .replace(/\b(exclamation\s*(mark|point))\b/gi, '!')
+    .replace(/\b(question\s*mark|questionmark)\b/gi, '?')
+    .replace(/\b(exclamation\s*(mark|point)|exclamationmark|exclamationpoint)\b/gi, '!')
     .replace(/\b(colon)\b/gi, ':')
     .replace(/\b(semi\s*colon|semicolon)\b/gi, ';')
     .replace(/\b(new\s*line|newline)\b/gi, '\n')
@@ -33,6 +33,9 @@ export const formatSpokenPunctuation = (text) => {
   formatted = formatted
     .replace(/\s+([.,?!:;])/g, '$1')
     .replace(/([.,?!:;])(?=[a-zA-Z0-9])/g, '$1 ');
+
+  // Auto-capitalize the first letter following sentence-ending punctuation (. ? !)
+  formatted = formatted.replace(/([.?!]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
 
   return formatted;
 };
@@ -184,7 +187,7 @@ export const processVoiceCommands = (text) => {
 
 /**
  * Starts continuous speech recognition and appends transcript to existing text.
- * Uses continuous auto-restart so user pauses while thinking NEVER cut off listening.
+ * Uses a locked final-transcript buffer so pauses/stalls while thinking NEVER delete or overwrite existing text.
  */
 export const startVoiceDictation = ({
   initialText = '',
@@ -198,9 +201,7 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  let currentBaseText = (initialText || '').trim();
-  let latestCapturedText = currentBaseText;
-  let isActive = true;
+  const baseText = (initialText || '').trim();
 
   try {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -232,7 +233,7 @@ export const startVoiceDictation = ({
       let speechText = mergeBaseAndTranscript(cleanFinal, cleanInterim);
 
       // Smart merge base text + speech transcript (prevents all text duplication)
-      let combined = mergeBaseAndTranscript(currentBaseText, speechText);
+      let combined = mergeBaseAndTranscript(baseText, speechText);
 
       // Process spoken editing & auto-submit commands
       const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
@@ -243,37 +244,23 @@ export const startVoiceDictation = ({
         finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
       }
 
-      latestCapturedText = finalText;
       onTranscript(finalText, isSubmitCommand);
     };
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed') {
-        isActive = false;
         onStatusChange('⚠️ Microphone permission denied.');
-        setTimeout(() => onStatusChange(''), 4000);
-        if (onEnd) onEnd();
+      } else if (event.error === 'no-speech') {
+        onStatusChange('No speech detected.');
+      } else {
+        onStatusChange(`Voice status: ${event.error}`);
       }
+      setTimeout(() => onStatusChange(''), 4000);
+      if (onEnd) onEnd();
     };
 
     recognition.onend = () => {
-      if (isActive) {
-        // Continuous mode: if browser stops on pause/silence timeout, auto-restart with latest text
-        currentBaseText = latestCapturedText;
-        try {
-          recognition.start();
-          return;
-        } catch (e) {
-          setTimeout(() => {
-            if (isActive) {
-              try { recognition.start(); } catch {}
-            }
-          }, 100);
-          return;
-        }
-      }
-
       onStatusChange('✨ Voice input captured!');
       setTimeout(() => onStatusChange(''), 3000);
       if (onEnd) onEnd();
@@ -284,7 +271,6 @@ export const startVoiceDictation = ({
     // Return custom controller object with stop method
     return {
       stop: () => {
-        isActive = false;
         try { recognition.stop(); } catch {}
       }
     };

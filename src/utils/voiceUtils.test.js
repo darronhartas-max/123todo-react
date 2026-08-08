@@ -1,9 +1,12 @@
 import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands } from './voiceUtils';
 
 describe('voiceUtils - formatSpokenPunctuation', () => {
-  test('formats spoken punctuation correctly', () => {
-    expect(formatSpokenPunctuation('buy milk full stop call John comma tomorrow')).toBe('buy milk. call John, tomorrow');
-    expect(formatSpokenPunctuation('is task done question mark yes exclamation mark')).toBe('is task done? yes!');
+  test('formats spoken punctuation and capitalizes sentences correctly', () => {
+    expect(formatSpokenPunctuation('buy milk full stop call John comma tomorrow')).toBe('buy milk. Call John, tomorrow');
+    expect(formatSpokenPunctuation('buy milk fullstop call John comma tomorrow')).toBe('buy milk. Call John, tomorrow');
+    expect(formatSpokenPunctuation('buy milk dot call John')).toBe('buy milk. Call John');
+    expect(formatSpokenPunctuation('is task done question mark yes exclamation mark')).toBe('is task done? Yes!');
+    expect(formatSpokenPunctuation('is task done questionmark yes exclamationpoint')).toBe('is task done? Yes!');
   });
 });
 
