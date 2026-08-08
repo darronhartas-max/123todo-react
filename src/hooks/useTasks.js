@@ -235,58 +235,62 @@ export const useTasks = () => {
     }, [counter]);
 
     const completeTask = useCallback((id) => {
-        let spawnedTask = null;
+        const targetIdStr = String(id);
+        const now = Date.now();
 
-        setTasks(prev => {
-            const taskIndex = prev.findIndex(t => String(t.id) === String(id));
-            if (taskIndex === -1) return prev;
+        setTasks(prevTasks => {
+            const taskIndex = prevTasks.findIndex(t => String(t.id) === targetIdStr);
+            if (taskIndex === -1) return prevTasks;
 
-            const newTasks = [...prev];
-            const [task] = newTasks.splice(taskIndex, 1);
+            const taskToComplete = prevTasks[taskIndex];
             const completedTask = {
-                ...task,
+                ...taskToComplete,
                 isRecurring: false,
                 recurrence: null,
-                completedAt: Date.now(),
-                updatedAt: Date.now()
+                completedAt: now,
+                updatedAt: now
             };
 
-            setArchived(arch => [completedTask, ...arch.filter(a => String(a.id) !== String(id))]);
+            setArchived(prevArchived => [
+                completedTask,
+                ...prevArchived.filter(a => String(a.id) !== targetIdStr)
+            ]);
 
-            if (task.isRecurring && task.recurrence) {
-                const baseDate = task.scheduledDate || new Date().toISOString().split('T')[0];
-                const nextDate = calculateNextRecurrenceDate(baseDate, task.recurrence);
-                
+            const newTasks = [...prevTasks];
+            newTasks.splice(taskIndex, 1);
+
+            if (taskToComplete.isRecurring && taskToComplete.recurrence) {
+                const baseDate = taskToComplete.scheduledDate || new Date().toISOString().split('T')[0];
+                const nextDate = calculateNextRecurrenceDate(baseDate, taskToComplete.recurrence);
+
                 if (nextDate) {
-                    const resetSubtasks = (task.subtasks || []).map(st => ({
+                    const resetSubtasks = (taskToComplete.subtasks || []).map(st => ({
                         ...st,
                         completed: false
                     }));
 
-                    spawnedTask = {
-                        ...task,
+                    const spawnedTask = {
+                        ...taskToComplete,
                         scheduledDate: nextDate,
                         deferCount: 0,
                         subtasks: resetSubtasks,
                         completedAt: null,
-                        updatedAt: Date.now()
+                        updatedAt: now
                     };
+
+                    setCounter(curr => {
+                        const newId = curr + 1;
+                        spawnedTask.id = newId;
+                        return newId;
+                    });
+                    newTasks.unshift(spawnedTask);
                 }
             }
 
             return newTasks;
         });
 
-        if (spawnedTask) {
-            setCounter(curr => {
-                const newId = curr + 1;
-                spawnedTask.id = newId;
-                setTasks(prev => [spawnedTask, ...prev]);
-                return newId;
-            });
-        }
-
-        setTimestamp(Date.now());
+        setTimestamp(now);
     }, []);
 
     const deleteArchivedTask = useCallback((id) => {

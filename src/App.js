@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Archive } from 'lucide-react';
 import Header from './components/layout/Header';
@@ -410,7 +410,7 @@ const TodoApp = () => {
     }
   };
 
-  const handleCompleteTask = (id) => {
+  const handleCompleteTask = useCallback((id) => {
     completeTask(id);
     recordTaskCompleted();
     setShowArchiveToast(true);
@@ -427,7 +427,7 @@ const TodoApp = () => {
         setTimeout(() => setShowShareModal(true), 1200);
       }
     } catch (e) {}
-  };
+  }, [completeTask]);
 
   // Filtering
   const filteredBySearch = (list) => list.filter(t =>

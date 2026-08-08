@@ -121,6 +121,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         touchStartRef.current = { x: 0, y: 0 };
     };
 
+    const onCompleteRef = React.useRef(onComplete);
+    React.useEffect(() => {
+        onCompleteRef.current = onComplete;
+    }, [onComplete]);
+
     const handleComplete = (e) => {
         e.stopPropagation();
         if (isChecked) {
@@ -133,7 +138,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             setIsChecked(true);
             archiveTimeoutRef.current = setTimeout(() => {
                 archiveTimeoutRef.current = null;
-                onComplete(task.id);
+                if (onCompleteRef.current) {
+                    onCompleteRef.current(task.id);
+                }
             }, 600);
         }
     };
@@ -143,10 +150,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             if (archiveTimeoutRef.current) {
                 clearTimeout(archiveTimeoutRef.current);
                 archiveTimeoutRef.current = null;
-                onComplete(task.id);
+                if (onCompleteRef.current) {
+                    onCompleteRef.current(task.id);
+                }
             }
         };
-    }, [onComplete, task.id]);
+    }, [task.id]);
 
 
 

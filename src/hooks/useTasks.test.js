@@ -134,4 +134,22 @@ describe('useTasks - reorderTasks drag and drop', () => {
         const saved = JSON.parse(localStorage.getItem('123TodoTasks'));
         expect(saved[0].text).toBe('New Task Title');
     });
+
+    test('completes task and moves it to archived array', () => {
+        const initialTasks = [
+            { id: 1, text: 'Task to Complete', priority: 1, projectId: 'general' }
+        ];
+        localStorage.setItem('123TodoTasks', JSON.stringify(initialTasks));
+
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.completeTask(1);
+        });
+
+        expect(result.current.tasks.length).toBe(0);
+        expect(result.current.archived.length).toBe(1);
+        expect(result.current.archived[0].text).toBe('Task to Complete');
+        expect(result.current.archived[0].completedAt).toBeDefined();
+    });
 });
