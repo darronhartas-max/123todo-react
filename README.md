@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.9 (Current)
-- **Unified Single-Line Action Toolbar in Edit Modal**: Aligned **Notes**, **Subtasks**, and **Schedule** toggle buttons onto a single flex row directly below the task description in the Edit Modal.
+### v2.7.0 (Current)
+- **Refined Google Sync Status Indicator**: Kept the Google Drive Sync button text and background color completely steady during background syncs, replacing state-text flashing with a pulsing green indicator dot.
 
-### v2.6.8
+### v2.6.9
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

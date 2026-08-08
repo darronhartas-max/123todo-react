@@ -172,3 +172,21 @@ html.bold-font-active strong,
 html.bold-font-active b {
   font-weight: 800 !important;
 }
+
+@keyframes pulseDot {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.85);
+    box-shadow: 0 0 2px #10b981;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px #10b981;
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+    box-shadow: 0 0 2px #10b981;
+  }
+}
