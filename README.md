@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.7.0 (Current)
-- **Refined Google Sync Status Indicator**: Kept the Google Drive Sync button text and background color completely steady during background syncs, replacing state-text flashing with a pulsing green indicator dot.
+### v2.7.1 (Current)
+- **Live Voice Dictation Auto-Scroll & Viewport Tracking**: Implemented dynamic height expansion and `scrollTop = scrollHeight` tracking across all task textareas, ensuring newly spoken words/lines are always clearly visible at the bottom during voice input.
 
-### v2.6.9
+### v2.7.0
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

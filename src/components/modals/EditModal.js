@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
@@ -19,6 +19,35 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [showNotes, setShowNotes] = useState(() => Boolean(task.notes && task.notes.trim().length > 0));
+
+    const titleRef = useRef(null);
+    const notesRef = useRef(null);
+    const focusTextareaRef = useRef(null);
+
+    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
+    useEffect(() => {
+        if (titleRef.current) {
+            titleRef.current.style.height = 'auto';
+            const targetH = Math.min(Math.max(titleRef.current.scrollHeight, isTitleExpanded ? 200 : 48), isTitleExpanded ? 400 : 150);
+            titleRef.current.style.height = `${targetH}px`;
+            titleRef.current.scrollTop = titleRef.current.scrollHeight;
+        }
+    }, [editingTask.text, isTitleExpanded]);
+
+    useEffect(() => {
+        if (notesRef.current) {
+            notesRef.current.style.height = 'auto';
+            const targetH = Math.min(Math.max(notesRef.current.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180);
+            notesRef.current.style.height = `${targetH}px`;
+            notesRef.current.scrollTop = notesRef.current.scrollHeight;
+        }
+    }, [editingTask.notes, isNotesExpanded]);
+
+    useEffect(() => {
+        if (focusTextareaRef.current) {
+            focusTextareaRef.current.scrollTop = focusTextareaRef.current.scrollHeight;
+        }
+    }, [editingTask.text, editingTask.notes, expandedOverlayField]);
 
     const activePriority = PRIORITIES[editingTask.priority] || PRIORITIES[3];
     const activeProject = (projects || []).find(p => p.id === (editingTask.projectId || 'general')) || { id: 'general', name: 'General', color: '#6b7280' };
@@ -485,6 +514,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
 
                     <textarea
+                        ref={titleRef}
                         autoFocus
                         value={editingTask.text}
                         onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
@@ -497,12 +527,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             fontSize: '0.98rem'
                         }}
                         maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
-                        ref={(textarea) => {
-                            if (textarea) {
-                                textarea.style.height = 'auto';
-                                textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isTitleExpanded ? 200 : 48), isTitleExpanded ? 400 : 150) + 'px';
-                            }
-                        }}
                     />
                 </div>
 
@@ -625,6 +649,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             </div>
                         </div>
                         <textarea
+                            ref={notesRef}
                             value={editingTask.notes || ''}
                             onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                             onInput={handleInput}
@@ -633,12 +658,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 ...styles.textarea,
                                 minHeight: isNotesExpanded ? '240px' : '85px',
                                 maxHeight: isNotesExpanded ? '480px' : '180px'
-                            }}
-                            ref={(textarea) => {
-                                if (textarea) {
-                                    textarea.style.height = 'auto';
-                                    textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180) + 'px';
-                                }
                             }}
                         />
                     </div>
@@ -1061,6 +1080,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             </div>
 
                             <textarea
+                                ref={focusTextareaRef}
                                 autoFocus
                                 value={expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')}
                                 onChange={(e) => setEditingTask({

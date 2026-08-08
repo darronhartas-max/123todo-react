@@ -37,7 +37,25 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [recurrenceDaysOfWeek, setRecurrenceDaysOfWeek] = useState([]);
     
     const inputRef = useRef(null);
+    const notesRef = useRef(null);
     const hasOpenedRef = useRef(false);
+
+    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = Math.min(inputRef.current.scrollHeight, 250) + 'px';
+            inputRef.current.scrollTop = inputRef.current.scrollHeight;
+        }
+    }, [text]);
+
+    useEffect(() => {
+        if (notesRef.current) {
+            notesRef.current.style.height = 'auto';
+            notesRef.current.style.height = Math.min(notesRef.current.scrollHeight, 300) + 'px';
+            notesRef.current.scrollTop = notesRef.current.scrollHeight;
+        }
+    }, [notes]);
 
     // Voice Input State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
@@ -411,6 +429,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         </button>
                     </div>
                     <textarea
+                        ref={notesRef}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         onInput={handleInput}
