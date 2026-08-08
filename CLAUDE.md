@@ -24,25 +24,24 @@ src/
 └── utils/               # Constants, crypto, date utilities, syncUtils, voiceUtils
 ```
 
-## Automated CI/CD & Git Commit Workflow
+## Automated CI/CD & Dual-Repo Git Commit Workflow
 
-Deployment is automated via GitHub Actions (`.github/workflows/deploy.yml`).
+Both the **App** (`123todo-react` ➔ `app.123todo.com`) and the **Website** (`123todo-website` ➔ `www.123todo.com`) have automated GitHub Actions CI/CD deployment pipelines.
 
-### Assistant Rule for Git Commits & Deployment Verification:
+### Assistant Rule for Git Commits & Dual-Repo Deployment Verification:
 Whenever the user asks to "commit to git" or "commit":
-1. **Stage & Commit**:
-   ```bash
-   git add <files>
-   git commit -m "<descriptive message>"
-   ```
-2. **Push to Remote (CRITICAL)**: Always execute `git push origin main` with `BypassSandbox: true` (network bypass enabled).
-3. **Automated Deployment Verification (MANDATORY)**: Immediately after pushing, check the GitHub Actions workflow run status via GitHub REST API:
+1. **Lint & Test**: Run `npm test` / `npm run check` locally before pushing to ensure zero linter errors or failing tests in either repository.
+2. **Stage, Commit & Push**:
+   - For App changes (`123todo-react`): Push to `darronhartas-max/123todo-react`.
+   - For Website changes (`123todo-website`): Push to `darronhartas-max/123todo-website`.
+3. **Automated Deployment Verification (MANDATORY)**: Immediately after pushing, check the GitHub Actions workflow run status via GitHub REST API for both updated repositories:
    ```bash
    curl -s "https://api.github.com/repos/darronhartas-max/123todo-react/actions/runs?per_page=1"
+   curl -s "https://api.github.com/repos/darronhartas-max/123todo-website/actions/runs?per_page=1"
    ```
    - Verify `status` reaches `"completed"` and `conclusion` is `"success"`.
    - Confirm `head_sha` matches the pushed commit.
-   - If the build fails (`conclusion: "failure"`), fetch log details, fix the root cause immediately, and push the fix.
+   - If a build fails (`conclusion: "failure"`), fetch log details, fix the root cause immediately, and push the fix so both sites remain live and fully updated.
 
 ### Assistant Rule for Version Bumps & Release Changelog:
 Whenever bumping the application version (`APP_VERSION`):
