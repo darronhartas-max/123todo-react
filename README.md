@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.7.3 (Current)
-- **Voice Commands & Spoken Dictation Settings Guide**: Added spoken deletion commands (`"delete last word"`, `"scratch that"`, `"delete last N words"`, `"clear all"`), hands-free task auto-submission when dictating `"add task"`, and a comprehensive Voice-to-Text guide in Settings under Shortcuts.
+### v2.7.4 (Current)
+- **Advanced Voice Commands & Auto-Scroll Viewport Tracking**: Hands-free task creation (`"add task"`), live spoken deletion (`"delete last word"`, `"scratch that"`, `"clear all"`), real-time auto-scroll tracking across textareas, steady Google Sync status dot indicator, and Voice-to-Text guide in Settings under Shortcuts.
 
-### v2.7.2
+### v2.7.3
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.7.3';
+export const APP_VERSION = '2.7.4';
 
 export const RELEASE_CHANGELOG = {
+  '2.7.4': [
+    { title: '🎙️ Advanced Voice Commands & Auto-Scroll Viewport Tracking:', desc: 'Hands-free task creation ("add task"), live spoken deletion ("delete last word", "scratch that", "clear all"), real-time auto-scroll tracking, steady Google Sync indicator dot, and a Voice-to-Text guide in Settings.' }
+  ],
   '2.7.3': [
     { title: '🎙️ Spoken Voice Commands & Dictation Settings Guide:', desc: 'Added spoken deletion commands ("delete last word", "scratch that", "clear all"), hands-free auto-submission when saying "add task", and a detailed Voice-to-Text guide in Settings.' }
   ],
