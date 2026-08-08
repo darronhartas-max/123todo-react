@@ -300,11 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.7 (Current)
-- **Compact Empty Notes Field**: Compacted empty Notes fields in the Edit Modal to a low-profile `+ Notes` toggle button, matching the Add Task design.
-- **Refined Priority & Project Dropdown Backgrounds**: Removed background color fills on selected Priority and Project items while keeping vibrant borders, color badges, and sharp text accents.
+### v2.6.8 (Current)
+- **Smart Voice Transcript Deduplication Algorithm**: Implemented `mergeBaseAndTranscript` algorithm featuring word-level prefix/suffix overlap detection to prevent duplicate phrases when dictating voice tasks or notes across multiple recognition cycles.
 
-### v2.6.6
+### v2.6.7
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

@@ -38,6 +38,53 @@ export const formatSpokenPunctuation = (text) => {
 };
 
 /**
+ * Intelligently merges baseText and speech transcript avoiding duplicate words or repeated prefixes.
+ */
+export const mergeBaseAndTranscript = (baseText, speechText) => {
+  const base = (baseText || '').trim();
+  const speech = (speechText || '').trim();
+
+  if (!base) return speech;
+  if (!speech) return base;
+
+  const baseLower = base.toLowerCase();
+  const speechLower = speech.toLowerCase();
+
+  // Case 1: Speech transcript already starts with baseText
+  if (speechLower.startsWith(baseLower)) {
+    return speech;
+  }
+
+  // Case 2: baseText starts with speech transcript
+  if (baseLower.startsWith(speechLower)) {
+    return base;
+  }
+
+  // Case 3: Word-level suffix / prefix overlap check
+  const baseWords = base.split(/\s+/);
+  const speechWords = speech.split(/\s+/);
+
+  let maxOverlapWords = 0;
+  const maxCheck = Math.min(baseWords.length, speechWords.length);
+
+  for (let len = 1; len <= maxCheck; len++) {
+    const baseSuffix = baseWords.slice(baseWords.length - len).join(' ').toLowerCase();
+    const speechPrefix = speechWords.slice(0, len).join(' ').toLowerCase();
+    if (baseSuffix === speechPrefix) {
+      maxOverlapWords = len;
+    }
+  }
+
+  if (maxOverlapWords > 0) {
+    const remainingSpeech = speechWords.slice(maxOverlapWords).join(' ');
+    return remainingSpeech ? `${base} ${remainingSpeech}` : base;
+  }
+
+  // Case 4: Standard clean concatenation
+  return `${base} ${speech}`;
+};
+
+/**
  * Starts continuous speech recognition and appends transcript to existing text.
  * Uses a locked final-transcript buffer so pauses/stalls while thinking NEVER delete or overwrite existing text.
  */
@@ -84,15 +131,14 @@ export const startVoiceDictation = ({
       const cleanFinal = formatSpokenPunctuation(sessionFinal).trim();
       const cleanInterim = formatSpokenPunctuation(sessionInterim).trim();
 
-      // Combine base text + confirmed final transcript + current interim speech
-      let combined = baseText;
-
-      if (cleanFinal) {
-        combined = combined ? `${combined} ${cleanFinal}` : cleanFinal;
-      }
+      // Combine final & interim speech
+      let speechText = cleanFinal;
       if (cleanInterim) {
-        combined = combined ? `${combined} ${cleanInterim}` : cleanInterim;
+        speechText = speechText ? `${speechText} ${cleanInterim}` : cleanInterim;
       }
+
+      // Smart merge base text + speech transcript (prevents all text duplication)
+      let combined = mergeBaseAndTranscript(baseText, speechText);
 
       // Capitalize first letter of output
       if (combined.length > 0) {

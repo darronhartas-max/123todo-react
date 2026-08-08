@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.6.7';
+export const APP_VERSION = '2.6.8';
 
 export const RELEASE_CHANGELOG = {
+  '2.6.8': [
+    { title: '🎙️ Smart Voice Transcript Deduplication:', desc: 'Added word-level suffix and prefix overlap detection algorithm (mergeBaseAndTranscript) to guarantee zero text duplication across all voice dictation sessions.' }
+  ],
   '2.6.7': [
     { title: '📝 Compact Empty Notes & Refined Selector Styling:', desc: 'Compacted empty Notes field to a clean toggle button when editing tasks, and removed background color fills from Priority & Project dropdown triggers and options.' }
   ],
