@@ -95,9 +95,17 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
         const rec = startVoiceDictation({
             initialText: initialVal,
-            onTranscript: (updatedText) => {
+            onTranscript: (updatedText, isSubmitCommand) => {
                 if (targetField === 'title') {
                     setText(updatedText);
+                    if (isSubmitCommand && updatedText.trim().length > 0) {
+                        stopVoice();
+                        setVoiceStatus('🚀 Auto-submitting task...');
+                        setTimeout(() => {
+                            handleSubmit(updatedText);
+                            setVoiceStatus('');
+                        }, 200);
+                    }
                 } else {
                     setNotes(updatedText);
                 }
@@ -139,8 +147,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         }
     }, [isOpen, defaultProjectId, projects]);
 
-    const handleSubmit = () => {
-        if (!text.trim()) return;
+    const handleSubmit = (overrideText) => {
+        const taskTitle = typeof overrideText === 'string' ? overrideText : text;
+        if (!taskTitle.trim()) return;
         const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
         
         // Build recurrence rule if recurring is selected
@@ -160,7 +169,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             };
         }
 
-        onAdd(text, priority, finalProjectId, notes.trim(), {
+        onAdd(taskTitle, priority, finalProjectId, notes.trim(), {
             scheduledDate: finalScheduledDate,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,

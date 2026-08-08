@@ -85,6 +85,59 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
 };
 
 /**
+ * Processes spoken deletion commands ("delete last word", "scratch that", "delete last 3 words", "clear all")
+ * and auto-submit commands ("add task", "submit task", "save task").
+ */
+export const processVoiceCommands = (text) => {
+  if (!text || typeof text !== 'string') return { text: '', isSubmitCommand: false };
+
+  let processed = text;
+  let isSubmitCommand = false;
+
+  // 1. Check for spoken submit command ("add task", "submit task", "save task")
+  const submitRegex = /\b(add\s*task|submit\s*task|save\s*task)\b/gi;
+  if (submitRegex.test(processed)) {
+    isSubmitCommand = true;
+    processed = processed.replace(submitRegex, '').trim();
+  }
+
+  // 2. Check for "clear all" or "delete all"
+  const clearAllRegex = /\b(clear\s*all|delete\s*all)\b/gi;
+  if (clearAllRegex.test(processed)) {
+    return { text: '', isSubmitCommand: false };
+  }
+
+  // 3. Process "delete last N words" (e.g., "delete last 2 words", "delete last 3 words")
+  const deleteNRegex = /\bdelete\s+last\s+(\d+|one|two|three|four|five)\s+words?\b/gi;
+  processed = processed.replace(deleteNRegex, (match, numStr) => {
+    const wordMap = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+    const count = parseInt(numStr, 10) || wordMap[numStr.toLowerCase()] || 1;
+    return `__DEL_${count}__`;
+  });
+
+  // 4. Process "delete last word", "scratch that", "undo that"
+  processed = processed.replace(/\b(delete\s+last\s+word|scratch\s+that|undo\s+that)\b/gi, '__DEL_1__');
+
+  // Perform deletion of previous N words for each __DEL_N__ marker
+  while (processed.includes('__DEL_')) {
+    const matchPos = processed.indexOf('__DEL_');
+    const markerMatch = processed.match(/__DEL_(\d+)__/);
+    if (!markerMatch) break;
+    const numToDelete = parseInt(markerMatch[1], 10) || 1;
+    const beforeMarker = processed.substring(0, matchPos).trim();
+    const afterMarker = processed.substring(matchPos + markerMatch[0].length).trim();
+
+    const words = beforeMarker.split(/\s+/).filter(Boolean);
+    const remainingWords = words.slice(0, Math.max(0, words.length - numToDelete));
+    const newBefore = remainingWords.join(' ');
+
+    processed = newBefore ? (afterMarker ? `${newBefore} ${afterMarker}` : newBefore) : afterMarker;
+  }
+
+  return { text: processed, isSubmitCommand };
+};
+
+/**
  * Starts continuous speech recognition and appends transcript to existing text.
  * Uses a locked final-transcript buffer so pauses/stalls while thinking NEVER delete or overwrite existing text.
  */
@@ -111,7 +164,7 @@ export const startVoiceDictation = ({
     recognition.lang = 'en-US';
 
     recognition.onstart = () => {
-      onStatusChange('🎙️ Listening... Speak naturally (appends & supports "full stop", "comma", etc.)');
+      onStatusChange('🎙️ Listening... Speak naturally (supports punctuation, "delete last word", & "add task")');
     };
 
     recognition.onresult = (event) => {
@@ -140,12 +193,16 @@ export const startVoiceDictation = ({
       // Smart merge base text + speech transcript (prevents all text duplication)
       let combined = mergeBaseAndTranscript(baseText, speechText);
 
+      // Process spoken editing & auto-submit commands
+      const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
+      let finalText = processedText;
+
       // Capitalize first letter of output
-      if (combined.length > 0) {
-        combined = combined.charAt(0).toUpperCase() + combined.slice(1);
+      if (finalText.length > 0) {
+        finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
       }
 
-      onTranscript(combined);
+      onTranscript(finalText, isSubmitCommand);
     };
 
     recognition.onerror = (event) => {

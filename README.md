@@ -300,10 +300,10 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.7.2 (Current)
-- **Minimalist Milestone Congratulations Modal**: Redesigned the task completion milestone modal to align perfectly with the clean, modern aesthetic of the application, featuring theme variables, Framer Motion entry animations, and sharp stat cards.
+### v2.7.3 (Current)
+- **Voice Commands & Spoken Dictation Settings Guide**: Added spoken deletion commands (`"delete last word"`, `"scratch that"`, `"delete last N words"`, `"clear all"`), hands-free task auto-submission when dictating `"add task"`, and a comprehensive Voice-to-Text guide in Settings under Shortcuts.
 
-### v2.7.1
+### v2.7.2
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

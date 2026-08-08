@@ -581,6 +581,30 @@ const SettingsModal = ({
             fontSize: '0.9rem',
             boxShadow: '0 2px 0 var(--border-color)',
             color: 'var(--accent-color)'
+        },
+        voiceGuideTag: {
+            background: 'var(--surface-color)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '6px',
+            padding: '6px 10px',
+            fontSize: '0.82rem',
+            color: 'var(--text-color)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '6px'
+        },
+        voiceGuideRow: {
+            background: 'var(--surface-color)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '6px',
+            padding: '8px 12px',
+            fontSize: '0.84rem',
+            display: 'flex',
+            justify: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            color: 'var(--text-color)'
         }
     };
 
@@ -1292,7 +1316,7 @@ const SettingsModal = ({
                         {activeTab === 'shortcuts' && (
                             <div>
                                 <div style={styles.sectionTitle}>Keyboard Shortcuts</div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '24px' }}>
                                     {SHORTCUTS_LIST.map((s, idx) => (
                                         <div key={idx} style={styles.shortcutItem}>
                                             <span style={{ color: 'var(--text-color)', fontWeight: '500' }}>{s.desc}</span>
@@ -1303,6 +1327,59 @@ const SettingsModal = ({
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+
+                                <div style={styles.sectionTitle}>🎙️ Voice-to-Text & Spoken Commands Guide</div>
+                                <div style={{
+                                    background: 'var(--bg-color)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '10px',
+                                    padding: '16px',
+                                    lineHeight: '1.5'
+                                }}>
+                                    <p style={{ margin: '0 0 14px 0', fontSize: '0.88rem', color: 'var(--muted-text)' }}>
+                                        Click the <strong>Voice Task</strong> or <strong>Voice Notes</strong> microphone button to dictate tasks naturally. Speak punctuation marks, perform live edits, or automatically submit tasks hands-free!
+                                    </p>
+
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
+                                        ✍️ Spoken Punctuation:
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '8px', marginBottom: '16px' }}>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"full stop"</em> <strong style={{ color: 'var(--accent-color)' }}>.</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"comma"</em> <strong style={{ color: 'var(--accent-color)' }}>,</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"question mark"</em> <strong style={{ color: 'var(--accent-color)' }}>?</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"exclamation mark"</em> <strong style={{ color: 'var(--accent-color)' }}>!</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"colon"</em> <strong style={{ color: 'var(--accent-color)' }}>:</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"semi colon"</em> <strong style={{ color: 'var(--accent-color)' }}>;</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"new line"</em> <strong style={{ color: 'var(--accent-color)' }}>[↵]</strong></div>
+                                        <div style={styles.voiceGuideTag}>🗣️ <em>"hyphen"</em> / <em>"dash"</em> <strong style={{ color: 'var(--accent-color)' }}>-</strong></div>
+                                    </div>
+
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
+                                        ✂️ Voice Editing Commands:
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"delete last word"</kbd> or <kbd style={styles.kbdBadge}>"scratch that"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Removes the last spoken word</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"delete last 2 words"</kbd> (or 3, 4, 5)</div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Removes N words from input</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"clear all"</kbd> or <kbd style={styles.kbdBadge}>"delete all"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Clears the entire text field</span>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
+                                        🚀 Auto-Submit Command:
+                                    </div>
+                                    <div style={styles.voiceGuideRow}>
+                                        <div><kbd style={styles.kbdBadge}>"add task"</kbd> or <kbd style={styles.kbdBadge}>"submit task"</kbd></div>
+                                        <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#10b981' }}>Strips command & automatically saves task!</span>
+                                    </div>
                                 </div>
                             </div>
                         )}
