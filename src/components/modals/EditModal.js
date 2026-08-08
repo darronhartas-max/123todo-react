@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check, ChevronDown } from 'lucide-react';
+import { Mic, MicOff, Calendar, ListTodo, X, Maximize2, Minimize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -18,6 +18,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
+    const [showNotes, setShowNotes] = useState(() => Boolean(task.notes && task.notes.trim().length > 0));
 
     const activePriority = PRIORITIES[editingTask.priority] || PRIORITIES[3];
     const activeProject = (projects || []).find(p => p.id === (editingTask.projectId || 'general')) || { id: 'general', name: 'General', color: '#6b7280' };
@@ -45,7 +46,9 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
             return;
         }
 
-        stopVoice();
+        if (targetField === 'notes') {
+            setShowNotes(true);
+        }
 
         const initialVal = targetField === 'title' ? (editingTask.text || '') : (editingTask.notes || '');
 
@@ -218,7 +221,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 padding: '6px 10px',
                                 borderRadius: '6px',
                                 border: `1.5px solid ${activePriority.color}`,
-                                background: `${activePriority.color}15`,
+                                background: 'var(--item-bg)',
                                 color: activePriority.color,
                                 fontSize: '0.88rem',
                                 fontWeight: '700',
@@ -279,7 +282,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                     fontSize: '0.85rem',
                                                     fontWeight: isSel ? '700' : '600',
                                                     color: isSel ? conf.color : 'var(--text-color)',
-                                                    background: isSel ? `${conf.color}18` : 'transparent',
+                                                    background: 'transparent',
                                                     cursor: 'pointer',
                                                     transition: 'background 0.15s ease'
                                                 }}
@@ -312,7 +315,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 padding: '6px 10px',
                                 borderRadius: '6px',
                                 border: `1.5px solid ${activeProject.color || '#6b7280'}`,
-                                background: `${activeProject.color || '#6b7280'}15`,
+                                background: 'var(--item-bg)',
                                 color: activeProject.color || 'var(--text-color)',
                                 fontSize: '0.88rem',
                                 fontWeight: '700',
@@ -373,7 +376,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                     fontSize: '0.85rem',
                                                     fontWeight: isSel ? '700' : '600',
                                                     color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
-                                                    background: isSel ? `${p.color || '#6b7280'}18` : 'transparent',
+                                                    background: 'transparent',
                                                     cursor: 'pointer',
                                                     transition: 'background 0.15s ease'
                                                 }}
@@ -503,94 +506,138 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     />
                 </div>
 
-                {/* 3. NOTES (Directly Below Task Title) */}
-                <div style={{ marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={styles.sectionLabel}>Notes</span>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                            <button
-                                type="button"
-                                onClick={() => toggleVoiceInput('notes')}
-                                title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '3px',
-                                    padding: '1px 6px',
-                                    borderRadius: '10px',
-                                    border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
-                                    background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                    color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.72rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
-                                <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setIsNotesExpanded(!isNotesExpanded)}
-                                title={isNotesExpanded ? "Collapse height" : "Expand height in modal"}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '3px',
-                                    padding: '1px 6px',
-                                    borderRadius: '10px',
-                                    border: '1px solid var(--border-color)',
-                                    background: isNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                    color: isNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.72rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {isNotesExpanded ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
-                                <span>{isNotesExpanded ? 'Compact' : 'Expand'}</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setExpandedOverlayField('notes')}
-                                title="Open Full Screen Focus Editor for Notes"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '3px',
-                                    padding: '1px 6px',
-                                    borderRadius: '10px',
-                                    border: '1px solid var(--accent-color)',
-                                    background: 'var(--accent-bg)',
-                                    color: 'var(--accent-color)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.72rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                <Maximize2 size={10} />
-                                <span>Focus Editor</span>
-                            </button>
-                        </div>
+                {/* 3. NOTES (Compacted to Button when no notes exist, like AddTask) */}
+                {!showNotes && (!editingTask.notes || editingTask.notes.trim().length === 0) ? (
+                    <div style={{ marginBottom: '10px' }}>
+                        <button
+                            type="button"
+                            onClick={() => setShowNotes(true)}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '4px 10px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-color)',
+                                background: 'var(--item-bg)',
+                                color: 'var(--accent-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.82rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            <Plus size={14} />
+                            <span>Notes</span>
+                        </button>
                     </div>
-                    <textarea
-                        value={editingTask.notes || ''}
-                        onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
-                        onInput={handleInput}
-                        placeholder="Add notes or extra details..."
-                        style={{
-                            ...styles.textarea,
-                            minHeight: isNotesExpanded ? '240px' : '85px',
-                            maxHeight: isNotesExpanded ? '480px' : '180px'
-                        }}
-                        ref={(textarea) => {
-                            if (textarea) {
-                                textarea.style.height = 'auto';
-                                textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180) + 'px';
-                            }
-                        }}
-                    />
-                </div>
+                ) : (
+                    <div style={{ marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={styles.sectionLabel}>Notes</span>
+                                {(!editingTask.notes || editingTask.notes.trim().length === 0) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNotes(false)}
+                                        title="Hide notes input"
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: 'var(--muted-text)',
+                                            padding: 0,
+                                            display: 'flex'
+                                        }}
+                                    >
+                                        <Minus size={12} />
+                                    </button>
+                                )}
+                            </div>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => toggleVoiceInput('notes')}
+                                    title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '10px',
+                                        border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
+                                        background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                        color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
+                                    <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                                    title={isNotesExpanded ? "Collapse height" : "Expand height in modal"}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--border-color)',
+                                        background: isNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                        color: isNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    {isNotesExpanded ? <Minimize2 size={10} /> : <Maximize2 size={10} />}
+                                    <span>{isNotesExpanded ? 'Compact' : 'Expand'}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setExpandedOverlayField('notes')}
+                                    title="Open Full Screen Focus Editor for Notes"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--accent-color)',
+                                        background: 'var(--accent-bg)',
+                                        color: 'var(--accent-color)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    <Maximize2 size={10} />
+                                    <span>Focus Editor</span>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea
+                            value={editingTask.notes || ''}
+                            onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
+                            onInput={handleInput}
+                            placeholder="Add notes or extra details..."
+                            style={{
+                                ...styles.textarea,
+                                minHeight: isNotesExpanded ? '240px' : '85px',
+                                maxHeight: isNotesExpanded ? '480px' : '180px'
+                            }}
+                            ref={(textarea) => {
+                                if (textarea) {
+                                    textarea.style.height = 'auto';
+                                    textarea.style.height = Math.min(Math.max(textarea.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180) + 'px';
+                                }
+                            }}
+                        />
+                    </div>
+                )}
 
                 {/* Defer Alert (if deferred >= 2) */}
                 {task.deferCount >= 2 && (
