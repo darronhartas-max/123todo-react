@@ -53,7 +53,7 @@ Whenever bumping the application version (`APP_VERSION`):
 - **Google Drive Sync**: Client-side AES-256-GCM encryption (`crypto.js`), 2-way multi-device dataset merge engine (`syncUtils.js`), auto-token drop detection (`isSyncDropped`), single-tap re-auth popup modal (`SyncDroppedModal.js`).
 - **Projects**: Custom project tabs with color bands, HTML5 drag-and-drop project reordering in Settings (`GripVertical`).
 - **Updates**: Persistent version upgrade tracking (`123Todo_Last_Seen_Version`), automatic PWA update banner + 1-click "Check for Updates" control in Footer & Settings header (`v2.5.8`).
-- **Voice Task & Voice Notes**: Web Speech API continuous dictation with spoken punctuation recognition ("full stop", "comma", "question mark", etc.) & overwrite-proof speech buffer (`v2.5.5`).
+- **Voice Task & Voice Notes**: Web Speech API continuous dictation with noise-free session management, expanded spoken punctuation recognition ("full stop", "fullstop", "dot", "comma", "question mark", "exclamation point", etc.), automatic sentence capitalization, and hands-free task & note auto-submission ("add task", "add note", "save task", "save note").
 - **Task Reordering Sync Fix**: Timestamp-prioritized active task dataset merge preserving user custom drag-and-drop task ordering across 2-way Google Drive sync (`v2.5.14`).
 - **Single-Row Header Bar**: Clean single-row alignment of Search icon (start), Projects dropdown (dynamically sized to longest project text), and Settings cog (far right) (`v2.5.13`).
 - **Archive Task Deletion Sync Fix**: Permanent `deletedTaskKeys` tombstone tracking for deleted archived tasks during 2-way Google Drive sync (`v2.5.12`).
