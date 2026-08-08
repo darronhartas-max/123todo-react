@@ -314,13 +314,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             </>
                         )}
                     </button>
-                    <div style={{
-                        fontSize: '0.85rem',
-                        color: '#6b7280',
-                        fontWeight: '500'
-                    }}>
-                        {isUnlimited ? `${text.length} chars` : `${text.length}/${MAX_TASK_LENGTH}`}
-                    </div>
+                    {!isUnlimited && (
+                        <div style={{
+                            fontSize: '0.85rem',
+                            color: '#6b7280',
+                            fontWeight: '500'
+                        }}>
+                            {`${text.length}/${MAX_TASK_LENGTH}`}
+                        </div>
+                    )}
                 </div>
             </div>
 

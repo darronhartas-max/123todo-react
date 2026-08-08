@@ -899,10 +899,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                {/* 5. FOOTER ACTIONS & CHAR COUNT */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)' }}>
-                        {isUnlimited ? `${editingTask.text.length} chars` : `${editingTask.text.length}/${MAX_TASK_LENGTH}`}
+                    <div>
+                        {!isUnlimited && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)' }}>
+                                {`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
+                            </div>
+                        )}
                     </div>
 
                     <div style={{ display: 'flex', gap: '6px' }}>
@@ -1052,9 +1055,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px' }}>
                                 <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', display: 'flex', gap: '14px' }}>
-                                    <span>
-                                        Chars: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).length}</strong>
-                                    </span>
+                                    {!isUnlimited && (
+                                        <span>
+                                            Chars: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).length}/{MAX_TASK_LENGTH}</strong>
+                                        </span>
+                                    )}
                                     <span>
                                         Words: <strong>{(expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')).trim().split(/\s+/).filter(Boolean).length}</strong>
                                     </span>

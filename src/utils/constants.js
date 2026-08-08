@@ -82,9 +82,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.6.5';
+export const APP_VERSION = '2.6.6';
 
 export const RELEASE_CHANGELOG = {
+  '2.6.6': [
+    { title: '🎙️ Voice Input Fix & Selective Character Count:', desc: 'Fixed text duplication when dictating via voice, and hidden character count indicators when Unlimited Characters mode is enabled.' }
+  ],
   '2.6.5': [
     { title: '🎨 Color-Coded Priority & Project Selectors:', desc: 'Enhanced Edit Modal dropdowns with custom color-coded indicators, priority dot badges, and project accent color bands.' }
   ],

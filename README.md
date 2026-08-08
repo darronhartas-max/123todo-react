@@ -300,10 +300,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.6.5 (Current)
-- **Color-Coded Priority & Project Selectors**: Replaced native dropdowns in the Edit Modal with custom color-coded selectors featuring glowing priority dot badges and project accent color bands.
+### v2.6.6 (Current)
+- **Voice Dictation Duplication Fix**: Resolved result chunk accumulation in Web Speech API event handling to prevent text duplication during voice task creation and dictation.
+- **Selective Character Count Display**: Hidden character count indicators when Unlimited Characters mode is enabled, reserving the count for the 250 character limit setting.
 
-### v2.6.4
+### v2.6.5
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.
   - **Task Spacing & Typography**: Standardized compact spacing with refined top/bottom padding and regular weight typography.
   - **1-Click "Next Week" Quick Scheduling**: Added Next Week shortcuts across Edit Modal, Add Task, and Quick Defer controls.

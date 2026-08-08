@@ -54,7 +54,6 @@ export const startVoiceDictation = ({
   }
 
   const baseText = (initialText || '').trim();
-  let accumulatedFinal = '';
   let isActive = true;
 
   try {
@@ -69,25 +68,21 @@ export const startVoiceDictation = ({
     };
 
     recognition.onresult = (event) => {
-      let currentSessionFinal = '';
-      let currentSessionInterim = '';
+      let sessionFinal = '';
+      let sessionInterim = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      for (let i = 0; i < event.results.length; ++i) {
         const transcriptChunk = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          currentSessionFinal += transcriptChunk + ' ';
+          sessionFinal += transcriptChunk + ' ';
         } else {
-          currentSessionInterim += transcriptChunk;
+          sessionInterim += transcriptChunk;
         }
       }
 
-      if (currentSessionFinal) {
-        accumulatedFinal += currentSessionFinal;
-      }
-
-      // Format spoken punctuation for accumulated final & current interim
-      const cleanFinal = formatSpokenPunctuation(accumulatedFinal).trim();
-      const cleanInterim = formatSpokenPunctuation(currentSessionInterim).trim();
+      // Format spoken punctuation for final & interim
+      const cleanFinal = formatSpokenPunctuation(sessionFinal).trim();
+      const cleanInterim = formatSpokenPunctuation(sessionInterim).trim();
 
       // Combine base text + confirmed final transcript + current interim speech
       let combined = baseText;
