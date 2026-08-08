@@ -18,8 +18,23 @@ describe('voiceUtils - mergeBaseAndTranscript', () => {
   });
 
   test('prevents duplication when speech starts with base', () => {
-    expect(mergeBaseAndTranscript('Buy milk', 'buy milk tomorrow')).toBe('buy milk tomorrow');
+    expect(mergeBaseAndTranscript('Buy milk', 'buy milk tomorrow')).toBe('Buy milk tomorrow');
     expect(mergeBaseAndTranscript('Call John', 'Call John tomorrow morning')).toBe('Call John tomorrow morning');
+  });
+
+  test('prevents duplication when base contains punctuation (full stop, comma, etc.)', () => {
+    expect(mergeBaseAndTranscript('Buy milk.', 'buy milk and eggs')).toBe('Buy milk. and eggs');
+    expect(mergeBaseAndTranscript('Buy milk,', 'milk and eggs')).toBe('Buy milk, and eggs');
+    expect(mergeBaseAndTranscript('Is task done?', 'is task done yes')).toBe('Is task done? yes');
+  });
+
+  test('preserves initial base capitalization when speech matches base', () => {
+    expect(mergeBaseAndTranscript('Buy milk', 'buy milk. and eggs')).toBe('Buy milk and eggs');
+    expect(mergeBaseAndTranscript('Buy organic milk', 'buy organic milk')).toBe('Buy organic milk');
+  });
+
+  test('prevents duplication when speech is a subset of base', () => {
+    expect(mergeBaseAndTranscript('Buy milk and eggs tomorrow', 'buy milk')).toBe('Buy milk and eggs tomorrow');
   });
 
   test('prevents duplication when speech overlaps with suffix of base', () => {
