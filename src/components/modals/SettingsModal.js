@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
@@ -268,6 +268,32 @@ const SettingsModal = ({
     // Project drag and drop reordering state
     const [draggedProjectId, setDraggedProjectId] = useState(null);
     const [dragOverProjectId, setDragOverProjectId] = useState(null);
+    const projectListRef = useRef(null);
+    const autoScrollProjectRef = useRef(null);
+    const scrollSpeedProjectRef = useRef(0);
+
+    const startProjectAutoScroll = (speed) => {
+        scrollSpeedProjectRef.current = speed;
+        if (!autoScrollProjectRef.current && projectListRef.current) {
+            const step = () => {
+                if (scrollSpeedProjectRef.current !== 0 && projectListRef.current) {
+                    projectListRef.current.scrollTop += scrollSpeedProjectRef.current;
+                    autoScrollProjectRef.current = requestAnimationFrame(step);
+                } else {
+                    autoScrollProjectRef.current = null;
+                }
+            };
+            autoScrollProjectRef.current = requestAnimationFrame(step);
+        }
+    };
+
+    const stopProjectAutoScroll = () => {
+        scrollSpeedProjectRef.current = 0;
+        if (autoScrollProjectRef.current) {
+            cancelAnimationFrame(autoScrollProjectRef.current);
+            autoScrollProjectRef.current = null;
+        }
+    };
 
     const handleDragStartProject = (e, projectId) => {
         setDraggedProjectId(projectId);
@@ -278,12 +304,32 @@ const SettingsModal = ({
     const handleDragOverProject = (e, projectId) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
+
+        if (projectListRef.current) {
+            const rect = projectListRef.current.getBoundingClientRect();
+            const clientY = e.clientY;
+            const threshold = 60; // 60px from top or bottom of container
+
+            if (clientY < rect.top + threshold) {
+                const proximity = (rect.top + threshold) - clientY;
+                const speed = -Math.max(4, Math.min(20, Math.round((proximity / threshold) * 20)));
+                startProjectAutoScroll(speed);
+            } else if (clientY > rect.bottom - threshold) {
+                const proximity = clientY - (rect.bottom - threshold);
+                const speed = Math.max(4, Math.min(20, Math.round((proximity / threshold) * 20)));
+                startProjectAutoScroll(speed);
+            } else {
+                stopProjectAutoScroll();
+            }
+        }
+
         if (dragOverProjectId !== projectId) {
             setDragOverProjectId(projectId);
         }
     };
 
     const handleDropProject = (e, targetProjectId) => {
+        stopProjectAutoScroll();
         e.preventDefault();
         if (!draggedProjectId || draggedProjectId === targetProjectId) {
             setDraggedProjectId(null);
@@ -312,6 +358,7 @@ const SettingsModal = ({
     };
 
     const handleDragEndProject = () => {
+        stopProjectAutoScroll();
         setDraggedProjectId(null);
         setDragOverProjectId(null);
     };
@@ -661,7 +708,7 @@ const SettingsModal = ({
                         {activeTab === 'projects' && (
                             <div>
                                 <div style={styles.sectionTitle}>Manage Projects</div>
-                                <div style={{ maxHeight: showAddForm ? '220px' : '440px', overflowY: 'auto', paddingRight: '4px', transition: 'max-height 0.3s ease' }}>
+                                <div ref={projectListRef} style={{ maxHeight: showAddForm ? '220px' : '440px', overflowY: 'auto', paddingRight: '4px', transition: 'max-height 0.3s ease' }}>
                                     {projects.map((project, idx) => (
                                         <div
                                             key={project.id}

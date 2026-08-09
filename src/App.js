@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Archive } from 'lucide-react';
 import Header from './components/layout/Header';
@@ -456,6 +456,33 @@ const TodoApp = () => {
     }
   }, [archived, checkMilestones]);
 
+  // Drag and drop auto-scrolling
+  const autoScrollRef = useRef(null);
+  const scrollSpeedRef = useRef(0);
+
+  const startAutoScroll = (speed) => {
+    scrollSpeedRef.current = speed;
+    if (!autoScrollRef.current) {
+      const step = () => {
+        if (scrollSpeedRef.current !== 0) {
+          window.scrollBy(0, scrollSpeedRef.current);
+          autoScrollRef.current = requestAnimationFrame(step);
+        } else {
+          autoScrollRef.current = null;
+        }
+      };
+      autoScrollRef.current = requestAnimationFrame(step);
+    }
+  };
+
+  const stopAutoScroll = () => {
+    scrollSpeedRef.current = 0;
+    if (autoScrollRef.current) {
+      cancelAnimationFrame(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
+  };
+
   // Drag and drop handlers
   const handleDragStart = (e, taskId) => {
     setDraggedId(taskId);
@@ -471,13 +498,35 @@ const TodoApp = () => {
     if (e) {
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+
+      const clientY = e.clientY;
+      if (typeof clientY === 'number' && clientY > 0) {
+        const threshold = 140; // Hotspot zone distance from top or bottom of viewport
+        const viewportHeight = window.innerHeight;
+
+        if (clientY < threshold) {
+          // Near top: scroll UP with speed accelerating as cursor approaches top boundary
+          const proximity = threshold - clientY;
+          const speed = -Math.max(8, Math.min(32, Math.round((proximity / threshold) * 32)));
+          startAutoScroll(speed);
+        } else if (viewportHeight - clientY < threshold) {
+          // Near bottom: scroll DOWN with speed accelerating as cursor approaches bottom boundary
+          const proximity = threshold - (viewportHeight - clientY);
+          const speed = Math.max(8, Math.min(32, Math.round((proximity / threshold) * 32)));
+          startAutoScroll(speed);
+        } else {
+          stopAutoScroll();
+        }
+      }
     }
+
     if (draggedId && draggedId !== targetId) {
       setDragOverId(targetId);
     }
   };
 
   const handleDrop = (e, targetId) => {
+    stopAutoScroll();
     if (e) e.preventDefault();
     let sourceId = draggedId;
     if (!sourceId && e && e.dataTransfer) {
@@ -495,6 +544,7 @@ const TodoApp = () => {
   };
 
   const handleDragEnd = (e) => {
+    stopAutoScroll();
     setDraggedId(null);
     setDragOverId(null);
   };
