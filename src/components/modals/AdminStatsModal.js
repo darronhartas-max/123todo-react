@@ -87,7 +87,7 @@ const AdminStatsModal = ({ isOpen, onClose }) => {
             setIsAuthenticated(true);
             setPasswordInput('');
         } else {
-            setAuthError('Incorrect Admin Password. Default is "admin".');
+            setAuthError('Incorrect password. Please try again.');
         }
     };
 
@@ -227,7 +227,7 @@ const AdminStatsModal = ({ isOpen, onClose }) => {
                                 Unlock Admin Portal
                             </button>
                             <p style={{ marginTop: '12px', fontSize: '0.8rem', color: 'var(--muted-text)' }}>
-                                Default password: <code style={{ background: 'var(--bg-color)', padding: '2px 6px', borderRadius: '4px' }}>admin</code>
+                                Enter your admin password to continue.
                             </p>
                         </form>
                     </div>

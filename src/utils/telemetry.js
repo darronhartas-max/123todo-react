@@ -248,9 +248,13 @@ export const recordFeatureUsage = (featureKey) => {
 /** Verify Admin Password */
 export const verifyAdminPassword = (inputPassword) => {
     if (!inputPassword) return false;
-    const storedHash = localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH);
-    const targetHash = storedHash || hashPassword(DEFAULT_PASSWORD);
-    return hashPassword(inputPassword) === targetHash;
+    let storedHash = localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH);
+    // On first-ever use, persist the default password hash so it survives across versions
+    if (!storedHash) {
+        storedHash = hashPassword(DEFAULT_PASSWORD);
+        localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, storedHash);
+    }
+    return hashPassword(inputPassword) === storedHash;
 };
 
 /** Update Admin Password */
