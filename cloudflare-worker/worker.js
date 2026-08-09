@@ -19,9 +19,8 @@ function jsonResponse(data, status = 200) {
 function generateId(length = 24) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
-  const cryptoObj = typeof crypto !== 'undefined' ? crypto : require('crypto');
   const bytes = new Uint8Array(length);
-  cryptoObj.getRandomValues(bytes);
+  crypto.getRandomValues(bytes);
   for (let i = 0; i < length; i++) {
     result += chars[bytes[i] % chars.length];
   }
@@ -33,20 +32,14 @@ function generate6DigitCode() {
 }
 
 async function initDB(env) {
-  await env.DB.exec(`
-    CREATE TABLE IF NOT EXISTS user_sync (
-      sync_id TEXT PRIMARY KEY,
-      device_token TEXT NOT NULL,
-      payload TEXT NOT NULL,
-      updated_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS pair_codes (
-      code TEXT PRIMARY KEY,
-      sync_id TEXT NOT NULL,
-      device_token TEXT NOT NULL,
-      expires_at INTEGER NOT NULL
-    );
-  `);
+  try {
+    await env.DB.batch([
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_sync (sync_id TEXT PRIMARY KEY, device_token TEXT NOT NULL, payload TEXT NOT NULL, updated_at INTEGER NOT NULL);`),
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS pair_codes (code TEXT PRIMARY KEY, sync_id TEXT NOT NULL, device_token TEXT NOT NULL, expires_at INTEGER NOT NULL);`)
+    ]);
+  } catch (err) {
+    console.error('initDB error:', err);
+  }
 }
 
 export default {

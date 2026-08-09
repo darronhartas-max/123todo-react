@@ -1,8 +1,9 @@
 name = "123todo-sync-worker"
 main = "worker.js"
 compatibility_date = "2026-08-01"
+account_id = "95e8d0b17a2bafb58ab99f1545e98aa1"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "123todo-sync-db"
-database_id = "YOUR_D1_DATABASE_ID" # Auto-populated upon `npx wrangler d1 create 123todo-sync-db`
+database_id = "412758eb-6df0-4f7b-9b1d-f4b18e8666eb"

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { encryptData, decryptData } from '../utils/crypto';
 import { mergeSyncDatasets } from '../utils/syncUtils';
 
-const DEFAULT_SYNC_ENDPOINT = 'https://sync.123todo.com/api/sync';
+const DEFAULT_SYNC_ENDPOINT = 'https://123todo-sync-worker.darron-hartas.workers.dev/api/sync';
 
 export const useCloudflareSync = (localData, importDataCallback) => {
     const [isAuthed, setIsAuthed] = useState(() => {
