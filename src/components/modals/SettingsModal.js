@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
 
@@ -247,7 +247,10 @@ const SettingsModal = ({
     setTaskLengthLimit,
     isBoldFont = false,
     setIsBoldFont,
-    onOpenAdminStats
+    onOpenAdminStats,
+    syncProvider = 'cloudflare',
+    setSyncProvider,
+    onOpenSyncModal
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -701,6 +704,13 @@ const SettingsModal = ({
                         >
                             <Keyboard size={18} />
                             Shortcuts
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'sync')}
+                            onClick={() => setActiveTab('sync')}
+                        >
+                            <Cloud size={18} />
+                            Cloud Sync
                         </button>
                     </div>
 
@@ -1428,6 +1438,83 @@ const SettingsModal = ({
                                         <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#10b981' }}>Strips command & automatically saves task!</span>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'sync' && (
+                            <div>
+                                <div style={styles.sectionTitle}>Cloud Sync & Backup Options</div>
+                                <div style={{ fontSize: '0.86rem', color: 'var(--muted-text)', marginBottom: '16px', lineHeight: '1.4' }}>
+                                    Choose your preferred cross-platform sync engine to keep your tasks seamlessly updated across mobile, laptop, and desktop devices.
+                                </div>
+
+                                <div style={{ marginBottom: '20px', background: 'var(--item-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '12px', color: 'var(--text-color)' }}>
+                                        Active Sync Provider
+                                    </div>
+
+                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px', cursor: 'pointer' }}>
+                                        <input
+                                            type="radio"
+                                            name="syncProvider"
+                                            value="cloudflare"
+                                            checked={syncProvider === 'cloudflare'}
+                                            onChange={() => setSyncProvider && setSyncProvider('cloudflare')}
+                                            style={{ marginTop: '3px' }}
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-color)' }}>
+                                                123ToDo Cloud Sync (Recommended - Set & Forget)
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
+                                                Zero 1-hour OAuth drops, 100% iPhone & Safari PWA ready, E2E Zero-Knowledge encrypted.
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                        <input
+                                            type="radio"
+                                            name="syncProvider"
+                                            value="gdrive"
+                                            checked={syncProvider === 'gdrive'}
+                                            onChange={() => setSyncProvider && setSyncProvider('gdrive')}
+                                            style={{ marginTop: '3px' }}
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-color)' }}>
+                                                Google Drive AppData
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
+                                                Sync to your personal Google Drive account. (May require frequent Google re-authentication on iOS Safari).
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        onClose();
+                                        if (onOpenSyncModal) onOpenSyncModal();
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 16px',
+                                        background: 'var(--accent-color)',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontWeight: '700',
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    <Cloud size={18} /> Manage Sync Credentials & Device Pairing
+                                </button>
                             </div>
                         )}
                     </div>

@@ -24,7 +24,10 @@ export const STORAGE_KEYS = {
   DATE_FORMAT: '123TodoDateFormat',
   TASK_LENGTH_LIMIT: '123TodoTaskLengthLimit',
   DELETED_PROJECTS: '123TodoDeletedProjects',
-  DELETED_TASKS: '123TodoDeletedTasks'
+  DELETED_TASKS: '123TodoDeletedTasks',
+  SYNC_PROVIDER: '123Todo_SyncProvider',
+  CF_SYNC_ID: '123Todo_CF_SyncId',
+  CF_DEVICE_TOKEN: '123Todo_CF_DeviceToken'
 };
 
 export const DATE_FORMAT_OPTIONS = [

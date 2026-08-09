@@ -29,6 +29,7 @@ import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } f
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
+import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
@@ -45,9 +46,26 @@ const TodoApp = () => {
     ...projects
   ], [projects]);
 
+  const [syncProvider, setSyncProviderState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.SYNC_PROVIDER) || 'cloudflare';
+  });
+
+  const setSyncProvider = (provider) => {
+    setSyncProviderState(provider);
+    localStorage.setItem(STORAGE_KEYS.SYNC_PROVIDER, provider);
+  };
+
+  const syncPayloadData = useMemo(() => ({
+    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp
+  }), [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp]);
+
+  const gdriveSync = useGoogleDriveSync(syncPayloadData, importData);
+  const cloudflareSync = useCloudflareSync(syncPayloadData, importData);
+
+  const activeSync = syncProvider === 'gdrive' ? gdriveSync : cloudflareSync;
   const {
-    isAuthed, syncStatus, isSyncDropped, isOffline, dismissSyncDropped, passphrase, setPassphrase, signIn, signOut, performSync
-  } = useGoogleDriveSync({ tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp }, importData);
+    isAuthed, syncStatus, isSyncDropped = false, isOffline, dismissSyncDropped = () => {}, signIn = activeSync.signIn || activeSync.connectSync
+  } = activeSync;
 
   const {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
@@ -1054,13 +1072,10 @@ const TodoApp = () => {
       <SyncModal
         isOpen={showSyncModal}
         onClose={() => setShowSyncModal(false)}
-        isAuthed={isAuthed}
-        syncStatus={syncStatus}
-        passphrase={passphrase}
-        setPassphrase={setPassphrase}
-        signIn={signIn}
-        signOut={signOut}
-        performSync={performSync}
+        syncProvider={syncProvider}
+        setSyncProvider={setSyncProvider}
+        cloudflareSync={cloudflareSync}
+        gdriveSync={gdriveSync}
       />
 
       <SyncDroppedModal
@@ -1097,6 +1112,9 @@ const TodoApp = () => {
         isBoldFont={isBoldFont}
         setIsBoldFont={setIsBoldFont}
         onOpenAdminStats={() => setShowAdminStats(true)}
+        syncProvider={syncProvider}
+        setSyncProvider={setSyncProvider}
+        onOpenSyncModal={() => setShowSyncModal(true)}
       />
 
       <AdminStatsModal
