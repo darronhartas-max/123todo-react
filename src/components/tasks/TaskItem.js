@@ -17,6 +17,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
+    const [showNotesExpanded, setShowNotesExpanded] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
 
     // Swipe Gesture State & Visual Damping
@@ -676,27 +677,52 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
 
                 {showFullDetails && task.notes && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        style={{
-                            fontSize: '0.92rem',
-                            color: 'var(--muted-text)',
-                            marginTop: '8px',
-                            padding: '8px 12px',
-                            background: 'rgba(0,0,0,0.03)',
-                            borderRadius: '6px',
-                            borderLeft: '3px solid var(--accent-color)',
-                            whiteSpace: 'pre-wrap',
-                            wordBreak: 'break-word',
-                            lineHeight: '1.4',
-                            overflow: 'visible'
-                        }}
-                    >
-                        {task.notes}
-                    </motion.div>
+                    <div style={{ marginTop: '6px' }}>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowNotesExpanded(!showNotesExpanded); }}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                border: '1px solid var(--border-color)',
+                                background: showNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                color: showNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                cursor: 'pointer',
+                                fontSize: '0.7rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes'}
+                        </button>
+                        <AnimatePresence>
+                            {showNotesExpanded && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    style={{
+                                        fontSize: '0.92rem',
+                                        color: 'var(--muted-text)',
+                                        marginTop: '6px',
+                                        padding: '8px 12px',
+                                        background: 'rgba(0,0,0,0.03)',
+                                        borderRadius: '6px',
+                                        borderLeft: '3px solid var(--accent-color)',
+                                        whiteSpace: 'pre-wrap',
+                                        wordBreak: 'break-word',
+                                        lineHeight: '1.4',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    {task.notes}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 )}
             </div>
 
