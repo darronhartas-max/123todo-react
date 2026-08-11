@@ -491,9 +491,20 @@ export const useTasks = () => {
         setCounter(sanitized.counter);
         if (data.timestamp) setTimestamp(data.timestamp);
 
+        if (data.dateFormat) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.DATE_FORMAT, data.dateFormat);
+            } catch (e) {}
+        }
+        if (data.taskLengthLimit) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.TASK_LENGTH_LIMIT, data.taskLengthLimit);
+            } catch (e) {}
+        }
+
         if (data.adminPasswordHash) {
             try {
-                localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, data.adminPasswordHash);
+                localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH || '123TodoAdminPassHash', data.adminPasswordHash);
             } catch (e) {}
         }
 

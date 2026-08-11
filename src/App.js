@@ -57,6 +57,8 @@ const TodoApp = () => {
 
   const syncPayloadData = useMemo(() => ({
     tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp,
+    dateFormat: localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT,
+    taskLengthLimit: localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT,
     adminPasswordHash: localStorage.getItem('123TodoAdminPassHash')
   }), [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp]);
 

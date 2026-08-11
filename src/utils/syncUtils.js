@@ -24,12 +24,18 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const mergedDeletedTaskKeys = Array.from(new Set([...localDeletedTaskKeys, ...remoteDeletedTaskKeys]));
   const deletedTaskSet = new Set(mergedDeletedTaskKeys);
 
-  // 1. Merge Projects
+  // 1. Merge Projects with Timestamp & Color Awareness
+  const primaryProjects = (localData.timestamp || 0) >= (remoteData.timestamp || 0)
+    ? localProjects
+    : remoteProjects;
+  const secondaryProjects = primaryProjects === localProjects ? remoteProjects : localProjects;
+
   const projectMap = new Map();
   // Ensure default General project exists
   projectMap.set('general', { id: 'general', name: 'General', color: '#285a82' });
 
-  [...remoteProjects, ...localProjects].forEach(p => {
+  // Process secondary (older) projects first, then primary (newer) projects second so newer project colors & names overwrite
+  [...secondaryProjects, ...primaryProjects].forEach(p => {
     if (!p || !p.id || p.id === 'all') return;
     if (mergedDeletedProjects.includes(p.id)) return; // Ignore deleted project
     if (!projectMap.has(p.id)) {
@@ -44,7 +50,25 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
       });
     }
   });
-  const mergedProjects = Array.from(projectMap.values());
+
+  // Preserve the exact project order from the primary (newer) dataset, appending any non-deleted secondary projects
+  const primaryOrderIds = primaryProjects.map(p => p.id).filter(id => id && id !== 'all' && !mergedDeletedProjects.includes(id));
+  const orderedProjects = [];
+  const addedIds = new Set();
+
+  primaryOrderIds.forEach(id => {
+    if (projectMap.has(id)) {
+      orderedProjects.push(projectMap.get(id));
+      addedIds.add(id);
+    }
+  });
+
+  projectMap.forEach((proj, id) => {
+    if (!addedIds.has(id)) {
+      orderedProjects.push(proj);
+      addedIds.add(id);
+    }
+  });
 
   // Helper key to uniquely identify tasks across devices
   const getTaskKey = (t) => {
@@ -178,6 +202,13 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const finalTasks = sanitize(mergedActiveRaw);
   const finalArchived = sanitize(mergedArchivedRaw);
 
+  // 5. Merge User Preferences (Date Format & Task Length Limit)
+  const primaryData = (localData.timestamp || 0) >= (remoteData.timestamp || 0) ? localData : remoteData;
+  const secondaryData = primaryData === localData ? remoteData : localData;
+
+  const mergedDateFormat = primaryData.dateFormat || secondaryData.dateFormat || 'UK';
+  const mergedTaskLengthLimit = primaryData.taskLengthLimit || secondaryData.taskLengthLimit || '250';
+
   // 6. Merge Admin Password Hash (preserve custom password across devices & updates)
   const defaultAdminHash = 'h_589b25';
   const localHash = localData.adminPasswordHash || (typeof localStorage !== 'undefined' ? localStorage.getItem('123TodoAdminPassHash') : null);
@@ -198,10 +229,12 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   return {
     tasks: finalTasks,
     archived: finalArchived,
-    projects: mergedProjects,
+    projects: orderedProjects,
     deletedProjects: mergedDeletedProjects,
     deletedTaskKeys: mergedDeletedTaskKeys,
     counter: currentCounter,
+    dateFormat: mergedDateFormat,
+    taskLengthLimit: mergedTaskLengthLimit,
     adminPasswordHash: mergedAdminPasswordHash,
     timestamp: Date.now()
   };

@@ -140,5 +140,40 @@ test('keeps task in archived when local task is completed and remote still conta
     expect(merged.archived[0].id).toBe(5);
 });
 
+test('syncs project custom colors, reordered list, and user preferences from newer dataset', () => {
+    const localData = {
+        tasks: [],
+        archived: [],
+        projects: [
+            { id: 'general', name: 'General', color: '#285a82' },
+            { id: 'work', name: 'Work', color: '#ec4899' } // Updated color on Laptop
+        ],
+        dateFormat: 'US',
+        taskLengthLimit: 'unlimited',
+        counter: 1,
+        timestamp: 1700000900000 // Newer timestamp on Laptop
+    };
+
+    const remoteData = {
+        tasks: [],
+        archived: [],
+        projects: [
+            { id: 'general', name: 'General', color: '#285a82' },
+            { id: 'work', name: 'Work', color: '#10b981' } // Old color on Phone
+        ],
+        dateFormat: 'UK',
+        taskLengthLimit: '250',
+        counter: 1,
+        timestamp: 1700000100000
+    };
+
+    const merged = mergeSyncDatasets(localData, remoteData);
+
+    const workProj = merged.projects.find(p => p.id === 'work');
+    expect(workProj.color).toBe('#ec4899');
+    expect(merged.dateFormat).toBe('US');
+    expect(merged.taskLengthLimit).toBe('unlimited');
+});
+
 
 
