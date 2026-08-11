@@ -85,9 +85,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.8.0';
+export const APP_VERSION = '2.9.0';
 
 export const RELEASE_CHANGELOG = {
+  '2.9.0': [
+    { title: '📂 Collapsible Priority Sections & Streamlined Toolbar Controls:', desc: 'Added expand/contract toggles with state persistence to priority sections, provider-agnostic Synced status indicator, collapsible notes for scheduled tasks, and streamlined Edit Task modal controls.' }
+  ],
   '2.8.0': [
     { title: '🔒 123ToDo Set & Forget Cloud Sync & Dual Provider Engine:', desc: 'Introduced 123ToDo Cloud Sync powered by Cloudflare D1 Serverless E2E Zero-Knowledge Encryption (AES-256-GCM). Eliminates 1-hour Google OAuth drops, fully supports iOS Safari PWAs, and adds 5-second 6-digit device pairing.' }
   ],
