@@ -374,10 +374,17 @@ export const useTasks = () => {
                 movedTask.priority = newPriority;
                 movedTask.updatedAt = now;
 
-                // Insert at the top of the target priority section for immediate visual feedback
-                let firstPriorityIdx = newTasks.findIndex(t => t.priority === newPriority);
-                if (firstPriorityIdx > -1) {
-                    newTasks.splice(firstPriorityIdx, 0, movedTask);
+                // Append at the bottom of the target priority section for natural dropping
+                let lastPriorityIdx = -1;
+                for (let i = newTasks.length - 1; i >= 0; i--) {
+                    if (newTasks[i].priority === newPriority) {
+                        lastPriorityIdx = i;
+                        break;
+                    }
+                }
+
+                if (lastPriorityIdx > -1) {
+                    newTasks.splice(lastPriorityIdx + 1, 0, movedTask);
                 } else {
                     let insertIdx = newTasks.findIndex(t => t.priority > newPriority);
                     if (insertIdx === -1) insertIdx = newTasks.length;
@@ -386,7 +393,7 @@ export const useTasks = () => {
                 return newTasks;
             }
 
-            // Handle standard task-to-task reordering across or within priorities
+            // Handle standard task-to-task reordering
             const targetIndex = prev.findIndex(t => String(t.id) === targetStr);
             if (targetIndex === -1 || fromIndex === targetIndex) return prev;
 
@@ -403,7 +410,7 @@ export const useTasks = () => {
                 return newTasks;
             }
 
-            // When dragging down, insert after the target task so it moves past it.
+            // When dragging down, insert after the target task so it stays where dropped.
             // When dragging up, insert before the target task.
             const insertPosition = isDraggingDown ? newTargetIndex + 1 : newTargetIndex;
             newTasks.splice(insertPosition, 0, movedTask);

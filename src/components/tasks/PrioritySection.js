@@ -139,6 +139,8 @@ const PrioritySection = ({
                         style={{ overflow: 'hidden' }}
                     >
                         <ul 
+                            onDragOver={(e) => handleDragOver(e, `priority-${priority}`)}
+                            onDrop={(e) => handleDrop(e, `priority-${priority}`)}
                             style={{ 
                                 listStyle: 'none', 
                                 margin: 0, 
