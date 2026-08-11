@@ -227,43 +227,50 @@ const SyncModal = ({
                 {isCloudflare ? (
                     <div>
                         <div style={{ marginBottom: '16px', fontSize: '0.85rem', color: 'var(--muted-text)', lineHeight: '1.4' }}>
-                            🔒 <strong>E2E Zero-Knowledge Sync</strong>: Tasks and notes are encrypted locally with AES-256-GCM before saving to the cloud. Zero 1-hour login drops and 100% iPhone compatible.
+                            🔒 <strong>Instant Cloud Sync</strong>: Keep your tasks updated across your phone, tablet, and computer without constant re-login prompts.
                         </div>
 
                         {!isAuthed ? (
                             <div>
-                                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '700', fontSize: '0.85rem' }}>
-                                    1. Encryption Passphrase
-                                </label>
-                                <input
-                                    type={showPassphrase ? 'text' : 'password'}
-                                    style={styles.input}
-                                    value={localPassphrase}
-                                    onChange={(e) => setLocalPassphrase(e.target.value)}
-                                    placeholder="Enter secret passphrase (e.g. MySecret123!)"
-                                />
-
-                                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '700', fontSize: '0.85rem' }}>
-                                    2. Pair Code (Optional - if connecting second device)
-                                </label>
-                                <input
-                                    type="text"
-                                    style={styles.input}
-                                    value={pairCodeInput}
-                                    onChange={(e) => setPairCodeInput(e.target.value)}
-                                    placeholder="Enter 6-digit pair code from device 1"
-                                    maxLength={6}
-                                />
-
-                                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                                    <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                                <div style={{ marginBottom: '14px' }}>
+                                    <label style={{ display: 'block', marginBottom: '4px', fontWeight: '700', fontSize: '0.88rem' }}>
+                                        1. Secret Passphrase
+                                    </label>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)', marginBottom: '6px' }}>
+                                        Create a password to keep your tasks private. Use the exact same passphrase on all your devices.
+                                    </div>
+                                    <input
+                                        type={showPassphrase ? 'text' : 'password'}
+                                        style={styles.input}
+                                        value={localPassphrase}
+                                        onChange={(e) => setLocalPassphrase(e.target.value)}
+                                        placeholder="Enter secret passphrase (e.g. MyPassphrase123)"
+                                    />
+                                    <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', marginTop: '-6px', marginBottom: '10px' }}>
                                         <input type="checkbox" checked={showPassphrase} onChange={(e) => setShowPassphrase(e.target.checked)} />
                                         Show Passphrase
                                     </label>
                                 </div>
 
+                                <div style={{ marginBottom: '14px', background: 'var(--item-bg)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                    <label style={{ display: 'block', marginBottom: '4px', fontWeight: '700', fontSize: '0.88rem' }}>
+                                        2. Connecting a Second Device?
+                                    </label>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)', marginBottom: '6px' }}>
+                                        If you already set up sync on another device (e.g. Laptop), enter the 6-digit pairing code from that device below:
+                                    </div>
+                                    <input
+                                        type="text"
+                                        style={{ ...styles.input, marginBottom: '0' }}
+                                        value={pairCodeInput}
+                                        onChange={(e) => setPairCodeInput(e.target.value)}
+                                        placeholder="Enter 6-digit code (Leave blank if 1st device)"
+                                        maxLength={6}
+                                    />
+                                </div>
+
                                 {pairStatus && (
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--accent-color)', marginBottom: '12px', fontWeight: '600' }}>
+                                    <div style={{ fontSize: '0.82rem', color: 'var(--accent-color)', marginBottom: '12px', fontWeight: '600' }}>
                                         {pairStatus}
                                     </div>
                                 )}
@@ -273,36 +280,44 @@ const SyncModal = ({
                                     onClick={handleConnectCloudflare}
                                     disabled={!localPassphrase}
                                 >
-                                    Enable Set & Forget Cloud Sync
+                                    Enable Instant Cloud Sync
                                 </button>
                             </div>
                         ) : (
                             <div>
                                 <div style={{ background: 'var(--item-bg)', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                                        <Check size={16} /> Connected & E2E Encrypted
+                                    <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                        <Check size={16} /> Connected & Syncing
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>
-                                        Your tasks are syncing seamlessly across devices with zero re-login prompts.
+                                        Your tasks are syncing across all connected devices.
                                     </div>
                                 </div>
 
                                 <div style={{ marginBottom: '16px' }}>
-                                    <label style={{ display: 'block', marginBottom: '6px', fontWeight: '700', fontSize: '0.85rem' }}>
-                                        Pair a Second Device (iPhone, iPad, Laptop)
-                                    </label>
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '4px' }}>
+                                        📱 Connect Another Device (Phone, Tablet, PC)
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '10px', lineHeight: '1.4' }}>
+                                        To link a new phone or computer to this device:
+                                        <br />
+                                        1. Open 123ToDo on your second device and go to <strong>Settings → Cloud Sync</strong>.
+                                        <br />
+                                        2. Enter the same passphrase and the 6-digit code below.
+                                    </div>
+
                                     {generatedCode ? (
                                         <div style={{ textAlign: 'center', background: 'var(--accent-bg)', border: '2px dashed var(--accent-color)', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted-text)', uppercase: 'true' }}>6-Digit Pairing Code</div>
-                                            <div style={{ fontSize: '1.6rem', fontWeight: '900', letterSpacing: '4px', color: 'var(--accent-color)' }}>{generatedCode}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)', marginTop: '4px' }}>Valid for 10 minutes</div>
+                                            <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted-text)' }}>6-DIGIT PAIRING CODE</div>
+                                            <div style={{ fontSize: '1.8rem', fontWeight: '900', letterSpacing: '4px', color: 'var(--accent-color)', margin: '4px 0' }}>{generatedCode}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)' }}>Enter this code on your second device (valid for 10 minutes)</div>
                                         </div>
                                     ) : (
                                         <button
                                             style={{ ...styles.button, ...styles.secondaryBtn, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                                             onClick={handleGeneratePairCode}
                                         >
-                                            <Smartphone size={16} /> Generate 6-Digit Pairing Code
+                                            <Smartphone size={16} /> Get 6-Digit Pairing Code
                                         </button>
                                     )}
                                 </div>
