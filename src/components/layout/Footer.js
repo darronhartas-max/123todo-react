@@ -30,32 +30,32 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
     };
 
     const getSyncStatusText = () => {
-        if (isOffline || !navigator.onLine) return '📡 Offline Mode';
-        if (syncStatus === 'error') return '⚠️ Sync Error';
-        if (isAuthed) return '☁️ Google Drive Sync';
-        return '❌ Sync Offline';
+        if (isOffline || !navigator.onLine) return '📡 Offline';
+        if (syncStatus === 'error') return 'Sync Error';
+        if (isAuthed) return 'Synced';
+        return 'Sync';
     };
 
     const getSyncButtonStyle = () => {
         if (isOffline || !navigator.onLine) return { ...styles.footerButton, background: 'rgba(245, 158, 11, 0.12)', color: '#d97706', borderColor: 'rgba(245, 158, 11, 0.3)' };
         if (syncStatus === 'error') return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' };
-        if (isAuthed) return { ...styles.footerButton, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
-        return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
+        if (isAuthed) return { ...styles.footerButton, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)' };
+        return { ...styles.footerButton, background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.25)' };
     };
 
     return (
         <footer style={styles.footer}>
             <div style={{ marginBottom: '16px' }}>
-                <button onClick={onSyncClick} style={getSyncButtonStyle()} title={syncStatus === 'syncing' ? "Syncing in background..." : (isAuthed ? "Connected to Google Drive" : "Click to setup sync")}>
+                <button onClick={onSyncClick} style={getSyncButtonStyle()} title={syncStatus === 'syncing' ? "Syncing in background..." : (isAuthed ? "Cloud Sync Active" : "Click to setup sync")}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                        {isAuthed && (!isOffline && navigator.onLine) && (
+                        {(!isOffline && navigator.onLine) && (
                             <span
                                 style={{
                                     width: '8px',
                                     height: '8px',
                                     borderRadius: '50%',
-                                    background: syncStatus === 'error' ? '#ef4444' : '#10b981',
-                                    boxShadow: `0 0 6px ${syncStatus === 'error' ? '#ef4444' : '#10b981'}`,
+                                    background: isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444',
+                                    boxShadow: `0 0 6px ${isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444'}`,
                                     display: 'inline-block',
                                     flexShrink: 0,
                                     animation: syncStatus === 'syncing' ? 'pulseDot 1.2s infinite ease-in-out' : 'none'

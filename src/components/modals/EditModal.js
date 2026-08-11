@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, X, Maximize2, Minimize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
+import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -13,8 +13,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     // Voice, Dropdowns & Expanded Editor State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
     const [voiceStatus, setVoiceStatus] = useState('');
-    const [isTitleExpanded, setIsTitleExpanded] = useState(false);
-    const [isNotesExpanded, setIsNotesExpanded] = useState(false);
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
@@ -28,20 +26,20 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = 'auto';
-            const targetH = Math.min(Math.max(titleRef.current.scrollHeight, isTitleExpanded ? 200 : 48), isTitleExpanded ? 400 : 150);
+            const targetH = Math.min(Math.max(titleRef.current.scrollHeight, 48), 150);
             titleRef.current.style.height = `${targetH}px`;
             titleRef.current.scrollTop = titleRef.current.scrollHeight;
         }
-    }, [editingTask.text, isTitleExpanded]);
+    }, [editingTask.text]);
 
     useEffect(() => {
         if (notesRef.current) {
             notesRef.current.style.height = 'auto';
-            const targetH = Math.min(Math.max(notesRef.current.scrollHeight, isNotesExpanded ? 240 : 85), isNotesExpanded ? 480 : 180);
+            const targetH = Math.min(Math.max(notesRef.current.scrollHeight, 85), 180);
             notesRef.current.style.height = `${targetH}px`;
             notesRef.current.scrollTop = notesRef.current.scrollHeight;
         }
-    }, [editingTask.notes, isNotesExpanded]);
+    }, [editingTask.notes]);
 
     useEffect(() => {
         if (focusTextareaRef.current) {
@@ -193,8 +191,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
             padding: '16px 18px',
             borderRadius: '10px',
             maxWidth: '94%',
-            width: (isTitleExpanded || isNotesExpanded) ? '580px' : '440px',
-            maxHeight: (isTitleExpanded || isNotesExpanded) ? '92vh' : '88vh',
+            width: '440px',
+            maxHeight: '88vh',
             overflowY: 'auto',
             boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
             color: 'var(--text-color)',
@@ -508,8 +506,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onInput={handleInput}
                         style={{
                             ...styles.textarea,
-                            minHeight: isTitleExpanded ? '200px' : '48px',
-                            maxHeight: isTitleExpanded ? '400px' : '150px',
+                            minHeight: '48px',
+                            maxHeight: '150px',
                             fontWeight: '400',
                             fontSize: '0.98rem'
                         }}
@@ -622,8 +620,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             placeholder="Add notes or extra details..."
                             style={{
                                 ...styles.textarea,
-                                minHeight: isNotesExpanded ? '240px' : '85px',
-                                maxHeight: isNotesExpanded ? '480px' : '180px'
+                                minHeight: '85px',
+                                maxHeight: '180px'
                             }}
                         />
                     </div>
