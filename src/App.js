@@ -56,7 +56,8 @@ const TodoApp = () => {
   };
 
   const syncPayloadData = useMemo(() => ({
-    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp
+    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp,
+    adminPasswordHash: localStorage.getItem('123TodoAdminPassHash')
   }), [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp]);
 
   const gdriveSync = useGoogleDriveSync(syncPayloadData, importData);

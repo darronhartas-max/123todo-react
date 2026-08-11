@@ -178,6 +178,23 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   const finalTasks = sanitize(mergedActiveRaw);
   const finalArchived = sanitize(mergedArchivedRaw);
 
+  // 6. Merge Admin Password Hash (preserve custom password across devices & updates)
+  const defaultAdminHash = 'h_589b25';
+  const localHash = localData.adminPasswordHash || (typeof localStorage !== 'undefined' ? localStorage.getItem('123TodoAdminPassHash') : null);
+  const remoteHash = remoteData.adminPasswordHash;
+  let mergedAdminPasswordHash = localHash;
+  if (remoteHash && remoteHash !== defaultAdminHash) {
+    mergedAdminPasswordHash = remoteHash;
+  } else if (localHash && localHash !== defaultAdminHash) {
+    mergedAdminPasswordHash = localHash;
+  }
+
+  if (mergedAdminPasswordHash && typeof localStorage !== 'undefined') {
+    try {
+      localStorage.setItem('123TodoAdminPassHash', mergedAdminPasswordHash);
+    } catch (e) {}
+  }
+
   return {
     tasks: finalTasks,
     archived: finalArchived,
@@ -185,6 +202,7 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
     deletedProjects: mergedDeletedProjects,
     deletedTaskKeys: mergedDeletedTaskKeys,
     counter: currentCounter,
+    adminPasswordHash: mergedAdminPasswordHash,
     timestamp: Date.now()
   };
 };

@@ -484,6 +484,12 @@ export const useTasks = () => {
         setCounter(sanitized.counter);
         if (data.timestamp) setTimestamp(data.timestamp);
 
+        if (data.adminPasswordHash) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, data.adminPasswordHash);
+            } catch (e) {}
+        }
+
         // Also update shadow backup upon successful manual import
         try {
             const now = Date.now();
