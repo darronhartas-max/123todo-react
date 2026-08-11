@@ -32,7 +32,8 @@ Both the **App** (`123todo-react` ➔ `app.123todo.com`) and the **Website** (`1
 
 ### Assistant Rule for Git Commits & Dual-Repo Deployment Verification:
 Whenever the user asks to "commit to git" or "commit":
-1. **Lint & Test**: Run `npm test` / `npm run check` locally before pushing to ensure zero linter errors or failing tests in either repository.
+1. **Prettier & Lint Fix**: Always run `npm run fix:prettier` / `npx prettier --write .` locally before committing to ensure 100% Prettier compliance and prevent CI check failures.
+2. **Lint & Test**: Run `npm test` / `npm run check` locally before pushing to ensure zero linter errors or failing tests in either repository.
 2. **Stage, Commit & Push**:
    - For App changes (`123todo-react`): Push to `darronhartas-max/123todo-react`.
    - For Website changes (`123todo-website`): Push to `darronhartas-max/123todo-website`.
