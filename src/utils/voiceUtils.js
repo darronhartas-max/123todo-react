@@ -219,6 +219,8 @@ export const startVoiceDictation = ({
   let isActive = true;
   let restartCount = 0;
   let lastRestartTime = Date.now();
+  let currentSessionBaseText = baseText;
+  let lastEmittedText = baseText;
 
   const createAndStartRecognition = () => {
     if (!isActive) return;
@@ -235,8 +237,8 @@ export const startVoiceDictation = ({
       };
 
       recognition.onresult = (event) => {
-        const finalChunks = [];
-        let interimChunk = '';
+        let cleanFinal = '';
+        let cleanInterim = '';
 
         for (let i = 0; i < event.results.length; ++i) {
           const res = event.results[i];
@@ -246,21 +248,15 @@ export const startVoiceDictation = ({
           if (!formattedChunk) continue;
 
           if (res.isFinal) {
-            finalChunks.push(formattedChunk);
+            cleanFinal = mergeBaseAndTranscript(cleanFinal, formattedChunk);
           } else {
-            interimChunk = formattedChunk;
+            cleanInterim = mergeBaseAndTranscript(cleanInterim, formattedChunk);
           }
         }
 
-        let finalSpeech = finalChunks.join(' ').trim();
-        finalSpeech = formatSpokenPunctuation(finalSpeech);
+        let currentSpeech = mergeBaseAndTranscript(cleanFinal, cleanInterim);
+        let combined = mergeBaseAndTranscript(currentSessionBaseText, currentSpeech);
 
-        let currentSpeech = finalSpeech;
-        if (interimChunk) {
-          currentSpeech = finalSpeech ? `${finalSpeech} ${interimChunk}` : interimChunk;
-        }
-
-        let combined = mergeBaseAndTranscript(baseText, currentSpeech);
         const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
         let finalText = processedText;
 
@@ -272,6 +268,7 @@ export const startVoiceDictation = ({
           isActive = false;
         }
 
+        lastEmittedText = finalText;
         onTranscript(finalText, isSubmitCommand);
       };
 
@@ -303,6 +300,7 @@ export const startVoiceDictation = ({
 
           if (restartCount < 10) {
             try {
+              currentSessionBaseText = lastEmittedText;
               createAndStartRecognition();
               return;
             } catch (e) {
