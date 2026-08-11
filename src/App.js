@@ -25,6 +25,8 @@ import ExportModal from './components/modals/ExportModal';
 import SharePromptModal from './components/modals/SharePromptModal';
 import ArchiveModal from './components/modals/ArchiveModal';
 import AdminStatsModal from './components/modals/AdminStatsModal';
+import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
+import NotesView from './components/notes/NotesView';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -36,7 +38,7 @@ import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, r
 
 const TodoApp = () => {
   const {
-    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp, addTask, completeTask, deleteArchivedTask,
+    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp, addTask, addNote, convertNoteToTask, bulkAssignProject, completeTask, deleteArchivedTask,
     restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, moveProject, reorderProjects,
     importData, bulkAddTasks
   } = useTasks();
@@ -130,6 +132,35 @@ const TodoApp = () => {
         break;
     }
   };
+
+  // Dual Skin App Mode State ('tasks' | 'notes')
+  const [appMode, setAppMode] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.APP_MODE) || 'tasks';
+  });
+
+  const handleSwitchMode = (newMode) => {
+    setAppMode(newMode);
+    try {
+      localStorage.setItem(STORAGE_KEYS.APP_MODE, newMode);
+    } catch (e) {
+      console.warn('Could not persist app mode preference:', e);
+    }
+  };
+
+  const [showSkinDiscoveryModal, setShowSkinDiscoveryModal] = useState(false);
+
+  useEffect(() => {
+    try {
+      const rawCount = localStorage.getItem(STORAGE_KEYS.MODE_DISCOVERY_COUNT);
+      const count = rawCount ? parseInt(rawCount, 10) : 0;
+      if (count < 3) {
+        localStorage.setItem(STORAGE_KEYS.MODE_DISCOVERY_COUNT, String(count + 1));
+        setShowSkinDiscoveryModal(true);
+      }
+    } catch (e) {
+      console.warn('Failed to read/write mode discovery count:', e);
+    }
+  }, []);
 
   // UI State
   const [showAddSection, setShowAddSection] = useState(false);
@@ -762,6 +793,8 @@ const TodoApp = () => {
           onToggleAdd={() => setShowAddSection(!showAddSection)}
           isAddOpen={showAddSection}
           isDark={isDark}
+          appMode={appMode}
+          onSwitchMode={handleSwitchMode}
         />
 
         <AddTask
@@ -802,95 +835,118 @@ const TodoApp = () => {
             <BackupReminder onBackup={handleExport} onDismiss={dismissBackupReminder} />
           )}
 
-          {showSearch && (
-            <SearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onClear={() => setSearchTerm('')}
+          {appMode === 'notes' ? (
+            <NotesView
+              tasks={tasks}
+              projects={availableProjects}
+              onAddNote={(title, body, projId) => addNote(title, body, projId)}
+              onUpdateTask={updateTask}
+              onConvertNoteToTask={(id, p) => convertNoteToTask(id, p)}
+              onCompleteTask={handleCompleteTask}
+              onDeleteTask={(id) => handleCompleteTask(id)}
+              onAssignProject={(id, projId) => updateTask(id, { projectId: projId })}
+              onBulkAssignProject={bulkAssignProject}
+              activeProjectFilter={currentProjectId}
+              onSelectProjectFilter={setCurrentProjectId}
+              searchQuery={searchTerm}
+              onSearchChange={setSearchTerm}
             />
-          )}
-
-          <ProjectTabs
-            projects={projects}
-            tasks={activeTasks}
-            currentProjectId={currentProjectId}
-            onSelect={setCurrentProjectId}
-            onAdd={addProject}
-            onUpdate={updateProject}
-            onDelete={handleDeleteProjectRequest}
-            showSearch={showSearch}
-            onToggleSearch={() => setShowSearch(!showSearch)}
-            onOpenSettings={() => setShowSettings(true)}
-          />
-
-          {projectToDelete && (
-            <DeleteProjectModal
-              project={projectToDelete}
-              projects={projects}
-              taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
-              onConfirm={handleDeleteProjectConfirm}
-              onClose={() => setProjectToDelete(null)}
-            />
-          )}
-
-          <div style={styles.sectionsContainer}>
-            {[1, 2, 3].map(priority => (
-              <PrioritySection
-                key={priority}
-                priority={priority}
-                tasks={filteredTasks}
-                projects={[...DEFAULT_PROJECTS, ...projects]}
-                onComplete={handleCompleteTask}
-                onEdit={setEditingTask}
-                onUpdate={updateTask}
-                handleDragStart={handleDragStart}
-                handleDragOver={handleDragOver}
-                handleDrop={handleDrop}
-                handleDragEnd={handleDragEnd}
-                draggedId={draggedId}
-                dragOverId={dragOverId}
-                swipeSettings={swipeSettings}
-                onSwipeAction={handleSwipeAction}
-                dateFormat={dateFormat}
-              />
-            ))}
-
-            {filteredTasks.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
-                {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
-              </div>
-            )}
-          </div>
-
-          {onHoldTasksFiltered.length > 0 && (
-            <div style={{ ...styles.toggleSection, background: 'var(--accent-bg)' }}>
-              <button
-                onClick={() => setShowOnHold(!showOnHold)}
-                style={{ ...styles.toggleBtn, color: '#9333ea' }}
-              >
-                {showOnHold ? 'Hide' : 'Show'} On Hold ({onHoldTasksFiltered.length})
-              </button>
-              {showOnHold && (
-                <PrioritySection
-                  priority={4}
-                  tasks={filteredTasks}
-                  projects={[...DEFAULT_PROJECTS, ...projects]}
-                  onComplete={handleCompleteTask}
-                  onEdit={setEditingTask}
-                  onUpdate={updateTask}
-                  handleDragStart={handleDragStart}
-                  handleDragOver={handleDragOver}
-                  handleDrop={handleDrop}
-                  handleDragEnd={handleDragEnd}
-                  draggedId={draggedId}
-                  dragOverId={dragOverId}
-                  swipeSettings={swipeSettings}
-                  onSwipeAction={handleSwipeAction}
-                  dateFormat={dateFormat}
+          ) : (
+            <>
+              {showSearch && (
+                <SearchBar
+                  value={searchTerm}
+                  onChange={setSearchTerm}
+                  onClear={() => setSearchTerm('')}
                 />
               )}
-            </div>
-          )}
+
+              <ProjectTabs
+                projects={projects}
+                tasks={activeTasks}
+                currentProjectId={currentProjectId}
+                onSelect={setCurrentProjectId}
+                onAdd={addProject}
+                onUpdate={updateProject}
+                onDelete={handleDeleteProjectRequest}
+                showSearch={showSearch}
+                onToggleSearch={() => setShowSearch(!showSearch)}
+                onOpenSettings={() => setShowSettings(true)}
+              />
+
+              {projectToDelete && (
+                <DeleteProjectModal
+                  project={projectToDelete}
+                  projects={projects}
+                  taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
+                  onConfirm={handleDeleteProjectConfirm}
+                  onClose={() => setProjectToDelete(null)}
+                />
+              )}
+
+              <div style={styles.sectionsContainer}>
+                {[1, 2, 3].map(priority => (
+                  <PrioritySection
+                    key={priority}
+                    priority={priority}
+                    tasks={filteredTasks}
+                    projects={[...DEFAULT_PROJECTS, ...projects]}
+                    onComplete={handleCompleteTask}
+                    onEdit={setEditingTask}
+                    onUpdate={updateTask}
+                    handleDragStart={handleDragStart}
+                    handleDragOver={handleDragOver}
+                    handleDrop={handleDrop}
+                    handleDragEnd={handleDragEnd}
+                    draggedId={draggedId}
+                    dragOverId={dragOverId}
+                    swipeSettings={swipeSettings}
+                    onSwipeAction={handleSwipeAction}
+                    dateFormat={dateFormat}
+                  />
+                ))}
+
+                {filteredTasks.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
+                    {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
+                  </div>
+                )}
+              </div>
+
+              {onHoldTasksFiltered.length > 0 && (
+                <div style={{ ...styles.toggleSection, background: 'var(--accent-bg)' }}>
+                  <button
+                    onClick={() => setShowOnHold(!showOnHold)}
+                    style={{ ...styles.toggleBtn, color: '#9333ea' }}
+                  >
+                    {showOnHold ? 'Hide On Hold Tasks' : `Show On Hold Tasks (${onHoldTasksFiltered.length})`}
+                  </button>
+                  {showOnHold && (
+                    <ul style={styles.taskList}>
+                      <AnimatePresence>
+                        {onHoldTasksFiltered.map(task => {
+                          const proj = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
+                          return (
+                            <TaskItem
+                              key={task.id}
+                              task={task}
+                              projectColor={proj ? proj.color : null}
+                              projectName={proj ? proj.name : null}
+                              onComplete={handleCompleteTask}
+                              onEdit={setEditingTask}
+                              onUpdate={updateTask}
+                              swipeSettings={swipeSettings}
+                              onSwipeAction={handleSwipeAction}
+                              dateFormat={dateFormat}
+                              showFullDetails={true}
+                            />
+                          );
+                        })}
+                      </AnimatePresence>
+                    </ul>
+                  )}
+                </div>
+              )}
 
           {filteredScheduled.length > 0 && (
             <div style={{ ...styles.toggleSection, background: 'rgba(37, 99, 235, 0.04)', border: '1px dashed rgba(37, 99, 235, 0.2)' }}>
@@ -938,7 +994,9 @@ const TodoApp = () => {
               Open Archive ({archived.length})
             </button>
           </div>
-        </div>
+        </>
+      )}
+    </div>
 
         <Footer
           onExport={handleExport}
@@ -1118,6 +1176,8 @@ const TodoApp = () => {
         syncProvider={syncProvider}
         setSyncProvider={setSyncProvider}
         onOpenSyncModal={() => setShowSyncModal(true)}
+        appMode={appMode}
+        onSwitchMode={handleSwitchMode}
       />
 
       <AdminStatsModal
@@ -1225,6 +1285,12 @@ const TodoApp = () => {
           </div>
         )}
       </AnimatePresence>
+      <SkinDiscoveryModal
+        isOpen={showSkinDiscoveryModal}
+        onClose={() => setShowSkinDiscoveryModal(false)}
+        currentMode={appMode}
+        onSwitchMode={handleSwitchMode}
+      />
     </div>
   );
 };

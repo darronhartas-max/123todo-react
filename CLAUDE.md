@@ -3,7 +3,7 @@
 ## Overview
 **123 ToDo** is a React Progressive Web App (PWA) for task management featuring drag-and-drop, customizable swipe gestures, Google Drive end-to-end encrypted sync, subtasks/recurrence, and Todoist CSV imports.
 
-- **Version**: v2.9.0
+- **Version**: v3.0.0
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **Live URLs**:
   - Primary: https://app.123todo.com
@@ -12,13 +12,14 @@
 ## Architecture
 ```
 src/
-├── components/          # Modular UI components (layout, tasks, projects, modals)
-│   ├── modals/          # SettingsModal, SyncModal, SyncDroppedModal, TodoistGuideModal, EditModal, etc.
+├── components/          # Modular UI components (layout, tasks, projects, modals, notes)
+│   ├── modals/          # SettingsModal, SyncModal, SkinDiscoveryModal, TodoistGuideModal, EditModal, etc.
+│   ├── notes/           # NotesView, NoteCard (Simple Voice Notes skin & builder hands-free mode)
 │   ├── projects/        # ProjectTabs
 │   ├── tasks/           # TaskItem, PrioritySection, AddTask, SearchBar
-│   └── layout/          # Header, Footer, NotificationBar, SocialShare
+│   └── layout/          # Header (with Mode Switcher), Footer, NotificationBar, SocialShare
 ├── hooks/               # State & business logic
-│   ├── useTasks.js      # Tasks, archived, projects, shadow backups, local storage
+│   ├── useTasks.js      # Tasks, archived, projects, note helpers, shadow backups, local storage
 │   ├── useCloudflareSync.js # E2E Zero-Knowledge Cloudflare D1 Sync Engine (Set & Forget)
 │   ├── useGoogleDriveSync.js # Encrypted Google Drive sync, token drop detection
 │   └── useAppSystem.js  # Milestones, PWA update detection, persistent storage
@@ -50,6 +51,7 @@ Whenever bumping the application version (`APP_VERSION`):
 2. Add the release highlights to `RELEASE_CHANGELOG` in `src/utils/constants.js`. This ensures the post-update modal (`UpdatedModal.js`) dynamically presents accurate "What's New" highlights for the user's specific version update.
 
 ## Core Features & Systems
+- **Dual Skin Operating System**: Seamless 1-tap switching between Task Manager Mode (P1-P4 matrix) and Simple Voice Notes Mode (extra large builder text, hands-free dictation, unassigned inbox capture, 1-tap task conversion) (`v3.0.0`).
 - **Priority System**: P1 Must Do (#dc2626), P2 Should Do (#f59e0b), P3 Could Do (#6b7280), P4 On Hold (#9333ea).
 - **Google Drive Sync**: Client-side AES-256-GCM encryption (`crypto.js`), 2-way multi-device dataset merge engine (`syncUtils.js`), auto-token drop detection (`isSyncDropped`), single-tap re-auth popup modal (`SyncDroppedModal.js`).
 - **Projects**: Custom project tabs with color bands, HTML5 drag-and-drop project reordering in Settings (`GripVertical`).

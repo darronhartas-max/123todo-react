@@ -556,6 +556,79 @@ export const useTasks = () => {
         setTimestamp(Date.now());
     }, [counter]);
 
+    const addNote = useCallback((text, notes = '', projectId = 'general') => {
+        const newId = counter + 1;
+        const now = Date.now();
+        let finalTitle = (text || '').trim();
+        const finalNotes = (notes || '').trim();
+
+        if (!finalTitle && finalNotes) {
+            const lines = finalNotes.split('\n');
+            const firstLine = lines[0].trim();
+            if (firstLine.length <= 60) {
+                finalTitle = firstLine;
+            } else {
+                finalTitle = firstLine.substring(0, 57).trim() + '...';
+            }
+        }
+        if (!finalTitle) finalTitle = 'Untitled Note';
+
+        const newNote = {
+            id: newId,
+            text: finalTitle,
+            priority: 4,
+            projectId: projectId || 'general',
+            notes: finalNotes,
+            isSample: false,
+            scheduledDate: null,
+            deferCount: 0,
+            subtasks: [],
+            isRecurring: false,
+            recurrence: null,
+            completedAt: null,
+            updatedAt: now
+        };
+
+        setCounter(newId);
+        setTasks(prev => [newNote, ...prev]);
+        setTimestamp(now);
+        return newId;
+    }, [counter]);
+
+    const convertNoteToTask = useCallback((id, priority = 1, scheduledDate = null, projectId = null) => {
+        const now = Date.now();
+        setTasks(prev => prev.map(task => {
+            if (String(task.id) === String(id)) {
+                return {
+                    ...task,
+                    priority: priority || 1,
+                    scheduledDate: scheduledDate !== undefined ? scheduledDate : task.scheduledDate,
+                    projectId: projectId || task.projectId || 'general',
+                    updatedAt: now
+                };
+            }
+            return task;
+        }));
+        setTimestamp(now);
+    }, []);
+
+    const bulkAssignProject = useCallback((taskIds, targetProjectId) => {
+        if (!taskIds || taskIds.length === 0 || !targetProjectId) return;
+        const idStrs = new Set(taskIds.map(id => String(id)));
+        const now = Date.now();
+        setTasks(prev => prev.map(task => {
+            if (idStrs.has(String(task.id))) {
+                return {
+                    ...task,
+                    projectId: targetProjectId,
+                    updatedAt: now
+                };
+            }
+            return task;
+        }));
+        setTimestamp(now);
+    }, []);
+
     return {
         tasks,
         archived,
@@ -565,6 +638,9 @@ export const useTasks = () => {
         counter,
         timestamp,
         addTask,
+        addNote,
+        convertNoteToTask,
+        bulkAssignProject,
         completeTask,
         deleteArchivedTask,
         restoreTask,

@@ -250,7 +250,9 @@ const SettingsModal = ({
     onOpenAdminStats,
     syncProvider = 'cloudflare',
     setSyncProvider,
-    onOpenSyncModal
+    onOpenSyncModal,
+    appMode = 'tasks',
+    onSwitchMode = () => {}
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -916,6 +918,30 @@ const SettingsModal = ({
                         {activeTab === 'appearance' && (
                             <div>
                                 <div style={styles.sectionTitle}>Appearance & Styling</div>
+
+                                {/* App Skin / Mode */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Active App Skin</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: 'normal' }}>
+                                            {appMode === 'notes' ? 'Simple Voice Notes' : 'Task Manager (P1-P4 Matrix)'}
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(appMode === 'tasks')}
+                                            onClick={() => onSwitchMode('tasks')}
+                                        >
+                                            📋 Task Manager
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(appMode === 'notes')}
+                                            onClick={() => onSwitchMode('notes')}
+                                        >
+                                            🎙️ Voice Notes
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {/* Text Size */}
                                 <div style={styles.settingRow}>

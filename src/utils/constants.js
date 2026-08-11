@@ -27,7 +27,9 @@ export const STORAGE_KEYS = {
   DELETED_TASKS: '123TodoDeletedTasks',
   SYNC_PROVIDER: '123Todo_SyncProvider',
   CF_SYNC_ID: '123Todo_CF_SyncId',
-  CF_DEVICE_TOKEN: '123Todo_CF_DeviceToken'
+  CF_DEVICE_TOKEN: '123Todo_CF_DeviceToken',
+  APP_MODE: '123TodoAppMode',
+  MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -85,9 +87,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '2.9.0';
+export const APP_VERSION = '3.0.0';
 
 export const RELEASE_CHANGELOG = {
+  '3.0.0': [
+    { title: '🎙️ Dual Skin Operating System & Simple Voice Notes Mode:', desc: 'Introduced a second skin for 123 ToDo! Switch between structured Task Manager Mode (P1-P4 matrix) and Simple Voice Notes Mode featuring extra large builder-friendly text, hands-free continuous dictation, unassigned inbox capture, deferred project assignment, and 1-tap task conversion — all backed by the same unified dataset and zero-knowledge sync engine.' }
+  ],
   '2.9.0': [
     { title: '📂 Collapsible Priority Sections & Streamlined Toolbar Controls:', desc: 'Added expand/contract toggles with state persistence to priority sections, provider-agnostic Synced status indicator, collapsible notes for scheduled tasks, and streamlined Edit Task modal controls.' }
   ],

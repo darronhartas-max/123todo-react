@@ -1,7 +1,7 @@
 import React from 'react';
-import { PlusCircle, MinusCircle } from 'lucide-react';
+import { PlusCircle, MinusCircle, CheckSquare, Mic } from 'lucide-react';
 
-const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark }) => {
+const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -9,15 +9,41 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark }) => {
             justifyContent: 'space-between',
             background: 'var(--header-bg)',
             border: '1px solid var(--border-color)',
-            padding: '12px 20px',
-            boxSizing: 'border-box'
+            padding: '12px 16px',
+            boxSizing: 'border-box',
+            gap: '12px',
+            flexWrap: 'wrap'
         },
         taskCounter: {
-            fontSize: '1.1rem',
+            fontSize: '0.95rem',
             opacity: 0.8,
             color: 'var(--muted-text)',
+            whiteSpace: 'nowrap'
+        },
+        modeToggleContainer: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.05))',
+            borderRadius: '20px',
+            padding: '3px',
+            border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
             margin: '0 auto'
         },
+        modeButton: (active) => ({
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '5px 12px',
+            borderRadius: '16px',
+            border: 'none',
+            backgroundColor: active ? '#2563eb' : 'transparent',
+            color: active ? '#ffffff' : 'var(--text-color, #4b5563)',
+            fontWeight: '700',
+            fontSize: '12px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap'
+        }),
         addTaskToggle: {
             background: 'none',
             border: 'none',
@@ -38,41 +64,67 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark }) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flex: 1,
+                gap: '12px',
                 filter: isAddOpen ? 'blur(5px)' : 'none',
                 opacity: isAddOpen ? 0.5 : 1,
                 transition: 'all 0.3s ease',
                 pointerEvents: isAddOpen ? 'none' : 'auto'
             }}>
-                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block' }}>
+                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', shrink: 0 }}>
                     <img
                         src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                         alt="123 ToDo logo"
                         style={{
-                            width: '240px',
+                            width: '180px',
+                            maxWidth: '100%',
                             height: 'auto',
                             cursor: 'pointer',
                             display: 'block'
                         }}
                     />
                 </a>
+
+                {/* Dual Skin Mode Switcher Toggle Pill */}
+                <div style={styles.modeToggleContainer}>
+                    <button
+                        style={styles.modeButton(appMode === 'tasks')}
+                        onClick={() => onSwitchMode('tasks')}
+                        title="Switch to Task Manager Mode"
+                    >
+                        <CheckSquare size={14} />
+                        <span>Tasks</span>
+                    </button>
+                    <button
+                        style={styles.modeButton(appMode === 'notes')}
+                        onClick={() => onSwitchMode('notes')}
+                        title="Switch to Simple Voice Notes Mode"
+                    >
+                        <Mic size={14} />
+                        <span>Voice Notes</span>
+                    </button>
+                </div>
+
                 <div style={styles.taskCounter}>
                     {taskCount} active
                 </div>
             </div>
-            <button
-                onClick={onToggleAdd}
-                style={{
-                    ...styles.addTaskToggle,
-                    position: 'relative',
-                    zIndex: 10,
-                    filter: 'none',
-                    opacity: 1,
-                    pointerEvents: 'auto'
-                }}
-                aria-label={isAddOpen ? "Close add task" : "Open add task"}
-            >
-                {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
-            </button>
+
+            {appMode === 'tasks' && (
+                <button
+                    onClick={onToggleAdd}
+                    style={{
+                        ...styles.addTaskToggle,
+                        position: 'relative',
+                        zIndex: 10,
+                        filter: 'none',
+                        opacity: 1,
+                        pointerEvents: 'auto'
+                    }}
+                    aria-label={isAddOpen ? "Close add task" : "Open add task"}
+                >
+                    {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+                </button>
+            )}
         </header>
     );
 };

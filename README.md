@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.9.1 | © Unforgettable Management Ltd 2026
+Version 3.0.0 | © Unforgettable Management Ltd 2026
 
 ---
 
@@ -14,7 +14,7 @@ Version 2.9.1 | © Unforgettable Management Ltd 2026
 2. **Install on Mobile** (Optional but Recommended):
    - **iPhone/iPad**: Tap Share → "Add to Home Screen" → "Add"
    - **Android**: Tap Menu (⋮) → "Add to Home screen" or "Install app" → "Install"
-3. **Start Managing Tasks**: Add your first task using the ➕ button or swipe task cards for quick actions!
+3. **Start Managing Tasks & Voice Notes**: Switch between Task Manager and Simple Voice Notes skins via the top toggle pill!
 
 ### For Developers
 
@@ -32,6 +32,12 @@ npm run build
 ---
 
 ## 📱 Features
+
+### 🎙️ Dual Skin Operating System (v3.0.0)
+- **1-Tap Mode Switcher**: Toggle between **Task Manager Mode** (P1-P4 matrix, drag-and-drop, due dates) and **Simple Voice Notes Mode** (extra large builder text, hands-free field capture).
+- **Builder On-Site Quick Capture**: Record multiple continuous notes hands-free into an **Unassigned Inbox** while on site.
+- **End-of-Day Categorization**: Assign notes to specific projects or elevate notes into actionable tasks with priorities (`P1`, `P2`, `P3`) at a later time.
+- **Unified Data System**: All data remains in the same local and cloud sync dataset (`useTasks.js`).
 
 ### Voice Dictation & Smart Spoken Commands
 - **Continuous Voice Dictation**: Hands-free dictation stays active across silence pauses, allowing natural composition without microphone timeouts.
