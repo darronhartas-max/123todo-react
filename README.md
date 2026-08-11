@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 2.4.16 | © Unforgettable Management Ltd 2026
+Version 2.9.1 | © Unforgettable Management Ltd 2026
 
 ---
 
@@ -32,6 +32,12 @@ npm run build
 ---
 
 ## 📱 Features
+
+### Voice Dictation & Smart Spoken Commands
+- **Continuous Voice Dictation**: Hands-free dictation stays active across silence pauses, allowing natural composition without microphone timeouts.
+- **Regional Language Support**: Uses your browser's native language locale (`navigator.language`) for optimal regional accent recognition.
+- **Spoken Commands & Editing**: Recognizes spoken deletion ("delete last word", "scratch that") and auto-submit commands ("Add Task", "Add Note", "Save Note", "Create Task").
+- **Voice Notes & Smart Titles**: Add detailed notes by voice; automatically derives a clean task title from the first sentence when creating notes hands-free.
 
 ### Task Management & Swipe Gestures
 - **Customizable Swipe Gestures**: Swipe task cards left or right on touch devices or desktop to quickly complete, delete, edit, or set On Hold.

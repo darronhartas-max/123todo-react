@@ -78,5 +78,22 @@ describe('voiceUtils - processVoiceCommands', () => {
     const res5 = processVoiceCommands('Meeting agenda notes save note');
     expect(res5.text).toBe('Meeting agenda notes.');
     expect(res5.isSubmitCommand).toBe(true);
+
+    // Test variations: add a note, add a task, create task, homophones like and note, standalone triggers
+    const res6 = processVoiceCommands('Pick up dry cleaning add a note');
+    expect(res6.text).toBe('Pick up dry cleaning.');
+    expect(res6.isSubmitCommand).toBe(true);
+
+    const res7 = processVoiceCommands('Schedule dental checkup create task');
+    expect(res7.text).toBe('Schedule dental checkup.');
+    expect(res7.isSubmitCommand).toBe(true);
+
+    const res8 = processVoiceCommands('Buy milk and note');
+    expect(res8.text).toBe('Buy milk.');
+    expect(res8.isSubmitCommand).toBe(true);
+
+    const res9 = processVoiceCommands('Finish reading report submit');
+    expect(res9.text).toBe('Finish reading report.');
+    expect(res9.isSubmitCommand).toBe(true);
   });
 });

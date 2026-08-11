@@ -129,7 +129,7 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
 
 /**
  * Processes spoken deletion commands ("delete last word", "scratch that", "delete last 3 words", "clear all")
- * and auto-submit commands ("add task", "submit task", "save task").
+ * and auto-submit commands ("add task", "add note", "submit task", "save note", etc.).
  */
 export const processVoiceCommands = (text) => {
   if (!text || typeof text !== 'string') return { text: '', isSubmitCommand: false };
@@ -137,14 +137,24 @@ export const processVoiceCommands = (text) => {
   let processed = text;
   let isSubmitCommand = false;
 
-  // 1. Check for spoken submit command ("add task", "submit task", "save task", "add note", "submit note", "save note")
-  const submitRegex = /\b(add\s*task|submit\s*task|save\s*task|add\s*note|submit\s*note|save\s*note)\b/gi;
-  if (submitRegex.test(processed)) {
+  // 1. Check for spoken submit command ("add task", "add note", "add a note", "submit task", "save note", "create task", etc.)
+  // Matches action verbs: add, ad, at, and, create, save, submit, finish, done, complete
+  // Optional determiners: a, the, this, my
+  // Noun targets: task, tax, text, note, node, noat
+  const submitRegex = /\b(add|ad|at|and|create|save|submit|finish|done|complete)\s*(a|the|this|my)?\s*(task|tax|text|note|node|noat)\b/gi;
+  
+  // Standalone submit triggers at the end of speech (e.g. "... buy milk submit", "... save note", "... add task.")
+  const endSubmitRegex = /\b(add\s*task|add\s*note|submit\s*task|submit\s*note|save\s*task|save\s*note|submit|save)\b[.,?!]*$/gi;
+
+  if (submitRegex.test(processed) || endSubmitRegex.test(processed)) {
     isSubmitCommand = true;
-    processed = processed.replace(submitRegex, '').trim();
+    processed = processed.replace(submitRegex, '').replace(endSubmitRegex, '').trim();
+
+    // Clean up trailing punctuation or separators left after stripping command
+    processed = processed.replace(/[,:;\s]+$/, '').trim();
 
     // Add full stop at end of sentence if no terminal punctuation exists
-    if (processed.length > 0 && !/[.,?!:;]$/.test(processed)) {
+    if (processed.length > 0 && !/[.,?!]$/.test(processed)) {
       processed += '.';
     }
   }
@@ -187,13 +197,14 @@ export const processVoiceCommands = (text) => {
 
 /**
  * Starts continuous speech recognition and appends transcript to existing text.
- * Uses a locked final-transcript buffer so pauses/stalls while thinking NEVER delete or overwrite existing text.
+ * Maintains continuous dictation across silence pauses and handles regional language accents.
  */
 export const startVoiceDictation = ({
   initialText = '',
   onTranscript,
   onStatusChange,
-  onEnd
+  onEnd,
+  lang
 }) => {
   if (!isSpeechRecognitionSupported()) {
     onStatusChange('Voice input is not supported in this browser.');
@@ -202,83 +213,127 @@ export const startVoiceDictation = ({
   }
 
   const baseText = (initialText || '').trim();
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  try {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true; // Continuous dictation across pauses
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
+  let recognition = null;
+  let isActive = true;
+  let restartCount = 0;
+  let lastRestartTime = Date.now();
 
-    recognition.onstart = () => {
-      onStatusChange('🎙️ Listening... Speak naturally (supports punctuation, "delete last word", & "add task")');
-    };
+  const createAndStartRecognition = () => {
+    if (!isActive) return;
 
-    recognition.onresult = (event) => {
-      let cleanFinal = '';
-      let cleanInterim = '';
+    try {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
-      for (let i = 0; i < event.results.length; ++i) {
-        const rawChunk = event.results[i][0].transcript;
-        const formattedChunk = formatSpokenPunctuation(rawChunk).trim();
+      recognition.onstart = () => {
+        onStatusChange('🎙️ Listening... Speak naturally (supports punctuation, "delete last word", & "add task" / "add note")');
+      };
 
-        if (event.results[i].isFinal) {
-          cleanFinal = mergeBaseAndTranscript(cleanFinal, formattedChunk);
-        } else {
-          cleanInterim = mergeBaseAndTranscript(cleanInterim, formattedChunk);
+      recognition.onresult = (event) => {
+        const finalChunks = [];
+        let interimChunk = '';
+
+        for (let i = 0; i < event.results.length; ++i) {
+          const res = event.results[i];
+          if (!res || !res[0]) continue;
+          const rawChunk = res[0].transcript;
+          const formattedChunk = formatSpokenPunctuation(rawChunk).trim();
+          if (!formattedChunk) continue;
+
+          if (res.isFinal) {
+            finalChunks.push(formattedChunk);
+          } else {
+            interimChunk = formattedChunk;
+          }
         }
-      }
 
-      // Combine final & interim speech using smart deduplication
-      let speechText = mergeBaseAndTranscript(cleanFinal, cleanInterim);
+        let finalSpeech = finalChunks.join(' ').trim();
+        finalSpeech = formatSpokenPunctuation(finalSpeech);
 
-      // Smart merge base text + speech transcript (prevents all text duplication)
-      let combined = mergeBaseAndTranscript(baseText, speechText);
+        let currentSpeech = finalSpeech;
+        if (interimChunk) {
+          currentSpeech = finalSpeech ? `${finalSpeech} ${interimChunk}` : interimChunk;
+        }
 
-      // Process spoken editing & auto-submit commands
-      const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
-      let finalText = processedText;
+        let combined = mergeBaseAndTranscript(baseText, currentSpeech);
+        const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
+        let finalText = processedText;
 
-      // Capitalize first letter of output
-      if (finalText.length > 0) {
-        finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
-      }
+        if (finalText.length > 0) {
+          finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);
+        }
 
-      onTranscript(finalText, isSubmitCommand);
-    };
+        if (isSubmitCommand) {
+          isActive = false;
+        }
 
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
-        onStatusChange('⚠️ Microphone permission denied.');
-      } else if (event.error === 'no-speech') {
-        onStatusChange('No speech detected.');
-      } else {
-        onStatusChange(`Voice status: ${event.error}`);
-      }
-      setTimeout(() => onStatusChange(''), 4000);
-      if (onEnd) onEnd();
-    };
+        onTranscript(finalText, isSubmitCommand);
+      };
 
-    recognition.onend = () => {
-      onStatusChange('✨ Voice input captured!');
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          isActive = false;
+          onStatusChange('⚠️ Microphone permission denied.');
+          setTimeout(() => onStatusChange(''), 4000);
+          if (onEnd) onEnd();
+        } else if (event.error === 'no-speech') {
+          onStatusChange('🎙️ Listening... (Paused - keep speaking)');
+        } else if (event.error === 'aborted') {
+          // Aborted manually or by stop()
+        } else {
+          onStatusChange(`Voice status: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        if (isActive) {
+          const now = Date.now();
+          if (now - lastRestartTime < 1000) {
+            restartCount++;
+          } else {
+            restartCount = 0;
+          }
+          lastRestartTime = now;
+
+          if (restartCount < 10) {
+            try {
+              createAndStartRecognition();
+              return;
+            } catch (e) {
+              console.warn('Failed to restart speech recognition:', e);
+            }
+          }
+        }
+
+        onStatusChange('✨ Voice input captured!');
+        setTimeout(() => onStatusChange(''), 3000);
+        if (onEnd) onEnd();
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.error('Failed to initialize speech recognition:', e);
+      isActive = false;
+      onStatusChange('Voice recognition error.');
       setTimeout(() => onStatusChange(''), 3000);
       if (onEnd) onEnd();
-    };
+    }
+  };
 
-    recognition.start();
+  createAndStartRecognition();
 
-    // Return custom controller object with stop method
-    return {
-      stop: () => {
+  return {
+    stop: () => {
+      isActive = false;
+      if (recognition) {
         try { recognition.stop(); } catch {}
       }
-    };
-  } catch (e) {
-    console.error('Failed to start speech recognition:', e);
-    onStatusChange('Voice recognition error.');
-    setTimeout(() => onStatusChange(''), 3000);
-    if (onEnd) onEnd();
-    return null;
-  }
+    }
+  };
 };

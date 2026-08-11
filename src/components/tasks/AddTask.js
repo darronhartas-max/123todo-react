@@ -156,7 +156,27 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         const taskTitle = typeof overrideText === 'string' ? overrideText : text;
         const taskNotes = typeof overrideNotes === 'string' ? overrideNotes : notes;
         if (!taskTitle.trim() && !taskNotes.trim()) return;
-        const finalTitle = taskTitle.trim() || 'Untitled Task';
+
+        let finalTitle = taskTitle.trim();
+        const finalNotes = taskNotes.trim();
+
+        // If title is empty but notes were added by voice/typing, derive title from first line/sentence of notes
+        if (!finalTitle && finalNotes) {
+            const lines = finalNotes.split('\n');
+            const firstLine = lines[0].trim();
+            if (firstLine.length <= 60) {
+                finalTitle = firstLine;
+            } else {
+                const sentenceMatch = firstLine.match(/^[^.!?]+[.!?]/);
+                if (sentenceMatch && sentenceMatch[0].length <= 80) {
+                    finalTitle = sentenceMatch[0].trim();
+                } else {
+                    finalTitle = firstLine.substring(0, 57).trim() + '...';
+                }
+            }
+        }
+
+        if (!finalTitle) finalTitle = 'Untitled Task';
         const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
         
         // Build recurrence rule if recurring is selected
