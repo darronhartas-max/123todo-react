@@ -274,6 +274,7 @@ const NotesView = ({
             onSearchChange('');
             setShowSearch(false);
           }}
+          placeholder="Search notes..."
         />
       )}
 

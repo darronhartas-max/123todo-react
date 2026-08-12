@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 
-const SearchBar = ({ value, onChange, onClear }) => {
+const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, []);
+
     const styles = {
         container: {
             padding: '0 12px',
@@ -48,12 +56,14 @@ const SearchBar = ({ value, onChange, onClear }) => {
                 <Search size={16} />
             </div>
             <input
+                ref={inputRef}
                 id="searchInput"
                 type="text"
-                placeholder="Search tasks..."
+                placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 style={styles.input}
+                autoFocus
             />
             {value && (
                 <button onClick={onClear} style={styles.clearBtn}>

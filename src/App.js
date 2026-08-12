@@ -881,6 +881,7 @@ const TodoApp = () => {
                     setSearchTerm('');
                     setShowSearch(false);
                   }}
+                  placeholder="Search tasks..."
                 />
               )}
 

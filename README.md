@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 3.1.3 | © Unforgettable Management Ltd 2026
+Version 3.1.4 | © Unforgettable Management Ltd 2026
 
 ---
 

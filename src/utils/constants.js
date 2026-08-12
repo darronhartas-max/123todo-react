@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.3';
+export const APP_VERSION = '3.1.4';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.4': [
+    { title: '🎯 Instant Search Input Auto-Focus:', desc: 'Tapping the search magnifying glass icon in either Tasks or Notes mode automatically focuses the expanded search text box and places the cursor inside for instant typing.' }
+  ],
   '3.1.3': [
     { title: '🔍 Search Bar Collapse & Unstacked Single-Row Header Layout:', desc: 'Clicking X on the expanded Search bar now clears search query and collapses the bar back to magnifying glass only, and guaranteed non-stacking single row header layout in Notes view.' }
   ],
