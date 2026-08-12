@@ -189,9 +189,30 @@ const NotesView = ({
 
   return (
     <div className="notes-container">
-      {/* Header Bar: Project Filter Dropdown & Action Controls */}
-      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingBottom: '4px' }}>
-        {/* Project Filter Dropdown */}
+      {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact order on same line) */}
+      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '4px' }}>
+        {/* 1. Search Toggle Icon Button */}
+        <button
+          onClick={() => setShowSearch(!showSearch)}
+          style={{
+            padding: '7px',
+            borderRadius: '10px',
+            backgroundColor: showSearch || searchQuery ? 'rgba(37, 99, 235, 0.1)' : 'var(--card-bg, #ffffff)',
+            border: '1.5px solid var(--border-color, #d1d5db)',
+            color: showSearch || searchQuery ? '#2563eb' : 'var(--text-color, #4b5563)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            flexShrink: 0
+          }}
+          title="Search notes"
+        >
+          <Search size={18} />
+        </button>
+
+        {/* 2. Projects Filter Dropdown */}
         <select
           value={activeProjectFilter}
           onChange={(e) => onSelectProjectFilter(e.target.value)}
@@ -219,16 +240,16 @@ const NotesView = ({
           })}
         </select>
 
-        {/* Action Controls: Expanding Search Toggle & Settings Cog */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+        {/* 3. Settings Cog Icon Button */}
+        {onOpenSettings && (
           <button
-            onClick={() => setShowSearch(!showSearch)}
+            onClick={onOpenSettings}
             style={{
               padding: '7px',
               borderRadius: '10px',
-              backgroundColor: showSearch || searchQuery ? 'rgba(37, 99, 235, 0.1)' : 'var(--card-bg, #ffffff)',
+              backgroundColor: 'var(--card-bg, #ffffff)',
               border: '1.5px solid var(--border-color, #d1d5db)',
-              color: showSearch || searchQuery ? '#2563eb' : 'var(--text-color, #4b5563)',
+              color: 'var(--text-color, #4b5563)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -236,33 +257,11 @@ const NotesView = ({
               transition: 'all 0.2s ease',
               flexShrink: 0
             }}
-            title="Search notes"
+            title="Settings"
           >
-            <Search size={18} />
+            <Settings size={18} />
           </button>
-
-          {onOpenSettings && (
-            <button
-              onClick={onOpenSettings}
-              style={{
-                padding: '7px',
-                borderRadius: '10px',
-                backgroundColor: 'var(--card-bg, #ffffff)',
-                border: '1.5px solid var(--border-color, #d1d5db)',
-                color: 'var(--text-color, #4b5563)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-                flexShrink: 0
-              }}
-              title="Settings"
-            >
-              <Settings size={18} />
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Expanding Search Bar (matching Tasks view functionality) */}

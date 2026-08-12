@@ -972,7 +972,7 @@ const SettingsModal = ({
                                     <div style={styles.settingLabel}>
                                         <span>Notes View Text Size</span>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
-                                            {notesFontSize}pt ({notesFontSize === 18 ? 'Builder Default (18pt)' : notesFontSize === 12 ? 'Uniform with Tasks (12pt)' : `${notesFontSize}pt`})
+                                            {notesFontSize}pt ({notesFontSize === 18 ? 'Default' : notesFontSize < 18 ? 'Smaller' : 'Larger'})
                                         </span>
                                     </div>
                                     <div style={styles.sliderContainer}>

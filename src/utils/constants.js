@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.1';
+export const APP_VERSION = '3.1.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.2': [
+    { title: '🎨 Notes Control Bar Layout & Settings Label Formatting:', desc: 'Aligned Search icon, Projects dropdown, and Settings icon on the exact same row in order, and updated Notes View Text Size settings label formatting to (Default), (Smaller), or (Larger).' }
+  ],
   '3.1.1': [
     { title: '📱 Mobile Header & Expanding Search Bar:', desc: 'Fixed mobile header layout overflow with responsive logo scaling, larger switcher font size (15px), expandable search icon toggle in Notes view matching Tasks view, and "Add New Note" placeholder.' }
   ],
