@@ -5,9 +5,21 @@ const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
+        const doFocus = () => {
+            if (inputRef.current) {
+                inputRef.current.focus({ preventScroll: true });
+            }
+        };
+
+        // Execute focus immediately and with fallback delays to handle DOM layout & mobile ticks
+        doFocus();
+        const timer1 = setTimeout(doFocus, 50);
+        const timer2 = setTimeout(doFocus, 150);
+
+        return () => {
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+        };
     }, []);
 
     const styles = {
