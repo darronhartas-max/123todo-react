@@ -259,6 +259,16 @@ const TodoApp = () => {
     }
     return 12;
   });
+  const [notesFontSize, setNotesFontSizeState] = useState(() => {
+    const saved = localStorage.getItem('123TodoNotesFontSize');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= 8 && parsed <= 24) {
+        return parsed;
+      }
+    }
+    return 18;
+  });
   const [layoutWidth, setLayoutWidthState] = useState(() => {
     const saved = localStorage.getItem('123TodoLayoutWidth');
     if (saved === '800px' || saved === '1200px') return '480px';
@@ -284,6 +294,10 @@ const TodoApp = () => {
   const setFontSize = (size) => {
     setFontSizeState(size);
     localStorage.setItem('123TodoFontSize', size.toString());
+  };
+  const setNotesFontSize = (size) => {
+    setNotesFontSizeState(size);
+    localStorage.setItem('123TodoNotesFontSize', size.toString());
   };
   const setLayoutWidth = (val) => {
     setLayoutWidthState(val);
@@ -482,9 +496,13 @@ const TodoApp = () => {
   }, [completeTask]);
 
   // Filtering
-  const filteredBySearch = (list) => list.filter(t =>
-    t.text.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBySearch = (list) => list.filter(t => {
+    if (!searchTerm || !searchTerm.trim()) return true;
+    const query = searchTerm.toLowerCase();
+    const textMatch = (t.text || '').toLowerCase().includes(query);
+    const notesMatch = (t.notes || '').toLowerCase().includes(query);
+    return textMatch || notesMatch;
+  });
 
   const filteredByProject = (list) => list.filter(t =>
     currentProjectId === 'all' || t.projectId === currentProjectId
@@ -850,6 +868,8 @@ const TodoApp = () => {
               onSelectProjectFilter={setCurrentProjectId}
               searchQuery={searchTerm}
               onSearchChange={setSearchTerm}
+              onOpenSettings={() => setShowSettings(true)}
+              notesFontSize={notesFontSize}
             />
           ) : (
             <>
@@ -1158,6 +1178,8 @@ const TodoApp = () => {
         onReorderProjects={reorderProjects}
         fontSize={fontSize}
         setFontSize={setFontSize}
+        notesFontSize={notesFontSize}
+        setNotesFontSize={setNotesFontSize}
         layoutWidth={layoutWidth}
         setLayoutWidth={setLayoutWidth}
         themeMode={themeMode}

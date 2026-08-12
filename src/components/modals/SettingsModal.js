@@ -231,6 +231,8 @@ const SettingsModal = ({
     onReorderProjects,
     fontSize,
     setFontSize,
+    notesFontSize = 18,
+    setNotesFontSize,
     layoutWidth,
     setLayoutWidth,
     themeMode,
@@ -943,10 +945,10 @@ const SettingsModal = ({
                                     </div>
                                 </div>
 
-                                {/* Text Size */}
+                                {/* Tasks View Text Size */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
-                                        <span>Text Size</span>
+                                        <span>Tasks View Text Size</span>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
                                             {fontSize}pt ({fontSize === 12 ? 'Default' : fontSize < 12 ? 'Smaller' : 'Larger'})
                                         </span>
@@ -956,9 +958,31 @@ const SettingsModal = ({
                                         <input
                                             type="range"
                                             min="8"
-                                            max="20"
+                                            max="24"
                                             value={fontSize}
                                             onChange={(e) => setFontSize(parseInt(e.target.value))}
+                                            style={styles.slider}
+                                        />
+                                        <span style={{ fontSize: '20pt', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>
+                                    </div>
+                                </div>
+
+                                {/* Notes View Text Size (Independent) */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Notes View Text Size</span>
+                                        <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
+                                            {notesFontSize}pt ({notesFontSize === 18 ? 'Builder Default (18pt)' : notesFontSize === 12 ? 'Uniform with Tasks (12pt)' : `${notesFontSize}pt`})
+                                        </span>
+                                    </div>
+                                    <div style={styles.sliderContainer}>
+                                        <span style={{ fontSize: '8pt', color: 'var(--muted-text)' }}>A</span>
+                                        <input
+                                            type="range"
+                                            min="10"
+                                            max="24"
+                                            value={notesFontSize}
+                                            onChange={(e) => setNotesFontSize && setNotesFontSize(parseInt(e.target.value))}
                                             style={styles.slider}
                                         />
                                         <span style={{ fontSize: '20pt', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>

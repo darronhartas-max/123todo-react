@@ -29,7 +29,8 @@ export const STORAGE_KEYS = {
   CF_SYNC_ID: '123Todo_CF_SyncId',
   CF_DEVICE_TOKEN: '123Todo_CF_DeviceToken',
   APP_MODE: '123TodoAppMode',
-  MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount'
+  MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount',
+  NOTES_FONT_SIZE: '123TodoNotesFontSize'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -87,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.0.2';
+export const APP_VERSION = '3.1.0';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.0': [
+    { title: '🛡️ Safe Note Archiving & Multi-Field Search:', desc: 'Removed direct card deletion icon to prevent accidental data loss (items are safely archived via completion), enabled full multi-field search across titles and notes in Tasks view, added Settings cog to Notes view, and introduced independent Notes View text size scaling.' }
+  ],
   '3.0.2': [
     { title: '🎨 Header & Notes Layout Refinements:', desc: 'Removed duplicated header Add Task button, single-row Search and Project Filter dropdown alignment, Add Note holding placeholder text, expanded button spacing for glove-friendly use, and renamed card action button to "Priority".' }
   ],

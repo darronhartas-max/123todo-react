@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Mic, MicOff, Folder, Search
+  Mic, MicOff, Folder, Search, Settings
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import './NotesView.css';
@@ -19,7 +19,9 @@ const NotesView = ({
   activeProjectFilter,
   onSelectProjectFilter,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onOpenSettings,
+  notesFontSize = 18
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
@@ -209,7 +211,7 @@ const NotesView = ({
             />
           </div>
 
-          {/* Project Filter Dropdown */}
+          {/* Project Filter Dropdown & Settings Cog */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <select
               value={activeProjectFilter}
@@ -236,6 +238,28 @@ const NotesView = ({
                 );
               })}
             </select>
+
+            {onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                style={{
+                  padding: '7px',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--card-bg, #ffffff)',
+                  border: '1.5px solid var(--border-color, #d1d5db)',
+                  color: 'var(--text-color, #4b5563)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0
+                }}
+                title="Settings"
+              >
+                <Settings size={18} />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -248,6 +272,7 @@ const NotesView = ({
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
           placeholder="Add Note"
+          style={{ fontSize: `${notesFontSize}px` }}
         />
 
         {statusMessage && (
@@ -363,6 +388,7 @@ const NotesView = ({
               onAssignProject={(id, projId) => onAssignProject(id, projId)}
               isSelected={selectedNoteIds.includes(note.id)}
               onToggleSelect={handleToggleSelectNote}
+              notesFontSize={notesFontSize}
             />
           ))}
         </div>

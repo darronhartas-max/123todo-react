@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, CheckCircle, Trash2, Mic, MicOff, ChevronDown, 
+  Folder, CheckCircle, Mic, MicOff, ChevronDown, 
   ArrowUpRight, Check, Clock
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
@@ -16,7 +16,8 @@ const NoteCard = ({
   onDeleteNote,
   onAssignProject,
   isSelected,
-  onToggleSelect
+  onToggleSelect,
+  notesFontSize = 18
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [titleText, setTitleText] = useState(note.text || '');
@@ -274,7 +275,7 @@ const NoteCard = ({
         ) : (
           <div>
             <h3 style={{ 
-              fontSize: '18px', 
+              fontSize: `${notesFontSize}px`, 
               fontWeight: '700', 
               color: 'var(--text-color, #111827)', 
               margin: '0 0 6px 0',
@@ -285,7 +286,7 @@ const NoteCard = ({
 
             {note.notes ? (
               <p style={{ 
-                fontSize: '16px', 
+                fontSize: `${Math.max(notesFontSize - 2, 12)}px`, 
                 color: 'var(--text-color, #374151)', 
                 margin: 0, 
                 lineHeight: 1.5,
@@ -295,7 +296,7 @@ const NoteCard = ({
                 {note.notes}
               </p>
             ) : (
-              <p style={{ fontSize: '14px', color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>
+              <p style={{ fontSize: `${Math.max(notesFontSize - 4, 12)}px`, color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>
                 Tap to add details or record voice...
               </p>
             )}
@@ -444,25 +445,6 @@ const NoteCard = ({
             title="Complete / Archive Note"
           >
             <CheckCircle size={16} />
-          </button>
-
-          {/* Delete Button */}
-          <button
-            onClick={() => onDeleteNote(note.id)}
-            style={{
-              padding: '6px 10px',
-              borderRadius: '10px',
-              border: 'none',
-              backgroundColor: 'rgba(239, 68, 68, 0.08)',
-              color: '#ef4444',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            title="Delete Note"
-          >
-            <Trash2 size={16} />
           </button>
         </div>
       </div>
