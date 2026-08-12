@@ -872,6 +872,8 @@ const TodoApp = () => {
                 showSearch={showSearch}
                 onToggleSearch={() => setShowSearch(!showSearch)}
                 onOpenSettings={() => setShowSettings(true)}
+                onToggleAdd={() => setShowAddSection(!showAddSection)}
+                isAddOpen={showAddSection}
               />
 
               {projectToDelete && (

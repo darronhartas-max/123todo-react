@@ -102,18 +102,9 @@ const NoteCard = ({
         gap: '12px'
       }}
     >
-      {/* Top Header Row: Project Badge & Timestamp & Selection Checkbox */}
+      {/* Top Header Row: Project Badge & Timestamp */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {onToggleSelect && (
-            <input 
-              type="checkbox" 
-              checked={isSelected || false}
-              onChange={() => onToggleSelect(note.id)}
-              style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' }}
-            />
-          )}
-
           {/* Project Tag Pill */}
           <div style={{ position: 'relative' }}>
             <button

@@ -43,7 +43,7 @@ const NotesView = ({
 
   // Filter tasks to show all items (since every task can act as a note or has notes)
   const filteredNotes = useMemo(() => {
-    return tasks.filter(task => {
+    const list = tasks.filter(task => {
       // Filter by project
       if (activeProjectFilter && activeProjectFilter !== 'all') {
         if (task.projectId !== activeProjectFilter) return false;
@@ -56,6 +56,13 @@ const NotesView = ({
         if (!textMatch && !notesMatch) return false;
       }
       return true;
+    });
+
+    // Sort descending so newly created or updated notes (highest timestamp or ID) appear at the top of the list
+    return list.sort((a, b) => {
+      const valA = Number(a.createdAt || a.updatedAt || a.id || 0);
+      const valB = Number(b.createdAt || b.updatedAt || b.id || 0);
+      return valB - valA;
     });
   }, [tasks, activeProjectFilter, searchQuery]);
 

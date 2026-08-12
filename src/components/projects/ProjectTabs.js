@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, Search as SearchIcon, Settings } from 'lucide-react';
+import { X, ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 
-const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings }) => {
+const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings, onToggleAdd, isAddOpen }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
@@ -201,7 +201,7 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                     )}
                 </div>
 
-                {/* 3. Settings cog icon on the far right-hand side */}
+                {/* 3. Settings cog icon on the right-hand side */}
                 <button 
                     onClick={onOpenSettings} 
                     style={{ ...styles.actionBtn, marginLeft: 'auto' }} 
@@ -209,6 +209,30 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                 >
                     <Settings size={18} />
                 </button>
+
+                {/* 4. Add Task + / - toggle button to the right of Settings with generous margin */}
+                {onToggleAdd && (
+                    <button
+                        onClick={onToggleAdd}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#dc2626',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginLeft: '14px',
+                            flexShrink: 0,
+                            transition: 'transform 0.2s ease'
+                        }}
+                        aria-label={isAddOpen ? "Close add task" : "Open add task"}
+                        title={isAddOpen ? "Close add task form" : "Add new task"}
+                    >
+                        {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+                    </button>
+                )}
             </div>
         </div>
     );

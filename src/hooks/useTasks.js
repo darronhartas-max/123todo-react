@@ -586,6 +586,7 @@ export const useTasks = () => {
             isRecurring: false,
             recurrence: null,
             completedAt: null,
+            createdAt: now,
             updatedAt: now
         };
 
