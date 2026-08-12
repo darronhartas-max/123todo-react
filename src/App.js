@@ -877,7 +877,10 @@ const TodoApp = () => {
                 <SearchBar
                   value={searchTerm}
                   onChange={setSearchTerm}
-                  onClear={() => setSearchTerm('')}
+                  onClear={() => {
+                    setSearchTerm('');
+                    setShowSearch(false);
+                  }}
                 />
               )}
 

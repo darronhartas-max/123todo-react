@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.2';
+export const APP_VERSION = '3.1.3';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.3': [
+    { title: '🔍 Search Bar Collapse & Unstacked Single-Row Header Layout:', desc: 'Clicking X on the expanded Search bar now clears search query and collapses the bar back to magnifying glass only, and guaranteed non-stacking single row header layout in Notes view.' }
+  ],
   '3.1.2': [
     { title: '🎨 Notes Control Bar Layout & Settings Label Formatting:', desc: 'Aligned Search icon, Projects dropdown, and Settings icon on the exact same row in order, and updated Notes View Text Size settings label formatting to (Default), (Smaller), or (Larger).' }
   ],

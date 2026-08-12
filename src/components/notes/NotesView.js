@@ -189,8 +189,8 @@ const NotesView = ({
 
   return (
     <div className="notes-container">
-      {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact order on same line) */}
-      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '4px' }}>
+      {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact single-row order) */}
+      <div className="notes-header-bar" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px', width: '100%', paddingBottom: '4px' }}>
         {/* 1. Search Toggle Icon Button */}
         <button
           onClick={() => setShowSearch(!showSearch)}
@@ -217,7 +217,7 @@ const NotesView = ({
           value={activeProjectFilter}
           onChange={(e) => onSelectProjectFilter(e.target.value)}
           style={{
-            padding: '7px 12px',
+            padding: '7px 10px',
             borderRadius: '10px',
             border: '1.5px solid var(--border-color, #d1d5db)',
             backgroundColor: 'var(--card-bg, #ffffff)',
@@ -227,7 +227,8 @@ const NotesView = ({
             cursor: 'pointer',
             outline: 'none',
             flex: 1,
-            minWidth: 0
+            minWidth: 0,
+            width: '100%'
           }}
         >
           <option value="all">All Notes ({tasks.length})</option>
@@ -264,12 +265,15 @@ const NotesView = ({
         )}
       </div>
 
-      {/* Expanding Search Bar (matching Tasks view functionality) */}
+      {/* Expanding Search Bar (collapses back on X click) */}
       {(showSearch || searchQuery) && (
         <SearchBar
           value={searchQuery || ''}
           onChange={onSearchChange}
-          onClear={() => onSearchChange('')}
+          onClear={() => {
+            onSearchChange('');
+            setShowSearch(false);
+          }}
         />
       )}
 
