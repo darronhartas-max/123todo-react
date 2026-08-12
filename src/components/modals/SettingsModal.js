@@ -924,7 +924,7 @@ const SettingsModal = ({
                                     <div style={styles.settingLabel}>
                                         <span>Active App Skin</span>
                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: 'normal' }}>
-                                            {appMode === 'notes' ? 'Simple Voice Notes' : 'Task Manager (P1-P4 Matrix)'}
+                                            {appMode === 'notes' ? 'Voice Notes' : 'Task Manager (P1-P4 Matrix)'}
                                         </span>
                                     </div>
                                     <div style={styles.segmentContainer}>

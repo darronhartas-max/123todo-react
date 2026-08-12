@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Mic, MicOff, Plus, Folder, Search, Inbox
+  Mic, MicOff, Plus, Folder, Search
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import './NotesView.css';
@@ -183,7 +183,7 @@ const NotesView = ({
       <div className="notes-header-bar">
         <div className="notes-title-row">
           <h1 className="notes-main-title">
-            <span>🎙️ Simple Voice Notes</span>
+            <span>🎙️ Voice Notes</span>
           </h1>
 
           {/* Search bar input inside header */}
@@ -208,40 +208,33 @@ const NotesView = ({
           </div>
         </div>
 
-        {/* Project Filter Pills */}
-        <div className="notes-filter-pills">
-          <button
-            className={`notes-filter-pill ${activeProjectFilter === 'all' ? 'active' : ''}`}
-            onClick={() => onSelectProjectFilter('all')}
+        {/* Project Filter Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '4px' }}>
+          <select
+            value={activeProjectFilter}
+            onChange={(e) => onSelectProjectFilter(e.target.value)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '10px',
+              border: '1.5px solid var(--border-color, #d1d5db)',
+              backgroundColor: 'var(--card-bg, #ffffff)',
+              color: 'var(--text-color, #111827)',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: '200px'
+            }}
           >
-            All Notes ({tasks.length})
-          </button>
-
-          <button
-            className={`notes-filter-pill ${activeProjectFilter === 'general' ? 'active' : ''}`}
-            onClick={() => onSelectProjectFilter('general')}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Inbox size={14} />
-            <span>Unassigned Inbox ({unassignedCount})</span>
-          </button>
-
-          {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
-            const count = tasks.filter(t => t.projectId === p.id).length;
-            return (
-              <button
-                key={p.id}
-                className={`notes-filter-pill ${activeProjectFilter === p.id ? 'active' : ''}`}
-                onClick={() => onSelectProjectFilter(p.id)}
-                style={{
-                  borderColor: activeProjectFilter === p.id ? p.color : undefined,
-                  backgroundColor: activeProjectFilter === p.id ? p.color : undefined
-                }}
-              >
-                {p.name} ({count})
-              </button>
-            );
-          })}
+            <option value="all">All Notes ({tasks.length})</option>
+            <option value="general">Unassigned Inbox ({unassignedCount})</option>
+            {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
+              const count = tasks.filter(t => t.projectId === p.id).length;
+              return (
+                <option key={p.id} value={p.id}>{p.name} ({count})</option>
+              );
+            })}
+          </select>
         </div>
       </div>
 
@@ -252,7 +245,7 @@ const NotesView = ({
           className="quick-add-title-input"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Note Title or Subject (optional)..."
+          placeholder=""
         />
 
         <textarea
@@ -260,7 +253,7 @@ const NotesView = ({
           rows={3}
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
-          placeholder="Dictate or type your note details (e.g. wall measurements, site materials needed)..."
+          placeholder=""
         />
 
         {statusMessage && (
@@ -272,20 +265,18 @@ const NotesView = ({
         <div className="quick-add-footer">
           {/* Target Project Dropdown for Quick Add */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary, #6b7280)' }}>
-              Target Project:
-            </span>
             <select
               value={targetProjectId}
               onChange={(e) => setTargetProjectId(e.target.value)}
               style={{
-                padding: '4px 8px',
+                padding: '6px 10px',
                 borderRadius: '8px',
                 border: '1px solid var(--border-color, #d1d5db)',
                 backgroundColor: 'var(--card-bg, #ffffff)',
                 color: 'var(--text-color, #111827)',
-                fontSize: '12px',
-                fontWeight: '600'
+                fontSize: '13px',
+                fontWeight: '600',
+                outline: 'none'
               }}
             >
               <option value="general">Unassigned Inbox</option>
@@ -296,24 +287,35 @@ const NotesView = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Red Tape Recorder 'Talk' / 'Stop' Button */}
             <button
               onClick={toggleQuickAddDictation}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '8px 14px',
+                gap: '8px',
+                padding: '8px 16px',
                 borderRadius: '10px',
-                border: `1px solid ${isDictatingQuickAdd ? '#ef4444' : '#2563eb'}`,
-                backgroundColor: isDictatingQuickAdd ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.08)',
-                color: isDictatingQuickAdd ? '#ef4444' : '#2563eb',
+                border: '1.5px solid #ef4444',
+                backgroundColor: isDictatingQuickAdd ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.08)',
+                color: '#dc2626',
                 fontWeight: '700',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
+              title={isDictatingQuickAdd ? "Click to stop voice dictation" : "Click to speak and append to note"}
             >
-              {isDictatingQuickAdd ? <MicOff size={16} /> : <Mic size={16} />}
-              <span>{isDictatingQuickAdd ? 'Stop Voice' : 'Voice Dictate'}</span>
+              <span style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: isDictatingQuickAdd ? '2px' : '50%',
+                backgroundColor: '#ef4444',
+                display: 'inline-block',
+                boxShadow: isDictatingQuickAdd ? '0 0 8px #ef4444' : 'none',
+                animation: isDictatingQuickAdd ? 'pulse 1.2s infinite' : 'none'
+              }} />
+              <span>{isDictatingQuickAdd ? 'Stop' : 'Talk'}</span>
             </button>
 
             <button
@@ -333,7 +335,7 @@ const NotesView = ({
               }}
             >
               <Plus size={16} />
-              <span>Save Note</span>
+              <span>Save</span>
             </button>
           </div>
         </div>

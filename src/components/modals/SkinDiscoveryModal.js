@@ -118,7 +118,7 @@ const SkinDiscoveryModal = ({ isOpen, onClose, currentMode, onSwitchMode }) => {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '700', fontSize: '15px', color: 'var(--text-color, #111827)' }}>
-                  🎙️ Simple Voice Notes Mode
+                  🎙️ Voice Notes Mode
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--text-secondary, #6b7280)', marginTop: '2px', lineHeight: '1.4' }}>
                   Big text, quick voice dictation for builders & field notes. Assign tasks & projects later!

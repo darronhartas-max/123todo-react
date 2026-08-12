@@ -11,8 +11,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
             border: '1px solid var(--border-color)',
             padding: '12px 16px',
             boxSizing: 'border-box',
-            gap: '12px',
-            flexWrap: 'wrap'
+            gap: '12px'
         },
         taskCounter: {
             fontSize: '0.95rem',
@@ -25,15 +24,16 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
             alignItems: 'center',
             backgroundColor: 'var(--item-bg, rgba(0,0,0,0.05))',
             borderRadius: '20px',
-            padding: '3px',
+            padding: '2px',
             border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
-            margin: '0 auto'
+            margin: '0 auto',
+            flexShrink: 0
         },
         modeButton: (active) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '5px 12px',
+            gap: '4px',
+            padding: '4px 10px',
             borderRadius: '16px',
             border: 'none',
             backgroundColor: active ? '#2563eb' : 'transparent',
@@ -53,7 +53,8 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'transform 0.2s ease'
+            transition: 'transform 0.2s ease',
+            flexShrink: 0
         }
     };
 
@@ -70,12 +71,12 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
                 transition: 'all 0.3s ease',
                 pointerEvents: isAddOpen ? 'none' : 'auto'
             }}>
-                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', shrink: 0 }}>
+                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', flexShrink: 0 }}>
                     <img
                         src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                         alt="123 ToDo logo"
                         style={{
-                            width: '180px',
+                            width: '240px',
                             maxWidth: '100%',
                             height: 'auto',
                             cursor: 'pointer',
@@ -91,16 +92,16 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
                         onClick={() => onSwitchMode('tasks')}
                         title="Switch to Task Manager Mode"
                     >
-                        <CheckSquare size={14} />
+                        <CheckSquare size={13} />
                         <span>Tasks</span>
                     </button>
                     <button
                         style={styles.modeButton(appMode === 'notes')}
                         onClick={() => onSwitchMode('notes')}
-                        title="Switch to Simple Voice Notes Mode"
+                        title="Switch to Notes Mode"
                     >
-                        <Mic size={14} />
-                        <span>Voice Notes</span>
+                        <Mic size={13} />
+                        <span>Notes</span>
                     </button>
                 </div>
 
