@@ -22,7 +22,6 @@ const NotesView = ({
   onSearchChange
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
-  const [newTitle, setNewTitle] = useState('');
   const [newNotes, setNewNotes] = useState('');
   const [targetProjectId, setTargetProjectId] = useState(activeProjectFilter === 'all' ? 'general' : activeProjectFilter);
   const [isDictatingQuickAdd, setIsDictatingQuickAdd] = useState(false);
@@ -60,14 +59,26 @@ const NotesView = ({
     });
   }, [tasks, activeProjectFilter, searchQuery]);
 
-  const handleCreateNote = (overrideTitle, overrideBody) => {
-    const titleToUse = typeof overrideTitle === 'string' ? overrideTitle : newTitle;
-    const bodyToUse = typeof overrideBody === 'string' ? overrideBody : newNotes;
+  const handleCreateNote = (overrideBody) => {
+    const rawContent = typeof overrideBody === 'string' ? overrideBody : newNotes;
 
-    if (!titleToUse.trim() && !bodyToUse.trim()) return;
+    if (!rawContent.trim()) return;
 
-    onAddNote(titleToUse, bodyToUse, targetProjectId || 'general');
-    setNewTitle('');
+    // Auto-extract a title from the first line or phrase (up to 50 chars), leaving full content in note body
+    const lines = rawContent.trim().split('\n');
+    const firstLine = lines[0].trim();
+    let noteTitle = '';
+    let noteBody = '';
+
+    if (firstLine.length <= 50) {
+      noteTitle = firstLine;
+      noteBody = lines.slice(1).join('\n').trim();
+    } else {
+      noteTitle = firstLine.slice(0, 45) + '...';
+      noteBody = rawContent.trim();
+    }
+
+    onAddNote(noteTitle, noteBody || rawContent.trim(), targetProjectId || 'general');
     setNewNotes('');
     if (isDictatingQuickAdd) {
       if (quickRecognitionRef.current) quickRecognitionRef.current.stop();
@@ -90,28 +101,16 @@ const NotesView = ({
     }
 
     setIsDictatingQuickAdd(true);
-    const initialText = newNotes || newTitle;
+    const initialText = newNotes;
 
     quickRecognitionRef.current = startVoiceDictation({
       initialText,
       onTranscript: (updatedText, isFinalChunk) => {
         const { text: processedText, isSubmitCommand } = processVoiceCommands(updatedText);
-        
-        if (!newTitle && processedText) {
-          const lines = processedText.split('\n');
-          const firstLine = lines[0].trim();
-          if (firstLine.length <= 60) {
-            setNewTitle(firstLine);
-            setNewNotes(lines.slice(1).join('\n').trim());
-          } else {
-            setNewNotes(processedText);
-          }
-        } else {
-          setNewNotes(processedText);
-        }
+        setNewNotes(processedText);
 
         if (isSubmitCommand) {
-          handleCreateNote(undefined, processedText);
+          handleCreateNote(processedText);
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),
@@ -238,16 +237,8 @@ const NotesView = ({
         </div>
       </div>
 
-      {/* Quick Add Note Card (Large builder text area) */}
+      {/* Quick Add Note Card (Single note field) */}
       <div className="quick-add-note-card">
-        <input
-          type="text"
-          className="quick-add-title-input"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder=""
-        />
-
         <textarea
           className="quick-add-body-textarea"
           rows={3}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { PlusCircle, MinusCircle, CheckSquare, Mic } from 'lucide-react';
 
-const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
+const Header = ({ onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -9,40 +9,36 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
             justifyContent: 'space-between',
             background: 'var(--header-bg)',
             border: '1px solid var(--border-color)',
-            padding: '12px 16px',
+            padding: '10px 16px',
             boxSizing: 'border-box',
             gap: '12px'
-        },
-        taskCounter: {
-            fontSize: '0.95rem',
-            opacity: 0.8,
-            color: 'var(--muted-text)',
-            whiteSpace: 'nowrap'
         },
         modeToggleContainer: {
             display: 'inline-flex',
             alignItems: 'center',
-            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.05))',
-            borderRadius: '20px',
-            padding: '2px',
-            border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
+            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.06))',
+            borderRadius: '24px',
+            padding: '4px',
+            border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
             margin: '0 auto',
-            flexShrink: 0
+            flexShrink: 0,
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
         },
         modeButton: (active) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            padding: '4px 10px',
-            borderRadius: '16px',
+            gap: '6px',
+            padding: '7px 18px',
+            borderRadius: '20px',
             border: 'none',
             backgroundColor: active ? '#2563eb' : 'transparent',
             color: active ? '#ffffff' : 'var(--text-color, #4b5563)',
             fontWeight: '700',
-            fontSize: '12px',
+            fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            boxShadow: active ? '0 2px 6px rgba(37,99,235,0.3)' : 'none'
         }),
         addTaskToggle: {
             background: 'none',
@@ -54,7 +50,8 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'transform 0.2s ease',
-            flexShrink: 0
+            flexShrink: 0,
+            marginLeft: '8px'
         }
     };
 
@@ -92,7 +89,7 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
                         onClick={() => onSwitchMode('tasks')}
                         title="Switch to Task Manager Mode"
                     >
-                        <CheckSquare size={13} />
+                        <CheckSquare size={16} />
                         <span>Tasks</span>
                     </button>
                     <button
@@ -100,13 +97,9 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
                         onClick={() => onSwitchMode('notes')}
                         title="Switch to Notes Mode"
                     >
-                        <Mic size={13} />
+                        <Mic size={16} />
                         <span>Notes</span>
                     </button>
-                </div>
-
-                <div style={styles.taskCounter}>
-                    {taskCount} active
                 </div>
             </div>
 
@@ -122,8 +115,9 @@ const Header = ({ taskCount, onToggleAdd, isAddOpen, isDark, appMode = 'tasks', 
                         pointerEvents: 'auto'
                     }}
                     aria-label={isAddOpen ? "Close add task" : "Open add task"}
+                    title={isAddOpen ? "Close add task form" : "Add new task"}
                 >
-                    {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+                    {isAddOpen ? <MinusCircle size={30} /> : <PlusCircle size={30} />}
                 </button>
             )}
         </header>
