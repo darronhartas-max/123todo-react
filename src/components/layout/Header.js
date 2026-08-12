@@ -11,30 +11,32 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
             border: '1px solid var(--border-color)',
             padding: '10px 16px',
             boxSizing: 'border-box',
-            gap: '12px'
+            gap: '8px',
+            width: '100%',
+            overflow: 'hidden'
         },
         modeToggleContainer: {
             display: 'inline-flex',
             alignItems: 'center',
             backgroundColor: 'var(--item-bg, rgba(0,0,0,0.06))',
             borderRadius: '24px',
-            padding: '4px',
+            padding: '3px',
             border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
-            margin: '0 auto',
+            margin: 0,
             flexShrink: 0,
             boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
         },
         modeButton: (active) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '7px 18px',
+            gap: '5px',
+            padding: '6px 14px',
             borderRadius: '20px',
             border: 'none',
             backgroundColor: active ? '#2563eb' : 'transparent',
             color: active ? '#ffffff' : 'var(--text-color, #4b5563)',
             fontWeight: '700',
-            fontSize: '14px',
+            fontSize: '15px',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -48,15 +50,15 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                flex: 1,
-                gap: '12px'
+                width: '100%',
+                gap: '8px'
             }}>
-                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', flexShrink: 0 }}>
+                <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', flexShrink: 1, minWidth: 0, marginLeft: '-4px' }}>
                     <img
                         src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                         alt="123 ToDo logo"
                         style={{
-                            width: '240px',
+                            width: '190px',
                             maxWidth: '100%',
                             height: 'auto',
                             cursor: 'pointer',

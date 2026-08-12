@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.0';
+export const APP_VERSION = '3.1.1';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.1': [
+    { title: '📱 Mobile Header & Expanding Search Bar:', desc: 'Fixed mobile header layout overflow with responsive logo scaling, larger switcher font size (15px), expandable search icon toggle in Notes view matching Tasks view, and "Add New Note" placeholder.' }
+  ],
   '3.1.0': [
     { title: '🛡️ Safe Note Archiving & Multi-Field Search:', desc: 'Removed direct card deletion icon to prevent accidental data loss (items are safely archived via completion), enabled full multi-field search across titles and notes in Tasks view, added Settings cog to Notes view, and introduced independent Notes View text size scaling.' }
   ],

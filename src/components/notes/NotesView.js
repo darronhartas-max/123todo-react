@@ -3,6 +3,7 @@ import {
   Mic, MicOff, Folder, Search, Settings
 } from 'lucide-react';
 import NoteCard from './NoteCard';
+import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
 import { isSpeechRecognitionSupported, startVoiceDictation, processVoiceCommands } from '../../utils/voiceUtils';
 
@@ -30,6 +31,7 @@ const NotesView = ({
   const [isDictatingFloating, setIsDictatingFloating] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [showBatchProjectPicker, setShowBatchProjectPicker] = useState(false);
+  const [showSearch, setShowSearch] = useState(Boolean(searchQuery && searchQuery.trim().length > 0));
 
   const floatingRecognitionRef = useRef(null);
   const quickRecognitionRef = useRef(null);
@@ -187,82 +189,90 @@ const NotesView = ({
 
   return (
     <div className="notes-container">
-      {/* Header Bar: Search bar & Project Filter Dropdown on same line */}
-      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', paddingBottom: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, flexWrap: 'wrap' }}>
-          {/* Search bar input */}
-          <div style={{ position: 'relative', minWidth: '200px', flex: 1, maxWidth: '320px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-            <input
-              type="text"
-              value={searchQuery || ''}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search notes..."
-              style={{
-                width: '100%',
-                padding: '6px 12px 6px 32px',
-                borderRadius: '20px',
-                border: '1px solid var(--border-color, #e5e7eb)',
-                backgroundColor: 'var(--card-bg, #ffffff)',
-                color: 'var(--text-color, #1f2937)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
-            />
-          </div>
+      {/* Header Bar: Project Filter Dropdown & Action Controls */}
+      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingBottom: '4px' }}>
+        {/* Project Filter Dropdown */}
+        <select
+          value={activeProjectFilter}
+          onChange={(e) => onSelectProjectFilter(e.target.value)}
+          style={{
+            padding: '7px 12px',
+            borderRadius: '10px',
+            border: '1.5px solid var(--border-color, #d1d5db)',
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            color: 'var(--text-color, #111827)',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            outline: 'none',
+            flex: 1,
+            minWidth: 0
+          }}
+        >
+          <option value="all">All Notes ({tasks.length})</option>
+          <option value="general">Unassigned Inbox ({unassignedCount})</option>
+          {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
+            const count = tasks.filter(t => t.projectId === p.id).length;
+            return (
+              <option key={p.id} value={p.id}>{p.name} ({count})</option>
+            );
+          })}
+        </select>
 
-          {/* Project Filter Dropdown & Settings Cog */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <select
-              value={activeProjectFilter}
-              onChange={(e) => onSelectProjectFilter(e.target.value)}
+        {/* Action Controls: Expanding Search Toggle & Settings Cog */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            style={{
+              padding: '7px',
+              borderRadius: '10px',
+              backgroundColor: showSearch || searchQuery ? 'rgba(37, 99, 235, 0.1)' : 'var(--card-bg, #ffffff)',
+              border: '1.5px solid var(--border-color, #d1d5db)',
+              color: showSearch || searchQuery ? '#2563eb' : 'var(--text-color, #4b5563)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              flexShrink: 0
+            }}
+            title="Search notes"
+          >
+            <Search size={18} />
+          </button>
+
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
               style={{
-                padding: '6px 12px',
+                padding: '7px',
                 borderRadius: '10px',
-                border: '1.5px solid var(--border-color, #d1d5db)',
                 backgroundColor: 'var(--card-bg, #ffffff)',
-                color: 'var(--text-color, #111827)',
-                fontSize: '14px',
-                fontWeight: '700',
+                border: '1.5px solid var(--border-color, #d1d5db)',
+                color: 'var(--text-color, #4b5563)',
                 cursor: 'pointer',
-                outline: 'none',
-                minWidth: '190px'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
+              title="Settings"
             >
-              <option value="all">All Notes ({tasks.length})</option>
-              <option value="general">Unassigned Inbox ({unassignedCount})</option>
-              {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
-                const count = tasks.filter(t => t.projectId === p.id).length;
-                return (
-                  <option key={p.id} value={p.id}>{p.name} ({count})</option>
-                );
-              })}
-            </select>
-
-            {onOpenSettings && (
-              <button
-                onClick={onOpenSettings}
-                style={{
-                  padding: '7px',
-                  borderRadius: '10px',
-                  backgroundColor: 'var(--card-bg, #ffffff)',
-                  border: '1.5px solid var(--border-color, #d1d5db)',
-                  color: 'var(--text-color, #4b5563)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease',
-                  flexShrink: 0
-                }}
-                title="Settings"
-              >
-                <Settings size={18} />
-              </button>
-            )}
-          </div>
+              <Settings size={18} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Expanding Search Bar (matching Tasks view functionality) */}
+      {(showSearch || searchQuery) && (
+        <SearchBar
+          value={searchQuery || ''}
+          onChange={onSearchChange}
+          onClear={() => onSearchChange('')}
+        />
+      )}
 
       {/* Quick Add Note Card (Single note field) */}
       <div className="quick-add-note-card">
@@ -271,7 +281,7 @@ const NotesView = ({
           rows={3}
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
-          placeholder="Add Note"
+          placeholder="Add New Note"
           style={{ fontSize: `${notesFontSize}px` }}
         />
 
