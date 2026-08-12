@@ -87,9 +87,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.0.1';
+export const APP_VERSION = '3.0.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.0.2': [
+    { title: '🎨 Header & Notes Layout Refinements:', desc: 'Removed duplicated header Add Task button, single-row Search and Project Filter dropdown alignment, Add Note holding placeholder text, expanded button spacing for glove-friendly use, and renamed card action button to "Priority".' }
+  ],
   '3.0.1': [
     { title: '🎙️ Voice Notes UI Refinements & Bug Fixes:', desc: 'Deeper mode toggle buttons, relocated + Add Task button to subheader, red tape-recorder Talk dictation button, simplified single note entry, and descending chronological note ordering.' }
   ],

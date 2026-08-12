@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Mic, MicOff, Plus, Folder, Search
+  Mic, MicOff, Folder, Search
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import './NotesView.css';
@@ -185,15 +185,11 @@ const NotesView = ({
 
   return (
     <div className="notes-container">
-      {/* Header Bar */}
-      <div className="notes-header-bar">
-        <div className="notes-title-row">
-          <h1 className="notes-main-title">
-            <span>🎙️ Voice Notes</span>
-          </h1>
-
-          {/* Search bar input inside header */}
-          <div style={{ position: 'relative', maxWidth: '240px', flex: 1 }}>
+      {/* Header Bar: Search bar & Project Filter Dropdown on same line */}
+      <div className="notes-header-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', paddingBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, flexWrap: 'wrap' }}>
+          {/* Search bar input */}
+          <div style={{ position: 'relative', minWidth: '200px', flex: 1, maxWidth: '320px' }}>
             <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
             <input
               type="text"
@@ -212,35 +208,35 @@ const NotesView = ({
               }}
             />
           </div>
-        </div>
 
-        {/* Project Filter Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '4px' }}>
-          <select
-            value={activeProjectFilter}
-            onChange={(e) => onSelectProjectFilter(e.target.value)}
-            style={{
-              padding: '6px 12px',
-              borderRadius: '10px',
-              border: '1.5px solid var(--border-color, #d1d5db)',
-              backgroundColor: 'var(--card-bg, #ffffff)',
-              color: 'var(--text-color, #111827)',
-              fontSize: '14px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              outline: 'none',
-              minWidth: '200px'
-            }}
-          >
-            <option value="all">All Notes ({tasks.length})</option>
-            <option value="general">Unassigned Inbox ({unassignedCount})</option>
-            {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
-              const count = tasks.filter(t => t.projectId === p.id).length;
-              return (
-                <option key={p.id} value={p.id}>{p.name} ({count})</option>
-              );
-            })}
-          </select>
+          {/* Project Filter Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <select
+              value={activeProjectFilter}
+              onChange={(e) => onSelectProjectFilter(e.target.value)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '10px',
+                border: '1.5px solid var(--border-color, #d1d5db)',
+                backgroundColor: 'var(--card-bg, #ffffff)',
+                color: 'var(--text-color, #111827)',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                outline: 'none',
+                minWidth: '190px'
+              }}
+            >
+              <option value="all">All Notes ({tasks.length})</option>
+              <option value="general">Unassigned Inbox ({unassignedCount})</option>
+              {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
+                const count = tasks.filter(t => t.projectId === p.id).length;
+                return (
+                  <option key={p.id} value={p.id}>{p.name} ({count})</option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -251,7 +247,7 @@ const NotesView = ({
           rows={3}
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
-          placeholder=""
+          placeholder="Add Note"
         />
 
         {statusMessage && (
@@ -284,7 +280,7 @@ const NotesView = ({
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* Red Tape Recorder 'Talk' / 'Stop' Button */}
             <button
               onClick={toggleQuickAddDictation}
@@ -319,7 +315,7 @@ const NotesView = ({
             <button
               onClick={() => handleCreateNote()}
               style={{
-                padding: '8px 18px',
+                padding: '8px 20px',
                 borderRadius: '10px',
                 border: 'none',
                 backgroundColor: '#2563eb',
@@ -329,10 +325,9 @@ const NotesView = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                justifyContent: 'center'
               }}
             >
-              <Plus size={16} />
               <span>Save</span>
             </button>
           </div>

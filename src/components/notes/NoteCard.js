@@ -373,7 +373,7 @@ const NoteCard = ({
               }}
             >
               <ArrowUpRight size={14} />
-              <span>Make Task</span>
+              <span>Priority</span>
               <ChevronDown size={12} />
             </button>
 

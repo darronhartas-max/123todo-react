@@ -1,7 +1,7 @@
 import React from 'react';
-import { PlusCircle, MinusCircle, CheckSquare, Mic } from 'lucide-react';
+import { CheckSquare, Mic } from 'lucide-react';
 
-const Header = ({ onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
+const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -39,20 +39,7 @@ const Header = ({ onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMod
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
             boxShadow: active ? '0 2px 6px rgba(37,99,235,0.3)' : 'none'
-        }),
-        addTaskToggle: {
-            background: 'none',
-            border: 'none',
-            color: '#dc2626',
-            cursor: 'pointer',
-            padding: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'transform 0.2s ease',
-            flexShrink: 0,
-            marginLeft: '8px'
-        }
+        })
     };
 
     return (
@@ -62,11 +49,7 @@ const Header = ({ onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMod
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flex: 1,
-                gap: '12px',
-                filter: isAddOpen ? 'blur(5px)' : 'none',
-                opacity: isAddOpen ? 0.5 : 1,
-                transition: 'all 0.3s ease',
-                pointerEvents: isAddOpen ? 'none' : 'auto'
+                gap: '12px'
             }}>
                 <a href="https://www.123todo.com" target="_blank" rel="noreferrer" style={{ display: 'block', flexShrink: 0 }}>
                     <img
@@ -102,24 +85,6 @@ const Header = ({ onToggleAdd, isAddOpen, isDark, appMode = 'tasks', onSwitchMod
                     </button>
                 </div>
             </div>
-
-            {appMode === 'tasks' && (
-                <button
-                    onClick={onToggleAdd}
-                    style={{
-                        ...styles.addTaskToggle,
-                        position: 'relative',
-                        zIndex: 10,
-                        filter: 'none',
-                        opacity: 1,
-                        pointerEvents: 'auto'
-                    }}
-                    aria-label={isAddOpen ? "Close add task" : "Open add task"}
-                    title={isAddOpen ? "Close add task form" : "Add new task"}
-                >
-                    {isAddOpen ? <MinusCircle size={30} /> : <PlusCircle size={30} />}
-                </button>
-            )}
         </header>
     );
 };
