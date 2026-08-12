@@ -87,9 +87,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.0.0';
+export const APP_VERSION = '3.0.1';
 
 export const RELEASE_CHANGELOG = {
+  '3.0.1': [
+    { title: '🎙️ Voice Notes UI Refinements & Bug Fixes:', desc: 'Deeper mode toggle buttons, relocated + Add Task button to subheader, red tape-recorder Talk dictation button, simplified single note entry, and descending chronological note ordering.' }
+  ],
   '3.0.0': [
     { title: '🎙️ Dual Skin Operating System & Simple Voice Notes Mode:', desc: 'Introduced a second skin for 123 ToDo! Switch between structured Task Manager Mode (P1-P4 matrix) and Simple Voice Notes Mode featuring extra large builder-friendly text, hands-free continuous dictation, unassigned inbox capture, deferred project assignment, and 1-tap task conversion — all backed by the same unified dataset and zero-knowledge sync engine.' }
   ],
