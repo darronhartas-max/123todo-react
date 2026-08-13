@@ -560,23 +560,18 @@ export const useTasks = () => {
         const newId = counter + 1;
         const now = Date.now();
         let finalTitle = (text || '').trim();
-        const finalNotes = (notes || '').trim();
+        let finalNotes = (notes || '').trim();
 
         if (!finalTitle && finalNotes) {
-            const lines = finalNotes.split('\n');
-            const firstLine = lines[0].trim();
-            if (firstLine.length <= 60) {
-                finalTitle = firstLine;
-            } else {
-                finalTitle = firstLine.substring(0, 57).trim() + '...';
-            }
+            finalTitle = finalNotes;
+            finalNotes = '';
         }
-        if (!finalTitle) finalTitle = 'Untitled Note';
+        if (!finalTitle) finalTitle = 'Untitled Task';
 
         const newNote = {
             id: newId,
             text: finalTitle,
-            priority: 4,
+            priority: 1, // Auto set to Must Do (Priority 1)
             projectId: projectId || 'general',
             notes: finalNotes,
             isSample: false,

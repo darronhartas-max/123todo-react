@@ -2,7 +2,7 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 3.1.5 | © Unforgettable Management Ltd 2026
+Version 3.1.6 | © Unforgettable Management Ltd 2026
 
 ---
 
@@ -312,8 +312,11 @@ Built with [Create React App](https://github.com/facebook/create-react-app)
 
 ## 🔄 Version History
 
-### v2.7.4 (Current)
-- **Advanced Voice Commands & Auto-Scroll Viewport Tracking**: Hands-free task creation (`"add task"`), live spoken deletion (`"delete last word"`, `"scratch that"`, `"clear all"`), real-time auto-scroll tracking across textareas, steady Google Sync status dot indicator, and Voice-to-Text guide in Settings under Shortcuts.
+### v3.1.6 (Current)
+- **14pt Tasks Default, Task-First Notes & Inline Subtask Editing**: Bumped default Tasks mode text size to 14pt with responsive button layout scaling, routed Notes View entry directly to Task text field with Must Do (P1) priority, added inline subtask text editing across all views, and fixed completion checkbox archiving.
+
+### v3.1.5
+- **Multi-Stage Search Auto-Focus**: Enhanced search input auto-focus with multi-stage timers (0ms, 50ms, 150ms) ensuring the cursor immediately focuses inside the text box across all mobile and desktop browsers.
 
 ### v2.7.3
   - **Redesigned Edit & Note Modal**: Professional 440px compact layout with Priority and Project selectors above title, and Notes directly below title.

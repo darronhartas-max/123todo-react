@@ -664,36 +664,64 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         padding: '3px 0',
-                                        borderBottom: '1px solid var(--border-color)'
+                                        borderBottom: '1px solid var(--border-color)',
+                                        gap: '6px'
                                     }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, cursor: 'pointer', minWidth: 0 }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={st.completed}
-                                                onChange={() => {
-                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
-                                                }}
-                                                style={{ cursor: 'pointer', width: '13px', height: '13px' }}
-                                            />
-                                            <span style={{
-                                                textDecoration: st.completed ? 'line-through' : 'none',
-                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                        <input
+                                            type="checkbox"
+                                            checked={st.completed}
+                                            onChange={() => {
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                            }}
+                                            style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={st.text}
+                                            onChange={(e) => {
+                                                const updatedText = e.target.value;
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                            }}
+                                            placeholder="Subtask description..."
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                background: 'transparent',
                                                 fontSize: '0.85rem',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {st.text}
-                                            </span>
-                                        </label>
+                                                fontWeight: '500',
+                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                textDecoration: st.completed ? 'line-through' : 'none',
+                                                outline: 'none',
+                                                padding: '2px 4px',
+                                                borderRadius: '4px',
+                                                fontFamily: 'inherit',
+                                                transition: 'all 0.15s ease'
+                                            }}
+                                            onFocus={(e) => {
+                                                e.target.style.background = 'var(--bg-color)';
+                                                e.target.style.boxShadow = '0 0 0 1px var(--accent-color)';
+                                            }}
+                                            onBlur={(e) => {
+                                                e.target.style.background = 'transparent';
+                                                e.target.style.boxShadow = 'none';
+                                                if (!st.text.trim()) {
+                                                    setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                                }
+                                            }}
+                                        />
                                         <button
+                                            type="button"
                                             onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
                                             style={{
                                                 border: 'none',
                                                 background: 'transparent',
                                                 color: '#ef4444',
                                                 cursor: 'pointer',
-                                                padding: '2px 4px'
+                                                padding: '2px 4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flexShrink: 0
                                             }}
                                             title="Delete step"
                                         >

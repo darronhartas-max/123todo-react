@@ -152,4 +152,18 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(result.current.archived[0].text).toBe('Task to Complete');
         expect(result.current.archived[0].completedAt).toBeDefined();
     });
+
+    test('addNote creates task with text in Task text field, empty notes, and priority 1 (Must Do)', () => {
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.addNote('Buy fresh organic sourdough bread', '', 'general');
+        });
+
+        const createdTask = result.current.tasks[0];
+        expect(createdTask.text).toBe('Buy fresh organic sourdough bread');
+        expect(createdTask.notes).toBe('');
+        expect(createdTask.priority).toBe(1); // Must Do
+    });
 });
+

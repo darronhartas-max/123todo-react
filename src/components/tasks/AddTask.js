@@ -240,9 +240,10 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const getPriorityButtonStyle = (p) => {
         const config = PRIORITIES[p];
         const isActive = priority === p;
+        const flexMap = { 1: '1', 2: '1.25', 3: '1.5' };
         return {
-            padding: '8px 4px',
-            fontSize: '0.9rem',
+            padding: '7px 6px',
+            fontSize: '0.85rem',
             fontWeight: '700',
             border: '2px solid',
             borderRadius: '5px',
@@ -250,10 +251,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             cursor: 'pointer',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             textTransform: 'uppercase',
-            letterSpacing: '0.2px',
-            flex: '1',
+            letterSpacing: '0.1px',
+            flex: `${flexMap[p] || '1'} 1 auto`,
             minWidth: '0',
             whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
             color: isActive ? 'white' : config.color,
             backgroundColor: isActive ? config.color : 'var(--bg-color)',
             borderColor: config.color
@@ -267,12 +271,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
-        fontSize: '1.05rem',
+        fontSize: '0.9rem',
         fontWeight: '600',
-        padding: '6px 12px',
+        padding: '6px 10px',
         borderRadius: '4px',
         background: isActive ? 'var(--accent-color)' : 'transparent',
-        transition: 'all 0.2s ease'
+        transition: 'all 0.2s ease',
+        boxSizing: 'border-box'
     });
 
     const handleInput = (e) => {
@@ -493,35 +498,64 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    padding: '8px 0',
-                                    borderBottom: '1px solid rgba(0,0,0,0.03)'
+                                    padding: '4px 0',
+                                    borderBottom: '1px solid rgba(0,0,0,0.04)',
+                                    gap: '8px'
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={st.completed}
-                                            onChange={() => {
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
-                                            }}
-                                            style={{ cursor: 'pointer', width: '15px', height: '15px' }}
-                                        />
-                                        <span style={{
-                                            textDecoration: st.completed ? 'line-through' : 'none',
+                                    <input
+                                        type="checkbox"
+                                        checked={st.completed}
+                                        onChange={() => {
+                                            setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                        }}
+                                        style={{ cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0 }}
+                                    />
+                                    <input
+                                        type="text"
+                                        value={st.text}
+                                        onChange={(e) => {
+                                            const updatedText = e.target.value;
+                                            setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                        }}
+                                        placeholder="Subtask step..."
+                                        style={{
+                                            flex: 1,
+                                            border: 'none',
+                                            background: 'transparent',
+                                            fontSize: '1.05rem',
+                                            fontWeight: '500',
                                             color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                            fontSize: '1.05rem'
-                                        }}>
-                                            {st.text}
-                                        </span>
-                                    </div>
+                                            textDecoration: st.completed ? 'line-through' : 'none',
+                                            outline: 'none',
+                                            padding: '3px 6px',
+                                            borderRadius: '4px',
+                                            fontFamily: 'inherit',
+                                            transition: 'all 0.15s ease'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.target.style.background = 'var(--surface-color)';
+                                            e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.background = 'transparent';
+                                            e.target.style.boxShadow = 'none';
+                                            if (!st.text.trim()) {
+                                                setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                            }
+                                        }}
+                                    />
                                     <button
+                                        type="button"
                                         onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
                                         style={{
                                             border: 'none',
                                             background: 'transparent',
                                             color: '#ef4444',
                                             cursor: 'pointer',
-                                            fontSize: '1rem',
-                                            fontWeight: '600'
+                                            fontSize: '0.95rem',
+                                            fontWeight: '600',
+                                            padding: '2px 6px',
+                                            flexShrink: 0
                                         }}
                                     >
                                         Delete
@@ -754,7 +788,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 gap: '6px',
                 margin: '10px 0',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                flexWrap: 'wrap'
             }}>
                 {[1, 2, 3].map(p => (
                     <button
@@ -768,20 +803,21 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 <button
                     onClick={handleSubmit}
                     style={{
-                        padding: '7px 4px',
+                        padding: '7px 16px',
                         background: '#10b981',
                         color: 'white',
                         border: '2px solid #059669',
                         borderRadius: '6px',
                         cursor: 'pointer',
-                        fontSize: '1rem',
+                        fontSize: '0.95rem',
                         fontWeight: '800',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        flex: '1',
-                        minWidth: '0',
+                        flex: '0 0 auto',
+                        minWidth: '60px',
                         whiteSpace: 'nowrap',
+                        boxSizing: 'border-box',
                         boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
                     }}
                     onMouseEnter={(e) => {

@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.5';
+export const APP_VERSION = '3.1.6';
 
 export const RELEASE_CHANGELOG = {
+  '3.1.6': [
+    { title: '📝 14pt Tasks Default, Task-First Notes & Inline Subtask Editing:', desc: 'Bumped default Tasks mode text size to 14pt with responsive button layout scaling, routed Notes View entry directly to Task text field with Must Do (P1) priority, added inline subtask text editing across all views, and fixed completion checkbox archiving.' }
+  ],
   '3.1.5': [
     { title: '⚡ Multi-Stage Search Auto-Focus:', desc: 'Enhanced search input auto-focus with multi-stage timers (0ms, 50ms, 150ms) ensuring the cursor immediately focuses inside the text box across all mobile and desktop browsers.' }
   ],

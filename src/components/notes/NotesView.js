@@ -75,21 +75,8 @@ const NotesView = ({
 
     if (!rawContent.trim()) return;
 
-    // Auto-extract a title from the first line or phrase (up to 50 chars), leaving full content in note body
-    const lines = rawContent.trim().split('\n');
-    const firstLine = lines[0].trim();
-    let noteTitle = '';
-    let noteBody = '';
-
-    if (firstLine.length <= 50) {
-      noteTitle = firstLine;
-      noteBody = lines.slice(1).join('\n').trim();
-    } else {
-      noteTitle = firstLine.slice(0, 45) + '...';
-      noteBody = rawContent.trim();
-    }
-
-    onAddNote(noteTitle, noteBody || rawContent.trim(), targetProjectId || 'general');
+    // Treat the note as a Task: add text directly to the Task text field, leaving note body empty for subsequent editing
+    onAddNote(rawContent.trim(), '', targetProjectId || 'general');
     setNewNotes('');
     if (isDictatingQuickAdd) {
       if (quickRecognitionRef.current) quickRecognitionRef.current.stop();
@@ -153,16 +140,16 @@ const NotesView = ({
         capturedTranscript = processedText;
 
         if (isSubmitCommand && capturedTranscript.trim()) {
-          onAddNote('', capturedTranscript, targetProjectId || 'general');
+          onAddNote(capturedTranscript.trim(), '', targetProjectId || 'general');
           capturedTranscript = '';
-          setStatusMessage('🎙️ Note saved! Continue speaking for next note...');
+          setStatusMessage('🎙️ Task saved! Continue speaking for next item...');
           setTimeout(() => setStatusMessage(''), 2500);
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),
       onEnd: () => {
         if (capturedTranscript.trim()) {
-          onAddNote('', capturedTranscript, targetProjectId || 'general');
+          onAddNote(capturedTranscript.trim(), '', targetProjectId || 'general');
         }
         setIsDictatingFloating(false);
       }

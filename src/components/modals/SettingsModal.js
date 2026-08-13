@@ -950,7 +950,7 @@ const SettingsModal = ({
                                     <div style={styles.settingLabel}>
                                         <span>Tasks View Text Size</span>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
-                                            {fontSize}pt ({fontSize === 12 ? 'Default' : fontSize < 12 ? 'Smaller' : 'Larger'})
+                                            {fontSize}pt ({fontSize === 14 ? 'Default' : fontSize < 14 ? 'Smaller' : 'Larger'})
                                         </span>
                                     </div>
                                     <div style={styles.sliderContainer}>

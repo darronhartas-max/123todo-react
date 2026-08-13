@@ -18,6 +18,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [isChecked, setIsChecked] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const [showNotesExpanded, setShowNotesExpanded] = useState(false);
+    const [showSubtasksExpanded, setShowSubtasksExpanded] = useState(false);
     const archiveTimeoutRef = React.useRef(null);
 
     // Swipe Gesture State & Visual Damping
@@ -651,9 +652,24 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 {subtasksCount > 0 && (
                     <div style={{ marginTop: '8px', width: '100%', paddingRight: '8px', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--muted-text)' }}>
-                                📋 Steps: {completedCount}/{subtasksCount}
-                            </span>
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setShowSubtasksExpanded(!showSubtasksExpanded); }}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    color: 'var(--muted-text)',
+                                    padding: 0
+                                }}
+                            >
+                                📋 Steps: {completedCount}/{subtasksCount} ({showSubtasksExpanded ? '▾' : '▸'})
+                            </button>
                             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-color)' }}>
                                 {Math.round((completedCount / subtasksCount) * 100)}%
                             </span>
@@ -673,6 +689,62 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 transition: 'width 0.3s ease'
                             }} />
                         </div>
+                        {showSubtasksExpanded && (
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '6px 0 0 0' }}>
+                                {(task.subtasks || []).map((st) => (
+                                    <li key={st.id} onClick={(e) => e.stopPropagation()} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '3px 0',
+                                        borderBottom: '1px dashed var(--border-color)'
+                                    }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={st.completed}
+                                            onChange={() => {
+                                                const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                                                onUpdate && onUpdate(task.id, { subtasks: updated });
+                                            }}
+                                            style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={st.text}
+                                            onChange={(e) => {
+                                                const updatedText = e.target.value;
+                                                const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, text: updatedText } : s);
+                                                onUpdate && onUpdate(task.id, { subtasks: updated });
+                                            }}
+                                            placeholder="Subtask step..."
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                background: 'transparent',
+                                                fontSize: '0.85rem',
+                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                textDecoration: st.completed ? 'line-through' : 'none',
+                                                outline: 'none',
+                                                padding: '2px 4px',
+                                                borderRadius: '4px'
+                                            }}
+                                            onFocus={(e) => {
+                                                e.target.style.background = 'var(--bg-color)';
+                                                e.target.style.boxShadow = '0 0 0 1px var(--accent-color)';
+                                            }}
+                                            onBlur={(e) => {
+                                                e.target.style.background = 'transparent';
+                                                e.target.style.boxShadow = 'none';
+                                                if (!st.text.trim()) {
+                                                    const updated = (task.subtasks || []).filter(s => s.id !== st.id);
+                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
+                                                }
+                                            }}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 )}
 
@@ -766,10 +838,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         <motion.button
                             onClick={handleComplete}
                             onTouchStart={(e) => e.stopPropagation()}
-                            onTouchEnd={(e) => {
-                                e.stopPropagation();
-                                handleComplete(e);
-                            }}
+                            onTouchEnd={(e) => e.stopPropagation()}
                             onPointerDown={(e) => e.stopPropagation()}
                             onPointerUp={(e) => e.stopPropagation()}
                             style={{

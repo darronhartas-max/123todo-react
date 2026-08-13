@@ -257,7 +257,7 @@ const TodoApp = () => {
         return parsed;
       }
     }
-    return 12;
+    return 14;
   });
   const [notesFontSize, setNotesFontSizeState] = useState(() => {
     const saved = localStorage.getItem('123TodoNotesFontSize');

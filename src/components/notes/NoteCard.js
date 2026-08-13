@@ -22,6 +22,8 @@ const NoteCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [titleText, setTitleText] = useState(note.text || '');
   const [notesText, setNotesText] = useState(note.notes || '');
+  const [subtasks, setSubtasks] = useState(note.subtasks || []);
+  const [newSubtaskText, setNewSubtaskText] = useState('');
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isDictating, setIsDictating] = useState(false);
@@ -32,18 +34,31 @@ const NoteCard = ({
   useEffect(() => {
     setTitleText(note.text || '');
     setNotesText(note.notes || '');
-  }, [note.text, note.notes]);
+    setSubtasks(note.subtasks || []);
+  }, [note.text, note.notes, note.subtasks]);
 
   const currentProject = projects.find(p => p.id === note.projectId) || { id: 'general', name: 'Unassigned Inbox', color: '#6b7280' };
 
+  const handleAddSubtask = () => {
+    if (!newSubtaskText.trim()) return;
+    const newSt = {
+      id: Date.now() + Math.random(),
+      text: newSubtaskText.trim(),
+      completed: false
+    };
+    const updated = [...subtasks, newSt];
+    setSubtasks(updated);
+    setNewSubtaskText('');
+    onUpdateNote(note.id, { subtasks: updated });
+  };
+
   const handleSaveEdits = () => {
     setIsEditing(false);
-    if (titleText.trim() !== note.text || notesText.trim() !== note.notes) {
-      onUpdateNote(note.id, {
-        text: titleText.trim() || 'Untitled Note',
-        notes: notesText.trim()
-      });
-    }
+    onUpdateNote(note.id, {
+      text: titleText.trim() || 'Untitled Task',
+      notes: notesText.trim(),
+      subtasks
+    });
   };
 
   const handleToggleDictation = (e) => {
@@ -254,6 +269,116 @@ const NoteCard = ({
                 lineHeight: 1.5
               }}
             />
+            {/* Subtasks Section in Edit Mode */}
+            <div style={{ marginTop: '4px', padding: '8px', borderRadius: '8px', background: 'var(--item-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '6px' }}>
+                📋 Subtasks ({subtasks.length})
+              </div>
+              {subtasks.length > 0 && (
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 8px 0' }}>
+                  {subtasks.map((st) => (
+                    <li key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', borderBottom: '1px solid var(--border-color, #f3f4f6)' }}>
+                      <input
+                        type="checkbox"
+                        checked={st.completed}
+                        onChange={() => {
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0 }}
+                      />
+                      <input
+                        type="text"
+                        value={st.text}
+                        onChange={(e) => {
+                          const updatedText = e.target.value;
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        placeholder="Subtask step..."
+                        style={{
+                          flex: 1,
+                          border: 'none',
+                          background: 'transparent',
+                          fontSize: '13px',
+                          color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
+                          textDecoration: st.completed ? 'line-through' : 'none',
+                          outline: 'none',
+                          padding: '2px 4px',
+                          borderRadius: '4px'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.background = 'var(--card-bg, #ffffff)';
+                          e.target.style.boxShadow = '0 0 0 1px #2563eb';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.background = 'transparent';
+                          e.target.style.boxShadow = 'none';
+                          if (!st.text.trim()) {
+                            const updated = subtasks.filter(s => s.id !== st.id);
+                            setSubtasks(updated);
+                            onUpdateNote(note.id, { subtasks: updated });
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = subtasks.filter(s => s.id !== st.id);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '2px 4px', fontSize: '12px', fontWeight: '600' }}
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <input
+                  type="text"
+                  value={newSubtaskText}
+                  onChange={(e) => setNewSubtaskText(e.target.value)}
+                  placeholder="Add step..."
+                  style={{
+                    flex: 1,
+                    padding: '4px 8px',
+                    fontSize: '13px',
+                    border: '1px solid var(--border-color, #d1d5db)',
+                    borderRadius: '6px',
+                    backgroundColor: 'var(--card-bg, #ffffff)',
+                    color: 'var(--text-color, #111827)',
+                    outline: 'none'
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddSubtask();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddSubtask}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
                 onClick={handleSaveEdits}
@@ -299,6 +424,66 @@ const NoteCard = ({
               <p style={{ fontSize: `${Math.max(notesFontSize - 4, 12)}px`, color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>
                 Tap to add details or record voice...
               </p>
+            )}
+
+            {/* Subtasks in View Mode */}
+            {subtasks.length > 0 && (
+              <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', marginBottom: '4px' }}>
+                  📋 Steps ({subtasks.filter(s => s.completed).length}/{subtasks.length}):
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {subtasks.map((st) => (
+                    <li key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0' }}>
+                      <input
+                        type="checkbox"
+                        checked={st.completed}
+                        onChange={() => {
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
+                      />
+                      <input
+                        type="text"
+                        value={st.text}
+                        onChange={(e) => {
+                          const updatedText = e.target.value;
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        placeholder="Subtask step..."
+                        style={{
+                          flex: 1,
+                          border: 'none',
+                          background: 'transparent',
+                          fontSize: '13px',
+                          color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
+                          textDecoration: st.completed ? 'line-through' : 'none',
+                          outline: 'none',
+                          padding: '2px 4px',
+                          borderRadius: '4px'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.background = 'var(--card-bg, #ffffff)';
+                          e.target.style.boxShadow = '0 0 0 1px #2563eb';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.background = 'transparent';
+                          e.target.style.boxShadow = 'none';
+                          if (!st.text.trim()) {
+                            const updated = subtasks.filter(s => s.id !== st.id);
+                            setSubtasks(updated);
+                            onUpdateNote(note.id, { subtasks: updated });
+                          }
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
         )}
