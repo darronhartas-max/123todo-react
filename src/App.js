@@ -169,6 +169,7 @@ const TodoApp = () => {
   const [showScheduled, setShowScheduled] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
+  const draggedIdRef = useRef(null);
   const [dragOverId, setDragOverId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -555,6 +556,7 @@ const TodoApp = () => {
 
   // Drag and drop handlers
   const handleDragStart = (e, taskId) => {
+    draggedIdRef.current = taskId;
     setDraggedId(taskId);
     if (e && e.dataTransfer) {
       e.dataTransfer.effectAllowed = 'move';
@@ -590,7 +592,8 @@ const TodoApp = () => {
       }
     }
 
-    if (draggedId && draggedId !== targetId) {
+    const activeSourceId = draggedIdRef.current || draggedId;
+    if (activeSourceId && String(activeSourceId) !== String(targetId)) {
       setDragOverId(targetId);
     }
   };
@@ -598,7 +601,7 @@ const TodoApp = () => {
   const handleDrop = (e, targetId) => {
     stopAutoScroll();
     if (e) e.preventDefault();
-    let sourceId = draggedId;
+    let sourceId = draggedIdRef.current || draggedId;
     if (!sourceId && e && e.dataTransfer) {
       try {
         const raw = e.dataTransfer.getData('text/plain');
@@ -609,12 +612,14 @@ const TodoApp = () => {
     if (sourceId && String(sourceId) !== String(targetId)) {
       reorderTasks(sourceId, targetId);
     }
+    draggedIdRef.current = null;
     setDragOverId(null);
     setDraggedId(null);
   };
 
   const handleDragEnd = (e) => {
     stopAutoScroll();
+    draggedIdRef.current = null;
     setDraggedId(null);
     setDragOverId(null);
   };
