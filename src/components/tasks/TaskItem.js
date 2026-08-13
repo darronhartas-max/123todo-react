@@ -188,10 +188,20 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         return `${freqText} ${intervalLabel}`;
     };
 
+    const subtasksCount = (task.subtasks || []).length;
+    const completedCount = (task.subtasks || []).filter(s => s.completed).length;
+
+    const hasExtraDetails = Boolean(
+        (showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0)) ||
+        showQuickSchedule ||
+        subtasksCount > 0 ||
+        (showFullDetails && task.notes)
+    );
+
     const styles = {
         taskItem: {
             display: 'flex',
-            padding: 'var(--task-padding, 10px 12px)',
+            padding: 'var(--task-padding, 6px 10px)',
             borderTop: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             borderRight: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             borderBottom: isDragging ? '1px solid var(--accent-color)' : '1px solid var(--border-color)',
@@ -202,9 +212,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             marginBottom: 'var(--task-margin, 4px)',
             transition: 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
             position: 'relative',
-            alignItems: 'flex-start',
-            paddingTop: 'var(--task-padding-top, 12px)',
-            paddingBottom: 'var(--task-padding-bottom, 12px)',
+            alignItems: hasExtraDetails ? 'flex-start' : 'center',
+            paddingTop: 'var(--task-padding-top, 6px)',
+            paddingBottom: 'var(--task-padding-bottom, 6px)',
             opacity: isDragging ? 0.35 : 1,
             boxShadow: isDragging ? 'none' : 'none'
         },
@@ -212,14 +222,16 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             flex: 1,
             border: 'none',
             background: 'transparent',
-            fontSize: 'var(--task-font-size, 1.1rem)',
+            fontSize: 'var(--task-font-size, 1.05rem)',
             color: 'var(--text-color)',
             cursor: isArchived ? 'default' : 'pointer',
             fontFamily: 'Inter, sans-serif',
             wordWrap: 'break-word',
             whiteSpace: 'normal',
             textAlign: 'left',
-            fontWeight: '400'
+            fontWeight: '400',
+            lineHeight: '1.35',
+            margin: 0
         },
         actionBtn: {
             background: 'transparent',
@@ -239,8 +251,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         }
     };
 
-    const subtasksCount = (task.subtasks || []).length;
-    const completedCount = (task.subtasks || []).filter(s => s.completed).length;
+
 
     const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
     const leftSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeLeft ? SWIPE_ACTIONS[swipeSettings.swipeLeft] : null;
@@ -799,7 +810,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '4px', alignSelf: hasExtraDetails ? 'flex-start' : 'center', marginTop: hasExtraDetails ? '2px' : '0' }}>
                 {isArchived ? (
                     <button
                         onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}
@@ -807,14 +818,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             ...styles.actionBtn,
                             color: '#3b82f6',
                             background: 'rgba(59, 130, 246, 0.08)',
-                            width: '34px',
-                            height: '34px',
-                            minWidth: '34px',
-                            marginTop: '2px'
+                            width: '32px',
+                            height: '32px',
+                            minWidth: '32px',
+                            marginTop: '0px'
                         }}
                         title="Restore Task"
                     >
-                        <RotateCcw size={18} />
+                        <RotateCcw size={17} />
                     </button>
                 ) : (
                     <>
@@ -827,13 +838,16 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     background: showQuickSchedule ? 'var(--accent-bg)' : 'transparent',
                                     border: '1px solid var(--accent-color)',
                                     marginRight: '6px',
-                                    opacity: 1.0
+                                    opacity: 1.0,
+                                    width: '32px',
+                                    height: '32px',
+                                    minWidth: '32px'
                                 }}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 title="Change schedule / Defer task"
                             >
-                                <Calendar size={18} />
+                                <Calendar size={17} />
                             </motion.button>
                         )}
                         <motion.button
@@ -844,10 +858,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             onPointerUp={(e) => e.stopPropagation()}
                             style={{
                                 ...styles.actionBtn,
-                                minWidth: '40px',
-                                minHeight: '40px',
-                                width: '40px',
-                                height: '40px',
+                                minWidth: '32px',
+                                minHeight: '32px',
+                                width: '32px',
+                                height: '32px',
                                 touchAction: 'manipulation',
                                 color: isChecked ? '#10b981' : 'var(--muted-text)',
                                 background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent'

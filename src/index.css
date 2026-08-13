@@ -18,9 +18,9 @@ html {
   --archive-bg: #f9fafb;
   
   /* Compact Task Spacing */
-  --task-padding: 8px 6px 10px 10px;
-  --task-padding-top: 8px;
-  --task-padding-bottom: 10px;
+  --task-padding: 6px 10px;
+  --task-padding-top: 6px;
+  --task-padding-bottom: 6px;
   --task-margin: 4px;
   --task-font-size: 1.05rem;
   --section-margin: 12px;

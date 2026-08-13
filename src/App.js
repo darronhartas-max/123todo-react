@@ -350,9 +350,9 @@ const TodoApp = () => {
   }, [fontSize]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--task-padding', '8px 6px 10px 10px');
-    document.documentElement.style.setProperty('--task-padding-top', '8px');
-    document.documentElement.style.setProperty('--task-padding-bottom', '10px');
+    document.documentElement.style.setProperty('--task-padding', '6px 10px');
+    document.documentElement.style.setProperty('--task-padding-top', '6px');
+    document.documentElement.style.setProperty('--task-padding-bottom', '6px');
     document.documentElement.style.setProperty('--task-margin', '4px');
     document.documentElement.style.setProperty('--task-font-size', '1.05rem');
     document.documentElement.style.setProperty('--section-margin', '12px');
