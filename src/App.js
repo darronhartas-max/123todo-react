@@ -249,6 +249,11 @@ const TodoApp = () => {
     } catch (e) {}
   }, []);
 
+  const getDefaultFontSize = () => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth > 768;
+    return isDesktop ? 11 : 14;
+  };
+
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
     const saved = localStorage.getItem('123TodoFontSize');
@@ -258,7 +263,7 @@ const TodoApp = () => {
         return parsed;
       }
     }
-    return 14;
+    return getDefaultFontSize();
   });
   const [notesFontSize, setNotesFontSizeState] = useState(() => {
     const saved = localStorage.getItem('123TodoNotesFontSize');
