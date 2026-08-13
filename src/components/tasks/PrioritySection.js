@@ -152,7 +152,7 @@ const PrioritySection = ({
                                 padding: isDragOverSection ? '4px 0' : '0'
                             }}
                         >
-                            <AnimatePresence mode="popLayout">
+                            <AnimatePresence initial={false}>
                                 {sectionTasks.map(task => {
                                     const project = projects.find(p => 
                                         p.id.toLowerCase() === task.projectId?.toLowerCase() || 
@@ -175,12 +175,11 @@ const PrioritySection = ({
                                                 onDragStart: (e) => handleDragStart(e, task.id),
                                                 onDragOver: (e) => {
                                                     e.preventDefault();
-                                                    e.stopPropagation();
+                                                    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
                                                     handleDragOver(e, task.id);
                                                 },
                                                 onDrop: (e) => {
                                                     e.preventDefault();
-                                                    e.stopPropagation();
                                                     handleDrop(e, task.id);
                                                 },
                                                 onDragEnd: handleDragEnd
