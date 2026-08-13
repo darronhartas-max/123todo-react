@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Mic, MicOff, Folder, Search, Settings
+  Folder, Search, Settings
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import SearchBar from '../tasks/SearchBar';
@@ -28,12 +28,10 @@ const NotesView = ({
   const [newNotes, setNewNotes] = useState('');
   const [targetProjectId, setTargetProjectId] = useState(activeProjectFilter === 'all' ? 'general' : activeProjectFilter);
   const [isDictatingQuickAdd, setIsDictatingQuickAdd] = useState(false);
-  const [isDictatingFloating, setIsDictatingFloating] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [showBatchProjectPicker, setShowBatchProjectPicker] = useState(false);
   const [showSearch, setShowSearch] = useState(Boolean(searchQuery && searchQuery.trim().length > 0));
 
-  const floatingRecognitionRef = useRef(null);
   const quickRecognitionRef = useRef(null);
 
   // Sync target project ID with active project filter when user changes filter tab
@@ -113,46 +111,6 @@ const NotesView = ({
       },
       onStatusChange: (msg) => setStatusMessage(msg),
       onEnd: () => setIsDictatingQuickAdd(false)
-    });
-  };
-
-  // Toggle Dictation for Floating Mic Button (Builder Hands-free Mode)
-  const toggleFloatingDictation = () => {
-    if (isDictatingFloating) {
-      if (floatingRecognitionRef.current) floatingRecognitionRef.current.stop();
-      setIsDictatingFloating(false);
-      return;
-    }
-
-    if (!isSpeechRecognitionSupported()) {
-      setStatusMessage('Voice input is not supported');
-      setTimeout(() => setStatusMessage(''), 3000);
-      return;
-    }
-
-    setIsDictatingFloating(true);
-    let capturedTranscript = '';
-
-    floatingRecognitionRef.current = startVoiceDictation({
-      initialText: '',
-      onTranscript: (updatedText, isFinalChunk) => {
-        const { text: processedText, isSubmitCommand } = processVoiceCommands(updatedText);
-        capturedTranscript = processedText;
-
-        if (isSubmitCommand && capturedTranscript.trim()) {
-          onAddNote(capturedTranscript.trim(), '', targetProjectId || 'general');
-          capturedTranscript = '';
-          setStatusMessage('🎙️ Task saved! Continue speaking for next item...');
-          setTimeout(() => setStatusMessage(''), 2500);
-        }
-      },
-      onStatusChange: (msg) => setStatusMessage(msg),
-      onEnd: () => {
-        if (capturedTranscript.trim()) {
-          onAddNote(capturedTranscript.trim(), '', targetProjectId || 'general');
-        }
-        setIsDictatingFloating(false);
-      }
     });
   };
 
@@ -272,7 +230,7 @@ const NotesView = ({
           rows={3}
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
-          placeholder="Add New Note"
+          placeholder="Add New Note (Saved as a Task in your Unified Inbox)"
           style={{ fontSize: `${notesFontSize}px` }}
         />
 
@@ -372,7 +330,7 @@ const NotesView = ({
         }}>
           <p style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0' }}>No notes found</p>
           <p style={{ fontSize: '14px', margin: 0 }}>
-            Tap the giant blue mic button at the bottom right to dictate your first note hands-free!
+            Tap the red 'Talk' button or header mic button to dictate your notes hands-free! Notes are saved directly into your task list.
           </p>
         </div>
       ) : (
@@ -394,15 +352,6 @@ const NotesView = ({
           ))}
         </div>
       )}
-
-      {/* Floating Action Button (Giant Builder Voice Mic) */}
-      <button
-        className={`big-mic-fab ${isDictatingFloating ? 'recording' : ''}`}
-        onClick={toggleFloatingDictation}
-        title={isDictatingFloating ? "Stop Voice Dictation" : "Tap to speak hands-free notes"}
-      >
-        {isDictatingFloating ? <MicOff size={28} /> : <Mic size={28} />}
-      </button>
 
       {/* Batch Selection Action Bar */}
       {selectedNoteIds.length > 0 && (
