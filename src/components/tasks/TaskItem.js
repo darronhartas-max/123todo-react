@@ -447,9 +447,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     ...styles.taskItem,
                     marginBottom: 0,
                     touchAction: 'pan-y',
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    MozUserSelect: 'none',
+                    userSelect: swipeOffset !== 0 ? 'none' : 'auto',
+                    WebkitUserSelect: swipeOffset !== 0 ? 'none' : 'auto',
                     position: 'relative',
                     zIndex: 2
                 }}

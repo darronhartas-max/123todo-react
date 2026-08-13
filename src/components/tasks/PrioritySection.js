@@ -175,11 +175,13 @@ const PrioritySection = ({
                                                 onDragStart: (e) => handleDragStart(e, task.id),
                                                 onDragOver: (e) => {
                                                     e.preventDefault();
+                                                    e.stopPropagation();
                                                     if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
                                                     handleDragOver(e, task.id);
                                                 },
                                                 onDrop: (e) => {
                                                     e.preventDefault();
+                                                    e.stopPropagation();
                                                     handleDrop(e, task.id);
                                                 },
                                                 onDragEnd: handleDragEnd
