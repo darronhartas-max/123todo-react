@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const SocialShare = () => {
     const isMobile = window.innerWidth < 768;
     const [copied, setCopied] = useState(false);
+    const [showMore, setShowMore] = useState(false);
 
     const styles = {
         adPanel: {
@@ -39,6 +40,20 @@ const SocialShare = () => {
             transition: 'all 0.2s ease',
             fontSize: '0.85rem',
             lineHeight: 1
+        },
+        moreBtn: {
+            background: 'rgba(255, 255, 255, 0.25)',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '6px',
+            padding: '6px 10px',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
         }
     };
 
@@ -84,7 +99,8 @@ const SocialShare = () => {
         window.open('/social-share.png', '_blank');
     };
 
-    const platforms = [
+    // Main 5 buttons
+    const mainPlatforms = [
         {
             name: 'Share Graphic',
             title: 'Share Official 123 ToDo Graphic Image',
@@ -136,7 +152,11 @@ const SocialShare = () => {
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                 </svg>
             )
-        },
+        }
+    ];
+
+    // Extra platforms toggled by "More..."
+    const extraPlatforms = [
         {
             name: 'Reddit',
             title: 'Share on Reddit',
@@ -212,7 +232,8 @@ const SocialShare = () => {
                 Found this useful? Pass it on — it's free! 😊
             </span>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {platforms.map(p => p.onClick ? (
+                {/* Main 5 Platforms */}
+                {mainPlatforms.map(p => p.onClick ? (
                     <button
                         key={p.name}
                         onClick={p.onClick}
@@ -223,6 +244,22 @@ const SocialShare = () => {
                         {p.icon}
                     </button>
                 ) : (
+                    <a
+                        key={p.name}
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleShareClick}
+                        className="footer-share-btn"
+                        style={styles.shareBtn}
+                        title={p.title}
+                    >
+                        {p.icon}
+                    </a>
+                ))}
+
+                {/* Extra Platforms shown if More... is clicked */}
+                {showMore && extraPlatforms.map(p => (
                     <a
                         key={p.name}
                         href={p.url}
@@ -237,19 +274,31 @@ const SocialShare = () => {
                     </a>
                 ))}
 
-                {/* Copy Link Button */}
+                {/* Copy Link Button (always shown when expanded or standard) */}
+                {showMore && (
+                    <button
+                        onClick={handleCopyLink}
+                        className="footer-share-btn"
+                        style={styles.shareBtn}
+                        title="Copy Share Link"
+                    >
+                        {copied ? '✓ Copied!' : (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        )}
+                    </button>
+                )}
+
+                {/* More... Toggle Button */}
                 <button
-                    onClick={handleCopyLink}
+                    onClick={() => setShowMore(!showMore)}
                     className="footer-share-btn"
-                    style={styles.shareBtn}
-                    title="Copy Share Link"
+                    style={styles.moreBtn}
+                    title={showMore ? "Show fewer platforms" : "Show more sharing platforms"}
                 >
-                    {copied ? '✓ Copied!' : (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    )}
+                    {showMore ? 'Less ▲' : 'More... ▼'}
                 </button>
             </div>
         </div>
