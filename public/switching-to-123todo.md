@@ -8,7 +8,7 @@ With the launch of **123 ToDo v3.3.0**, migrating your entire setup from bloated
 
 ---
 
-## 1. Why Millions are Switching to 123 ToDo
+## 1. Why People are Switching to 123 ToDo
 
 ### 🛡️ 100% Zero-Knowledge AES-256-GCM Encryption
 Unlike traditional task managers that store your private tasks, work notes, and personal checklists in plain text on central servers, 123 ToDo is built ground-up on **Zero-Knowledge Client-Side Encryption**. 
