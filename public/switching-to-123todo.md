@@ -70,6 +70,20 @@ Moving your existing data to 123 ToDo takes less than a minute. Our new **Univer
 
 ---
 
+## 4. Zero Data Lock-In: Exporting Your Data Out of 123 ToDo Anytime
+
+We believe true data ownership means you should never be trapped inside any application. If you ever decide to move your data out of 123 ToDo or transfer your task lists to another system, exporting is 100% free, instant, and unrestricted:
+
+### How to Export Your Data in 3 Clicks:
+
+1. Open 123 ToDo and click **Settings ⚙️** (or **Export** in the footer bar).
+2. Click **Export Backup Data**.
+3. Save the resulting `.json` file to your computer or mobile device.
+
+Your exported file contains 100% of your task items, subtask checklists, attached notes, project categories, priority assignments (P1–P4), and scheduled due dates in structured JSON format. You can keep this file as an offline backup or migrate it into other productivity tools whenever you choose.
+
+---
+
 ## Ready to Experience True Privacy & Freedom?
 
 Say goodbye to privacy invasion, monthly fees, and app lock-in. 
