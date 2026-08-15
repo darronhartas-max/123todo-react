@@ -2,7 +2,23 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 3.1.6 | © Unforgettable Management Ltd 2026
+Version 3.3.1 | © Unforgettable Management Ltd 2026
+
+---
+
+## 🔄 Version History
+
+### v3.3.1 (Current)
+- **Dual Encrypted Cloud Sync & Published Migration Guides**: Updated cloud sync documentation covering 123ToDo Zero-Knowledge Cloud Sync (Cloudflare D1 E2EE) alongside Google Drive AppData Sync, and published switching & migration guides.
+
+### v3.3.0
+- **Multi-Competitor Migration Wizard & 1-Click Import from Other Apps**: Introduced a unified "Import from Other Apps" wizard supporting seamless data migration from Todoist, TickTick, Google Keep, Google Tasks, and Microsoft To Do with zero text truncation and multi-file drag-and-drop support.
+
+### v3.2.0
+- **Multi-Platform Social Sharing & Native Graphic Image Share**: Added social share links for Reddit, Telegram, Threads, Bluesky, and Pinterest alongside X, WhatsApp, Facebook, LinkedIn, and Email, enabled native device image file sharing via Web Share API, and deployed a custom 1200x630 123 ToDo preview card.
+
+### v3.1.6
+- **Dual Skin Operating System**: Introduced Task Manager and Simple Voice Notes modes.
 
 ---
 

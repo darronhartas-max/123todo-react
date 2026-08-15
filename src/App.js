@@ -16,6 +16,7 @@ import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
 import TodoistGuideModal from './components/modals/TodoistGuideModal';
+import UniversalImportModal from './components/modals/UniversalImportModal';
 import ImportSelectionModal from './components/modals/ImportSelectionModal';
 import RestoreShadowModal from './components/modals/RestoreShadowModal';
 import SyncModal from './components/modals/SyncModal';
@@ -176,6 +177,7 @@ const TodoApp = () => {
   const [currentProjectId, setCurrentProjectId] = useState('all');
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [showTodoistImport, setShowTodoistImport] = useState(false);
+  const [showUniversalImport, setShowUniversalImport] = useState(false);
   const [showTodoistGuide, setShowTodoistGuide] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
   const [showArchiveToast, setShowArchiveToast] = useState(false);
@@ -693,6 +695,14 @@ const TodoApp = () => {
     setShowTodoistImport(false);
   };
 
+  const handleUniversalImportData = (importedTasks) => {
+    if (!importedTasks || importedTasks.length === 0) return;
+    if (bulkAddTasks) {
+      bulkAddTasks(importedTasks);
+    }
+    setShowUniversalImport(false);
+  };
+
   const onRestoreRequest = (id, targetPriority) => {
     if (targetPriority && [1, 2, 3, 4].includes(parseInt(targetPriority))) {
       restoreTask(id, parseInt(targetPriority));
@@ -1139,11 +1149,20 @@ const TodoApp = () => {
         />
       )}
 
+      {showUniversalImport && (
+        <UniversalImportModal
+          existingProjects={projects.map(p => typeof p === 'string' ? p : p.name)}
+          onClose={() => setShowUniversalImport(false)}
+          onImport={handleUniversalImportData}
+          onOpenGuide={() => setShowTodoistGuide(true)}
+        />
+      )}
+
       {showImportSelection && (
         <ImportSelectionModal
           onJSONImport={() => document.getElementById('fileInput').click()}
-          onTodoistImport={() => setShowTodoistImport(true)}
-          onOpenTodoistGuide={() => setShowTodoistGuide(true)}
+          onUniversalImport={() => setShowUniversalImport(true)}
+          onOpenGuide={() => setShowTodoistGuide(true)}
           onRestoreShadow={handleOpenRestoreShadow}
           onClose={() => setShowImportSelection(false)}
         />

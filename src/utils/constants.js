@@ -88,9 +88,18 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.1.6';
+export const APP_VERSION = '3.3.1';
 
 export const RELEASE_CHANGELOG = {
+  '3.3.1': [
+    { title: '🔒 Dual-Engine Encrypted Cloud Sync & Documentation Update:', desc: 'Expanded sync documentation covering 123ToDo Zero-Knowledge Cloud Sync (Cloudflare D1 E2EE) alongside Google Drive AppData Sync, and published switching & migration guides.' }
+  ],
+  '3.3.0': [
+    { title: '🚀 Multi-Competitor Migration Wizard & 1-Click Import from Other Apps:', desc: 'Introduced a unified "Import from Other Apps" wizard supporting seamless data migration from Todoist, TickTick, Google Keep, Google Tasks, and Microsoft To Do with zero text truncation and multi-file drag-and-drop support.' }
+  ],
+  '3.2.0': [
+    { title: '🌐 Multi-Platform Social Sharing & Native Graphic Image Share:', desc: 'Added social share links for Reddit, Telegram, Threads, Bluesky, and Pinterest alongside X, WhatsApp, Facebook, LinkedIn, and Email, enabled native device image file sharing via Web Share API, and deployed a custom 1200x630 123 ToDo preview card.' }
+  ],
   '3.1.6': [
     { title: '📝 14pt Tasks Default, Task-First Notes & Inline Subtask Editing:', desc: 'Bumped default Tasks mode text size to 14pt with responsive button layout scaling, routed Notes View entry directly to Task text field with Must Do (P1) priority, added inline subtask text editing across all views, and fixed completion checkbox archiving.' }
   ],

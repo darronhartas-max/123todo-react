@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, FileType, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { X, Layers, ArrowRight, Sparkles } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
 
 const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
+    const [activeTab, setActiveTab] = useState('todoist');
+
     if (!isOpen) return null;
 
     const styles = {
@@ -13,9 +15,9 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             padding: '24px 20px',
             borderRadius: '16px',
             maxWidth: '92%',
-            width: '540px',
+            width: '560px',
             boxShadow: '0 16px 45px rgba(0, 0, 0, 0.35)',
-            maxHeight: '85vh',
+            maxHeight: '88vh',
             overflowY: 'auto',
             border: '1px solid var(--border-color)',
             position: 'relative',
@@ -27,7 +29,7 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             justifyContent: 'space-between',
             borderBottom: '1px solid var(--border-color)',
             paddingBottom: '14px',
-            marginBottom: '18px'
+            marginBottom: '16px'
         },
         titleContainer: {
             display: 'flex',
@@ -38,8 +40,8 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             width: '42px',
             height: '42px',
             borderRadius: '10px',
-            background: 'rgba(228, 67, 50, 0.12)',
-            color: '#e44332',
+            background: 'rgba(40, 90, 130, 0.15)',
+            color: '#285a82',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -51,6 +53,17 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             margin: 0,
             color: 'var(--text-color)'
         },
+        tabBtn: (id) => ({
+            padding: '8px 12px',
+            borderRadius: '8px',
+            border: activeTab === id ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
+            background: activeTab === id ? 'var(--accent-bg)' : 'var(--bg-color)',
+            color: 'var(--text-color)',
+            fontWeight: activeTab === id ? '700' : '500',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+        }),
         stepCard: {
             background: 'var(--bg-color)',
             border: '1px solid var(--border-color)',
@@ -59,14 +72,8 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             marginBottom: '14px',
             textAlign: 'left'
         },
-        stepHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '8px'
-        },
         stepBadge: {
-            background: '#e44332',
+            background: 'var(--accent-color)',
             color: 'white',
             fontWeight: '800',
             fontSize: '0.8rem',
@@ -84,30 +91,12 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             color: 'var(--muted-text)',
             lineHeight: '1.5'
         },
-        featureGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '10px',
-            margin: '16px 0'
-        },
-        featureItem: {
-            background: 'var(--item-bg)',
-            border: '1px solid var(--border-color)',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            fontSize: '0.85rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: 'var(--text-color)',
-            fontWeight: '500'
-        },
         ctaBtn: {
             width: '100%',
             padding: '12px 20px',
             borderRadius: '10px',
             border: 'none',
-            background: 'linear-gradient(135deg, #e44332 0%, #dc2626 100%)',
+            background: 'linear-gradient(135deg, #285a82 0%, #1a3a54 100%)',
             color: 'white',
             fontWeight: '700',
             fontSize: '1.05rem',
@@ -116,7 +105,7 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            boxShadow: '0 4px 14px rgba(228, 67, 50, 0.3)',
+            boxShadow: '0 4px 14px rgba(40, 90, 130, 0.3)',
             transition: 'all 0.2s ease',
             marginTop: '16px'
         }
@@ -140,10 +129,10 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
                 <div style={styles.header}>
                     <div style={styles.titleContainer}>
                         <div style={styles.iconBox}>
-                            <FileType size={24} />
+                            <Layers size={24} />
                         </div>
                         <div>
-                            <h3 style={styles.title}>Todoist Migration Guide</h3>
+                            <h3 style={styles.title}>Migration Guide — Import App Data</h3>
                             <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)' }}>Step-by-step export & import instructions</div>
                         </div>
                     </div>
@@ -152,46 +141,83 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
                     </button>
                 </div>
 
-                {/* Step 1 */}
-                <div style={styles.stepCard}>
-                    <div style={styles.stepHeader}>
-                        <span style={styles.stepBadge}>STEP 1</span>
-                        <span style={styles.stepTitle}>Export CSV Files from Todoist</span>
-                    </div>
-                    <div style={styles.stepBody}>
-                        <ol style={{ margin: '6px 0 0 16px', padding: 0 }}>
-                            <li>Open <strong>Todoist</strong> on your desktop browser or app.</li>
-                            <li>Go to the Project you want to export.</li>
-                            <li>Click the <strong>three dots (...)</strong> menu icon in the top-right corner.</li>
-                            <li>Select <strong>Export as CSV</strong> and save the file to your computer.</li>
-                            <li><em>Repeat for any additional projects you wish to migrate.</em></li>
-                        </ol>
-                    </div>
+                {/* App Selection Tabs */}
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+                    <button style={styles.tabBtn('todoist')} onClick={() => setActiveTab('todoist')}>🔴 Todoist</button>
+                    <button style={styles.tabBtn('ticktick')} onClick={() => setActiveTab('ticktick')}>🔵 TickTick</button>
+                    <button style={styles.tabBtn('keep')} onClick={() => setActiveTab('keep')}>🟡 Google Keep</button>
+                    <button style={styles.tabBtn('gtasks')} onClick={() => setActiveTab('gtasks')}>🟢 Google Tasks / MS To Do</button>
                 </div>
+
+                {/* Todoist Guide */}
+                {activeTab === 'todoist' && (
+                    <>
+                        <div style={styles.stepCard}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <span style={styles.stepBadge}>STEP 1</span>
+                                <span style={styles.stepTitle}>Export CSV Files from Todoist</span>
+                            </div>
+                            <div style={styles.stepBody}>
+                                Open Todoist on your desktop ➔ Open a Project ➔ Click <strong>(...) menu</strong> ➔ Select <strong>Export as CSV</strong>.
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* TickTick Guide */}
+                {activeTab === 'ticktick' && (
+                    <>
+                        <div style={styles.stepCard}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <span style={styles.stepBadge}>STEP 1</span>
+                                <span style={styles.stepTitle}>Export CSV from TickTick</span>
+                            </div>
+                            <div style={styles.stepBody}>
+                                Open TickTick ➔ Go to <strong>Settings</strong> ➔ Select <strong>Backup & Export</strong> ➔ Click <strong>Export Backup CSV</strong>.
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* Google Keep Guide */}
+                {activeTab === 'keep' && (
+                    <>
+                        <div style={styles.stepCard}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <span style={styles.stepBadge}>STEP 1</span>
+                                <span style={styles.stepTitle}>Export Keep Notes via Google Takeout</span>
+                            </div>
+                            <div style={styles.stepBody}>
+                                Visit <strong>takeout.google.com</strong> ➔ Deselect all ➔ Check <strong>Keep</strong> ➔ Click <strong>Create Export</strong> ➔ Download and drop the JSON note files into 123 ToDo.
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* Google Tasks / MS To Do Guide */}
+                {activeTab === 'gtasks' && (
+                    <>
+                        <div style={styles.stepCard}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <span style={styles.stepBadge}>STEP 1</span>
+                                <span style={styles.stepTitle}>Export Google Tasks or MS To Do</span>
+                            </div>
+                            <div style={styles.stepBody}>
+                                For Google Tasks: Use <strong>takeout.google.com</strong> selecting <strong>Tasks</strong> (gives <code>Tasks.json</code>).<br />
+                                For MS To Do: Open Outlook/To Do Settings ➔ Export account data CSV.
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 {/* Step 2 */}
                 <div style={styles.stepCard}>
-                    <div style={styles.stepHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                         <span style={styles.stepBadge}>STEP 2</span>
-                        <span style={styles.stepTitle}>Upload CSV Files to 123 To Do</span>
+                        <span style={styles.stepTitle}>Drop Files into 123 To Do</span>
                     </div>
                     <div style={styles.stepBody}>
-                        <ol style={{ margin: '6px 0 0 16px', padding: 0 }}>
-                            <li>Click the <strong>Import</strong> button in the 123 To Do footer.</li>
-                            <li>Select <strong>Todoist Export</strong>.</li>
-                            <li>Drag and drop your <strong>.csv</strong> files into the upload dropzone (or click to choose files).</li>
-                        </ol>
-                    </div>
-                </div>
-
-                {/* Step 3 */}
-                <div style={styles.stepCard}>
-                    <div style={styles.stepHeader}>
-                        <span style={styles.stepBadge}>STEP 3</span>
-                        <span style={styles.stepTitle}>Map Projects & Confirm Import</span>
-                    </div>
-                    <div style={styles.stepBody}>
-                        123 To Do will automatically read your files and suggest matching existing project names. Choose whether to assign tasks to existing color-coded projects or create brand new projects automatically!
+                        Click <strong>Import</strong> in the 123 To Do footer ➔ Select <strong>Import from Other Apps</strong> ➔ Drop your exported CSV or JSON files into the wizard.
                     </div>
                 </div>
 
@@ -204,31 +230,18 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
                     marginTop: '12px',
                     textAlign: 'left'
                 }}>
-                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--accent-color)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Sparkles size={16} /> 🛡️ What Gets Migrated & Preserved (Zero Truncation Guarantee):
+                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--accent-color)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Sparkles size={16} /> 🛡️ What Gets Migrated & Preserved:
                     </div>
-                    <div style={styles.featureGrid}>
-                        <div style={styles.featureItem}>
-                            <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Unlimited Text Capacity:</strong> Todoist titles & descriptions of any length are imported in full.</span>
-                        </div>
-                        <div style={styles.featureItem}>
-                            <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>No Truncation on Edit:</strong> Notes & text are never capped or cut off when editing tasks later.</span>
-                        </div>
-                        <div style={styles.featureItem}>
-                            <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Due Dates & Subtasks:</strong> Dates preserved as <code>📅 Due: ...</code> and subtasks indented with <code>↳</code>.</span>
-                        </div>
-                        <div style={styles.featureItem}>
-                            <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                            <span><strong>Clean Import:</strong> Section headers & blank rows auto-filtered out cleanly.</span>
-                        </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', lineHeight: 1.5 }}>
+                        ✓ <strong>Zero Length Cap:</strong> 100% of notes, body text, & descriptions preserved.<br />
+                        ✓ <strong>Priorities & Projects:</strong> Mapped to P1-P4 priorities and custom project colors.<br />
+                        ✓ <strong>Subtasks & Checklists:</strong> Imported as interactive checklists.
                     </div>
                 </div>
 
                 <button style={styles.ctaBtn} onClick={handleStartClick}>
-                    <span>Start Migration Wizard Now</span>
+                    <span>Launch Import Wizard Now</span>
                     <ArrowRight size={18} />
                 </button>
             </motion.div>
