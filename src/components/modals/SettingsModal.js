@@ -237,6 +237,8 @@ const SettingsModal = ({
     setLayoutWidth,
     wideColumnView = 'priorities',
     setWideColumnView,
+    syncSpeed = 'adaptive',
+    setSyncSpeed,
     themeMode,
     setThemeMode,
     lightModeTone = 'soft',
@@ -1568,6 +1570,53 @@ const SettingsModal = ({
                                             </div>
                                             <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
                                                 Sync to your personal Google Drive account. (May require frequent Google re-authentication on iOS Safari).
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div style={{ marginBottom: '20px', background: 'var(--item-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '4px', color: 'var(--text-color)' }}>
+                                        Sync Refresh Speed / Mode
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '12px', lineHeight: '1.35' }}>
+                                        Control sync responsiveness and update frequency across devices.
+                                    </div>
+
+                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', cursor: 'pointer' }}>
+                                        <input
+                                            type="radio"
+                                            name="syncSpeed"
+                                            value="adaptive"
+                                            checked={syncSpeed === 'adaptive'}
+                                            onChange={() => setSyncSpeed && setSyncSpeed('adaptive')}
+                                            style={{ marginTop: '3px' }}
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-color)' }}>
+                                                Adaptive (Quota-Saver)
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
+                                                Standard mode with adaptive background polling (1-5 min) and 800ms push debounce.
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                        <input
+                                            type="radio"
+                                            name="syncSpeed"
+                                            value="instant"
+                                            checked={syncSpeed === 'instant'}
+                                            onChange={() => setSyncSpeed && setSyncSpeed('instant')}
+                                            style={{ marginTop: '3px' }}
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: '#10b981' }}>
+                                                Instant (Chief Programmer Mode) ⚡
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
+                                                Instant zero-delay sync: 50ms push on local edit, 2s live polling, and instant focus/hover sync.
                                             </div>
                                         </div>
                                     </label>

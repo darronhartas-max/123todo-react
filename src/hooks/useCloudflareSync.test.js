@@ -92,6 +92,11 @@ describe('useCloudflareSync hook', () => {
         localStorage.setItem(`123Todo_CF_SyncCount_${today}`, '350');
         expect(getAdaptivePollingInterval()).toBe(300000); // 5 minutes
         expect(getAdaptiveDebounceDelay()).toBe(3000);
+
+        // Instant Sync Mode (Chief Programmer Mode)
+        localStorage.setItem('123Todo_Sync_Speed', 'instant');
+        expect(getAdaptivePollingInterval()).toBe(2000); // 2 seconds
+        expect(getAdaptiveDebounceDelay()).toBe(50);     // 50ms
     });
 
     test('performSync handles HTTP 429 Too Many Requests gracefully without throwing', async () => {

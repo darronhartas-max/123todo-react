@@ -29,7 +29,21 @@ export function incrementDailySyncCount() {
     }
 }
 
+export function isInstantSyncMode() {
+    try {
+        const speed = localStorage.getItem('123Todo_Sync_Speed');
+        if (speed === 'instant') return true;
+        if (typeof window !== 'undefined' && window.location && window.location.search.includes('instant=true')) {
+            return true;
+        }
+    } catch {
+        return false;
+    }
+    return false;
+}
+
 export function getAdaptivePollingInterval() {
+    if (isInstantSyncMode()) return 2000; // 2-second live polling for Chief Programmer / Instant Mode
     const count = getDailySyncCount();
     if (count > 300) return 300000; // 5 minutes for heavy users later in the day
     if (count > 100) return 180000; // 3 minutes for moderate users
@@ -37,6 +51,7 @@ export function getAdaptivePollingInterval() {
 }
 
 export function getAdaptiveDebounceDelay() {
+    if (isInstantSyncMode()) return 50; // 50ms instant push delay for local edits
     const count = getDailySyncCount();
     if (count > 300) return 3000;  // 3s debounce for very heavy editing days
     if (count > 100) return 1500;  // 1.5s debounce for moderate days
@@ -294,8 +309,9 @@ export const useCloudflareSync = (localData, importDataCallback) => {
 
         const handleFocusOrVisible = () => {
             if (document.visibilityState === 'visible') {
-                // Throttle focus sync to at most once every 20 seconds
-                if (Date.now() - lastSyncTimeRef.current > 20000) {
+                const isInstant = isInstantSyncMode();
+                const minFocusInterval = isInstant ? 0 : 20000;
+                if (Date.now() - lastSyncTimeRef.current > minFocusInterval) {
                     performSync(false, false, false);
                 }
                 if (timeoutId) clearTimeout(timeoutId);
@@ -316,6 +332,7 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         window.addEventListener('focus', handleFocusOrVisible);
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
+        window.addEventListener('pointerenter', handleFocusOrVisible);
         document.addEventListener('visibilitychange', handleFocusOrVisible);
 
         return () => {
@@ -324,6 +341,7 @@ export const useCloudflareSync = (localData, importDataCallback) => {
             window.removeEventListener('focus', handleFocusOrVisible);
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
+            window.removeEventListener('pointerenter', handleFocusOrVisible);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
     }, [isAuthed, passphrase, performSync]);

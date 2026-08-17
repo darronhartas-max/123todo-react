@@ -286,6 +286,9 @@ const TodoApp = () => {
   const [wideColumnView, setWideColumnViewState] = useState(() => {
     return localStorage.getItem('123TodoWideColumnView') || 'priorities';
   });
+  const [syncSpeed, setSyncSpeedState] = useState(() => {
+    return localStorage.getItem('123Todo_Sync_Speed') || 'adaptive';
+  });
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
@@ -318,6 +321,10 @@ const TodoApp = () => {
   const setWideColumnView = (val) => {
     setWideColumnViewState(val);
     localStorage.setItem('123TodoWideColumnView', val);
+  };
+  const setSyncSpeed = (val) => {
+    setSyncSpeedState(val);
+    localStorage.setItem('123Todo_Sync_Speed', val);
   };
   const setThemeMode = (mode) => {
     setThemeModeState(mode);
@@ -1262,6 +1269,8 @@ const TodoApp = () => {
         setLayoutWidth={setLayoutWidth}
         wideColumnView={wideColumnView}
         setWideColumnView={setWideColumnView}
+        syncSpeed={syncSpeed}
+        setSyncSpeed={setSyncSpeed}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         lightModeTone={lightModeTone}
