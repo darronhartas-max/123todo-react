@@ -1,5 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCloudflareSync } from './useCloudflareSync';
+import {
+    useCloudflareSync,
+    getDailySyncCount,
+    incrementDailySyncCount,
+    getAdaptivePollingInterval,
+    getAdaptiveDebounceDelay
+} from './useCloudflareSync';
 
 describe('useCloudflareSync hook', () => {
     beforeEach(() => {
@@ -69,4 +75,45 @@ describe('useCloudflareSync hook', () => {
         expect(result.current.syncId).toBe('');
         expect(localStorage.getItem('123Todo_CF_SyncId')).toBeNull();
     });
+
+    test('daily sync tracking and adaptive interval calculation', () => {
+        expect(getDailySyncCount()).toBe(0);
+        expect(getAdaptivePollingInterval()).toBe(60000);
+        expect(getAdaptiveDebounceDelay()).toBe(800);
+
+        incrementDailySyncCount();
+        expect(getDailySyncCount()).toBe(1);
+
+        const today = new Date().toISOString().slice(0, 10);
+        localStorage.setItem(`123Todo_CF_SyncCount_${today}`, '150');
+        expect(getAdaptivePollingInterval()).toBe(180000); // 3 minutes
+        expect(getAdaptiveDebounceDelay()).toBe(1500);
+
+        localStorage.setItem(`123Todo_CF_SyncCount_${today}`, '350');
+        expect(getAdaptivePollingInterval()).toBe(300000); // 5 minutes
+        expect(getAdaptiveDebounceDelay()).toBe(3000);
+    });
+
+    test('performSync handles HTTP 429 Too Many Requests gracefully without throwing', async () => {
+        localStorage.setItem('123Todo_CF_SyncId', 'sync-123');
+        localStorage.setItem('123Todo_CF_DeviceToken', 'token-abc');
+        localStorage.setItem('123Todo_Sync_Passphrase', 'pass123');
+
+        global.fetch.mockResolvedValueOnce({
+            status: 429,
+            ok: false,
+            json: async () => ({ error: 'Rate limit exceeded' })
+        });
+
+        const dummyData = { tasks: [], timestamp: Date.now() };
+        const dummyImport = jest.fn();
+        const { result } = renderHook(() => useCloudflareSync(dummyData, dummyImport));
+
+        await act(async () => {
+            await result.current.performSync(false, false, false);
+        });
+
+        expect(result.current.syncStatus).toBe('synced');
+    });
 });
+

@@ -4,6 +4,45 @@ import { mergeSyncDatasets } from '../utils/syncUtils';
 
 const DEFAULT_SYNC_ENDPOINT = 'https://123todo-sync-worker.darron-hartas.workers.dev/api/sync';
 
+function getTodayKey() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+export function getDailySyncCount() {
+    try {
+        const today = getTodayKey();
+        return parseInt(localStorage.getItem(`123Todo_CF_SyncCount_${today}`) || '0', 10);
+    } catch {
+        return 0;
+    }
+}
+
+export function incrementDailySyncCount() {
+    try {
+        const today = getTodayKey();
+        const key = `123Todo_CF_SyncCount_${today}`;
+        const count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+        localStorage.setItem(key, String(count));
+        return count;
+    } catch {
+        return 0;
+    }
+}
+
+export function getAdaptivePollingInterval() {
+    const count = getDailySyncCount();
+    if (count > 300) return 300000; // 5 minutes for heavy users later in the day
+    if (count > 100) return 180000; // 3 minutes for moderate users
+    return 60000;                  // 1 minute default background polling
+}
+
+export function getAdaptiveDebounceDelay() {
+    const count = getDailySyncCount();
+    if (count > 300) return 3000;  // 3s debounce for very heavy editing days
+    if (count > 100) return 1500;  // 1.5s debounce for moderate days
+    return 800;                    // 800ms default debounce
+}
+
 export const useCloudflareSync = (localData, importDataCallback) => {
     const [isAuthed, setIsAuthed] = useState(() => {
         return Boolean(localStorage.getItem('123Todo_CF_SyncId') && localStorage.getItem('123Todo_CF_DeviceToken'));
@@ -16,6 +55,10 @@ export const useCloudflareSync = (localData, importDataCallback) => {
 
     const isSyncingRef = useRef(false);
     const localDataRef = useRef(localData);
+    const lastRemoteTimestampRef = useRef(0);
+    const lastLocalSyncedTimestampRef = useRef(localData?.timestamp || 0);
+    const lastSyncTimeRef = useRef(0);
+    const backoffUntilRef = useRef(0);
 
     useEffect(() => {
         localDataRef.current = localData;
@@ -41,8 +84,13 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         }
     }, [syncId, deviceToken]);
 
-    const performSync = useCallback(async (isInitial = false, isUserAction = false) => {
+    const performSync = useCallback(async (isInitial = false, isUserAction = false, isLocalDataChange = false) => {
         if (!syncId || !deviceToken || !passphrase || isSyncingRef.current) return;
+
+        // Check if under temporary rate-limit backoff (unless explicitly triggered by user)
+        if (Date.now() < backoffUntilRef.current && !isUserAction) {
+            return;
+        }
 
         isSyncingRef.current = true;
         if (isInitial || isUserAction) {
@@ -52,51 +100,88 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         try {
             const endpoint = localStorage.getItem('123Todo_CF_Endpoint') || DEFAULT_SYNC_ENDPOINT;
 
-            // 1. Download latest remote E2E encrypted payload from Cloudflare D1
+            // 1. Pull with conditional timestamp checking
             const pullRes = await fetch(`${endpoint}/pull`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ syncId, deviceToken })
+                body: JSON.stringify({
+                    syncId,
+                    deviceToken,
+                    sinceTimestamp: lastRemoteTimestampRef.current || undefined
+                })
             });
+
+            if (pullRes.status === 429) {
+                // Rate limited: back off for 60 seconds
+                backoffUntilRef.current = Date.now() + 60000;
+                setSyncStatus('synced');
+                isSyncingRef.current = false;
+                return;
+            }
+
+            incrementDailySyncCount();
+            lastSyncTimeRef.current = Date.now();
 
             const currentLocalData = localDataRef.current;
             let remoteData = null;
+            let shouldPush = isLocalDataChange;
 
             if (pullRes.ok) {
                 const pullJson = await pullRes.json();
-                if (pullJson && pullJson.payload) {
+
+                if (pullJson.notModified) {
+                    // Remote data has not changed
+                    lastRemoteTimestampRef.current = pullJson.timestamp || lastRemoteTimestampRef.current;
+                } else if (pullJson.payload) {
+                    // New remote payload received
                     try {
                         remoteData = await decryptData(pullJson.payload, passphrase);
+                        lastRemoteTimestampRef.current = pullJson.timestamp || Date.now();
                     } catch (decErr) {
                         console.error('Decryption failed for remote Cloudflare sync payload:', decErr);
                     }
                 }
             }
 
-            // 2. Perform 2-Way Merge between local dataset & remote dataset
-            const mergedData = remoteData ? mergeSyncDatasets(currentLocalData, remoteData) : currentLocalData;
-
+            // 2. Perform 2-Way Merge if remote has newer data
+            let mergedData = currentLocalData;
             if (remoteData) {
+                mergedData = mergeSyncDatasets(currentLocalData, remoteData);
                 importDataCallback(mergedData);
+                shouldPush = true;
+            } else if (currentLocalData?.timestamp && currentLocalData.timestamp > lastLocalSyncedTimestampRef.current) {
+                shouldPush = true;
             }
 
-            // 3. Re-encrypt merged dataset & Push back to Cloudflare D1
-            const encryptedPayload = await encryptData(mergedData, passphrase);
-            const pushRes = await fetch(`${endpoint}/push`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    syncId,
-                    deviceToken,
-                    payload: encryptedPayload,
-                    timestamp: mergedData.timestamp || Date.now()
-                })
-            });
+            // 3. Push to Cloudflare only if data has actually changed
+            if (shouldPush) {
+                const encryptedPayload = await encryptData(mergedData, passphrase);
+                const pushRes = await fetch(`${endpoint}/push`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        syncId,
+                        deviceToken,
+                        payload: encryptedPayload,
+                        timestamp: mergedData.timestamp || Date.now()
+                    })
+                });
 
-            if (pushRes.ok) {
-                setSyncStatus('synced');
+                if (pushRes.status === 429) {
+                    backoffUntilRef.current = Date.now() + 60000;
+                    setSyncStatus('synced');
+                    return;
+                }
+
+                if (pushRes.ok) {
+                    incrementDailySyncCount();
+                    lastLocalSyncedTimestampRef.current = mergedData.timestamp || Date.now();
+                    setSyncStatus('synced');
+                } else {
+                    setSyncStatus('error');
+                }
             } else {
-                setSyncStatus('error');
+                setSyncStatus('synced');
             }
         } catch (err) {
             console.error('Cloudflare sync failed:', err);
@@ -117,7 +202,6 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         setSyncStatus('syncing');
         try {
             if (pairCode) {
-                // Connect via 6-digit pair code from another device
                 const res = await fetch(`${endpoint}/pair-connect`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -130,7 +214,6 @@ export const useCloudflareSync = (localData, importDataCallback) => {
                 setPassphrase(userPassphrase);
                 return { success: true };
             } else {
-                // Generate a brand new Cloudflare Sync ID & Device Token
                 const res = await fetch(`${endpoint}/init`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
@@ -178,63 +261,69 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         localStorage.removeItem('123Todo_CF_DeviceToken');
     }, []);
 
-    // Auto-sync on local data change (debounced 300ms)
+    // Auto-sync on local data change with adaptive debounce
     useEffect(() => {
         if (isAuthed && passphrase) {
+            const debounceMs = getAdaptiveDebounceDelay();
             const timeoutId = setTimeout(() => {
-                performSync(false);
-            }, 300);
+                performSync(false, false, true);
+            }, debounceMs);
             return () => clearTimeout(timeoutId);
         }
     }, [localData.timestamp, isAuthed, passphrase, performSync]);
 
-    // Smart Sync: Focus, Pointer, Mobile TouchEnd & 25s polling
+    // Smart Adaptive Polling & Tab Lifecycle Listeners
     useEffect(() => {
         if (!isAuthed || !passphrase) return;
 
-        let intervalId;
-        const startPolling = () => {
-            if (intervalId) clearInterval(intervalId);
-            intervalId = setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    performSync(false);
+        let timeoutId;
+        let isDisposed = false;
+
+        const scheduleNextPoll = () => {
+            if (isDisposed) return;
+            const interval = getAdaptivePollingInterval();
+            timeoutId = setTimeout(() => {
+                if (document.visibilityState === 'visible' && !isDisposed) {
+                    performSync(false, false, false);
                 }
-            }, 25000);
+                scheduleNextPoll();
+            }, interval);
         };
-        startPolling();
+
+        scheduleNextPoll();
 
         const handleFocusOrVisible = () => {
             if (document.visibilityState === 'visible') {
-                performSync(false);
-                startPolling();
+                // Throttle focus sync to at most once every 20 seconds
+                if (Date.now() - lastSyncTimeRef.current > 20000) {
+                    performSync(false, false, false);
+                }
+                if (timeoutId) clearTimeout(timeoutId);
+                scheduleNextPoll();
             }
         };
 
-        let touchTimeoutId;
-        const handleTouchEnd = () => {
-            if (document.visibilityState === 'visible') {
-                if (touchTimeoutId) clearTimeout(touchTimeoutId);
-                touchTimeoutId = setTimeout(() => {
-                    performSync(false);
-                }, 50);
-            }
+        const handleOnline = () => {
+            setIsOffline(false);
+            performSync(false, false, false);
+        };
+
+        const handleOffline = () => {
+            setIsOffline(true);
+            setSyncStatus('offline');
         };
 
         window.addEventListener('focus', handleFocusOrVisible);
-        window.addEventListener('online', () => { setIsOffline(false); performSync(false); });
-        window.addEventListener('offline', () => { setIsOffline(true); setSyncStatus('offline'); });
-        window.addEventListener('pointerenter', handleFocusOrVisible);
-        window.addEventListener('touchend', handleTouchEnd, { passive: true });
-        window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
         document.addEventListener('visibilitychange', handleFocusOrVisible);
 
         return () => {
-            if (intervalId) clearInterval(intervalId);
-            if (touchTimeoutId) clearTimeout(touchTimeoutId);
+            isDisposed = true;
+            if (timeoutId) clearTimeout(timeoutId);
             window.removeEventListener('focus', handleFocusOrVisible);
-            window.removeEventListener('pointerenter', handleFocusOrVisible);
-            window.removeEventListener('touchend', handleTouchEnd);
-            window.removeEventListener('touchcancel', handleTouchEnd);
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
     }, [isAuthed, passphrase, performSync]);
@@ -252,3 +341,4 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         performSync
     };
 };
+

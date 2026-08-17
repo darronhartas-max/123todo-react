@@ -78,11 +78,13 @@ npm run build
 - Full multi-file CSV and JSON import support for **Todoist**, **TickTick**, **Google Keep**, **Google Tasks**, and **Microsoft To Do**.
 - Automatically preserves descriptions into unlimited text notes, maps subtasks (`↳`), and extracts due dates.
 
-### 6. Zero-Knowledge Cloud Sync
+### 6. Zero-Knowledge Cloud Sync & Adaptive Request Throttling
 
 - **Google Drive AppData Sync**: Stores encrypted backups directly in your private Google Drive AppData folder.
-- **Cloudflare D1 E2EE Sync**: Set-and-forget multi-device synchronization.
+- **Cloudflare D1 E2EE Sync**: Set-and-forget multi-device synchronization powered by Cloudflare Workers and D1 SQL database.
 - **Client-Side AES-256-GCM**: Data is encrypted locally before transmission; zero plain text leaves your device.
+- **Adaptive Request Throttling & Daily Budgeting**: Dynamically adjusts polling intervals (60s ➔ 180s ➔ 300s) and debounce rates as daily usage scales, protecting free-tier limits with zero user disruption.
+- **Conditional Syncing & CORS Caching**: Pulls with `sinceTimestamp` and skips redundant pushes when local or remote state hasn't changed.
 - **Automatic 2-Way Merge**: Conflict-free active task and tombstone tracking (`deletedTasks`, `deletedProjects`) prevent accidental data resurrection.
 
 ### 7. Appearance & Layout Customization

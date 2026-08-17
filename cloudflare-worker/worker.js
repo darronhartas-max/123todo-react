@@ -7,12 +7,13 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
 };
 
-function jsonResponse(data, status = 200) {
+function jsonResponse(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS }
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS, ...extraHeaders }
   });
 }
 
@@ -35,10 +36,43 @@ async function initDB(env) {
   try {
     await env.DB.batch([
       env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_sync (sync_id TEXT PRIMARY KEY, device_token TEXT NOT NULL, payload TEXT NOT NULL, updated_at INTEGER NOT NULL);`),
-      env.DB.prepare(`CREATE TABLE IF NOT EXISTS pair_codes (code TEXT PRIMARY KEY, sync_id TEXT NOT NULL, device_token TEXT NOT NULL, expires_at INTEGER NOT NULL);`)
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS pair_codes (code TEXT PRIMARY KEY, sync_id TEXT NOT NULL, device_token TEXT NOT NULL, expires_at INTEGER NOT NULL);`),
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, window_start INTEGER NOT NULL);`)
     ]);
   } catch (err) {
     console.error('initDB error:', err);
+  }
+}
+
+// Sliding window rate limiter (e.g. 100 requests per 10 minutes per syncId/IP)
+async function checkRateLimit(env, key, limit = 100, windowMs = 10 * 60 * 1000) {
+  if (!env.DB || !key) return { allowed: true };
+  const now = Date.now();
+  try {
+    const row = await env.DB.prepare(
+      'SELECT count, window_start FROM rate_limits WHERE key = ?'
+    ).bind(key).first();
+
+    if (!row || (now - row.window_start) > windowMs) {
+      await env.DB.prepare(
+        'INSERT OR REPLACE INTO rate_limits (key, count, window_start) VALUES (?, 1, ?)'
+      ).bind(key, now).run();
+      return { allowed: true };
+    }
+
+    if (row.count >= limit) {
+      const retryAfterSec = Math.ceil((row.window_start + windowMs - now) / 1000);
+      return { allowed: false, retryAfter: Math.max(1, retryAfterSec) };
+    }
+
+    await env.DB.prepare(
+      'UPDATE rate_limits SET count = count + 1 WHERE key = ?'
+    ).bind(key).run();
+
+    return { allowed: true };
+  } catch (err) {
+    console.error('Rate limit error:', err);
+    return { allowed: true }; // Fail open if DB issue
   }
 }
 
@@ -52,8 +86,15 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    const clientIp = request.headers.get('cf-connecting-ip') || 'unknown';
+
     try {
       if (path === '/api/sync/init' && request.method === 'POST') {
+        const rateCheck = await checkRateLimit(env, `init_${clientIp}`, 15, 60 * 1000);
+        if (!rateCheck.allowed) {
+          return jsonResponse({ error: 'Too many account initializations. Please wait.' }, 429, { 'Retry-After': String(rateCheck.retryAfter) });
+        }
+
         const syncId = 'sync_' + generateId(20);
         const deviceToken = 'tok_' + generateId(32);
         const now = Date.now();
@@ -71,6 +112,11 @@ export default {
 
         if (!syncId || !deviceToken || typeof payload !== 'string') {
           return jsonResponse({ error: 'Invalid parameters' }, 400);
+        }
+
+        const rateCheck = await checkRateLimit(env, `sync_${syncId}`, 120, 10 * 60 * 1000);
+        if (!rateCheck.allowed) {
+          return jsonResponse({ error: 'Rate limit exceeded. Sync requests throttled.' }, 429, { 'Retry-After': String(rateCheck.retryAfter) });
         }
 
         const existing = await env.DB.prepare(
@@ -91,10 +137,15 @@ export default {
 
       if (path === '/api/sync/pull' && request.method === 'POST') {
         const body = await request.json();
-        const { syncId, deviceToken } = body;
+        const { syncId, deviceToken, sinceTimestamp } = body;
 
         if (!syncId || !deviceToken) {
           return jsonResponse({ error: 'Invalid parameters' }, 400);
+        }
+
+        const rateCheck = await checkRateLimit(env, `sync_${syncId}`, 150, 10 * 60 * 1000);
+        if (!rateCheck.allowed) {
+          return jsonResponse({ error: 'Rate limit exceeded. Sync requests throttled.' }, 429, { 'Retry-After': String(rateCheck.retryAfter) });
         }
 
         const row = await env.DB.prepare(
@@ -103,6 +154,11 @@ export default {
 
         if (!row || row.device_token !== deviceToken) {
           return jsonResponse({ error: 'Unauthorized or not found' }, 401);
+        }
+
+        // Conditional Pull: If remote data has not changed since client's timestamp, return notModified
+        if (sinceTimestamp && Number(sinceTimestamp) >= Number(row.updated_at)) {
+          return jsonResponse({ notModified: true, timestamp: row.updated_at });
         }
 
         return jsonResponse({ payload: row.payload, timestamp: row.updated_at });
@@ -136,6 +192,11 @@ export default {
 
         if (!pairCode) {
           return jsonResponse({ error: 'Missing pair code' }, 400);
+        }
+
+        const rateCheck = await checkRateLimit(env, `pair_${clientIp}`, 20, 10 * 60 * 1000);
+        if (!rateCheck.allowed) {
+          return jsonResponse({ error: 'Too many pairing attempts. Please wait.' }, 429, { 'Retry-After': String(rateCheck.retryAfter) });
         }
 
         const row = await env.DB.prepare(
