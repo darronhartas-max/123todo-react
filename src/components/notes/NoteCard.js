@@ -79,7 +79,23 @@ const NoteCard = ({
     onUpdateNote(note.id, { subtasks: updated });
   };
 
+  // Clean up speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (e) {}
+        recognitionRef.current = null;
+      }
+    };
+  }, []);
+
   const handleSaveEdits = () => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (e) {}
+      recognitionRef.current = null;
+    }
+    setIsDictating(false);
+
     setIsEditing(false);
     onUpdateNote(note.id, {
       text: titleText.trim() || 'Untitled Task',
@@ -92,7 +108,8 @@ const NoteCard = ({
     e.stopPropagation();
     if (isDictating) {
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try { recognitionRef.current.stop(); } catch (e) {}
+        recognitionRef.current = null;
       }
       setIsDictating(false);
       return;
@@ -110,12 +127,15 @@ const NoteCard = ({
     recognitionRef.current = startVoiceDictation({
       initialText: initialNoteBody,
       onTranscript: (updatedText, isSubmitCommand) => {
-        setNotesText(updatedText);
-        onUpdateNote(note.id, { notes: updatedText });
-
         if (isSubmitCommand) {
-          if (recognitionRef.current) recognitionRef.current.stop();
+          if (recognitionRef.current) {
+            try { recognitionRef.current.stop(); } catch (e) {}
+            recognitionRef.current = null;
+          }
           setIsDictating(false);
+        } else {
+          setNotesText(updatedText);
+          onUpdateNote(note.id, { notes: updatedText });
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),

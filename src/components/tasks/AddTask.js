@@ -163,6 +163,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         const taskNotes = typeof overrideNotes === 'string' ? overrideNotes : notes;
         if (!taskTitle.trim() && !taskNotes.trim()) return;
 
+        stopVoice();
+
         let finalTitle = taskTitle.trim();
         const finalNotes = taskNotes.trim();
 

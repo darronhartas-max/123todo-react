@@ -86,24 +86,40 @@ const NotesView = ({
     });
   }, [tasks, activeProjectFilter, searchQuery]);
 
+  // Clean up speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (quickRecognitionRef.current) {
+        try { quickRecognitionRef.current.stop(); } catch (e) {}
+        quickRecognitionRef.current = null;
+      }
+    };
+  }, []);
+
   const handleCreateNote = (overrideBody) => {
     const rawContent = typeof overrideBody === 'string' ? overrideBody : newNotes;
 
     if (!rawContent.trim()) return;
 
+    // Unconditionally stop voice dictation if running
+    if (quickRecognitionRef.current) {
+      try { quickRecognitionRef.current.stop(); } catch (e) {}
+      quickRecognitionRef.current = null;
+    }
+    setIsDictatingQuickAdd(false);
+
     // Treat the note as a Task: add text directly to the Task text field, leaving note body empty for subsequent editing
     onAddNote(rawContent.trim(), '', targetProjectId || 'general');
     setNewNotes('');
-    if (isDictatingQuickAdd) {
-      if (quickRecognitionRef.current) quickRecognitionRef.current.stop();
-      setIsDictatingQuickAdd(false);
-    }
   };
 
   // Toggle Dictation for Quick Add Card
   const toggleQuickAddDictation = () => {
     if (isDictatingQuickAdd) {
-      if (quickRecognitionRef.current) quickRecognitionRef.current.stop();
+      if (quickRecognitionRef.current) {
+        try { quickRecognitionRef.current.stop(); } catch (e) {}
+        quickRecognitionRef.current = null;
+      }
       setIsDictatingQuickAdd(false);
       return;
     }
@@ -120,10 +136,15 @@ const NotesView = ({
     quickRecognitionRef.current = startVoiceDictation({
       initialText,
       onTranscript: (updatedText, isSubmitCommand) => {
-        setNewNotes(updatedText);
-
         if (isSubmitCommand) {
+          if (quickRecognitionRef.current) {
+            try { quickRecognitionRef.current.stop(); } catch (e) {}
+            quickRecognitionRef.current = null;
+          }
+          setIsDictatingQuickAdd(false);
           handleCreateNote(updatedText);
+        } else {
+          setNewNotes(updatedText);
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),

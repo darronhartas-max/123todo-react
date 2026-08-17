@@ -249,6 +249,8 @@ export const startVoiceDictation = ({
       };
 
       recognition.onresult = (event) => {
+        if (!isActive) return;
+
         let cleanFinal = '';
         let cleanInterim = '';
 
@@ -278,6 +280,10 @@ export const startVoiceDictation = ({
 
         if (isSubmitCommand) {
           isActive = false;
+          if (recognition) {
+            try { recognition.abort(); } catch {}
+            try { recognition.stop(); } catch {}
+          }
         }
 
         lastEmittedText = finalText;
@@ -342,6 +348,7 @@ export const startVoiceDictation = ({
     stop: () => {
       isActive = false;
       if (recognition) {
+        try { recognition.abort(); } catch {}
         try { recognition.stop(); } catch {}
       }
     }
