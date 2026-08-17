@@ -393,15 +393,41 @@ export const useTasks = () => {
                 return newTasks;
             }
 
+            // Handle dropping directly onto a project section header or container (e.g. project-work)
+            if (targetStr.startsWith('project-')) {
+                const targetProjId = targetStr.replace('project-', '');
+                if (!targetProjId) return prev;
+
+                const newTasks = [...prev];
+                const [movedTask] = newTasks.splice(fromIndex, 1);
+                movedTask.projectId = targetProjId;
+                movedTask.updatedAt = now;
+
+                let lastProjIdx = -1;
+                for (let i = newTasks.length - 1; i >= 0; i--) {
+                    if ((newTasks[i].projectId || 'general').toLowerCase() === targetProjId.toLowerCase()) {
+                        lastProjIdx = i;
+                        break;
+                    }
+                }
+
+                if (lastProjIdx > -1) {
+                    newTasks.splice(lastProjIdx + 1, 0, movedTask);
+                } else {
+                    newTasks.push(movedTask);
+                }
+                return newTasks;
+            }
+
             // Handle standard task-to-task reordering
             const targetIndex = prev.findIndex(t => String(t.id) === targetStr);
             if (targetIndex === -1 || fromIndex === targetIndex) return prev;
 
             const targetTask = prev[targetIndex];
-            const isDraggingDown = fromIndex < targetIndex;
             const newTasks = [...prev];
             const [movedTask] = newTasks.splice(fromIndex, 1);
             movedTask.priority = targetTask.priority;
+            movedTask.projectId = targetTask.projectId || 'general';
             movedTask.updatedAt = now;
 
             const newTargetIndex = newTasks.findIndex(t => String(t.id) === targetStr);
@@ -410,10 +436,8 @@ export const useTasks = () => {
                 return newTasks;
             }
 
-            // When dragging down, insert after the target task so it stays where dropped.
-            // When dragging up, insert before the target task.
-            const insertPosition = isDraggingDown ? newTargetIndex + 1 : newTargetIndex;
-            newTasks.splice(insertPosition, 0, movedTask);
+            // Always insert at newTargetIndex (before target task), aligning precisely with the top drop indicator line
+            newTasks.splice(newTargetIndex, 0, movedTask);
             return newTasks;
         });
         setTimestamp(now);

@@ -11,6 +11,7 @@
 - [x] User-controlled PWA update notifications & manual "Check for Updates" control in Settings.
 - [x] Automated CI/CD deployment pipeline via GitHub Actions (`.github/workflows/deploy.yml`).
 - [x] Voice Dictation & Voice Notes overhaul: Continuous speech recognition across silence pauses, spoken auto-submit commands ("Add Task", "Add Note"), regional language accent support, and auto-derived task titles from voice notes.
+- [x] Wide Mode Column View: Option to group wide-screen Kanban columns by Projects or Priorities with horizontal scroll support and full browser width expansion.
 
 ## Future Ideas
 - [ ] Native haptic feedback for mobile touch gestures (where supported).

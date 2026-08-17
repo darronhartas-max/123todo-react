@@ -88,9 +88,13 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.3.3';
+export const APP_VERSION = '3.4.0';
 
 export const RELEASE_CHANGELOG = {
+  '3.4.0': [
+    { title: '📊 Project Columns View in Wide Mode:', desc: 'Added a new setting option to view wide-screen Kanban columns grouped by Projects instead of Priorities, with horizontal scrolling and full browser width expansion.' },
+    { title: '🖐️ Precision Drag-and-Drop Drop Line Alignment:', desc: 'Fixed task insertion position during drag-and-drop to align precisely with the target drop indicator line.' }
+  ],
   '3.3.3': [
     { title: '📝 Real-Time Textarea Auto-Expansion & Dictation Viewport Scroll:', desc: 'Removed restrictive height caps across all Notes mode textareas, enabling unlimited dynamic height expansion and smooth viewport auto-scrolling so newly spoken lines remain 100% visible at all times.' }
   ],

@@ -3,7 +3,7 @@
 ## Overview
 **123 ToDo** is a React Progressive Web App (PWA) for task management featuring drag-and-drop, customizable swipe gestures, Google Drive end-to-end encrypted sync, subtasks/recurrence, and Todoist CSV imports.
 
-- **Version**: v3.3.1
+- **Version**: v3.4.0
 - **Tech Stack**: React 19.x, Create React App, lucide-react, framer-motion
 - **Live URLs**:
   - Primary: https://app.123todo.com
@@ -16,7 +16,7 @@ src/
 │   ├── modals/          # SettingsModal, SyncModal, SkinDiscoveryModal, TodoistGuideModal, EditModal, etc.
 │   ├── notes/           # NotesView, NoteCard (Simple Voice Notes skin & builder hands-free mode)
 │   ├── projects/        # ProjectTabs
-│   ├── tasks/           # TaskItem, PrioritySection, AddTask, SearchBar
+│   ├── tasks/           # TaskItem, PrioritySection, ProjectColumn, AddTask, SearchBar
 │   └── layout/          # Header (with Mode Switcher), Footer, NotificationBar, SocialShare
 ├── hooks/               # State & business logic
 │   ├── useTasks.js      # Tasks, archived, projects, note helpers, shadow backups, local storage

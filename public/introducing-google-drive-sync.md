@@ -1,6 +1,6 @@
 # Dual Encrypted Cloud Sync: Google Drive & 123ToDo Zero-Knowledge Cloud Engine
 
-*Updated for 123 ToDo v3.3.1 • Complete Privacy & Synchronization Guide*
+*Updated for 123 ToDo v3.4.0 • Complete Privacy & Synchronization Guide*
 
 When we first launched **123 ToDo**, our mission was clear: deliver a fast, priority-based, offline-first task manager with **zero compromise on user privacy**. 
 

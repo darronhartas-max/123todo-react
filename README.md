@@ -2,13 +2,16 @@
 
 **A sophisticated task management Progressive Web App with offline support**
 
-Version 3.3.1 | © Unforgettable Management Ltd 2026
+Version 3.4.0 | © Unforgettable Management Ltd 2026
 
 ---
 
 ## 🔄 Version History
 
-### v3.3.1 (Current)
+### v3.4.0 (Current)
+- **Project Columns View in Wide Mode & Drag-and-Drop Drop Line Alignment**: Added a new setting option to view wide-screen Kanban columns grouped by Projects instead of Priorities, with horizontal scrolling and full browser width expansion. Aligned drag-and-drop task insertion position to match the target drop line precisely.
+
+### v3.3.1
 - **Dual Encrypted Cloud Sync & Published Migration Guides**: Updated cloud sync documentation covering 123ToDo Zero-Knowledge Cloud Sync (Cloudflare D1 E2EE) alongside Google Drive AppData Sync, and published switching & migration guides.
 
 ### v3.3.0

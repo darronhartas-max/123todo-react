@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer';
 import SocialShare from './components/layout/SocialShare';
 import AddTask from './components/tasks/AddTask';
 import PrioritySection from './components/tasks/PrioritySection';
+import ProjectColumn from './components/tasks/ProjectColumn';
 import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
 import DeleteProjectModal from './components/modals/DeleteProjectModal';
@@ -282,6 +283,9 @@ const TodoApp = () => {
     if (saved === '800px' || saved === '1200px') return '480px';
     return saved || '480px';
   });
+  const [wideColumnView, setWideColumnViewState] = useState(() => {
+    return localStorage.getItem('123TodoWideColumnView') || 'priorities';
+  });
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
@@ -310,6 +314,10 @@ const TodoApp = () => {
   const setLayoutWidth = (val) => {
     setLayoutWidthState(val);
     localStorage.setItem('123TodoLayoutWidth', val);
+  };
+  const setWideColumnView = (val) => {
+    setWideColumnViewState(val);
+    localStorage.setItem('123TodoWideColumnView', val);
   };
   const setThemeMode = (mode) => {
     setThemeModeState(mode);
@@ -771,9 +779,14 @@ const TodoApp = () => {
     }
   };
 
+  const isWideLayout = window.innerWidth > 768 && layoutWidth !== '480px';
+  const visibleProjects = currentProjectId === 'all'
+    ? [...DEFAULT_PROJECTS, ...projects].filter(p => p.id !== 'all')
+    : [...DEFAULT_PROJECTS, ...projects].filter(p => p.id === currentProjectId);
+
   const styles = {
     appContainer: {
-      maxWidth: layoutWidth,
+      maxWidth: layoutWidth === '480px' ? '480px' : (wideColumnView === 'projects' ? '100%' : layoutWidth),
       margin: '0 auto',
       paddingBottom: window.innerWidth < 768 ? '120px' : '80px',
       minHeight: '100vh',
@@ -797,9 +810,12 @@ const TodoApp = () => {
       flex: 1,
       padding: '0 12px 8px 12px',
       display: 'flex',
-      flexDirection: window.innerWidth > 768 && layoutWidth !== '480px' ? 'row' : 'column',
-      gap: window.innerWidth > 768 && layoutWidth !== '480px' ? '20px' : '0px',
-      alignItems: 'stretch'
+      flexDirection: isWideLayout ? 'row' : 'column',
+      gap: isWideLayout ? '16px' : '0px',
+      alignItems: 'stretch',
+      overflowX: isWideLayout ? 'auto' : 'visible',
+      WebkitOverflowScrolling: 'touch',
+      paddingBottom: isWideLayout ? '12px' : '8px'
     },
     toggleSection: {
       padding: '12px',
@@ -936,29 +952,53 @@ const TodoApp = () => {
               )}
 
               <div style={styles.sectionsContainer}>
-                {[1, 2, 3].map(priority => (
-                  <PrioritySection
-                    key={priority}
-                    priority={priority}
-                    tasks={filteredTasks}
-                    projects={[...DEFAULT_PROJECTS, ...projects]}
-                    onComplete={handleCompleteTask}
-                    onEdit={setEditingTask}
-                    onUpdate={updateTask}
-                    handleDragStart={handleDragStart}
-                    handleDragOver={handleDragOver}
-                    handleDrop={handleDrop}
-                    handleDragEnd={handleDragEnd}
-                    draggedId={draggedId}
-                    dragOverId={dragOverId}
-                    swipeSettings={swipeSettings}
-                    onSwipeAction={handleSwipeAction}
-                    dateFormat={dateFormat}
-                  />
-                ))}
+                {isWideLayout && wideColumnView === 'projects' ? (
+                  visibleProjects.map(project => (
+                    <ProjectColumn
+                      key={project.id}
+                      project={project}
+                      tasks={filteredTasks}
+                      projects={[...DEFAULT_PROJECTS, ...projects]}
+                      onComplete={handleCompleteTask}
+                      onEdit={setEditingTask}
+                      onUpdate={updateTask}
+                      onQuickAdd={() => setShowAddSection(true)}
+                      handleDragStart={handleDragStart}
+                      handleDragOver={handleDragOver}
+                      handleDrop={handleDrop}
+                      handleDragEnd={handleDragEnd}
+                      draggedId={draggedId}
+                      dragOverId={dragOverId}
+                      swipeSettings={swipeSettings}
+                      onSwipeAction={handleSwipeAction}
+                      dateFormat={dateFormat}
+                    />
+                  ))
+                ) : (
+                  [1, 2, 3].map(priority => (
+                    <PrioritySection
+                      key={priority}
+                      priority={priority}
+                      tasks={filteredTasks}
+                      projects={[...DEFAULT_PROJECTS, ...projects]}
+                      onComplete={handleCompleteTask}
+                      onEdit={setEditingTask}
+                      onUpdate={updateTask}
+                      handleDragStart={handleDragStart}
+                      handleDragOver={handleDragOver}
+                      handleDrop={handleDrop}
+                      handleDragEnd={handleDragEnd}
+                      draggedId={draggedId}
+                      dragOverId={dragOverId}
+                      swipeSettings={swipeSettings}
+                      onSwipeAction={handleSwipeAction}
+                      dateFormat={dateFormat}
+                    />
+                  ))
+                )}
 
                 {filteredTasks.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)' }}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)', width: '100%' }}>
                     {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
                   </div>
                 )}
@@ -1220,6 +1260,8 @@ const TodoApp = () => {
         setNotesFontSize={setNotesFontSize}
         layoutWidth={layoutWidth}
         setLayoutWidth={setLayoutWidth}
+        wideColumnView={wideColumnView}
+        setWideColumnView={setWideColumnView}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         lightModeTone={lightModeTone}

@@ -16,9 +16,9 @@ describe('useTasks - reorderTasks drag and drop', () => {
 
         const { result } = renderHook(() => useTasks());
 
-        // Drag Task 1 down onto Task 2 -> Task 1 should end up after Task 2
+        // Drag Task 1 down onto Task 3 -> Task 1 should end up before Task 3 (where top indicator line was displayed)
         act(() => {
-            result.current.reorderTasks(1, 2);
+            result.current.reorderTasks(1, 3);
         });
 
         expect(result.current.tasks.map(t => t.id)).toEqual([2, 1, 3]);

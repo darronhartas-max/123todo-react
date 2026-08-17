@@ -235,6 +235,8 @@ const SettingsModal = ({
     setNotesFontSize,
     layoutWidth,
     setLayoutWidth,
+    wideColumnView = 'priorities',
+    setWideColumnView,
     themeMode,
     setThemeMode,
     lightModeTone = 'soft',
@@ -1100,6 +1102,32 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+
+                                {/* Wide View Columns Mode */}
+                                {layoutWidth !== '480px' && (
+                                    <div style={styles.settingRow}>
+                                        <div style={styles.settingLabel}>
+                                            <span>Wide Mode Column View</span>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                                Group columns in wide mode by Priorities or by Projects
+                                            </span>
+                                        </div>
+                                        <div style={styles.segmentContainer}>
+                                            <button
+                                                style={styles.segmentBtn(wideColumnView === 'priorities')}
+                                                onClick={() => setWideColumnView && setWideColumnView('priorities')}
+                                            >
+                                                By Priorities
+                                            </button>
+                                            <button
+                                                style={styles.segmentBtn(wideColumnView === 'projects')}
+                                                onClick={() => setWideColumnView && setWideColumnView('projects')}
+                                            >
+                                                By Projects
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                                  {/* Date Format Order Preference */}
                                  <div style={styles.settingRow}>
                                      <div style={styles.settingLabel}>

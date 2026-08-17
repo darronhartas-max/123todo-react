@@ -1,6 +1,6 @@
 # Introducing 123ToDo Cloud Sync: Zero-Knowledge AES-256-GCM Serverless Sync Engine
 
-*Published by 123 ToDo Team • Version 3.3.1 Technical Announcement*
+*Published by 123 ToDo Team • Version 3.4.0 Technical Announcement*
 
 We are thrilled to announce **123ToDo Cloud Sync** — a high-speed, zero-knowledge, serverless sync engine built on Cloudflare D1. 
 
