@@ -35,16 +35,22 @@ const NotesView = ({
   const quickRecognitionRef = useRef(null);
   const quickAddTextareaRef = useRef(null);
 
-  // Auto-expand textarea height & scroll to bottom so the last few spoken lines are always visible
+  // Auto-expand textarea height & keep the latest spoken/typed lines visible in viewport at all times
   useEffect(() => {
     if (quickAddTextareaRef.current) {
       const el = quickAddTextareaRef.current;
       el.style.height = 'auto';
-      const scrollH = el.scrollHeight;
-      el.style.height = `${Math.min(Math.max(scrollH, 80), 320)}px`;
+      const targetHeight = Math.max(el.scrollHeight, 80);
+      el.style.height = `${targetHeight}px`;
       el.scrollTop = el.scrollHeight;
+
+      if (isDictatingQuickAdd) {
+        try {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
+      }
     }
-  }, [newNotes]);
+  }, [newNotes, isDictatingQuickAdd]);
 
   // Sync target project ID with active project filter when user changes filter tab
   useEffect(() => {

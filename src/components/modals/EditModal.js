@@ -26,7 +26,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = 'auto';
-            const targetH = Math.min(Math.max(titleRef.current.scrollHeight, 48), 150);
+            const targetH = Math.max(titleRef.current.scrollHeight, 48);
             titleRef.current.style.height = `${targetH}px`;
             titleRef.current.scrollTop = titleRef.current.scrollHeight;
         }
@@ -35,7 +35,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     useEffect(() => {
         if (notesRef.current) {
             notesRef.current.style.height = 'auto';
-            const targetH = Math.min(Math.max(notesRef.current.scrollHeight, 85), 180);
+            const targetH = Math.max(notesRef.current.scrollHeight, 85);
             notesRef.current.style.height = `${targetH}px`;
             notesRef.current.scrollTop = notesRef.current.scrollHeight;
         }

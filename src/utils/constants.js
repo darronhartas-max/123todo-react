@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.3.2';
+export const APP_VERSION = '3.3.3';
 
 export const RELEASE_CHANGELOG = {
+  '3.3.3': [
+    { title: '📝 Real-Time Textarea Auto-Expansion & Dictation Viewport Scroll:', desc: 'Removed restrictive height caps across all Notes mode textareas, enabling unlimited dynamic height expansion and smooth viewport auto-scrolling so newly spoken lines remain 100% visible at all times.' }
+  ],
   '3.3.2': [
     { title: '🎙️ Voice Command Refinements & Expanded Focus Modal:', desc: 'Refined voice dictation punctuation processing, enhanced "add note" and "add task" voice submission sensitivity, aligned On Hold tasks list layout, and expanded focus editor overlay modal to maximum viewport size.' }
   ],

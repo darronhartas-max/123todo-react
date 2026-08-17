@@ -40,28 +40,34 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const notesRef = useRef(null);
     const hasOpenedRef = useRef(false);
 
-    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.style.height = 'auto';
-            inputRef.current.style.height = Math.min(inputRef.current.scrollHeight, 250) + 'px';
-            inputRef.current.scrollTop = inputRef.current.scrollHeight;
-        }
-    }, [text]);
-
-    useEffect(() => {
-        if (notesRef.current) {
-            notesRef.current.style.height = 'auto';
-            notesRef.current.style.height = Math.min(notesRef.current.scrollHeight, 300) + 'px';
-            notesRef.current.scrollTop = notesRef.current.scrollHeight;
-        }
-    }, [notes]);
-
     // Voice Input State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
     const [voiceStatus, setVoiceStatus] = useState('');
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
+
+    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = Math.max(inputRef.current.scrollHeight, 48) + 'px';
+            inputRef.current.scrollTop = inputRef.current.scrollHeight;
+            if (listeningTarget === 'title') {
+                try { inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+            }
+        }
+    }, [text, listeningTarget]);
+
+    useEffect(() => {
+        if (notesRef.current) {
+            notesRef.current.style.height = 'auto';
+            notesRef.current.style.height = Math.max(notesRef.current.scrollHeight, 80) + 'px';
+            notesRef.current.scrollTop = notesRef.current.scrollHeight;
+            if (listeningTarget === 'notes') {
+                try { notesRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+            }
+        }
+    }, [notes, listeningTarget]);
 
     const stopVoice = () => {
         if (recognitionRef.current) {

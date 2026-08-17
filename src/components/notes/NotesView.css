@@ -95,6 +95,8 @@
   outline: none;
   width: 100%;
   resize: none;
+  min-height: 80px;
+  overflow-y: hidden;
 }
 
 .quick-add-footer {

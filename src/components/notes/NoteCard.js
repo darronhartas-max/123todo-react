@@ -38,15 +38,23 @@ const NoteCard = ({
     if (noteTextareaRef.current) {
       const el = noteTextareaRef.current;
       el.style.height = 'auto';
-      const scrollH = el.scrollHeight;
-      el.style.height = `${Math.min(Math.max(scrollH, 60), 280)}px`;
+      const targetHeight = Math.max(el.scrollHeight, 60);
+      el.style.height = `${targetHeight}px`;
       el.scrollTop = el.scrollHeight;
+
+      if (isDictating) {
+        try {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
+      }
     }
-  }, [notesText, isEditing]);
+  }, [notesText, isEditing, isDictating]);
 
   useEffect(() => {
     if (isDictating && noteViewBodyRef.current) {
-      noteViewBodyRef.current.scrollTop = noteViewBodyRef.current.scrollHeight;
+      try {
+        noteViewBodyRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {}
     }
   }, [note.notes, isDictating]);
 
