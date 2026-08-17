@@ -5,7 +5,7 @@ import {
   ArrowUpRight, Check, Clock
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
-import { isSpeechRecognitionSupported, startVoiceDictation, processVoiceCommands } from '../../utils/voiceUtils';
+import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const NoteCard = ({
   note,

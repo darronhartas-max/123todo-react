@@ -5,7 +5,7 @@ import {
 import NoteCard from './NoteCard';
 import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
-import { isSpeechRecognitionSupported, startVoiceDictation, processVoiceCommands } from '../../utils/voiceUtils';
+import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const NotesView = ({
   tasks = [],
