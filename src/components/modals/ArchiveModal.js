@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Search, X, Trash2, Calendar, Filter, ArrowUpDown, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Archive, Search, X, Trash2, Calendar, Repeat, Filter, ArrowUpDown, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';
@@ -589,7 +589,7 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                                     alignItems: 'center',
                                                     gap: '4px'
                                                 }}>
-                                                    <Calendar size={12} />
+                                                    {task.isRecurring ? <Repeat size={12} color="#10b981" /> : <Calendar size={12} />}
                                                     Completed {completedDateStr}
                                                 </div>
                                             )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getNextWeekDateString } from '../../utils/dateUtils';
@@ -562,8 +562,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     }}>
                         {task.scheduledDate && !isArchived && (
                             <span style={{
-                                background: 'rgba(37, 99, 235, 0.08)',
-                                color: 'var(--accent-color)',
+                                background: task.isRecurring ? 'rgba(16, 185, 129, 0.08)' : 'rgba(37, 99, 235, 0.08)',
+                                color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
                                 padding: '2px 6px',
                                 borderRadius: '4px',
                                 fontWeight: '600',
@@ -571,7 +571,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 alignItems: 'center',
                                 gap: '3px'
                             }}>
-                                📅 {formatDisplayDate(task.scheduledDate, dateFormat)}
+                                {task.isRecurring ? <Repeat size={12} /> : <Calendar size={12} />} {formatDisplayDate(task.scheduledDate, dateFormat)}
                             </span>
                         )}
                         {task.isRecurring && task.recurrence && (
@@ -585,7 +585,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 alignItems: 'center',
                                 gap: '3px'
                             }}>
-                                🔁 {getRecurrenceText(task.recurrence)}
+                                <Repeat size={12} /> {getRecurrenceText(task.recurrence)}
                             </span>
                         )}
                         {task.deferCount > 0 && !isArchived && (
@@ -850,9 +850,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
                                 style={{
                                     ...styles.actionBtn,
-                                    color: 'var(--accent-color)',
-                                    background: showQuickSchedule ? 'var(--accent-bg)' : 'transparent',
-                                    border: '1px solid var(--accent-color)',
+                                    color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
+                                    background: showQuickSchedule ? (task.isRecurring ? 'rgba(16, 185, 129, 0.15)' : 'var(--accent-bg)') : 'transparent',
+                                    border: `1px solid ${task.isRecurring ? '#10b981' : 'var(--accent-color)'}`,
                                     marginRight: '6px',
                                     opacity: 1.0,
                                     width: '32px',
@@ -861,9 +861,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 }}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                title="Change schedule / Defer task"
+                                title={task.isRecurring ? "Recurring schedule / Defer task" : "Change schedule / Defer task"}
                             >
-                                <Calendar size={17} />
+                                {task.isRecurring ? <Repeat size={17} /> : <Calendar size={17} />}
                             </motion.button>
                         )}
                         <motion.button
