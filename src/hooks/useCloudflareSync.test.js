@@ -78,7 +78,7 @@ describe('useCloudflareSync hook', () => {
 
     test('daily sync tracking and adaptive interval calculation', () => {
         expect(getDailySyncCount()).toBe(0);
-        expect(getAdaptivePollingInterval()).toBe(60000);
+        expect(getAdaptivePollingInterval()).toBe(30000); // 30 seconds
         expect(getAdaptiveDebounceDelay()).toBe(800);
 
         incrementDailySyncCount();
@@ -86,11 +86,11 @@ describe('useCloudflareSync hook', () => {
 
         const today = new Date().toISOString().slice(0, 10);
         localStorage.setItem(`123Todo_CF_SyncCount_${today}`, '150');
-        expect(getAdaptivePollingInterval()).toBe(180000); // 3 minutes
+        expect(getAdaptivePollingInterval()).toBe(60000); // 1 minute
         expect(getAdaptiveDebounceDelay()).toBe(1500);
 
         localStorage.setItem(`123Todo_CF_SyncCount_${today}`, '350');
-        expect(getAdaptivePollingInterval()).toBe(300000); // 5 minutes
+        expect(getAdaptivePollingInterval()).toBe(120000); // 2 minutes
         expect(getAdaptiveDebounceDelay()).toBe(3000);
 
         // Instant Sync Mode (Chief Programmer Mode)

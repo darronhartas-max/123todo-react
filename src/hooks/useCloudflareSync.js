@@ -51,9 +51,9 @@ export function isInstantSyncMode() {
 export function getAdaptivePollingInterval() {
     if (isInstantSyncMode()) return 8000; // 8-second rate-limit safe live polling for Instant Mode
     const count = getDailySyncCount();
-    if (count > 300) return 300000; // 5 minutes for heavy users later in the day
-    if (count > 100) return 180000; // 3 minutes for moderate users
-    return 60000;                  // 1 minute default background polling
+    if (count > 300) return 120000; // 2 minutes for heavy usage days
+    if (count > 100) return 60000;  // 1 minute for moderate usage days
+    return 30000;                   // 30 seconds default background polling
 }
 
 export function getAdaptiveDebounceDelay() {

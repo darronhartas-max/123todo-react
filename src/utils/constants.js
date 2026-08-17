@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.4.1';
+export const APP_VERSION = '3.4.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.4.2': [
+    { title: '⚡ Accelerated Background Sync Intervals:', desc: 'Enhanced background polling speed across standard adaptive sync tiers: 30s for default background sync, 60s for moderate editing, and 120s for heavy usage.' }
+  ],
   '3.4.1': [
     { title: '🖐️ Drag-and-Drop Project Preservation Fix:', desc: 'Fixed task reordering logic to preserve task project assignments when dragging and dropping tasks to new positions in priority lists.' },
     { title: '⚡ Cloudflare Sync Optimization & Adaptive Rate Budgeting:', desc: 'Optimized cloud sync request volume with conditional pulls, automatic CORS caching, and intelligent client-side adaptive rate budgeting that protects battery, bandwidth, and zero-cost quotas.' }
