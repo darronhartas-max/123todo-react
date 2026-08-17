@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.4.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.4.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -153,7 +153,11 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.4.0 (Current)
+### v3.4.1 (Current)
+
+- **Cloudflare Sync Optimization & Adaptive Rate Budgeting**: Optimized cloud sync request volume with conditional pulls, automatic CORS caching, and intelligent client-side adaptive rate budgeting that protects battery, bandwidth, and zero-cost quotas.
+
+### v3.4.0
 
 - **Project Columns View in Wide Mode**: Added layout option to view wide-screen Kanban columns grouped by custom Projects instead of Priorities, with smooth horizontal scrolling and full browser width expansion.
 - **Precision Drag-and-Drop Drop Line Alignment**: Aligned task insertion position during drag-and-drop to match the target drop indicator line precisely.
