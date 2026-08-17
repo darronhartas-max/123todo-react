@@ -92,6 +92,7 @@ export const APP_VERSION = '3.4.1';
 
 export const RELEASE_CHANGELOG = {
   '3.4.1': [
+    { title: '🖐️ Drag-and-Drop Project Preservation Fix:', desc: 'Fixed task reordering logic to preserve task project assignments when dragging and dropping tasks to new positions in priority lists.' },
     { title: '⚡ Cloudflare Sync Optimization & Adaptive Rate Budgeting:', desc: 'Optimized cloud sync request volume with conditional pulls, automatic CORS caching, and intelligent client-side adaptive rate budgeting that protects battery, bandwidth, and zero-cost quotas.' }
   ],
   '3.4.0': [

@@ -427,7 +427,6 @@ export const useTasks = () => {
             const newTasks = [...prev];
             const [movedTask] = newTasks.splice(fromIndex, 1);
             movedTask.priority = targetTask.priority;
-            movedTask.projectId = targetTask.projectId || 'general';
             movedTask.updatedAt = now;
 
             const newTargetIndex = newTasks.findIndex(t => String(t.id) === targetStr);

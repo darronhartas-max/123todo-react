@@ -42,6 +42,24 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(result.current.tasks.map(t => t.id)).toEqual([3, 1, 2]);
     });
 
+    test('preserves task projectId when dragging and dropping tasks to a new position', () => {
+        const initialTasks = [
+            { id: 101, text: 'Work Task', priority: 1, projectId: 'work' },
+            { id: 102, text: 'Personal Task', priority: 1, projectId: 'personal' }
+        ];
+        localStorage.setItem('123TodoTasks', JSON.stringify(initialTasks));
+
+        const { result } = renderHook(() => useTasks());
+
+        // Drag Work Task (id 101) onto Personal Task (id 102)
+        act(() => {
+            result.current.reorderTasks(101, 102);
+        });
+
+        const movedWorkTask = result.current.tasks.find(t => t.id === 101);
+        expect(movedWorkTask.projectId).toBe('work'); // projectId MUST NOT change to 'personal'!
+    });
+
     test('changes priority when dragging task onto a different priority container', () => {
         const initialTasks = [
             { id: 1, text: 'Task 1', priority: 1, projectId: 'general' },
