@@ -31,10 +31,16 @@ export function incrementDailySyncCount() {
 
 export function isInstantSyncMode() {
     try {
-        const speed = localStorage.getItem('123Todo_Sync_Speed');
-        if (speed === 'instant') return true;
-        if (typeof window !== 'undefined' && window.location && window.location.search.includes('instant=true')) {
-            return true;
+        const isChief = localStorage.getItem('123Todo_ChiefProgrammer') === 'true';
+        if (isChief) return true;
+
+        if (typeof window !== 'undefined' && window.location) {
+            const search = window.location.search || '';
+            if (search.includes('chief=true') || search.includes('programmer=true')) {
+                localStorage.setItem('123Todo_ChiefProgrammer', 'true');
+                localStorage.setItem('123Todo_Sync_Speed', 'instant');
+                return true;
+            }
         }
     } catch {
         return false;

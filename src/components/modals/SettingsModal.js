@@ -239,6 +239,8 @@ const SettingsModal = ({
     setWideColumnView,
     syncSpeed = 'adaptive',
     setSyncSpeed,
+    isChiefProgrammer = false,
+    onToggleChiefProgrammer,
     themeMode,
     setThemeMode,
     lightModeTone = 'soft',
@@ -264,6 +266,24 @@ const SettingsModal = ({
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
+
+    const versionClickCountRef = useRef(0);
+    const versionClickTimerRef = useRef(null);
+
+    const handleVersionBadgeClick = () => {
+        versionClickCountRef.current += 1;
+        if (versionClickTimerRef.current) clearTimeout(versionClickTimerRef.current);
+        if (versionClickCountRef.current >= 3) {
+            versionClickCountRef.current = 0;
+            if (onToggleChiefProgrammer) {
+                onToggleChiefProgrammer();
+            }
+        } else {
+            versionClickTimerRef.current = setTimeout(() => {
+                versionClickCountRef.current = 0;
+            }, 800);
+        }
+    };
 
     const handleManualCheckForUpdates = (e) => {
         if (onCheckForUpdates) {
@@ -1251,9 +1271,13 @@ const SettingsModal = ({
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
                                         <span>App Version & Updates</span>
-                                        <span style={{ fontSize: '0.9rem', color: 'var(--muted-text)', fontWeight: '600' }}>
-                                            v{APP_VERSION}
-                                        </span>
+                                         <span 
+                                             onClick={handleVersionBadgeClick}
+                                             style={{ fontSize: '0.9rem', color: isChiefProgrammer ? '#10b981' : 'var(--muted-text)', fontWeight: '600', cursor: 'pointer', userSelect: 'none' }}
+                                             title={isChiefProgrammer ? "⚡ Chief Programmer Mode Active" : `v${APP_VERSION}`}
+                                         >
+                                             v{APP_VERSION} {isChiefProgrammer && '⚡'}
+                                         </span>
                                     </div>
                                     <div style={{
                                         display: 'flex',
@@ -1575,52 +1599,24 @@ const SettingsModal = ({
                                     </label>
                                 </div>
 
-                                <div style={{ marginBottom: '20px', background: 'var(--item-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '4px', color: 'var(--text-color)' }}>
-                                        Sync Refresh Speed / Mode
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '12px', lineHeight: '1.35' }}>
-                                        Control sync responsiveness and update frequency across devices.
-                                    </div>
-
-                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px', cursor: 'pointer' }}>
-                                        <input
-                                            type="radio"
-                                            name="syncSpeed"
-                                            value="adaptive"
-                                            checked={syncSpeed === 'adaptive'}
-                                            onChange={() => setSyncSpeed && setSyncSpeed('adaptive')}
-                                            style={{ marginTop: '3px' }}
-                                        />
-                                        <div>
-                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-color)' }}>
-                                                Adaptive (Quota-Saver)
+                                {isChiefProgrammer && (
+                                    <div style={{ marginBottom: '20px', background: 'rgba(16, 185, 129, 0.08)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                            <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                ⚡ Chief Programmer Mode Active
                                             </div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
-                                                Standard mode with adaptive background polling (1-5 min) and 800ms push debounce.
-                                            </div>
+                                            <button
+                                                onClick={() => onToggleChiefProgrammer && onToggleChiefProgrammer(false)}
+                                                style={{ fontSize: '0.75rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer' }}
+                                            >
+                                                Deactivate
+                                            </button>
                                         </div>
-                                    </label>
-
-                                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
-                                        <input
-                                            type="radio"
-                                            name="syncSpeed"
-                                            value="instant"
-                                            checked={syncSpeed === 'instant'}
-                                            onChange={() => setSyncSpeed && setSyncSpeed('instant')}
-                                            style={{ marginTop: '3px' }}
-                                        />
-                                        <div>
-                                            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: '#10b981' }}>
-                                                Instant (Chief Programmer Mode) ⚡
-                                            </div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.35' }}>
-                                                Instant zero-delay sync: 50ms push on local edit, 2s live polling, and instant focus/hover sync.
-                                            </div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', lineHeight: '1.35' }}>
+                                            Zero-delay live sync active: 50ms instant push on local edits, 2s live background polling, and instant focus/hover sync across all your devices.
                                         </div>
-                                    </label>
-                                </div>
+                                    </div>
+                                )}
 
                                 <button
                                     onClick={() => {

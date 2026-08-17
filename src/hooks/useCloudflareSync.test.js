@@ -94,7 +94,7 @@ describe('useCloudflareSync hook', () => {
         expect(getAdaptiveDebounceDelay()).toBe(3000);
 
         // Instant Sync Mode (Chief Programmer Mode)
-        localStorage.setItem('123Todo_Sync_Speed', 'instant');
+        localStorage.setItem('123Todo_ChiefProgrammer', 'true');
         expect(getAdaptivePollingInterval()).toBe(2000); // 2 seconds
         expect(getAdaptiveDebounceDelay()).toBe(50);     // 50ms
     });

@@ -289,6 +289,47 @@ const TodoApp = () => {
   const [syncSpeed, setSyncSpeedState] = useState(() => {
     return localStorage.getItem('123Todo_Sync_Speed') || 'adaptive';
   });
+  const [isChiefProgrammer, setIsChiefProgrammerState] = useState(() => {
+    try {
+      if (localStorage.getItem('123Todo_ChiefProgrammer') === 'true') return true;
+      if (typeof window !== 'undefined' && window.location) {
+        const s = window.location.search || '';
+        if (s.includes('chief=true') || s.includes('programmer=true')) {
+          localStorage.setItem('123Todo_ChiefProgrammer', 'true');
+          localStorage.setItem('123Todo_Sync_Speed', 'instant');
+          return true;
+        }
+      }
+    } catch {}
+    return false;
+  });
+
+  const toggleChiefProgrammerMode = useCallback((enable) => {
+    setIsChiefProgrammerState(prev => {
+      const nextVal = enable !== undefined ? Boolean(enable) : !prev;
+      if (nextVal) {
+        localStorage.setItem('123Todo_ChiefProgrammer', 'true');
+        localStorage.setItem('123Todo_Sync_Speed', 'instant');
+        setSyncSpeedState('instant');
+      } else {
+        localStorage.removeItem('123Todo_ChiefProgrammer');
+        localStorage.removeItem('123Todo_Sync_Speed');
+        setSyncSpeedState('adaptive');
+      }
+      return nextVal;
+    });
+  }, []);
+
+  useEffect(() => {
+    window.enableChiefProgrammerMode = () => {
+      toggleChiefProgrammerMode(true);
+      return '⚡ Chief Programmer Instant Sync Mode Activated!';
+    };
+    window.disableChiefProgrammerMode = () => {
+      toggleChiefProgrammerMode(false);
+      return 'Chief Programmer Mode Deactivated.';
+    };
+  }, [toggleChiefProgrammerMode]);
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('123TodoThemeMode') || 'system';
   });
@@ -1271,6 +1312,8 @@ const TodoApp = () => {
         setWideColumnView={setWideColumnView}
         syncSpeed={syncSpeed}
         setSyncSpeed={setSyncSpeed}
+        isChiefProgrammer={isChiefProgrammer}
+        onToggleChiefProgrammer={toggleChiefProgrammerMode}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         lightModeTone={lightModeTone}
