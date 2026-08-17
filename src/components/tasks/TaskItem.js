@@ -125,35 +125,50 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
     const onCompleteRef = React.useRef(onComplete);
     const lastCompleteTimeRef = React.useRef(0);
+    const isCompletingRef = React.useRef(false);
 
     React.useEffect(() => {
         onCompleteRef.current = onComplete;
     }, [onComplete]);
+
+    // Reset local checked state whenever task ID or archive status changes
+    React.useEffect(() => {
+        setIsChecked(false);
+        isCompletingRef.current = false;
+        if (archiveTimeoutRef.current) {
+            clearTimeout(archiveTimeoutRef.current);
+            archiveTimeoutRef.current = null;
+        }
+    }, [task.id, isArchived]);
 
     const handleComplete = (e) => {
         if (e) {
             if (e.stopPropagation) e.stopPropagation();
             if (e.preventDefault && e.cancelable) e.preventDefault();
         }
+        
+        // Prevent double trigger / mid-flight cancellation
+        if (isCompletingRef.current) return;
+
         const now = Date.now();
-        if (now - lastCompleteTimeRef.current < 350) return;
+        if (now - lastCompleteTimeRef.current < 250) return;
         lastCompleteTimeRef.current = now;
 
-        if (isChecked) {
-            setIsChecked(false);
-            if (archiveTimeoutRef.current) {
-                clearTimeout(archiveTimeoutRef.current);
-                archiveTimeoutRef.current = null;
-            }
-        } else {
-            setIsChecked(true);
-            archiveTimeoutRef.current = setTimeout(() => {
-                archiveTimeoutRef.current = null;
-                if (onCompleteRef.current) {
-                    onCompleteRef.current(task.id);
-                }
-            }, 600);
+        isCompletingRef.current = true;
+        setIsChecked(true);
+
+        if (archiveTimeoutRef.current) {
+            clearTimeout(archiveTimeoutRef.current);
         }
+
+        archiveTimeoutRef.current = setTimeout(() => {
+            archiveTimeoutRef.current = null;
+            setIsChecked(false);
+            isCompletingRef.current = false;
+            if (onCompleteRef.current) {
+                onCompleteRef.current(task.id);
+            }
+        }, 300);
     };
 
     React.useEffect(() => {
@@ -161,6 +176,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             if (archiveTimeoutRef.current) {
                 clearTimeout(archiveTimeoutRef.current);
                 archiveTimeoutRef.current = null;
+                setIsChecked(false);
+                isCompletingRef.current = false;
                 if (onCompleteRef.current) {
                     onCompleteRef.current(task.id);
                 }
