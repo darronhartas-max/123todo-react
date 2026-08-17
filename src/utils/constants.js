@@ -88,9 +88,12 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.3.1';
+export const APP_VERSION = '3.3.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.3.2': [
+    { title: '🎙️ Voice Command Refinements & Expanded Focus Modal:', desc: 'Refined voice dictation punctuation processing, enhanced "add note" and "add task" voice submission sensitivity, aligned On Hold tasks list layout, and expanded focus editor overlay modal to maximum viewport size.' }
+  ],
   '3.3.1': [
     { title: '🔒 Dual-Engine Encrypted Cloud Sync & Documentation Update:', desc: 'Expanded sync documentation covering 123ToDo Zero-Knowledge Cloud Sync (Cloudflare D1 E2EE) alongside Google Drive AppData Sync, and published switching & migration guides.' }
   ],

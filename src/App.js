@@ -820,6 +820,11 @@ const TodoApp = () => {
       transition: 'all 0.2s ease',
       textAlign: 'left',
       width: '100%'
+    },
+    taskList: {
+      listStyle: 'none',
+      margin: 0,
+      padding: 0
     }
   };
 

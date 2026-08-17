@@ -19,14 +19,14 @@ export const formatSpokenPunctuation = (text) => {
   if (!text || typeof text !== 'string') return text;
 
   let formatted = text
-    // Spoken punctuation replacements
-    .replace(/\b(full\s*stop|fullstop|period|dot)\b/gi, '.')
-    .replace(/\b(comma)\b/gi, ',')
-    .replace(/\b(question\s*mark|questionmark)\b/gi, '?')
-    .replace(/\b(exclamation\s*(mark|point)|exclamationmark|exclamationpoint)\b/gi, '!')
-    .replace(/\b(colon)\b/gi, ':')
-    .replace(/\b(semi\s*colon|semicolon)\b/gi, ';')
-    .replace(/\b(new\s*line|newline)\b/gi, '\n')
+    // Spoken punctuation replacements (handles singular, plural, variations)
+    .replace(/\b(full\s*stops?|fullstop|period|dot)\b/gi, '.')
+    .replace(/\b(commas?)\b/gi, ',')
+    .replace(/\b(question\s*marks?|questionmark)\b/gi, '?')
+    .replace(/\b(exclamation\s*(marks?|points?)|exclamationmark|exclamationpoint)\b/gi, '!')
+    .replace(/\b(colons?)\b/gi, ':')
+    .replace(/\b(semi\s*colons?|semicolon|semi-colon)\b/gi, ';')
+    .replace(/\b(new\s*lines?|newlines?|new\s*paragraphs?|paragraphs?)\b/gi, '\n')
     .replace(/\b(dash|hyphen)\b/gi, ' - ');
 
   // Fix spacing around punctuation: remove space before punctuation marks, ensure space after punctuation marks if followed by text
@@ -61,7 +61,19 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
   const baseCleanList = baseCleanWords.filter(Boolean);
   const speechCleanList = speechCleanWords.filter(Boolean);
 
-  if (speechCleanList.length === 0) return base;
+  if (speechCleanList.length === 0) {
+    // speechText consists only of punctuation marks or symbols (e.g. '.', ',', '?', '!', '\n')
+    // Append punctuation cleanly if base doesn't already end with punctuation
+    const punc = speech.replace(/\s+/g, '');
+    if (!punc) return base;
+    if (/[.,?!:;]$/.test(base) && /[.,?!:;]/.test(punc)) {
+      return base;
+    }
+    if (base.endsWith(punc)) {
+      return base;
+    }
+    return `${base}${punc}`;
+  }
   if (baseCleanList.length === 0) return speech;
 
   const baseCleanStr = baseCleanList.join(' ');
@@ -137,14 +149,14 @@ export const processVoiceCommands = (text) => {
   let processed = text;
   let isSubmitCommand = false;
 
-  // 1. Check for spoken submit command ("add task", "add note", "add a note", "submit task", "save note", "create task", etc.)
-  // Matches action verbs: add, ad, at, and, create, save, submit, finish, done, complete
-  // Optional determiners: a, the, this, my
-  // Noun targets: task, tax, text, note, node, noat
-  const submitRegex = /\b(add|ad|at|and|create|save|submit|finish|done|complete)\s*(a|the|this|my)?\s*(task|tax|text|note|node|noat)\b/gi;
+  // 1. Check for spoken submit command ("add task", "add note", "add a note", "add a task", "submit task", "save note", "create task", "add new note", "add new task", etc.)
+  // Matches action verbs: add, ad, at, and, had, create, save, submit, finish, done, complete
+  // Optional determiners: a, an, the, this, my, new
+  // Noun targets: task, tax, text, note, node, noat, know
+  const submitRegex = /\b(add|ad|at|and|had|create|save|submit|finish|done|complete)\s*(a|an|the|this|my|new)?\s*(task|tax|text|note|node|noat|know)\b/gi;
   
-  // Standalone submit triggers at the end of speech (e.g. "... buy milk submit", "... save note", "... add task.")
-  const endSubmitRegex = /\b(add\s*task|add\s*note|submit\s*task|submit\s*note|save\s*task|save\s*note|submit|save)\b[.,?!]*$/gi;
+  // Standalone submit triggers anywhere at the end of speech (e.g. "... buy milk submit", "... save note", "... add task.", "... finish")
+  const endSubmitRegex = /\b(add\s*task|add\s*note|submit\s*task|submit\s*note|save\s*task|save\s*note|create\s*task|create\s*note|submit|save|finish|done|complete)\b[.,?!]*$/gi;
 
   if (submitRegex.test(processed) || endSubmitRegex.test(processed)) {
     isSubmitCommand = true;
@@ -153,7 +165,7 @@ export const processVoiceCommands = (text) => {
     // Clean up trailing punctuation or separators left after stripping command
     processed = processed.replace(/[,:;\s]+$/, '').trim();
 
-    // Add full stop at end of sentence if no terminal punctuation exists
+    // Add full stop at end of sentence if no terminal punctuation exists and processed text is non-empty
     if (processed.length > 0 && !/[.,?!]$/.test(processed)) {
       processed += '.';
     }
@@ -233,7 +245,7 @@ export const startVoiceDictation = ({
       recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
       recognition.onstart = () => {
-        onStatusChange('🎙️ Listening... Speak naturally (supports punctuation, "delete last word", & "add task" / "add note")');
+        onStatusChange('Listening...');
       };
 
       recognition.onresult = (event) => {

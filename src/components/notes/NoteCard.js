@@ -82,10 +82,9 @@ const NoteCard = ({
 
     recognitionRef.current = startVoiceDictation({
       initialText: initialNoteBody,
-      onTranscript: (updatedText, isFinalChunk) => {
-        const { text: processedText, isSubmitCommand } = processVoiceCommands(updatedText);
-        setNotesText(processedText);
-        onUpdateNote(note.id, { notes: processedText });
+      onTranscript: (updatedText, isSubmitCommand) => {
+        setNotesText(updatedText);
+        onUpdateNote(note.id, { notes: updatedText });
 
         if (isSubmitCommand) {
           if (recognitionRef.current) recognitionRef.current.stop();
@@ -503,7 +502,7 @@ const NoteCard = ({
           fontWeight: '600'
         }}>
           <Mic size={16} style={{ animation: 'pulse 1.2s infinite' }} />
-          <span>{statusMessage || 'Listening... Dictate text to append'}</span>
+          <span>{statusMessage || 'Listening...'}</span>
         </div>
       )}
 

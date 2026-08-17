@@ -101,12 +101,11 @@ const NotesView = ({
 
     quickRecognitionRef.current = startVoiceDictation({
       initialText,
-      onTranscript: (updatedText, isFinalChunk) => {
-        const { text: processedText, isSubmitCommand } = processVoiceCommands(updatedText);
-        setNewNotes(processedText);
+      onTranscript: (updatedText, isSubmitCommand) => {
+        setNewNotes(updatedText);
 
         if (isSubmitCommand) {
-          handleCreateNote(processedText);
+          handleCreateNote(updatedText);
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),

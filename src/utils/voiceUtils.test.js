@@ -48,6 +48,12 @@ describe('voiceUtils - mergeBaseAndTranscript', () => {
   test('concatenates non-overlapping speech cleanly', () => {
     expect(mergeBaseAndTranscript('Buy milk', 'tomorrow')).toBe('Buy milk tomorrow');
   });
+
+  test('appends punctuation-only speech chunks to base without duplicating', () => {
+    expect(mergeBaseAndTranscript('Buy milk', '.')).toBe('Buy milk.');
+    expect(mergeBaseAndTranscript('Buy milk.', '.')).toBe('Buy milk.');
+    expect(mergeBaseAndTranscript('Is task done', '?')).toBe('Is task done?');
+  });
 });
 
 describe('voiceUtils - processVoiceCommands', () => {
@@ -95,5 +101,11 @@ describe('voiceUtils - processVoiceCommands', () => {
     const res9 = processVoiceCommands('Finish reading report submit');
     expect(res9.text).toBe('Finish reading report.');
     expect(res9.isSubmitCommand).toBe(true);
+
+    const res10 = processVoiceCommands('add note');
+    expect(res10.isSubmitCommand).toBe(true);
+
+    const res11 = processVoiceCommands('add task');
+    expect(res11.isSubmitCommand).toBe(true);
   });
 });
