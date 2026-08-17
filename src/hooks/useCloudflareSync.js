@@ -49,7 +49,7 @@ export function isInstantSyncMode() {
 }
 
 export function getAdaptivePollingInterval() {
-    if (isInstantSyncMode()) return 2000; // 2-second live polling for Chief Programmer / Instant Mode
+    if (isInstantSyncMode()) return 8000; // 8-second rate-limit safe live polling for Instant Mode
     const count = getDailySyncCount();
     if (count > 300) return 300000; // 5 minutes for heavy users later in the day
     if (count > 100) return 180000; // 3 minutes for moderate users
@@ -57,7 +57,7 @@ export function getAdaptivePollingInterval() {
 }
 
 export function getAdaptiveDebounceDelay() {
-    if (isInstantSyncMode()) return 50; // 50ms instant push delay for local edits
+    if (isInstantSyncMode()) return 150; // 150ms instant push delay for local edits
     const count = getDailySyncCount();
     if (count > 300) return 3000;  // 3s debounce for very heavy editing days
     if (count > 100) return 1500;  // 1.5s debounce for moderate days
@@ -108,8 +108,8 @@ export const useCloudflareSync = (localData, importDataCallback) => {
     const performSync = useCallback(async (isInitial = false, isUserAction = false, isLocalDataChange = false) => {
         if (!syncId || !deviceToken || !passphrase || isSyncingRef.current) return;
 
-        // Check if under temporary rate-limit backoff (unless explicitly triggered by user)
-        if (Date.now() < backoffUntilRef.current && !isUserAction) {
+        // Check if under temporary rate-limit backoff (unless user action or local edit)
+        if (Date.now() < backoffUntilRef.current && !isUserAction && !isLocalDataChange) {
             return;
         }
 
@@ -133,8 +133,8 @@ export const useCloudflareSync = (localData, importDataCallback) => {
             });
 
             if (pullRes.status === 429) {
-                // Rate limited: back off for 60 seconds
-                backoffUntilRef.current = Date.now() + 60000;
+                // Rate limited: back off for 15 seconds
+                backoffUntilRef.current = Date.now() + 15000;
                 setSyncStatus('synced');
                 isSyncingRef.current = false;
                 return;
@@ -189,12 +189,16 @@ export const useCloudflareSync = (localData, importDataCallback) => {
                 });
 
                 if (pushRes.status === 429) {
-                    backoffUntilRef.current = Date.now() + 60000;
+                    backoffUntilRef.current = Date.now() + 15000;
                     setSyncStatus('synced');
                     return;
                 }
 
                 if (pushRes.ok) {
+                    const pushJson = await pushRes.json().catch(() => ({}));
+                    if (pushJson && pushJson.timestamp) {
+                        lastRemoteTimestampRef.current = pushJson.timestamp;
+                    }
                     incrementDailySyncCount();
                     lastLocalSyncedTimestampRef.current = mergedData.timestamp || Date.now();
                     setSyncStatus('synced');
