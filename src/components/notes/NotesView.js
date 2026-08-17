@@ -33,6 +33,18 @@ const NotesView = ({
   const [showSearch, setShowSearch] = useState(Boolean(searchQuery && searchQuery.trim().length > 0));
 
   const quickRecognitionRef = useRef(null);
+  const quickAddTextareaRef = useRef(null);
+
+  // Auto-expand textarea height & scroll to bottom so the last few spoken lines are always visible
+  useEffect(() => {
+    if (quickAddTextareaRef.current) {
+      const el = quickAddTextareaRef.current;
+      el.style.height = 'auto';
+      const scrollH = el.scrollHeight;
+      el.style.height = `${Math.min(Math.max(scrollH, 80), 320)}px`;
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [newNotes]);
 
   // Sync target project ID with active project filter when user changes filter tab
   useEffect(() => {
@@ -225,6 +237,7 @@ const NotesView = ({
       {/* Quick Add Note Card (Single note field) */}
       <div className="quick-add-note-card">
         <textarea
+          ref={quickAddTextareaRef}
           className="quick-add-body-textarea"
           rows={3}
           value={newNotes}

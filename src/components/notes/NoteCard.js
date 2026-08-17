@@ -30,6 +30,25 @@ const NoteCard = ({
   const [statusMessage, setStatusMessage] = useState('');
   
   const recognitionRef = useRef(null);
+  const noteTextareaRef = useRef(null);
+  const noteViewBodyRef = useRef(null);
+
+  // Keep latest spoken lines visible at all times during dictation / editing
+  useEffect(() => {
+    if (noteTextareaRef.current) {
+      const el = noteTextareaRef.current;
+      el.style.height = 'auto';
+      const scrollH = el.scrollHeight;
+      el.style.height = `${Math.min(Math.max(scrollH, 60), 280)}px`;
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [notesText, isEditing]);
+
+  useEffect(() => {
+    if (isDictating && noteViewBodyRef.current) {
+      noteViewBodyRef.current.scrollTop = noteViewBodyRef.current.scrollHeight;
+    }
+  }, [note.notes, isDictating]);
 
   useEffect(() => {
     setTitleText(note.text || '');
@@ -251,6 +270,7 @@ const NoteCard = ({
               autoFocus
             />
             <textarea
+              ref={noteTextareaRef}
               value={notesText}
               onChange={(e) => setNotesText(e.target.value)}
               placeholder="Write note details or dictation..."
@@ -264,7 +284,7 @@ const NoteCard = ({
                 color: 'var(--text-color, #111827)',
                 outline: 'none',
                 width: '100%',
-                resize: 'vertical',
+                resize: 'none',
                 lineHeight: 1.5
               }}
             />
@@ -409,14 +429,19 @@ const NoteCard = ({
             </h3>
 
             {note.notes ? (
-              <p style={{ 
-                fontSize: `${Math.max(notesFontSize - 2, 12)}px`, 
-                color: 'var(--text-color, #374151)', 
-                margin: 0, 
-                lineHeight: 1.5,
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
-              }}>
+              <p
+                ref={noteViewBodyRef}
+                style={{ 
+                  fontSize: `${Math.max(notesFontSize - 2, 12)}px`, 
+                  color: 'var(--text-color, #374151)', 
+                  margin: 0, 
+                  lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  maxHeight: '280px',
+                  overflowY: 'auto'
+                }}
+              >
                 {note.notes}
               </p>
             ) : (
