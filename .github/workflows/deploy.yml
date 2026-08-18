@@ -32,6 +32,19 @@ jobs:
           cp Dockerfile build/
           cp -r nginx build/
 
+      - name: Prepare remote target directory
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            mkdir -p /home/debian/wordpress-docker/app-123todo
+            sudo chown -R debian:debian /home/debian/wordpress-docker/app-123todo
+            rm -rf /home/debian/wordpress-docker/app-123todo/*
+
       - name: Deploy files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -44,7 +57,6 @@ jobs:
           target: "/home/debian/wordpress-docker/app-123todo/"
           strip_components: 1
           overwrite: true
-          rm: true
 
       - name: Rebuild and restart Docker container
         uses: appleboy/ssh-action@v1.2.0
