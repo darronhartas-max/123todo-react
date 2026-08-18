@@ -43,6 +43,8 @@ jobs:
           source: "build/"
           target: "/home/debian/wordpress-docker/app-123todo/"
           strip_components: 1
+          overwrite: true
+          rm: true
 
       - name: Rebuild and restart Docker container
         uses: appleboy/ssh-action@v1.2.0
