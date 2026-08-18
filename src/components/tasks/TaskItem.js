@@ -28,7 +28,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const wasSwipingRef = React.useRef(false);
     const isScrollingVerticalRef = React.useRef(false);
 
-    const THRESHOLD = 75;
+    const THRESHOLD = 90;
 
     const applyDamping = (diffX) => {
         const absX = Math.abs(diffX);
@@ -51,17 +51,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         const diffX = clientX - touchStartRef.current.x;
         const diffY = clientY - touchStartRef.current.y;
 
-        // If vertical movement is dominant (scrolling or pulling down screen to refresh), lock out swiping for this touch gesture!
-        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 6) {
+        // If vertical movement is detected (scrolling down/up the screen), immediately CANCEL and lock out swiping!
+        if (Math.abs(diffY) > 12 || (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 6)) {
             isScrollingVerticalRef.current = true;
-            setSwipeOffset(0);
             isSwipingRef.current = false;
+            setSwipeOffset(0);
             return;
         }
 
         if (!isSwipingRef.current) {
-            // Require clear horizontal intent (horizontal distance exceeds vertical by 1.5x and > 10px)
-            if (Math.abs(diffX) > Math.abs(diffY) * 1.5 && Math.abs(diffX) > 10) {
+            // Require clear horizontal intent (horizontal distance exceeds vertical by 2.5x and > 20px)
+            if (Math.abs(diffX) > Math.abs(diffY) * 2.5 && Math.abs(diffX) > 20) {
                 isSwipingRef.current = true;
                 wasSwipingRef.current = true;
             }
@@ -83,6 +83,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             setTimeout(() => { wasSwipingRef.current = false; }, 100);
             return;
         }
+
         if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight !== 'none') {
             onSwipeAction && onSwipeAction(task, swipeSettings.swipeRight);
         } else if (swipeOffset <= -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
@@ -147,6 +148,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             if (e.preventDefault && e.cancelable) e.preventDefault();
         }
         
+        // Block completion click if user was swiping or vertical scrolling
+        if (wasSwipingRef.current || isSwipingRef.current || isScrollingVerticalRef.current) return;
+
         // Prevent double trigger / mid-flight cancellation
         if (isCompletingRef.current) return;
 
