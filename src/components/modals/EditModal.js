@@ -170,15 +170,15 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     };
 
     const toggleButtonStyle = (isActive) => ({
-        border: `1px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}`,
-        color: isActive ? 'white' : 'var(--muted-text)',
+        border: `1px solid ${isActive ? 'var(--accent-color)' : 'var(--accent-color)'}`,
+        color: isActive ? 'white' : 'var(--accent-color)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        gap: '5px',
-        fontSize: '0.82rem',
+        gap: '6px',
+        fontSize: '0.9rem',
         fontWeight: '600',
-        padding: '5px 10px',
+        padding: '6px 12px',
         borderRadius: '6px',
         background: isActive ? 'var(--accent-color)' : 'var(--item-bg)',
         transition: 'all 0.15s ease',
@@ -188,30 +188,30 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
-            padding: '16px 18px',
-            borderRadius: '10px',
-            maxWidth: '94%',
-            width: '440px',
-            maxHeight: '88vh',
+            borderRadius: '12px',
+            padding: '20px',
+            width: '94%',
+            maxWidth: '560px',
+            maxHeight: '90vh',
             overflowY: 'auto',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
             color: 'var(--text-color)',
             boxSizing: 'border-box',
+            position: 'relative',
             border: '1px solid var(--border-color)',
             transition: 'width 0.2s ease, max-height 0.2s ease'
         },
         sectionLabel: {
-            fontSize: '0.72rem',
-            fontWeight: '700',
+            fontSize: '0.9rem',
+            fontWeight: '600',
             color: 'var(--muted-text)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.2px'
         },
         textarea: {
             width: '100%',
-            padding: '8px 10px',
-            fontSize: '0.95rem',
-            lineHeight: '1.45',
+            padding: '10px 12px',
+            fontSize: '1.1rem',
+            lineHeight: '1.5',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             resize: 'none',
@@ -226,8 +226,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
         },
         select: {
             width: '100%',
-            padding: '5px 8px',
-            fontSize: '0.85rem',
+            padding: '8px 12px',
+            fontSize: '1rem',
             fontWeight: '600',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
@@ -253,12 +253,12 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             onClick={() => { setIsPriorityOpen(!isPriorityOpen); setIsProjectOpen(false); }}
                             style={{
                                 width: '100%',
-                                padding: '6px 10px',
+                                padding: '8px 12px',
                                 borderRadius: '6px',
                                 border: `1.5px solid ${activePriority.color}`,
                                 background: 'var(--item-bg)',
                                 color: activePriority.color,
-                                fontSize: '0.88rem',
+                                fontSize: '1rem',
                                 fontWeight: '700',
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -269,10 +269,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 transition: 'all 0.15s ease'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
                                 <span style={{
-                                    width: '8px',
-                                    height: '8px',
+                                    width: '10px',
+                                    height: '10px',
                                     borderRadius: '50%',
                                     background: activePriority.color,
                                     boxShadow: `0 0 6px ${activePriority.color}`,
@@ -282,7 +282,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     {activePriority.label}
                                 </span>
                             </div>
-                            <ChevronDown size={14} style={{ color: activePriority.color, flexShrink: 0 }} />
+                            <ChevronDown size={16} style={{ color: activePriority.color, flexShrink: 0 }} />
                         </button>
 
                         {isPriorityOpen && (
@@ -310,11 +310,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                     setIsPriorityOpen(false);
                                                 }}
                                                 style={{
-                                                    padding: '7px 10px',
+                                                    padding: '9px 12px',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: '8px',
-                                                    fontSize: '0.85rem',
+                                                    gap: '10px',
+                                                    fontSize: '0.95rem',
                                                     fontWeight: isSel ? '700' : '600',
                                                     color: isSel ? conf.color : 'var(--text-color)',
                                                     background: 'transparent',
@@ -323,8 +323,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 }}
                                             >
                                                 <span style={{
-                                                    width: '8px',
-                                                    height: '8px',
+                                                    width: '10px',
+                                                    height: '10px',
                                                     borderRadius: '50%',
                                                     background: conf.color,
                                                     boxShadow: `0 0 4px ${conf.color}`,
@@ -347,12 +347,12 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             onClick={() => { setIsProjectOpen(!isProjectOpen); setIsPriorityOpen(false); }}
                             style={{
                                 width: '100%',
-                                padding: '6px 10px',
+                                padding: '8px 12px',
                                 borderRadius: '6px',
                                 border: `1.5px solid ${activeProject.color || '#6b7280'}`,
                                 background: 'var(--item-bg)',
                                 color: activeProject.color || 'var(--text-color)',
-                                fontSize: '0.88rem',
+                                fontSize: '1rem',
                                 fontWeight: '700',
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -363,10 +363,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 transition: 'all 0.15s ease'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
                                 <span style={{
-                                    width: '4px',
-                                    height: '12px',
+                                    width: '5px',
+                                    height: '14px',
                                     borderRadius: '2px',
                                     background: activeProject.color || '#6b7280',
                                     flexShrink: 0
@@ -375,7 +375,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     {activeProject.name}
                                 </span>
                             </div>
-                            <ChevronDown size={14} style={{ color: activeProject.color || 'var(--muted-text)', flexShrink: 0 }} />
+                            <ChevronDown size={16} style={{ color: activeProject.color || 'var(--muted-text)', flexShrink: 0 }} />
                         </button>
 
                         {isProjectOpen && (
@@ -404,11 +404,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                     setIsProjectOpen(false);
                                                 }}
                                                 style={{
-                                                    padding: '7px 10px',
+                                                    padding: '9px 12px',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: '8px',
-                                                    fontSize: '0.85rem',
+                                                    gap: '10px',
+                                                    fontSize: '0.95rem',
                                                     fontWeight: isSel ? '700' : '600',
                                                     color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
                                                     background: 'transparent',
@@ -417,27 +417,27 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 }}
                                             >
                                                 <span style={{
-                                                    width: '4px',
-                                                    height: '12px',
+                                                    width: '5px',
+                                                    height: '14px',
                                                     borderRadius: '2px',
                                                     background: p.color || '#6b7280',
                                                     flexShrink: 0
                                                 }} />
-                                                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
                                             </div>
                                         );
                                     })}
                                 </div>
                             </>
-                        )}
+                        )} )}
                     </div>
                 </div>
 
                 {/* Voice Status Alert */}
                 {voiceStatus && (
                     <div style={{
-                        fontSize: '0.78rem',
-                        padding: '4px 8px',
+                        fontSize: '0.85rem',
+                        padding: '6px 10px',
                         borderRadius: '6px',
                         marginBottom: '8px',
                         background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
@@ -460,18 +460,18 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '3px',
-                                    padding: '1px 6px',
-                                    borderRadius: '10px',
+                                    gap: '4px',
+                                    padding: '3px 8px',
+                                    borderRadius: '12px',
                                     border: '1px solid var(--accent-color)',
                                     background: 'var(--accent-bg)',
                                     color: 'var(--accent-color)',
                                     cursor: 'pointer',
-                                    fontSize: '0.72rem',
+                                    fontSize: '0.8rem',
                                     fontWeight: '600'
                                 }}
                             >
-                                <Maximize2 size={10} />
+                                <Maximize2 size={12} />
                                 <span>Expand</span>
                             </button>
                             <button
@@ -481,19 +481,19 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '3px',
-                                    padding: '1px 6px',
-                                    borderRadius: '10px',
+                                    gap: '4px',
+                                    padding: '3px 8px',
+                                    borderRadius: '12px',
                                     border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
                                     background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                    color: listeningTarget === 'title' ? '#ef4444' : 'var(--muted-text)',
+                                    color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
                                     cursor: 'pointer',
-                                    fontSize: '0.72rem',
-                                    fontWeight: '700'
+                                    fontSize: '0.82rem',
+                                    fontWeight: '600'
                                 }}
                             >
-                                {listeningTarget === 'title' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
-                                <span><strong>{listeningTarget === 'title' ? 'Listening...' : 'Voice'}</strong></span>
+                                {listeningTarget === 'title' ? <MicOff size={13} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={13} color="var(--accent-color)" />}
+                                <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice Task'}</span>
                             </button>
                         </div>
                     </div>
@@ -506,10 +506,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onInput={handleInput}
                         style={{
                             ...styles.textarea,
-                            minHeight: '48px',
+                            minHeight: '52px',
                             maxHeight: '150px',
-                            fontWeight: '400',
-                            fontSize: '0.98rem'
+                            fontWeight: '500',
+                            fontSize: '1.1rem'
                         }}
                         maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
                     />
@@ -522,7 +522,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onClick={() => setShowNotes(!showNotes)}
                         style={toggleButtonStyle(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0))}
                     >
-                        {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) ? <Minus size={13} /> : <Plus size={13} />}
+                        {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) ? <Minus size={14} /> : <Plus size={14} />}
                         <span>Notes</span>
                     </button>
                     <button
@@ -530,7 +530,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onClick={() => setShowSubtasks(!showSubtasks)}
                         style={toggleButtonStyle(showSubtasks || subtasks.length > 0)}
                     >
-                        {showSubtasks ? <Minus size={13} /> : <Plus size={13} />}
+                        {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
                         <span>Subtasks ({subtasks.length})</span>
                     </button>
                     <button
@@ -538,7 +538,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         onClick={() => setShowSchedule(!showSchedule)}
                         style={toggleButtonStyle(showSchedule || Boolean(scheduledDate))}
                     >
-                        {showSchedule ? <Minus size={13} /> : <Plus size={13} />}
+                        {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
                         <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
                     </button>
                 </div>
@@ -563,7 +563,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             display: 'flex'
                                         }}
                                     >
-                                        <Minus size={12} />
+                                        <Minus size={14} />
                                     </button>
                                 )}
                             </div>
@@ -575,18 +575,18 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '3px',
-                                        padding: '1px 6px',
-                                        borderRadius: '10px',
+                                        gap: '4px',
+                                        padding: '3px 8px',
+                                        borderRadius: '12px',
                                         border: '1px solid var(--accent-color)',
                                         background: 'var(--accent-bg)',
                                         color: 'var(--accent-color)',
                                         cursor: 'pointer',
-                                        fontSize: '0.72rem',
+                                        fontSize: '0.8rem',
                                         fontWeight: '600'
                                     }}
                                 >
-                                    <Maximize2 size={10} />
+                                    <Maximize2 size={12} />
                                     <span>Expand</span>
                                 </button>
                                 <button
@@ -596,19 +596,19 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '3px',
-                                        padding: '1px 6px',
-                                        borderRadius: '10px',
+                                        gap: '4px',
+                                        padding: '3px 8px',
+                                        borderRadius: '12px',
                                         border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
                                         background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                        color: listeningTarget === 'notes' ? '#ef4444' : 'var(--muted-text)',
+                                        color: listeningTarget === 'notes' ? '#ef4444' : 'var(--text-color)',
                                         cursor: 'pointer',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700'
+                                        fontSize: '0.82rem',
+                                        fontWeight: '600'
                                     }}
                                 >
-                                    {listeningTarget === 'notes' ? <MicOff size={10} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={10} color="var(--accent-color)" />}
-                                    <span><strong>{listeningTarget === 'notes' ? 'Listening...' : 'Voice'}</strong></span>
+                                    {listeningTarget === 'notes' ? <MicOff size={13} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={13} color="var(--accent-color)" />}
+                                    <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
                                 </button>
                             </div>
                         </div>
@@ -621,7 +621,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             style={{
                                 ...styles.textarea,
                                 minHeight: '85px',
-                                maxHeight: '180px'
+                                maxHeight: '180px',
+                                fontSize: '1.05rem'
                             }}
                         />
                     </div>
@@ -630,14 +631,14 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                 {/* Defer Alert (if deferred >= 2) */}
                 {task.deferCount >= 2 && (
                     <div style={{
-                        padding: '6px 10px',
+                        padding: '8px 12px',
                         background: 'rgba(239, 68, 68, 0.06)',
                         border: '1px solid rgba(239, 68, 68, 0.2)',
                         borderRadius: '6px',
                         color: '#dc2626',
-                        fontSize: '0.78rem',
+                        fontSize: '0.85rem',
                         marginBottom: '10px',
-                        lineHeight: '1.35',
+                        lineHeight: '1.4',
                         textAlign: 'left'
                     }}>
                         💡 Deferred {task.deferCount}x. Consider breaking into <strong>Subtasks</strong> below.
@@ -648,24 +649,24 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                 {showSubtasks && (
                     <div style={{
                         marginBottom: '10px',
-                        padding: '8px 10px',
+                        padding: '12px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
                         background: 'var(--item-bg)'
                     }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '6px' }}>
-                            Subtasks Checklist
+                        <div style={{ fontSize: '1.05rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                            📋 Subtasks Checklist
                         </div>
                         {subtasks.length > 0 && (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 8px 0' }}>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
                                 {subtasks.map((st) => (
                                     <li key={st.id} style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
-                                        padding: '3px 0',
+                                        padding: '4px 0',
                                         borderBottom: '1px solid var(--border-color)',
-                                        gap: '6px'
+                                        gap: '8px'
                                     }}>
                                         <input
                                             type="checkbox"
@@ -673,7 +674,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             onChange={() => {
                                                 setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
                                             }}
-                                            style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0 }}
                                         />
                                         <input
                                             type="text"
@@ -687,19 +688,19 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 flex: 1,
                                                 border: 'none',
                                                 background: 'transparent',
-                                                fontSize: '0.85rem',
+                                                fontSize: '1.05rem',
                                                 fontWeight: '500',
                                                 color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
                                                 textDecoration: st.completed ? 'line-through' : 'none',
                                                 outline: 'none',
-                                                padding: '2px 4px',
+                                                padding: '4px 6px',
                                                 borderRadius: '4px',
                                                 fontFamily: 'inherit',
                                                 transition: 'all 0.15s ease'
                                             }}
                                             onFocus={(e) => {
                                                 e.target.style.background = 'var(--bg-color)';
-                                                e.target.style.boxShadow = '0 0 0 1px var(--accent-color)';
+                                                e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
                                             }}
                                             onBlur={(e) => {
                                                 e.target.style.background = 'transparent';
@@ -717,7 +718,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 background: 'transparent',
                                                 color: '#ef4444',
                                                 cursor: 'pointer',
-                                                padding: '2px 4px',
+                                                padding: '2px 6px',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -725,13 +726,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             }}
                                             title="Delete step"
                                         >
-                                            <X size={13} />
+                                            <X size={16} />
                                         </button>
                                     </li>
                                 ))}
                             </ul>
                         )}
-                        <div style={{ display: 'flex', gap: '4px' }}>
+                        <div style={{ display: 'flex', gap: '6px' }}>
                             <input
                                 type="text"
                                 value={newSubtaskText}
@@ -739,8 +740,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 placeholder="Add step..."
                                 style={{
                                     flex: 1,
-                                    padding: '4px 8px',
-                                    fontSize: '0.85rem',
+                                    padding: '8px 12px',
+                                    fontSize: '1.05rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--bg-color)',
@@ -757,13 +758,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             <button
                                 onClick={handleAddSubtask}
                                 style={{
-                                    padding: '4px 10px',
+                                    padding: '8px 16px',
                                     background: 'var(--accent-color)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.82rem',
+                                    fontSize: '1.05rem',
                                     fontWeight: '600'
                                 }}
                             >
@@ -777,41 +778,41 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                 {showSchedule && (
                     <div style={{
                         marginBottom: '10px',
-                        padding: '8px 10px',
+                        padding: '12px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
                         background: 'var(--item-bg)'
                     }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '6px' }}>
-                            Date & Recurrence
+                        <div style={{ fontSize: '1.05rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                            📅 Date & Recurrence Scheduling
                         </div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
                             <input
                                 type="date"
                                 value={scheduledDate || ''}
                                 onChange={(e) => setScheduledDate(e.target.value || null)}
                                 style={{
-                                    padding: '4px 8px',
-                                    fontSize: '0.85rem',
+                                    padding: '8px 12px',
+                                    fontSize: '1.05rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--bg-color)',
                                     color: 'var(--text-color)',
                                     outline: 'none',
                                     flex: 1,
-                                    minWidth: '120px'
+                                    minWidth: '140px'
                                 }}
                             />
                             <button
                                 type="button"
                                 onClick={() => setScheduledDate(getNextWeekDateString())}
                                 style={{
-                                    padding: '4px 8px',
+                                    padding: '8px 14px',
                                     background: 'var(--accent-bg)',
                                     border: '1px solid var(--accent-color)',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.78rem',
+                                    fontSize: '0.9rem',
                                     color: 'var(--accent-color)',
                                     fontWeight: '600',
                                     whiteSpace: 'nowrap'
@@ -825,12 +826,12 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     type="button"
                                     onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                     style={{
-                                        padding: '4px 8px',
+                                        padding: '8px 14px',
                                         background: 'transparent',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontSize: '0.78rem',
+                                        fontSize: '0.9rem',
                                         color: '#ef4444',
                                         fontWeight: '600'
                                     }}
@@ -840,8 +841,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             )}
                         </div>
 
-                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '500' }}>
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}>
                                 <input
                                     type="checkbox"
                                     checked={isRecurring}
@@ -851,24 +852,24 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             setScheduledDate(getTodayDateString());
                                         }
                                     }}
-                                    style={{ cursor: 'pointer', width: '13px', height: '13px' }}
+                                    style={{ cursor: 'pointer', width: '16px', height: '16px' }}
                                 />
                                 <span>Repeat this task</span>
                             </label>
 
                             {isRecurring && (
-                                <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Every</span>
+                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>Every</span>
                                         <input
                                             type="number"
                                             min="1"
                                             value={recurrenceFrequency}
                                             onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
                                             style={{
-                                                width: '45px',
-                                                padding: '3px 6px',
-                                                fontSize: '0.82rem',
+                                                width: '55px',
+                                                padding: '6px 10px',
+                                                fontSize: '1rem',
                                                 border: '1px solid var(--border-color)',
                                                 borderRadius: '4px',
                                                 background: 'var(--bg-color)',
@@ -880,8 +881,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             value={recurrenceInterval}
                                             onChange={(e) => setRecurrenceInterval(e.target.value)}
                                             style={{
-                                                padding: '3px 6px',
-                                                fontSize: '0.82rem',
+                                                padding: '6px 10px',
+                                                fontSize: '1rem',
                                                 border: '1px solid var(--border-color)',
                                                 borderRadius: '4px',
                                                 background: 'var(--bg-color)',
@@ -897,7 +898,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                                     {recurrenceInterval === 'weeks' && (
                                         <div>
-                                            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
+                                            <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                                                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
                                                     const isSelected = recurrenceDaysOfWeek.includes(idx);
                                                     return (
@@ -919,8 +920,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                             }}
                                                             style={{
                                                                 flex: 1,
-                                                                padding: '4px 2px',
-                                                                fontSize: '0.78rem',
+                                                                padding: '6px 4px',
+                                                                fontSize: '0.85rem',
                                                                 fontWeight: '700',
                                                                 borderRadius: '4px',
                                                                 cursor: 'pointer',
@@ -944,22 +945,22 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                     <div>
                         {!isUnlimited && (
-                            <div style={{ fontSize: '0.75rem', color: 'var(--muted-text)' }}>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
                                 {`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
                             </div>
                         )}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '6px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                             type="button"
                             onClick={onClose}
                             style={{
-                                padding: '5px 12px',
-                                fontSize: '0.85rem',
+                                padding: '8px 16px',
+                                fontSize: '0.95rem',
                                 fontWeight: '600',
                                 border: '1px solid var(--border-color)',
                                 borderRadius: '6px',
@@ -974,14 +975,28 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             type="button"
                             onClick={handleSave}
                             style={{
-                                padding: '5px 14px',
-                                fontSize: '0.85rem',
-                                fontWeight: '700',
-                                border: 'none',
+                                padding: '8px 20px',
+                                fontSize: '0.95rem',
+                                fontWeight: '800',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                                border: '2px solid #059669',
                                 borderRadius: '6px',
                                 cursor: 'pointer',
-                                background: 'var(--accent-color)',
-                                color: '#ffffff'
+                                background: '#10b981',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#059669';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                e.currentTarget.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#10b981';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 4px rgba(16, 185, 129, 0.2)';
                             }}
                         >
                             Save
