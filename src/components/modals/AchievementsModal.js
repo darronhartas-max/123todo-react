@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     X, 
@@ -12,7 +12,12 @@ import {
     BookOpen, 
     ExternalLink, 
     FolderKanban, 
-    Star
+    Star,
+    ChevronDown,
+    ChevronUp,
+    Lock,
+    Check,
+    HelpCircle
 } from 'lucide-react';
 
 const BLOG_ARTICLES = [
@@ -58,7 +63,102 @@ const BLOG_ARTICLES = [
     }
 ];
 
+const LEVEL_DEFINITIONS = [
+    { 
+        level: 1, 
+        title: 'Focused Starter', 
+        minPoints: 0, 
+        maxPoints: 100, 
+        icon: '🌱', 
+        color: '#10b981',
+        desc: 'Taking your first steps, creating tasks, and building daily to-do discipline.'
+    },
+    { 
+        level: 2, 
+        title: 'Momentum Builder', 
+        minPoints: 100, 
+        maxPoints: 300, 
+        icon: '⚡', 
+        color: '#06b6d4',
+        desc: 'Establishing an ongoing daily rhythm and clearing checklists regularly.'
+    },
+    { 
+        level: 3, 
+        title: 'Task Master', 
+        minPoints: 300, 
+        maxPoints: 700, 
+        icon: '🎯', 
+        color: '#2563eb',
+        desc: 'Consistently crushing scheduled priorities and driving project progress.'
+    },
+    { 
+        level: 4, 
+        title: '1-2-3 Strategist', 
+        minPoints: 700, 
+        maxPoints: 1500, 
+        icon: '🏆', 
+        color: '#6366f1',
+        desc: 'Mastering the 1 Must-Do, 2 Should-Do, and 3 Could-Do daily balance.'
+    },
+    { 
+        level: 5, 
+        title: 'Focus Champion', 
+        minPoints: 1500, 
+        maxPoints: 3000, 
+        icon: '🌟', 
+        color: '#9333ea',
+        desc: 'High-volume execution with active streaks across multiple categories.'
+    },
+    { 
+        level: 6, 
+        title: 'Productivity Pro', 
+        minPoints: 3000, 
+        maxPoints: 6000, 
+        icon: '💎', 
+        color: '#ec4899',
+        desc: 'Power-user consistency handling 10+ daily tasks without breaking momentum.'
+    },
+    { 
+        level: 7, 
+        title: 'Workflow Titan', 
+        minPoints: 6000, 
+        maxPoints: 12000, 
+        icon: '🚀', 
+        color: '#f97316',
+        desc: 'Hundreds of completed tasks, extensive subtask trees, and multi-week focus.'
+    },
+    { 
+        level: 8, 
+        title: 'Master of Execution', 
+        minPoints: 12000, 
+        maxPoints: 25000, 
+        icon: '🛡️', 
+        color: '#dc2626',
+        desc: 'Flawless execution sustained across months of structured productivity.'
+    },
+    { 
+        level: 9, 
+        title: 'Grandmaster of Focus', 
+        minPoints: 25000, 
+        maxPoints: 50000, 
+        icon: '🌌', 
+        color: '#7c3aed',
+        desc: 'Elite productivity veteran with thousands of completed tasks and unbroken habits.'
+    },
+    { 
+        level: 10, 
+        title: '123 Immortal', 
+        minPoints: 50000, 
+        maxPoints: 999999, 
+        icon: '👑', 
+        color: '#eab308',
+        desc: 'The ultimate, virtually unachievable pinnacle of lifelong personal mastery.'
+    }
+];
+
 const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], projects = [] }) => {
+    const [showLevelsLadder, setShowLevelsLadder] = useState(false);
+
     // 1. Compute Gamification & Productivity Metrics
     const stats = useMemo(() => {
         const totalCompleted = archived.length;
@@ -137,23 +237,9 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
         // Productivity Points Calculation: 10 pts per archived task + 2 pts per subtask + 15 pts per streak day
         const points = (totalCompleted * 10) + (subtasksCompleted * 2) + (currentStreak * 15);
 
-        // 10-Tier Level Definitions (Progressive scale up to elite Level 10 pinnacle)
-        const levels = [
-            { level: 1, title: 'Focused Starter', minPoints: 0, maxPoints: 100, icon: '🌱' },
-            { level: 2, title: 'Momentum Builder', minPoints: 100, maxPoints: 300, icon: '⚡' },
-            { level: 3, title: 'Task Master', minPoints: 300, maxPoints: 700, icon: '🎯' },
-            { level: 4, title: '1-2-3 Strategist', minPoints: 700, maxPoints: 1500, icon: '🏆' },
-            { level: 5, title: 'Focus Champion', minPoints: 1500, maxPoints: 3000, icon: '🌟' },
-            { level: 6, title: 'Productivity Pro', minPoints: 3000, maxPoints: 6000, icon: '💎' },
-            { level: 7, title: 'Workflow Titan', minPoints: 6000, maxPoints: 12000, icon: '🚀' },
-            { level: 8, title: 'Master of Execution', minPoints: 12000, maxPoints: 25000, icon: '🛡️' },
-            { level: 9, title: 'Grandmaster of Focus', minPoints: 25000, maxPoints: 50000, icon: '🌌' },
-            { level: 10, title: '123 Immortal', minPoints: 50000, maxPoints: 999999, icon: '👑' }
-        ];
-
-        const currentLevelInfo = levels.slice().reverse().find(l => points >= l.minPoints) || levels[0];
+        const currentLevelInfo = LEVEL_DEFINITIONS.slice().reverse().find(l => points >= l.minPoints) || LEVEL_DEFINITIONS[0];
         const isMaxLevel = currentLevelInfo.level === 10;
-        const nextLevelInfo = isMaxLevel ? currentLevelInfo : (levels.find(l => l.level === currentLevelInfo.level + 1) || currentLevelInfo);
+        const nextLevelInfo = isMaxLevel ? currentLevelInfo : (LEVEL_DEFINITIONS.find(l => l.level === currentLevelInfo.level + 1) || currentLevelInfo);
         
         const pointsInCurrentLevel = points - currentLevelInfo.minPoints;
         const pointsRequiredForNext = nextLevelInfo.maxPoints - currentLevelInfo.minPoints;
@@ -295,8 +381,8 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
             gap: '20px'
         },
         heroLevelCard: {
-            background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(147,51,234,0.12) 100%)',
-            border: '1.5px solid rgba(37,99,235,0.25)',
+            background: `linear-gradient(135deg, ${stats.currentLevelInfo.color}18 0%, rgba(147,51,234,0.12) 100%)`,
+            border: `1.5px solid ${stats.currentLevelInfo.color}45`,
             borderRadius: '12px',
             padding: '16px 18px',
             display: 'flex',
@@ -424,19 +510,38 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
                         {/* Hero Level & Productivity Points Progression */}
                         <div style={styles.heroLevelCard}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span style={{ fontSize: '1.6rem' }}>{stats.currentLevelInfo.icon}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{
+                                        width: '42px',
+                                        height: '42px',
+                                        borderRadius: '10px',
+                                        backgroundColor: `${stats.currentLevelInfo.color}25`,
+                                        border: `1.5px solid ${stats.currentLevelInfo.color}`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.5rem',
+                                        flexShrink: 0
+                                    }}>
+                                        {stats.currentLevelInfo.icon}
+                                    </div>
                                     <div>
-                                        <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', color: '#2563eb' }}>
+                                        <div style={{
+                                            fontSize: '0.78rem',
+                                            textTransform: 'uppercase',
+                                            fontWeight: '800',
+                                            letterSpacing: '0.5px',
+                                            color: stats.currentLevelInfo.color
+                                        }}>
                                             Level {stats.currentLevelInfo.level} of 10
                                         </div>
-                                        <div style={{ fontSize: '1.15rem', fontWeight: '800' }}>
+                                        <div style={{ fontSize: '1.18rem', fontWeight: '800' }}>
                                             {stats.currentLevelInfo.title}
                                         </div>
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--accent-color)' }}>
+                                    <div style={{ fontSize: '1.15rem', fontWeight: '800', color: stats.currentLevelInfo.color }}>
                                         {stats.points.toLocaleString()} Points
                                     </div>
                                     <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
@@ -456,11 +561,183 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
                                 <div style={{
                                     width: `${stats.levelProgressPercent}%`,
                                     height: '100%',
-                                    background: 'linear-gradient(90deg, #2563eb 0%, #9333ea 100%)',
+                                    background: `linear-gradient(90deg, ${stats.currentLevelInfo.color} 0%, #9333ea 100%)`,
                                     borderRadius: '4px',
                                     transition: 'width 0.5s ease'
                                 }} />
                             </div>
+
+                            {/* Expandable Level Hierarchy Roadmap Button */}
+                            <button
+                                onClick={() => setShowLevelsLadder(!showLevelsLadder)}
+                                style={{
+                                    border: 'none',
+                                    background: 'rgba(0, 0, 0, 0.05)',
+                                    borderRadius: '8px',
+                                    padding: '7px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-color)',
+                                    fontSize: '0.84rem',
+                                    fontWeight: '700',
+                                    marginTop: '2px',
+                                    transition: 'all 0.15s ease'
+                                }}
+                            >
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <HelpCircle size={14} color={stats.currentLevelInfo.color} />
+                                    {showLevelsLadder ? 'Hide Level Roadmap & Point Guide' : 'View All 10 Levels & Point Guide'}
+                                </span>
+                                {showLevelsLadder ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
+
+                            {/* Level Hierarchy Ladder Modal Expansion */}
+                            {showLevelsLadder && (
+                                <div style={{
+                                    background: 'var(--surface-color, #ffffff)',
+                                    border: '1px solid var(--border-color, #e5e7eb)',
+                                    borderRadius: '10px',
+                                    padding: '14px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '12px',
+                                    marginTop: '4px'
+                                }}>
+                                    {/* How Points are earned banner */}
+                                    <div style={{
+                                        background: 'var(--item-bg, #f9fafb)',
+                                        border: '1px dashed var(--border-color, #d1d5db)',
+                                        borderRadius: '8px',
+                                        padding: '10px 12px',
+                                        fontSize: '0.8rem',
+                                        color: 'var(--text-color)'
+                                    }}>
+                                        <div style={{ fontWeight: '800', marginBottom: '4px', color: 'var(--accent-color)' }}>
+                                            ⚡ How to Earn Productivity Points:
+                                        </div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '0.78rem', color: 'var(--muted-text)' }}>
+                                            <span>📋 <strong>+10 Points</strong> per task archived</span>
+                                            <span>📌 <strong>+2 Points</strong> per subtask checked</span>
+                                            <span>🔥 <strong>+15 Points</strong> per daily streak day</span>
+                                        </div>
+                                    </div>
+
+                                    {/* 10 Level Ladder List */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {LEVEL_DEFINITIONS.map(lvl => {
+                                            const isCurrent = stats.currentLevelInfo.level === lvl.level;
+                                            const isUnlocked = stats.points >= lvl.minPoints;
+                                            const pointsNeeded = lvl.minPoints - stats.points;
+
+                                            return (
+                                                <div 
+                                                    key={lvl.level}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '10px',
+                                                        padding: '8px 10px',
+                                                        borderRadius: '8px',
+                                                        background: isCurrent ? `${lvl.color}15` : 'transparent',
+                                                        border: isCurrent 
+                                                            ? `1.5px solid ${lvl.color}` 
+                                                            : '1px solid var(--border-color, #f3f4f6)',
+                                                        opacity: isUnlocked ? 1 : 0.65
+                                                    }}
+                                                >
+                                                    {/* Badge & Icon */}
+                                                    <div style={{
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        borderRadius: '8px',
+                                                        background: `${lvl.color}20`,
+                                                        border: `1px solid ${lvl.color}`,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1.2rem',
+                                                        flexShrink: 0
+                                                    }}>
+                                                        {lvl.icon}
+                                                    </div>
+
+                                                    {/* Title & Description */}
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                            <span style={{
+                                                                fontSize: '0.72rem',
+                                                                fontWeight: '800',
+                                                                color: lvl.color,
+                                                                textTransform: 'uppercase'
+                                                            }}>
+                                                                Level {lvl.level}
+                                                            </span>
+                                                            <span style={{ fontWeight: '800', fontSize: '0.88rem' }}>
+                                                                {lvl.title}
+                                                            </span>
+                                                            <span style={{ fontSize: '0.72rem', color: 'var(--muted-text)', fontWeight: '600' }}>
+                                                                ({lvl.level === 10 ? '50,000+ pts' : `${lvl.minPoints.toLocaleString()}–${lvl.maxPoints.toLocaleString()} pts`})
+                                                            </span>
+                                                        </div>
+                                                        <div style={{ fontSize: '0.74rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.25' }}>
+                                                            {lvl.desc}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Status Badge */}
+                                                    <div style={{ flexShrink: 0 }}>
+                                                        {isCurrent ? (
+                                                            <span style={{
+                                                                fontSize: '0.72rem',
+                                                                fontWeight: '800',
+                                                                color: '#ffffff',
+                                                                background: lvl.color,
+                                                                padding: '3px 8px',
+                                                                borderRadius: '12px',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '3px'
+                                                            }}>
+                                                                ⚡ Current
+                                                            </span>
+                                                        ) : isUnlocked ? (
+                                                            <span style={{
+                                                                fontSize: '0.72rem',
+                                                                fontWeight: '700',
+                                                                color: '#10b981',
+                                                                background: 'rgba(16, 185, 129, 0.1)',
+                                                                padding: '3px 8px',
+                                                                borderRadius: '12px',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '3px'
+                                                            }}>
+                                                                <Check size={12} /> Achieved
+                                                            </span>
+                                                        ) : (
+                                                            <span style={{
+                                                                fontSize: '0.72rem',
+                                                                fontWeight: '600',
+                                                                color: 'var(--muted-text)',
+                                                                background: 'rgba(0,0,0,0.04)',
+                                                                padding: '3px 8px',
+                                                                borderRadius: '12px',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '3px'
+                                                            }}>
+                                                                <Lock size={11} /> +{pointsNeeded.toLocaleString()} pts
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Core Stats 6-Card Grid */}

@@ -36,6 +36,14 @@ test('renders level, core stats, milestone badges and blog resources when open',
     expect(screen.getAllByText(/Level/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Points/i)).toBeInTheDocument();
 
+    // Verify Level Roadmap & Point Guide Button
+    const roadmapBtn = screen.getByText('View All 10 Levels & Point Guide');
+    expect(roadmapBtn).toBeInTheDocument();
+    fireEvent.click(roadmapBtn);
+    expect(screen.getByText('⚡ How to Earn Productivity Points:')).toBeInTheDocument();
+    expect(screen.getByText('123 Immortal')).toBeInTheDocument();
+    expect(screen.getByText('Grandmaster of Focus')).toBeInTheDocument();
+
     // Verify Stats
     expect(screen.getByText('Productivity Insights')).toBeInTheDocument();
     expect(screen.getByText('Tasks archived')).toBeInTheDocument();
