@@ -336,6 +336,12 @@ const NoteCard = ({
                         style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0 }}
                       />
                       <textarea
+                        ref={(el) => {
+                          if (el) {
+                            el.style.height = 'auto';
+                            el.style.height = `${Math.max(el.scrollHeight, 24)}px`;
+                          }
+                        }}
                         value={st.text}
                         rows={1}
                         onChange={(e) => {
@@ -346,7 +352,7 @@ const NoteCard = ({
                         }}
                         onInput={(e) => {
                           e.target.style.height = 'auto';
-                          e.target.style.height = e.target.scrollHeight + 'px';
+                          e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
                         }}
                         placeholder="Subtask step..."
                         style={{
@@ -363,11 +369,16 @@ const NoteCard = ({
                           resize: 'none',
                           overflowY: 'hidden',
                           wordBreak: 'break-word',
-                          lineHeight: '1.35'
+                          whiteSpace: 'pre-wrap',
+                          lineHeight: '1.4',
+                          minHeight: '24px',
+                          boxSizing: 'border-box'
                         }}
                         onFocus={(e) => {
                           e.target.style.background = 'var(--card-bg, #ffffff)';
                           e.target.style.boxShadow = '0 0 0 1px #2563eb';
+                          e.target.style.height = 'auto';
+                          e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
                         }}
                         onBlur={(e) => {
                           e.target.style.background = 'transparent';

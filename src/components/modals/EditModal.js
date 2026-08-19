@@ -522,15 +522,15 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     <button
                         type="button"
                         onClick={() => setShowNotes(!showNotes)}
-                        style={toggleButtonStyle(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0))}
+                        style={toggleButtonStyle(showNotes)}
                     >
-                        {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>Notes</span>
+                        {showNotes ? <Minus size={14} /> : <Plus size={14} />}
+                        <span>Notes{editingTask.notes && editingTask.notes.trim().length > 0 ? ' •' : ''}</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setShowSubtasks(!showSubtasks)}
-                        style={toggleButtonStyle(showSubtasks || subtasks.length > 0)}
+                        style={toggleButtonStyle(showSubtasks)}
                     >
                         {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
                         <span>Subtasks ({subtasks.length})</span>
@@ -538,36 +538,34 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     <button
                         type="button"
                         onClick={() => setShowSchedule(!showSchedule)}
-                        style={toggleButtonStyle(showSchedule || Boolean(scheduledDate))}
+                        style={toggleButtonStyle(showSchedule)}
                     >
                         {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
                         <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
                     </button>
                 </div>
 
-                {/* Notes Editor (Visible when Notes button is active or notes exist) */}
-                {(showNotes || Boolean(editingTask.notes && editingTask.notes.trim().length > 0)) && (
+                {/* Notes Editor (Visible when Notes button is active) */}
+                {showNotes && (
                     <div style={{ marginBottom: '10px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <span style={styles.sectionLabel}>Notes</span>
-                                {(!editingTask.notes || editingTask.notes.trim().length === 0) && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNotes(false)}
-                                        title="Hide notes input"
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            color: 'var(--muted-text)',
-                                            padding: 0,
-                                            display: 'flex'
-                                        }}
-                                    >
-                                        <Minus size={14} />
-                                    </button>
-                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNotes(false)}
+                                    title="Contract notes"
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: 'var(--muted-text)',
+                                        padding: 0,
+                                        display: 'flex'
+                                    }}
+                                >
+                                    <Minus size={14} />
+                                </button>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                                 <button
@@ -734,6 +732,12 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
                                             />
                                             <textarea
+                                                ref={(el) => {
+                                                    if (el) {
+                                                        el.style.height = 'auto';
+                                                        el.style.height = `${Math.max(el.scrollHeight, 28)}px`;
+                                                    }
+                                                }}
                                                 value={st.text}
                                                 rows={1}
                                                 onChange={(e) => {
@@ -742,7 +746,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 }}
                                                 onInput={(e) => {
                                                     e.target.style.height = 'auto';
-                                                    e.target.style.height = e.target.scrollHeight + 'px';
+                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
                                                 }}
                                                 placeholder="Subtask description..."
                                                 style={{
@@ -760,12 +764,17 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                     resize: 'none',
                                                     overflowY: 'hidden',
                                                     wordBreak: 'break-word',
-                                                    lineHeight: '1.35',
+                                                    whiteSpace: 'pre-wrap',
+                                                    lineHeight: '1.4',
+                                                    minHeight: '28px',
+                                                    boxSizing: 'border-box',
                                                     transition: 'all 0.15s ease'
                                                 }}
                                                 onFocus={(e) => {
                                                     e.target.style.background = 'var(--bg-color)';
                                                     e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
                                                 }}
                                                 onBlur={(e) => {
                                                     e.target.style.background = 'transparent';
@@ -806,7 +815,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 onChange={(e) => setNewSubtaskText(e.target.value)}
                                 onInput={(e) => {
                                     e.target.style.height = 'auto';
-                                    e.target.style.height = e.target.scrollHeight + 'px';
+                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 38)}px`;
                                 }}
                                 placeholder="Add step..."
                                 style={{
@@ -822,6 +831,9 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     fontFamily: 'inherit',
                                     lineHeight: '1.35',
                                     wordBreak: 'break-word',
+                                    whiteSpace: 'pre-wrap',
+                                    minHeight: '38px',
+                                    boxSizing: 'border-box',
                                     outline: 'none'
                                 }}
                                 onKeyDown={(e) => {
@@ -832,6 +844,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 }}
                             />
                             <button
+                                type="button"
                                 onClick={handleAddSubtask}
                                 style={{
                                     padding: '8px 16px',

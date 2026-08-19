@@ -664,104 +664,119 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                             }}
                                             style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
                                         />
-                                        <textarea
-                                            value={st.text}
-                                            rows={1}
-                                            onChange={(e) => {
-                                                const updatedText = e.target.value;
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
-                                            }}
-                                            onInput={(e) => {
-                                                e.target.style.height = 'auto';
-                                                e.target.style.height = e.target.scrollHeight + 'px';
-                                            }}
-                                            placeholder="Subtask step..."
-                                            style={{
-                                                flex: 1,
-                                                border: 'none',
-                                                background: 'transparent',
-                                                fontSize: '1.05rem',
-                                                fontWeight: '500',
-                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                textDecoration: st.completed ? 'line-through' : 'none',
-                                                outline: 'none',
-                                                padding: '3px 6px',
-                                                borderRadius: '4px',
-                                                fontFamily: 'inherit',
-                                                resize: 'none',
-                                                overflowY: 'hidden',
-                                                wordBreak: 'break-word',
-                                                lineHeight: '1.35',
-                                                transition: 'all 0.15s ease'
-                                            }}
-                                            onFocus={(e) => {
-                                                e.target.style.background = 'var(--surface-color)';
-                                                e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
-                                            }}
-                                            onBlur={(e) => {
-                                                e.target.style.background = 'transparent';
-                                                e.target.style.boxShadow = 'none';
-                                                if (!st.text.trim()) {
-                                                    setSubtasks(subtasks.filter(s => s.id !== st.id));
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
-                                            style={{
-                                                border: 'none',
-                                                background: 'transparent',
-                                                color: '#ef4444',
-                                                cursor: 'pointer',
-                                                fontSize: '0.95rem',
-                                                fontWeight: '600',
-                                                padding: '2px 6px',
-                                                flexShrink: 0,
-                                                marginTop: '2px'
-                                            }}
-                                        >
-                                            Delete
-                                        </button>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                        <textarea
-                            rows={1}
-                            value={newSubtaskText}
-                            onChange={(e) => setNewSubtaskText(e.target.value)}
-                            onInput={(e) => {
-                                e.target.style.height = 'auto';
-                                e.target.style.height = e.target.scrollHeight + 'px';
-                            }}
-                            placeholder="Add subtask step..."
-                            style={{
-                                flex: 1,
-                                padding: '8px 10px',
-                                fontSize: '1.05rem',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '4px',
-                                background: 'var(--item-bg)',
-                                color: 'var(--text-color)',
-                                resize: 'none',
-                                overflowY: 'hidden',
-                                fontFamily: 'inherit',
-                                lineHeight: '1.35',
-                                wordBreak: 'break-word',
-                                outline: 'none'
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleAddSubtask();
-                                }
-                            }}
-                        />
-                        <button
-                            onClick={handleAddSubtask}
+                                            <textarea
+                                                ref={(el) => {
+                                                    if (el) {
+                                                        el.style.height = 'auto';
+                                                        el.style.height = `${Math.max(el.scrollHeight, 28)}px`;
+                                                    }
+                                                }}
+                                                value={st.text}
+                                                rows={1}
+                                                onChange={(e) => {
+                                                    const updatedText = e.target.value;
+                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                                }}
+                                                onInput={(e) => {
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
+                                                }}
+                                                placeholder="Subtask step..."
+                                                style={{
+                                                    flex: 1,
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    fontSize: '1.05rem',
+                                                    fontWeight: '500',
+                                                    color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                    textDecoration: st.completed ? 'line-through' : 'none',
+                                                    outline: 'none',
+                                                    padding: '3px 6px',
+                                                    borderRadius: '4px',
+                                                    fontFamily: 'inherit',
+                                                    resize: 'none',
+                                                    overflowY: 'hidden',
+                                                    wordBreak: 'break-word',
+                                                    whiteSpace: 'pre-wrap',
+                                                    lineHeight: '1.4',
+                                                    minHeight: '28px',
+                                                    boxSizing: 'border-box',
+                                                    transition: 'all 0.15s ease'
+                                                }}
+                                                onFocus={(e) => {
+                                                    e.target.style.background = 'var(--surface-color)';
+                                                    e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
+                                                }}
+                                                onBlur={(e) => {
+                                                    e.target.style.background = 'transparent';
+                                                    e.target.style.boxShadow = 'none';
+                                                    if (!st.text.trim()) {
+                                                        setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
+                                                style={{
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    color: '#ef4444',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.95rem',
+                                                    fontWeight: '600',
+                                                    padding: '2px 6px',
+                                                    flexShrink: 0,
+                                                    marginTop: '2px'
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                            <textarea
+                                rows={1}
+                                value={newSubtaskText}
+                                onChange={(e) => setNewSubtaskText(e.target.value)}
+                                onInput={(e) => {
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 38)}px`;
+                                }}
+                                placeholder="Add subtask step..."
+                                style={{
+                                    flex: 1,
+                                    padding: '8px 10px',
+                                    fontSize: '1.05rem',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '4px',
+                                    background: 'var(--item-bg)',
+                                    color: 'var(--text-color)',
+                                    resize: 'none',
+                                    overflowY: 'hidden',
+                                    fontFamily: 'inherit',
+                                    lineHeight: '1.35',
+                                    wordBreak: 'break-word',
+                                    whiteSpace: 'pre-wrap',
+                                    minHeight: '38px',
+                                    boxSizing: 'border-box',
+                                    outline: 'none'
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleAddSubtask();
+                                    }
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAddSubtask}
                             style={{
                                 padding: '8px 16px',
                                 background: 'var(--accent-color)',
