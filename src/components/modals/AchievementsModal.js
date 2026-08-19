@@ -17,34 +17,42 @@ import {
 
 const BLOG_ARTICLES = [
     {
-        id: '123-rule',
-        title: 'Mastering the 1-2-3 Rule',
-        subtitle: 'Stop overwhelm by prioritizing 1 Must-Do, 2 Should-Do, and 3 Could-Do tasks daily.',
-        url: 'https://www.123todo.com/blog/the-1-2-3-rule-explained',
-        tag: 'Time Management',
+        id: 'prioritization',
+        title: 'Mastering Task Prioritization',
+        subtitle: 'Discover how a simple priority-based task management system transforms daily productivity.',
+        url: 'https://www.123todo.com/mastering-time-management-with-task-prioritization',
+        tag: 'Prioritization',
         icon: '🎯'
     },
     {
-        id: 'micro-steps',
-        title: 'Defeating Procrastination with Micro-Steps',
-        subtitle: 'How breaking daunting projects into 2-minute checklist subtasks unlocks instant momentum.',
-        url: 'https://www.123todo.com/blog/time-management-micro-steps',
-        tag: 'Productivity Science',
+        id: 'small-steps',
+        title: 'Small Steps, Big Dreams',
+        subtitle: 'How breaking daunting projects into checklist subtasks unlocks instant momentum.',
+        url: 'https://www.123todo.com/small-steps-big-dreams-goal-achievement',
+        tag: 'Goal Setting',
         icon: '⚡'
     },
     {
-        id: 'streaks-habits',
-        title: 'The Psychology of Daily Productivity Streaks',
-        subtitle: 'Build unbreakable work habits through small, daily compounding consistency.',
-        url: 'https://www.123todo.com/blog/building-daily-streaks',
-        tag: 'Habit Mastery',
+        id: 'building-habits',
+        title: 'Building Habits That Stick',
+        subtitle: 'Build unbreakable daily productivity habits through compounding consistency and streaks.',
+        url: 'https://www.123todo.com/building-habits-that-stick',
+        tag: 'Habits',
         icon: '🔥'
+    },
+    {
+        id: 'beginners-guide',
+        title: "Beginner's Guide to Time Management",
+        subtitle: 'The science-backed benefits of writing down tasks and organizing daily wins.',
+        url: 'https://www.123todo.com/beginners-guide-to-time-management',
+        tag: 'Time Management',
+        icon: '🌱'
     },
     {
         id: 'full-blog',
         title: 'Explore All Guides on 123todo.com',
-        subtitle: 'Read the latest deep dives, workflow tutorials, and focus strategies from our team.',
-        url: 'https://www.123todo.com/blog/',
+        subtitle: 'Read all expert tutorials, productivity insights, and focus strategies on our blog.',
+        url: 'https://www.123todo.com/blog',
         tag: 'Official Blog',
         icon: '📚'
     }

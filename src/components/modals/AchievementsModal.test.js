@@ -51,8 +51,8 @@ test('renders level, core stats, milestone badges and blog resources when open',
 
     // Verify Blog Guides
     expect(screen.getByText('Time Management & Productivity Guides')).toBeInTheDocument();
-    expect(screen.getByText('Mastering the 1-2-3 Rule')).toBeInTheDocument();
-    expect(screen.getByText('Defeating Procrastination with Micro-Steps')).toBeInTheDocument();
+    expect(screen.getByText('Mastering Task Prioritization')).toBeInTheDocument();
+    expect(screen.getByText('Small Steps, Big Dreams')).toBeInTheDocument();
 
     // Close button triggers onClose
     const closeBtn = screen.getByTitle('Close');
