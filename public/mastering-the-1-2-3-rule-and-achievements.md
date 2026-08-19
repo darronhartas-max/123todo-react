@@ -22,9 +22,19 @@ By constraining your daily focus to 6 carefully prioritized tasks, you eliminate
 
 Accessible via the **Trophy Badge (🏆)** located in the top action bar right before Settings:
 
-1. **Level Progression & XP Engine**:
-   - Earn XP by completing tasks, checking off subtasks, and keeping your daily streak alive.
-   - Advance from **Level 1: Productivity Starter** 🌱 all the way to **Level 6: 123 Legend** 👑 with live animated progress bars.
+1. **Productivity Points & 10-Tier Mastery Progression**:
+   - Earn **Productivity Points** naturally by completing tasks (+10 pts), checking off subtasks (+2 pts), and maintaining consecutive daily streaks (+15 pts/day).
+   - Advance through **10 Progressive Achievement Levels**:
+     - **Level 1: Focused Starter** 🌱 (0 – 100 Points)
+     - **Level 2: Momentum Builder** ⚡ (100 – 300 Points)
+     - **Level 3: Task Master** 🎯 (300 – 700 Points)
+     - **Level 4: 1-2-3 Strategist** 🏆 (700 – 1,500 Points)
+     - **Level 5: Focus Champion** 🌟 (1,500 – 3,000 Points)
+     - **Level 6: Productivity Pro** 💎 (3,000 – 6,000 Points)
+     - **Level 7: Workflow Titan** 🚀 (6,000 – 12,000 Points)
+     - **Level 8: Master of Execution** 🛡️ (12,000 – 25,000 Points)
+     - **Level 9: Grandmaster of Focus** 🌌 (25,000 – 50,000 Points)
+     - **Level 10: 123 Immortal** 👑 (50,000+ Points) — An elite pinnacle reserved for true long-term productivity legends!
 
 2. **Productivity Insights (6-Card Grid)**:
    - **Tasks Archived**: All-time total completions.
@@ -52,7 +62,7 @@ Accessible via the **Trophy Badge (🏆)** located in the top action bar right b
 - **Subtasks Multi-Line Wrapping**: Descriptions now automatically expand vertically onto multiple rows for crystal-clear readability.
 - **Space-Efficient Note Previews**: The first line of task notes appears subtly under the title for effortless scanning without cluttering screen real estate.
 - **Add Task Project Dropdown Styling**: Enhanced project picker with color-accented badges and matching elevated dropdown popovers.
-- **100% Cross-Platform Synchronization**: Streaks, XP, and milestone metrics synchronize automatically across all your devices via Cloudflare Sync.
+- **100% Cross-Platform Synchronization**: Streaks, Points, and milestone metrics synchronize automatically across all your devices via Cloudflare Sync.
 
 ---
 

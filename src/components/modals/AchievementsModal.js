@@ -126,25 +126,32 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
             currentStreak = 1;
         }
 
-        // XP Calculation: 10 XP per archived task + 2 XP per subtask + 15 XP per streak day
-        const xp = (totalCompleted * 10) + (subtasksCompleted * 2) + (currentStreak * 15);
+        // Productivity Points Calculation: 10 pts per archived task + 2 pts per subtask + 15 pts per streak day
+        const points = (totalCompleted * 10) + (subtasksCompleted * 2) + (currentStreak * 15);
 
-        // Level Definitions
+        // 10-Tier Level Definitions (Progressive scale up to elite Level 10 pinnacle)
         const levels = [
-            { level: 1, title: 'Productivity Starter', minXp: 0, maxXp: 50, icon: '🌱' },
-            { level: 2, title: 'Momentum Builder', minXp: 50, maxXp: 150, icon: '⚡' },
-            { level: 3, title: 'Task Master', minXp: 150, maxXp: 350, icon: '🎯' },
-            { level: 4, title: '1-2-3 Strategist', minXp: 350, maxXp: 750, icon: '🏆' },
-            { level: 5, title: 'Focus Champion', minXp: 750, maxXp: 1500, icon: '🌟' },
-            { level: 6, title: '123 Legend', minXp: 1500, maxXp: 99999, icon: '👑' }
+            { level: 1, title: 'Focused Starter', minPoints: 0, maxPoints: 100, icon: '🌱' },
+            { level: 2, title: 'Momentum Builder', minPoints: 100, maxPoints: 300, icon: '⚡' },
+            { level: 3, title: 'Task Master', minPoints: 300, maxPoints: 700, icon: '🎯' },
+            { level: 4, title: '1-2-3 Strategist', minPoints: 700, maxPoints: 1500, icon: '🏆' },
+            { level: 5, title: 'Focus Champion', minPoints: 1500, maxPoints: 3000, icon: '🌟' },
+            { level: 6, title: 'Productivity Pro', minPoints: 3000, maxPoints: 6000, icon: '💎' },
+            { level: 7, title: 'Workflow Titan', minPoints: 6000, maxPoints: 12000, icon: '🚀' },
+            { level: 8, title: 'Master of Execution', minPoints: 12000, maxPoints: 25000, icon: '🛡️' },
+            { level: 9, title: 'Grandmaster of Focus', minPoints: 25000, maxPoints: 50000, icon: '🌌' },
+            { level: 10, title: '123 Immortal', minPoints: 50000, maxPoints: 999999, icon: '👑' }
         ];
 
-        const currentLevelInfo = levels.slice().reverse().find(l => xp >= l.minXp) || levels[0];
-        const nextLevelInfo = levels.find(l => l.level === currentLevelInfo.level + 1) || currentLevelInfo;
+        const currentLevelInfo = levels.slice().reverse().find(l => points >= l.minPoints) || levels[0];
+        const isMaxLevel = currentLevelInfo.level === 10;
+        const nextLevelInfo = isMaxLevel ? currentLevelInfo : (levels.find(l => l.level === currentLevelInfo.level + 1) || currentLevelInfo);
         
-        const xpInCurrentLevel = xp - currentLevelInfo.minXp;
-        const xpRequiredForNext = nextLevelInfo.maxXp - currentLevelInfo.minXp;
-        const levelProgressPercent = Math.min(Math.max(Math.round((xpInCurrentLevel / Math.max(xpRequiredForNext, 1)) * 100), 0), 100);
+        const pointsInCurrentLevel = points - currentLevelInfo.minPoints;
+        const pointsRequiredForNext = nextLevelInfo.maxPoints - currentLevelInfo.minPoints;
+        const levelProgressPercent = isMaxLevel 
+            ? 100 
+            : Math.min(Math.max(Math.round((pointsInCurrentLevel / Math.max(pointsRequiredForNext, 1)) * 100), 0), 100);
 
         // Milestone Badges
         const badges = [
@@ -224,7 +231,8 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
             currentStreak,
             completedThisWeek,
             completedPrevWeek,
-            xp,
+            points,
+            isMaxLevel,
             currentLevelInfo,
             nextLevelInfo,
             levelProgressPercent,
@@ -405,14 +413,14 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
 
                     {/* Content */}
                     <div style={styles.content}>
-                        {/* Hero Level & XP Progression */}
+                        {/* Hero Level & Productivity Points Progression */}
                         <div style={styles.heroLevelCard}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span style={{ fontSize: '1.6rem' }}>{stats.currentLevelInfo.icon}</span>
                                     <div>
                                         <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.5px', color: '#2563eb' }}>
-                                            Level {stats.currentLevelInfo.level}
+                                            Level {stats.currentLevelInfo.level} of 10
                                         </div>
                                         <div style={{ fontSize: '1.15rem', fontWeight: '800' }}>
                                             {stats.currentLevelInfo.title}
@@ -421,10 +429,10 @@ const AchievementsModal = ({ isOpen, onClose, tasks = [], archived = [], project
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--accent-color)' }}>
-                                        {stats.xp} XP
+                                        {stats.points.toLocaleString()} Points
                                     </div>
                                     <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
-                                        {stats.levelProgressPercent}% to Level {stats.nextLevelInfo.level}
+                                        {stats.isMaxLevel ? 'Pinnacle Achieved 👑' : `${stats.levelProgressPercent}% to Level ${stats.nextLevelInfo.level}`}
                                     </div>
                                 </div>
                             </div>

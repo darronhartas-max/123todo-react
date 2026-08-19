@@ -92,7 +92,7 @@ export const APP_VERSION = '3.5.0';
 
 export const RELEASE_CHANGELOG = {
   '3.5.0': [
-    { title: '🏆 Productivity Achievements & Stats Hub:', desc: 'Added an achievement trophy badge in the header opening a house-styled modal with XP progression, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, and unlockable milestone badges.' },
+    { title: '🏆 Productivity Achievements & Stats Hub:', desc: 'Added an achievement trophy badge in the header opening a house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, and unlockable milestone badges.' },
     { title: '↕️ Subtasks Line Wrapping & Drag-and-Drop Reordering:', desc: 'Checklist subtasks now automatically wrap lines onto multiple rows and can be rearranged via drag-and-drop handles across Add Task, Edit Modal, and Task List views.' },
     { title: '🔍 Space-Efficient Note Preview:', desc: 'Tasks with notes now display a clean, single-line preview of the note directly underneath the task title for quick scanning without eating screen real estate.' },
     { title: '🎨 Add Task Project Dropdown Styling:', desc: 'Restyled project selector in the Add Task form with project color pills, clean borders, and matching elevated dropdown popovers.' },

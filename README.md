@@ -8,7 +8,7 @@
 ## 🌟 Highlights & Key Advantages
 
 - **100% Free & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, and unlimited notes without subscription paywalls.
-- **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with XP progression, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
+- **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Dual-Skin OS**: Instant 1-tap toggle between structured **Task Manager Mode** and distraction-free **Simple Voice Notes Mode**.
 - **Interactive Drag-and-Drop Subtasks**: Multi-line auto-wrapping checklist subtasks with draggable reordering across Add Task, Edit Task, and Task lists.
 - **Compact Note Previews**: Space-efficient single-line note preview under task titles for effortless scanning without clutter.
@@ -158,11 +158,11 @@ When releasing a new version:
 
 ### v3.5.0 (Current)
 
-- **Productivity & Achievements Hub**: New trophy badge opening a house-styled modal with XP progression (Levels 1–6), 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
+- **Productivity & Achievements Hub**: New trophy badge opening a house-styled modal with 10 progressive achievement tiers (Levels 1–10 with an elite pinnacle), Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Drag-and-Drop Subtasks & Line Wrapping**: Multi-line auto-wrapping textareas for subtasks with draggable reordering handles across Add Task, Edit Task, and Task list views.
 - **Space-Efficient Note Previews**: Displays the first line of task notes under task titles in a compact, unobtrusive font with 1-tap expansion.
 - **Add Task Project Dropdown Styling**: Upgraded native select in Add Task form to match the custom color-accented dropdown from Edit Modal.
-- **100% Cross-Platform Synced Metrics**: Streaks, XP, and milestone metrics synchronize automatically across all devices via Cloudflare Sync.
+- **100% Cross-Platform Synced Metrics**: Streaks, Points, and milestone metrics synchronize automatically across all devices via Cloudflare Sync.
 
 ### v3.4.2
 

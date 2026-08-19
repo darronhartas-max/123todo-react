@@ -32,8 +32,9 @@ test('renders level, core stats, milestone badges and blog resources when open',
     // Verify Title & Header
     expect(screen.getByText('Productivity & Achievements')).toBeInTheDocument();
     
-    // Verify Level
+    // Verify Level and Points
     expect(screen.getAllByText(/Level/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Points/i)).toBeInTheDocument();
 
     // Verify Stats
     expect(screen.getByText('Productivity Insights')).toBeInTheDocument();
