@@ -41,6 +41,8 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            docker system prune -af || true
+            sudo journalctl --vacuum-time=2d || true
             sudo rm -rf /home/debian/wordpress-docker/app-123todo
             mkdir -p /home/debian/wordpress-docker/app-123todo
             sudo chown -R debian:debian /home/debian/wordpress-docker/app-123todo
