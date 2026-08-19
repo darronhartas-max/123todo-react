@@ -1,6 +1,6 @@
-# Why Switching to 123 ToDo is the Ultimate Productivity Upgrade (And How to Migrate in 60 Seconds)
+# Why Switching to 123 ToDo: 1-Click Migration from Todoist, TickTick, Keep, Google Tasks & Microsoft To Do
 
-*Published by 123 ToDo Team • Version 3.4.2 Release Guide*
+*Published by 123 ToDo Team • Version 3.5.0 Release Guide*
 
 In today's digital landscape, keeping on top of your daily responsibilities shouldn't require surrendering your personal data, paying mandatory monthly subscriptions, or risking data loss when you're offline. 
 

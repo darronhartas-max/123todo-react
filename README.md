@@ -1,15 +1,18 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.4.2** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.5.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
 ## 🌟 Highlights & Key Advantages
 
 - **100% Free & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, and unlimited notes without subscription paywalls.
+- **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with XP progression, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Dual-Skin OS**: Instant 1-tap toggle between structured **Task Manager Mode** and distraction-free **Simple Voice Notes Mode**.
-- **Zero-Knowledge Encrypted Sync**: Client-side AES-256-GCM encryption syncing directly via personal Google Drive or Cloudflare D1.
+- **Interactive Drag-and-Drop Subtasks**: Multi-line auto-wrapping checklist subtasks with draggable reordering across Add Task, Edit Task, and Task lists.
+- **Compact Note Previews**: Space-efficient single-line note preview under task titles for effortless scanning without clutter.
+- **Zero-Knowledge Encrypted Sync**: Client-side AES-256-GCM encryption syncing directly via personal Google Drive or Cloudflare D1 with shared cross-platform stats.
 - **Universal Competitor Migration**: 1-click import wizard for Todoist, TickTick, Google Keep, Google Tasks, and Microsoft To Do.
 - **Continuous Voice Dictation**: Web Speech API integration with spoken punctuation recognition ("comma", "full stop", "question mark") and auto-submission commands.
 - **Wide Mode Kanban Views**: View desktop tasks grouped either by **Priorities (P1–P4)** or **Project Columns** with drag-and-drop.
@@ -153,9 +156,19 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.4.1 (Current)
+### v3.5.0 (Current)
 
-- **Cloudflare Sync Optimization & Adaptive Rate Budgeting**: Optimized cloud sync request volume with conditional pulls, automatic CORS caching, and intelligent client-side adaptive rate budgeting that protects battery, bandwidth, and zero-cost quotas.
+- **Productivity & Achievements Hub**: New trophy badge opening a house-styled modal with XP progression (Levels 1–6), 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
+- **Drag-and-Drop Subtasks & Line Wrapping**: Multi-line auto-wrapping textareas for subtasks with draggable reordering handles across Add Task, Edit Task, and Task list views.
+- **Space-Efficient Note Previews**: Displays the first line of task notes under task titles in a compact, unobtrusive font with 1-tap expansion.
+- **Add Task Project Dropdown Styling**: Upgraded native select in Add Task form to match the custom color-accented dropdown from Edit Modal.
+- **100% Cross-Platform Synced Metrics**: Streaks, XP, and milestone metrics synchronize automatically across all devices via Cloudflare Sync.
+
+### v3.4.2
+
+- **Accelerated Background Sync Intervals**: Upgraded background polling speeds across standard adaptive sync tiers (30s default, 60s moderate, 120s heavy).
+
+### v3.4.1
 
 ### v3.4.0
 
