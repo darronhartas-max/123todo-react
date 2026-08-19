@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, MicOff } from 'lucide-react';
+import { Plus, Minus, Mic, MicOff, ChevronDown, GripVertical } from 'lucide-react';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
@@ -19,6 +19,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     };
 
     const [projectId, setProjectId] = useState(getInitialProjectId);
+    const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [text, setText] = useState('');
     const [notes, setNotes] = useState('');
     const [showNotes, setShowNotes] = useState(false);
@@ -28,6 +29,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [showSubtasks, setShowSubtasks] = useState(false);
     const [subtasks, setSubtasks] = useState([]);
     const [newSubtaskText, setNewSubtaskText] = useState('');
+    const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
+    const [dragOverSubtaskIndex, setDragOverSubtaskIndex] = useState(null);
     
     const [showSchedule, setShowSchedule] = useState(false);
     const [scheduledDate, setScheduledDate] = useState(null);
@@ -334,16 +337,104 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
     return (
         <div style={styles.addSection}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <select
-                    value={projectId}
-                    onChange={(e) => setProjectId(e.target.value)}
-                    style={styles.projectSelect}
-                >
-                    {projects.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                </select>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', position: 'relative', zIndex: 50 }}>
+                {/* Project Custom Dropdown */}
+                {(() => {
+                    const activeProject = (projects || []).find(p => p.id === projectId) || projects?.[0] || { id: 'general', name: 'General', color: '#6b7280' };
+                    return (
+                        <div style={{ position: 'relative', minWidth: '150px', maxWidth: '240px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setIsProjectOpen(!isProjectOpen)}
+                                style={{
+                                    padding: '6px 10px',
+                                    borderRadius: '6px',
+                                    border: `1.5px solid ${activeProject.color || '#6b7280'}`,
+                                    background: 'var(--item-bg)',
+                                    color: activeProject.color || 'var(--text-color)',
+                                    fontSize: '0.95rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '8px',
+                                    boxSizing: 'border-box',
+                                    outline: 'none',
+                                    transition: 'all 0.15s ease'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                                    <span style={{
+                                        width: '5px',
+                                        height: '14px',
+                                        borderRadius: '2px',
+                                        background: activeProject.color || '#6b7280',
+                                        flexShrink: 0
+                                    }} />
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {activeProject.name}
+                                    </span>
+                                </div>
+                                <ChevronDown size={16} style={{ color: activeProject.color || 'var(--muted-text)', flexShrink: 0 }} />
+                            </button>
+
+                            {isProjectOpen && (
+                                <>
+                                    <div onClick={() => setIsProjectOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} />
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: 'calc(100% + 4px)',
+                                        left: 0,
+                                        minWidth: '180px',
+                                        background: 'var(--surface-color)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '6px',
+                                        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                        zIndex: 100,
+                                        maxHeight: '220px',
+                                        overflowY: 'auto',
+                                        padding: '4px 0'
+                                    }}>
+                                        {(projects || []).map(p => {
+                                            const isSel = p.id === projectId;
+                                            return (
+                                                <div
+                                                    key={p.id}
+                                                    onClick={() => {
+                                                        setProjectId(p.id);
+                                                        setIsProjectOpen(false);
+                                                    }}
+                                                    style={{
+                                                        padding: '8px 12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '10px',
+                                                        fontSize: '0.95rem',
+                                                        fontWeight: isSel ? '700' : '600',
+                                                        color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
+                                                        background: 'transparent',
+                                                        cursor: 'pointer',
+                                                        transition: 'background 0.15s ease'
+                                                    }}
+                                                >
+                                                    <span style={{
+                                                        width: '5px',
+                                                        height: '14px',
+                                                        borderRadius: '2px',
+                                                        background: p.color || '#6b7280',
+                                                        flexShrink: 0
+                                                    }} />
+                                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    );
+                })()}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -501,82 +592,151 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     </div>
                     {subtasks.length > 0 && (
                         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
-                            {subtasks.map((st) => (
-                                <li key={st.id} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '4px 0',
-                                    borderBottom: '1px solid rgba(0,0,0,0.04)',
-                                    gap: '8px'
-                                }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={st.completed}
-                                        onChange={() => {
-                                            setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                            {subtasks.map((st, index) => {
+                                const isDraggingThis = draggedSubtaskIndex === index;
+                                const isOverThis = dragOverSubtaskIndex === index;
+                                return (
+                                    <li
+                                        key={st.id}
+                                        draggable={true}
+                                        onDragStart={(e) => {
+                                            e.dataTransfer.setData('text/plain', index.toString());
+                                            setDraggedSubtaskIndex(index);
                                         }}
-                                        style={{ cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0 }}
-                                    />
-                                    <input
-                                        type="text"
-                                        value={st.text}
-                                        onChange={(e) => {
-                                            const updatedText = e.target.value;
-                                            setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
-                                        }}
-                                        placeholder="Subtask step..."
-                                        style={{
-                                            flex: 1,
-                                            border: 'none',
-                                            background: 'transparent',
-                                            fontSize: '1.05rem',
-                                            fontWeight: '500',
-                                            color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                            textDecoration: st.completed ? 'line-through' : 'none',
-                                            outline: 'none',
-                                            padding: '3px 6px',
-                                            borderRadius: '4px',
-                                            fontFamily: 'inherit',
-                                            transition: 'all 0.15s ease'
-                                        }}
-                                        onFocus={(e) => {
-                                            e.target.style.background = 'var(--surface-color)';
-                                            e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
-                                        }}
-                                        onBlur={(e) => {
-                                            e.target.style.background = 'transparent';
-                                            e.target.style.boxShadow = 'none';
-                                            if (!st.text.trim()) {
-                                                setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            e.dataTransfer.dropEffect = 'move';
+                                            if (dragOverSubtaskIndex !== index) {
+                                                setDragOverSubtaskIndex(index);
                                             }
                                         }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
+                                        onDragEnd={() => {
+                                            setDraggedSubtaskIndex(null);
+                                            setDragOverSubtaskIndex(null);
+                                        }}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            const fromIndex = draggedSubtaskIndex ?? parseInt(e.dataTransfer.getData('text/plain'), 10);
+                                            const toIndex = index;
+                                            if (fromIndex === undefined || fromIndex === null || isNaN(fromIndex) || fromIndex === toIndex) {
+                                                setDraggedSubtaskIndex(null);
+                                                setDragOverSubtaskIndex(null);
+                                                return;
+                                            }
+                                            const reordered = [...subtasks];
+                                            const [moved] = reordered.splice(fromIndex, 1);
+                                            reordered.splice(toIndex, 0, moved);
+                                            setSubtasks(reordered);
+                                            setDraggedSubtaskIndex(null);
+                                            setDragOverSubtaskIndex(null);
+                                        }}
                                         style={{
-                                            border: 'none',
-                                            background: 'transparent',
-                                            color: '#ef4444',
-                                            cursor: 'pointer',
-                                            fontSize: '0.95rem',
-                                            fontWeight: '600',
-                                            padding: '2px 6px',
-                                            flexShrink: 0
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            justifyContent: 'space-between',
+                                            padding: '4px 0',
+                                            borderBottom: '1px solid rgba(0,0,0,0.04)',
+                                            borderTop: isOverThis && draggedSubtaskIndex !== index ? '2px solid var(--accent-color)' : '2px solid transparent',
+                                            opacity: isDraggingThis ? 0.4 : 1,
+                                            gap: '8px',
+                                            transition: 'border-color 0.15s ease, opacity 0.15s ease'
                                         }}
                                     >
-                                        Delete
-                                    </button>
-                                </li>
-                            ))}
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                cursor: 'grab',
+                                                padding: '4px 0',
+                                                color: 'var(--muted-text)',
+                                                opacity: 0.6,
+                                                flexShrink: 0
+                                            }}
+                                            title="Drag to rearrange subtask"
+                                        >
+                                            <GripVertical size={16} />
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={st.completed}
+                                            onChange={() => {
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                            }}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
+                                        />
+                                        <textarea
+                                            value={st.text}
+                                            rows={1}
+                                            onChange={(e) => {
+                                                const updatedText = e.target.value;
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                            }}
+                                            onInput={(e) => {
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = e.target.scrollHeight + 'px';
+                                            }}
+                                            placeholder="Subtask step..."
+                                            style={{
+                                                flex: 1,
+                                                border: 'none',
+                                                background: 'transparent',
+                                                fontSize: '1.05rem',
+                                                fontWeight: '500',
+                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                textDecoration: st.completed ? 'line-through' : 'none',
+                                                outline: 'none',
+                                                padding: '3px 6px',
+                                                borderRadius: '4px',
+                                                fontFamily: 'inherit',
+                                                resize: 'none',
+                                                overflowY: 'hidden',
+                                                wordBreak: 'break-word',
+                                                lineHeight: '1.35',
+                                                transition: 'all 0.15s ease'
+                                            }}
+                                            onFocus={(e) => {
+                                                e.target.style.background = 'var(--surface-color)';
+                                                e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                            }}
+                                            onBlur={(e) => {
+                                                e.target.style.background = 'transparent';
+                                                e.target.style.boxShadow = 'none';
+                                                if (!st.text.trim()) {
+                                                    setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
+                                            style={{
+                                                border: 'none',
+                                                background: 'transparent',
+                                                color: '#ef4444',
+                                                cursor: 'pointer',
+                                                fontSize: '0.95rem',
+                                                fontWeight: '600',
+                                                padding: '2px 6px',
+                                                flexShrink: 0,
+                                                marginTop: '2px'
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                     <div style={{ display: 'flex', gap: '6px' }}>
-                        <input
-                            type="text"
+                        <textarea
+                            rows={1}
                             value={newSubtaskText}
                             onChange={(e) => setNewSubtaskText(e.target.value)}
+                            onInput={(e) => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                            }}
                             placeholder="Add subtask step..."
                             style={{
                                 flex: 1,
@@ -585,10 +745,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 border: '1px solid var(--border-color)',
                                 borderRadius: '4px',
                                 background: 'var(--item-bg)',
-                                color: 'var(--text-color)'
+                                color: 'var(--text-color)',
+                                resize: 'none',
+                                overflowY: 'hidden',
+                                fontFamily: 'inherit',
+                                lineHeight: '1.35',
+                                wordBreak: 'break-word',
+                                outline: 'none'
                             }}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
+                                if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();
                                     handleAddSubtask();
                                 }
@@ -604,7 +770,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 borderRadius: '4px',
                                 cursor: 'pointer',
                                 fontSize: '1.05rem',
-                                fontWeight: '600'
+                                fontWeight: '600',
+                                alignSelf: 'flex-start'
                             }}
                         >
                             Add

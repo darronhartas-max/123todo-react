@@ -335,14 +335,18 @@ const NoteCard = ({
                         }}
                         style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0 }}
                       />
-                      <input
-                        type="text"
+                      <textarea
                         value={st.text}
+                        rows={1}
                         onChange={(e) => {
                           const updatedText = e.target.value;
                           const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
                           setSubtasks(updated);
                           onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        onInput={(e) => {
+                          e.target.style.height = 'auto';
+                          e.target.style.height = e.target.scrollHeight + 'px';
                         }}
                         placeholder="Subtask step..."
                         style={{
@@ -354,7 +358,12 @@ const NoteCard = ({
                           textDecoration: st.completed ? 'line-through' : 'none',
                           outline: 'none',
                           padding: '2px 4px',
-                          borderRadius: '4px'
+                          borderRadius: '4px',
+                          fontFamily: 'inherit',
+                          resize: 'none',
+                          overflowY: 'hidden',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.35'
                         }}
                         onFocus={(e) => {
                           e.target.style.background = 'var(--card-bg, #ffffff)';

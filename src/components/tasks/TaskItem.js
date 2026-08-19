@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getNextWeekDateString } from '../../utils/dateUtils';
@@ -19,6 +19,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const [showNotesExpanded, setShowNotesExpanded] = useState(false);
     const [showSubtasksExpanded, setShowSubtasksExpanded] = useState(false);
+    const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
+    const [dragOverSubtaskIndex, setDragOverSubtaskIndex] = useState(null);
     const archiveTimeoutRef = React.useRef(null);
 
     // Swipe Gesture State & Visual Damping
@@ -553,6 +555,41 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     <span style={styles.taskText}>{task.text}</span>
                 </div>
 
+                {/* Compact Note Preview: first line only in smaller font, space-efficient */}
+                {(() => {
+                    const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
+                    if (!firstNoteLine || showNotesExpanded) return null;
+                    return (
+                        <div
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowNotesExpanded(true);
+                            }}
+                            title="Click to view full notes"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.78rem',
+                                color: 'var(--muted-text)',
+                                marginTop: '2px',
+                                cursor: 'pointer',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '100%',
+                                lineHeight: '1.25',
+                                opacity: 0.85
+                            }}
+                        >
+                            <FileText size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {firstNoteLine}
+                            </span>
+                        </div>
+                    );
+                })()}
+
                 {/* Scheduled / Recurrence details */}
                 {showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
                     <div style={{
@@ -723,58 +760,124 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         </div>
                         {showSubtasksExpanded && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '6px 0 0 0' }}>
-                                {(task.subtasks || []).map((st) => (
-                                    <li key={st.id} onClick={(e) => e.stopPropagation()} style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '3px 0',
-                                        borderBottom: '1px dashed var(--border-color)'
-                                    }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={st.completed}
-                                            onChange={() => {
-                                                const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
-                                                onUpdate && onUpdate(task.id, { subtasks: updated });
+                                {(task.subtasks || []).map((st, index) => {
+                                    const isDraggingThis = draggedSubtaskIndex === index;
+                                    const isOverThis = dragOverSubtaskIndex === index;
+                                    return (
+                                        <li
+                                            key={st.id}
+                                            draggable={true}
+                                            onDragStart={(e) => {
+                                                e.dataTransfer.setData('text/plain', index.toString());
+                                                setDraggedSubtaskIndex(index);
                                             }}
-                                            style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
-                                        />
-                                        <input
-                                            type="text"
-                                            value={st.text}
-                                            onChange={(e) => {
-                                                const updatedText = e.target.value;
-                                                const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, text: updatedText } : s);
-                                                onUpdate && onUpdate(task.id, { subtasks: updated });
-                                            }}
-                                            placeholder="Subtask step..."
-                                            style={{
-                                                flex: 1,
-                                                border: 'none',
-                                                background: 'transparent',
-                                                fontSize: '0.85rem',
-                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                textDecoration: st.completed ? 'line-through' : 'none',
-                                                outline: 'none',
-                                                padding: '2px 4px',
-                                                borderRadius: '4px'
-                                            }}
-                                            onFocus={(e) => {
-                                                e.target.style.background = 'var(--bg-color)';
-                                                e.target.style.boxShadow = '0 0 0 1px var(--accent-color)';
-                                            }}
-                                            onBlur={(e) => {
-                                                e.target.style.background = 'transparent';
-                                                e.target.style.boxShadow = 'none';
-                                                if (!st.text.trim()) {
-                                                    const updated = (task.subtasks || []).filter(s => s.id !== st.id);
-                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                e.dataTransfer.dropEffect = 'move';
+                                                if (dragOverSubtaskIndex !== index) {
+                                                    setDragOverSubtaskIndex(index);
                                                 }
                                             }}
-                                        />
-                                    </li>
-                                ))}
+                                            onDragEnd={() => {
+                                                setDraggedSubtaskIndex(null);
+                                                setDragOverSubtaskIndex(null);
+                                            }}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                const fromIndex = draggedSubtaskIndex ?? parseInt(e.dataTransfer.getData('text/plain'), 10);
+                                                const toIndex = index;
+                                                if (fromIndex === undefined || fromIndex === null || isNaN(fromIndex) || fromIndex === toIndex) {
+                                                    setDraggedSubtaskIndex(null);
+                                                    setDragOverSubtaskIndex(null);
+                                                    return;
+                                                }
+                                                const reordered = [...(task.subtasks || [])];
+                                                const [moved] = reordered.splice(fromIndex, 1);
+                                                reordered.splice(toIndex, 0, moved);
+                                                onUpdate && onUpdate(task.id, { subtasks: reordered });
+                                                setDraggedSubtaskIndex(null);
+                                                setDragOverSubtaskIndex(null);
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'flex-start',
+                                                gap: '6px',
+                                                padding: '3px 0',
+                                                borderBottom: '1px dashed var(--border-color)',
+                                                borderTop: isOverThis && draggedSubtaskIndex !== index ? '2px solid var(--accent-color)' : '2px solid transparent',
+                                                opacity: isDraggingThis ? 0.4 : 1,
+                                                transition: 'border-color 0.15s ease, opacity 0.15s ease'
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    cursor: 'grab',
+                                                    padding: '3px 0',
+                                                    color: 'var(--muted-text)',
+                                                    opacity: 0.6,
+                                                    flexShrink: 0
+                                                }}
+                                                title="Drag to rearrange subtask"
+                                            >
+                                                <GripVertical size={14} />
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                checked={st.completed}
+                                                onChange={() => {
+                                                    const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
+                                                }}
+                                                style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0, marginTop: '3px' }}
+                                            />
+                                            <textarea
+                                                value={st.text}
+                                                rows={1}
+                                                onChange={(e) => {
+                                                    const updatedText = e.target.value;
+                                                    const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, text: updatedText } : s);
+                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
+                                                }}
+                                                onInput={(e) => {
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = e.target.scrollHeight + 'px';
+                                                }}
+                                                placeholder="Subtask step..."
+                                                style={{
+                                                    flex: 1,
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    fontSize: '0.88rem',
+                                                    color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                    textDecoration: st.completed ? 'line-through' : 'none',
+                                                    outline: 'none',
+                                                    padding: '2px 4px',
+                                                    borderRadius: '4px',
+                                                    fontFamily: 'inherit',
+                                                    resize: 'none',
+                                                    overflowY: 'hidden',
+                                                    wordBreak: 'break-word',
+                                                    lineHeight: '1.35'
+                                                }}
+                                                onFocus={(e) => {
+                                                    e.target.style.background = 'var(--bg-color)';
+                                                    e.target.style.boxShadow = '0 0 0 1px var(--accent-color)';
+                                                }}
+                                                onBlur={(e) => {
+                                                    e.target.style.background = 'transparent';
+                                                    e.target.style.boxShadow = 'none';
+                                                    if (!st.text.trim()) {
+                                                        const updated = (task.subtasks || []).filter(s => s.id !== st.id);
+                                                        onUpdate && onUpdate(task.id, { subtasks: updated });
+                                                    }
+                                                }}
+                                            />
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         )}
                     </div>
@@ -799,7 +902,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 fontWeight: '600'
                             }}
                         >
-                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes'}
+                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Full Notes'}
                         </button>
                         <AnimatePresence>
                             {showNotesExpanded && (

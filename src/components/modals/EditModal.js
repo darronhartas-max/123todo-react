@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus } from 'lucide-react';
+import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
@@ -114,6 +114,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const [showSubtasks, setShowSubtasks] = useState(!!task.subtasks && task.subtasks.length > 0);
     const [subtasks, setSubtasks] = useState(task.subtasks || []);
     const [newSubtaskText, setNewSubtaskText] = useState('');
+    const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
+    const [dragOverSubtaskIndex, setDragOverSubtaskIndex] = useState(null);
 
     // Scheduling and recurrence states
     const [showSchedule, setShowSchedule] = useState(!!task.scheduledDate);
@@ -659,84 +661,153 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         </div>
                         {subtasks.length > 0 && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
-                                {subtasks.map((st) => (
-                                    <li key={st.id} style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: '4px 0',
-                                        borderBottom: '1px solid var(--border-color)',
-                                        gap: '8px'
-                                    }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={st.completed}
-                                            onChange={() => {
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                {subtasks.map((st, index) => {
+                                    const isDraggingThis = draggedSubtaskIndex === index;
+                                    const isOverThis = dragOverSubtaskIndex === index;
+                                    return (
+                                        <li
+                                            key={st.id}
+                                            draggable={true}
+                                            onDragStart={(e) => {
+                                                e.dataTransfer.setData('text/plain', index.toString());
+                                                setDraggedSubtaskIndex(index);
                                             }}
-                                            style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0 }}
-                                        />
-                                        <input
-                                            type="text"
-                                            value={st.text}
-                                            onChange={(e) => {
-                                                const updatedText = e.target.value;
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
-                                            }}
-                                            placeholder="Subtask description..."
-                                            style={{
-                                                flex: 1,
-                                                border: 'none',
-                                                background: 'transparent',
-                                                fontSize: '1.05rem',
-                                                fontWeight: '500',
-                                                color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                textDecoration: st.completed ? 'line-through' : 'none',
-                                                outline: 'none',
-                                                padding: '4px 6px',
-                                                borderRadius: '4px',
-                                                fontFamily: 'inherit',
-                                                transition: 'all 0.15s ease'
-                                            }}
-                                            onFocus={(e) => {
-                                                e.target.style.background = 'var(--bg-color)';
-                                                e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
-                                            }}
-                                            onBlur={(e) => {
-                                                e.target.style.background = 'transparent';
-                                                e.target.style.boxShadow = 'none';
-                                                if (!st.text.trim()) {
-                                                    setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                e.dataTransfer.dropEffect = 'move';
+                                                if (dragOverSubtaskIndex !== index) {
+                                                    setDragOverSubtaskIndex(index);
                                                 }
                                             }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
-                                            style={{
-                                                border: 'none',
-                                                background: 'transparent',
-                                                color: '#ef4444',
-                                                cursor: 'pointer',
-                                                padding: '2px 6px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                flexShrink: 0
+                                            onDragEnd={() => {
+                                                setDraggedSubtaskIndex(null);
+                                                setDragOverSubtaskIndex(null);
                                             }}
-                                            title="Delete step"
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                const fromIndex = draggedSubtaskIndex ?? parseInt(e.dataTransfer.getData('text/plain'), 10);
+                                                const toIndex = index;
+                                                if (fromIndex === undefined || fromIndex === null || isNaN(fromIndex) || fromIndex === toIndex) {
+                                                    setDraggedSubtaskIndex(null);
+                                                    setDragOverSubtaskIndex(null);
+                                                    return;
+                                                }
+                                                const reordered = [...subtasks];
+                                                const [moved] = reordered.splice(fromIndex, 1);
+                                                reordered.splice(toIndex, 0, moved);
+                                                setSubtasks(reordered);
+                                                setDraggedSubtaskIndex(null);
+                                                setDragOverSubtaskIndex(null);
+                                            }}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'flex-start',
+                                                justifyContent: 'space-between',
+                                                padding: '4px 0',
+                                                borderBottom: '1px solid var(--border-color)',
+                                                borderTop: isOverThis && draggedSubtaskIndex !== index ? '2px solid var(--accent-color)' : '2px solid transparent',
+                                                opacity: isDraggingThis ? 0.4 : 1,
+                                                gap: '8px',
+                                                transition: 'border-color 0.15s ease, opacity 0.15s ease'
+                                            }}
                                         >
-                                            <X size={16} />
-                                        </button>
-                                    </li>
-                                ))}
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    cursor: 'grab',
+                                                    padding: '4px 0',
+                                                    color: 'var(--muted-text)',
+                                                    opacity: 0.6,
+                                                    flexShrink: 0
+                                                }}
+                                                title="Drag to rearrange subtask"
+                                            >
+                                                <GripVertical size={16} />
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                checked={st.completed}
+                                                onChange={() => {
+                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                                }}
+                                                style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
+                                            />
+                                            <textarea
+                                                value={st.text}
+                                                rows={1}
+                                                onChange={(e) => {
+                                                    const updatedText = e.target.value;
+                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                                }}
+                                                onInput={(e) => {
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = e.target.scrollHeight + 'px';
+                                                }}
+                                                placeholder="Subtask description..."
+                                                style={{
+                                                    flex: 1,
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    fontSize: '1.05rem',
+                                                    fontWeight: '500',
+                                                    color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                    textDecoration: st.completed ? 'line-through' : 'none',
+                                                    outline: 'none',
+                                                    padding: '3px 6px',
+                                                    borderRadius: '4px',
+                                                    fontFamily: 'inherit',
+                                                    resize: 'none',
+                                                    overflowY: 'hidden',
+                                                    wordBreak: 'break-word',
+                                                    lineHeight: '1.35',
+                                                    transition: 'all 0.15s ease'
+                                                }}
+                                                onFocus={(e) => {
+                                                    e.target.style.background = 'var(--bg-color)';
+                                                    e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                                }}
+                                                onBlur={(e) => {
+                                                    e.target.style.background = 'transparent';
+                                                    e.target.style.boxShadow = 'none';
+                                                    if (!st.text.trim()) {
+                                                        setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
+                                                style={{
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    color: '#ef4444',
+                                                    cursor: 'pointer',
+                                                    padding: '4px 6px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0,
+                                                    marginTop: '2px'
+                                                }}
+                                                title="Delete step"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         )}
                         <div style={{ display: 'flex', gap: '6px' }}>
-                            <input
-                                type="text"
+                            <textarea
+                                rows={1}
                                 value={newSubtaskText}
                                 onChange={(e) => setNewSubtaskText(e.target.value)}
+                                onInput={(e) => {
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = e.target.scrollHeight + 'px';
+                                }}
                                 placeholder="Add step..."
                                 style={{
                                     flex: 1,
@@ -746,10 +817,15 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     borderRadius: '4px',
                                     background: 'var(--bg-color)',
                                     color: 'var(--text-color)',
+                                    resize: 'none',
+                                    overflowY: 'hidden',
+                                    fontFamily: 'inherit',
+                                    lineHeight: '1.35',
+                                    wordBreak: 'break-word',
                                     outline: 'none'
                                 }}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();
                                         handleAddSubtask();
                                     }
@@ -765,7 +841,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     borderRadius: '4px',
                                     cursor: 'pointer',
                                     fontSize: '1.05rem',
-                                    fontWeight: '600'
+                                    fontWeight: '600',
+                                    alignSelf: 'flex-start'
                                 }}
                             >
                                 Add
