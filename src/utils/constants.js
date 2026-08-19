@@ -88,9 +88,13 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.5.0';
+export const APP_VERSION = '3.5.1';
 
 export const RELEASE_CHANGELOG = {
+  '3.5.1': [
+    { title: '🎨 10-Tier Level Roadmap & Color-Coded Progress Ladder:', desc: 'Added an interactive progression guide in the Achievements Hub detailing all 10 ranks from Focused Starter to 123 Immortal, complete with custom color themes, level descriptions, and point requirements.' },
+    { title: '📖 Featured Streaks & Milestones Blog Guide:', desc: 'Linked our comprehensive illustrated guide on "The Psychology of Productivity Streaks & Milestones" directly from the Achievements Hub.' }
+  ],
   '3.5.0': [
     { title: '🏆 Productivity Achievements & Stats Hub:', desc: 'Added an achievement trophy badge in the header opening a house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, and unlockable milestone badges.' },
     { title: '↕️ Subtasks Line Wrapping & Drag-and-Drop Reordering:', desc: 'Checklist subtasks now automatically wrap lines onto multiple rows and can be rearranged via drag-and-drop handles across Add Task, Edit Modal, and Task List views.' },

@@ -22,6 +22,14 @@ import {
 
 const BLOG_ARTICLES = [
     {
+        id: 'milestones-guide',
+        title: 'Productivity Streaks & 10-Tier Milestones',
+        subtitle: "How 123 ToDo's gamified points engine turns daily focus into unstoppable momentum.",
+        url: 'https://www.123todo.com/gamification-productivity-streaks-milestones-guide',
+        tag: 'Featured Guide',
+        icon: '🏆'
+    },
+    {
         id: 'prioritization',
         title: 'Mastering Task Prioritization',
         subtitle: 'Discover how a simple priority-based task management system transforms daily productivity.',

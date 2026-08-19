@@ -34,7 +34,7 @@ test('renders level, core stats, milestone badges and blog resources when open',
     
     // Verify Level and Points
     expect(screen.getAllByText(/Level/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Points/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Points/i).length).toBeGreaterThan(0);
 
     // Verify Level Roadmap & Point Guide Button
     const roadmapBtn = screen.getByText('View All 10 Levels & Point Guide');
@@ -59,8 +59,8 @@ test('renders level, core stats, milestone badges and blog resources when open',
 
     // Verify Blog Guides
     expect(screen.getByText('Time Management & Productivity Guides')).toBeInTheDocument();
+    expect(screen.getByText('Productivity Streaks & 10-Tier Milestones')).toBeInTheDocument();
     expect(screen.getByText('Mastering Task Prioritization')).toBeInTheDocument();
-    expect(screen.getByText('Small Steps, Big Dreams')).toBeInTheDocument();
 
     // Close button triggers onClose
     const closeBtn = screen.getByTitle('Close');

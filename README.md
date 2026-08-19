@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.5.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.5.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -156,7 +156,12 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.5.0 (Current)
+### v3.5.1 (Current)
+
+- **10-Tier Level Roadmap & Color-Coded Progress Ladder**: Expandable progression guide in the Achievements Hub detailing all 10 ranks from Focused Starter to 123 Immortal, complete with custom color themes, level descriptions, and point requirements.
+- **Featured Streaks & Milestones Blog Guide**: Directly linked our new illustrated guide on *"The Psychology of Productivity Streaks & Milestones"* on 123todo.com.
+
+### v3.5.0
 
 - **Productivity & Achievements Hub**: New trophy badge opening a house-styled modal with 10 progressive achievement tiers (Levels 1–10 with an elite pinnacle), Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Drag-and-Drop Subtasks & Line Wrapping**: Multi-line auto-wrapping textareas for subtasks with draggable reordering handles across Add Task, Edit Task, and Task list views.
