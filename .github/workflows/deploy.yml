@@ -41,9 +41,10 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            sudo rm -rf /home/debian/wordpress-docker/app-123todo
             mkdir -p /home/debian/wordpress-docker/app-123todo
             sudo chown -R debian:debian /home/debian/wordpress-docker/app-123todo
-            rm -rf /home/debian/wordpress-docker/app-123todo/*
+            chmod -R 775 /home/debian/wordpress-docker/app-123todo
 
       - name: Deploy files via SCP
         uses: appleboy/scp-action@v0.1.7
