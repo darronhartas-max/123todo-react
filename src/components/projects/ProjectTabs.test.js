@@ -55,4 +55,25 @@ describe('ProjectTabs Component', () => {
         expect(screen.getByText('Personal')).toBeInTheDocument();
         expect(screen.getByText('1')).toBeInTheDocument();
     });
+
+    test('renders Achievements trophy button and triggers onOpenAchievements when clicked', () => {
+        const onOpenAchievementsMock = jest.fn();
+        render(
+            <ProjectTabs
+                projects={sampleProjects}
+                tasks={sampleTasks}
+                currentProjectId="all"
+                onSelect={jest.fn()}
+                showSearch={false}
+                onToggleSearch={jest.fn()}
+                onOpenSettings={jest.fn()}
+                onOpenAchievements={onOpenAchievementsMock}
+            />
+        );
+
+        const trophyBtn = screen.getByTitle('Productivity Achievements & Insights');
+        expect(trophyBtn).toBeInTheDocument();
+        fireEvent.click(trophyBtn);
+        expect(onOpenAchievementsMock).toHaveBeenCalled();
+    });
 });

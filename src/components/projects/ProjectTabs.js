@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle } from 'lucide-react';
+import { X, ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle, Trophy } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 
-const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings, onToggleAdd, isAddOpen }) => {
+const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings, onOpenAchievements, onToggleAdd, isAddOpen }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
@@ -201,10 +201,28 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                     )}
                 </div>
 
-                {/* 3. Settings cog icon on the right-hand side */}
+                {/* 3. Achievements Badge icon button */}
+                {onOpenAchievements && (
+                    <button
+                        onClick={onOpenAchievements}
+                        style={{
+                            ...styles.actionBtn,
+                            marginLeft: 'auto',
+                            borderColor: '#f59e0b',
+                            color: '#d97706',
+                            background: 'rgba(245, 158, 11, 0.12)',
+                            boxShadow: '0 1px 4px rgba(245, 158, 11, 0.2)'
+                        }}
+                        title="Productivity Achievements & Insights"
+                    >
+                        <Trophy size={17} />
+                    </button>
+                )}
+
+                {/* 4. Settings cog icon on the right-hand side */}
                 <button 
                     onClick={onOpenSettings} 
-                    style={{ ...styles.actionBtn, marginLeft: 'auto' }} 
+                    style={{ ...styles.actionBtn, marginLeft: onOpenAchievements ? '8px' : 'auto' }} 
                     title="Settings"
                 >
                     <Settings size={18} />

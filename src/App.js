@@ -15,6 +15,7 @@ import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
 import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
+import AchievementsModal from './components/modals/AchievementsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
 import TodoistGuideModal from './components/modals/TodoistGuideModal';
 import UniversalImportModal from './components/modals/UniversalImportModal';
@@ -186,6 +187,7 @@ const TodoApp = () => {
   const [showRestoreToast, setShowRestoreToast] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
   const [prevVersionStr, setPrevVersionStr] = useState('');
@@ -958,6 +960,7 @@ const TodoApp = () => {
               searchQuery={searchTerm}
               onSearchChange={setSearchTerm}
               onOpenSettings={() => setShowSettings(true)}
+              onOpenAchievements={() => setShowAchievements(true)}
               notesFontSize={notesFontSize}
             />
           ) : (
@@ -984,6 +987,7 @@ const TodoApp = () => {
                 onDelete={handleDeleteProjectRequest}
                 showSearch={showSearch}
                 onToggleSearch={() => setShowSearch(!showSearch)}
+                onOpenAchievements={() => setShowAchievements(true)}
                 onOpenSettings={() => setShowSettings(true)}
                 onToggleAdd={() => setShowAddSection(!showAddSection)}
                 isAddOpen={showAddSection}
@@ -1339,6 +1343,14 @@ const TodoApp = () => {
       <AdminStatsModal
         isOpen={showAdminStats}
         onClose={() => setShowAdminStats(false)}
+      />
+
+      <AchievementsModal
+        isOpen={showAchievements}
+        onClose={() => setShowAchievements(false)}
+        tasks={tasks}
+        archived={archived}
+        projects={availableProjects}
       />
 
       <AnimatePresence>

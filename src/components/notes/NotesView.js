@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Folder, Search, Settings
+  Folder, Search, Settings, Trophy
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import SearchBar from '../tasks/SearchBar';
@@ -22,6 +22,7 @@ const NotesView = ({
   searchQuery,
   onSearchChange,
   onOpenSettings,
+  onOpenAchievements,
   notesFontSize = 18
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
@@ -224,7 +225,31 @@ const NotesView = ({
           })}
         </select>
 
-        {/* 3. Settings Cog Icon Button */}
+        {/* 3. Achievements Badge Button */}
+        {onOpenAchievements && (
+          <button
+            onClick={onOpenAchievements}
+            style={{
+              padding: '7px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(245, 158, 11, 0.12)',
+              border: '1.5px solid #f59e0b',
+              color: '#d97706',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+              boxShadow: '0 1px 4px rgba(245, 158, 11, 0.2)'
+            }}
+            title="Productivity Achievements & Insights"
+          >
+            <Trophy size={18} />
+          </button>
+        )}
+
+        {/* 4. Settings Cog Icon Button */}
         {onOpenSettings && (
           <button
             onClick={onOpenSettings}
