@@ -92,13 +92,14 @@ const SwipeDemoCard = ({ swipeSettings }) => {
 
     const handlePointerDown = (e) => {
         if (!swipeSettings?.enabled) return;
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
         handleTouchStart(e);
     };
 
     const handlePointerMove = (e) => {
         if (!swipeSettings?.enabled) return;
+        if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         if (touchStartRef.current.x === 0 && touchStartRef.current.y === 0) return;
         handleTouchMove(e);
     };

@@ -53,22 +53,23 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         const diffX = clientX - touchStartRef.current.x;
         const diffY = clientY - touchStartRef.current.y;
 
-        // If vertical movement is detected (scrolling down/up the screen), immediately CANCEL and lock out swiping!
-        if (Math.abs(diffY) > 14 || (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 8)) {
-            isScrollingVerticalRef.current = true;
-            isSwipingRef.current = false;
-            setSwipeOffset(0);
-            return;
-        }
-
+        // If swiping has not started yet, determine user intent (horizontal swipe vs vertical page scroll)
         if (!isSwipingRef.current) {
-            // Require clear horizontal intent (horizontal distance exceeds vertical by 2x and > 14px)
-            if (Math.abs(diffX) > Math.abs(diffY) * 2 && Math.abs(diffX) > 14) {
+            // Vertical scroll intent: vertical movement clearly dominates early on
+            if (Math.abs(diffY) > 16 && Math.abs(diffY) > Math.abs(diffX) * 1.3) {
+                isScrollingVerticalRef.current = true;
+                setSwipeOffset(0);
+                return;
+            }
+
+            // Horizontal swipe intent: engage as soon as horizontal distance is > 8px and exceeds vertical
+            if (Math.abs(diffX) > 8 && Math.abs(diffX) >= Math.abs(diffY)) {
                 isSwipingRef.current = true;
                 wasSwipingRef.current = true;
             }
         }
 
+        // Once horizontal swiping is engaged, track smoothly and prevent default vertical scrolling
         if (isSwipingRef.current) {
             if (e && e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
@@ -82,19 +83,19 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             setSwipeOffset(0);
             isSwipingRef.current = false;
             isScrollingVerticalRef.current = false;
-            setTimeout(() => { wasSwipingRef.current = false; }, 100);
+            setTimeout(() => { wasSwipingRef.current = false; }, 120);
             return;
         }
 
-        if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight !== 'none') {
+        if (swipeOffset >= THRESHOLD && swipeSettings.swipeRight && swipeSettings.swipeRight !== 'none') {
             onSwipeAction && onSwipeAction(task, swipeSettings.swipeRight);
-        } else if (swipeOffset <= -THRESHOLD && swipeSettings.swipeLeft !== 'none') {
+        } else if (swipeOffset <= -THRESHOLD && swipeSettings.swipeLeft && swipeSettings.swipeLeft !== 'none') {
             onSwipeAction && onSwipeAction(task, swipeSettings.swipeLeft);
         }
         setSwipeOffset(0);
         isSwipingRef.current = false;
         isScrollingVerticalRef.current = false;
-        setTimeout(() => { wasSwipingRef.current = false; }, 100);
+        setTimeout(() => { wasSwipingRef.current = false; }, 120);
     };
 
     const handleTouchStart = (e) => {
@@ -112,16 +113,18 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     };
 
     const handlePointerDown = (e) => {
-        if (e.pointerType === 'mouse') return;
+        if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         handleStart(e.clientX, e.clientY);
     };
 
     const handlePointerMove = (e) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         if (touchStartRef.current.x === 0 && touchStartRef.current.y === 0) return;
         handleMove(e.clientX, e.clientY, e);
     };
 
-    const handlePointerUp = () => {
+    const handlePointerUp = (e) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         handleEnd();
         touchStartRef.current = { x: 0, y: 0 };
     };
