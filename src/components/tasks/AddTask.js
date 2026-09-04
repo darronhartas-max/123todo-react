@@ -341,13 +341,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 {/* Project Custom Dropdown */}
                 {(() => {
                     const activeProject = (projects || []).find(p => p.id === projectId) || projects?.[0] || { id: 'general', name: 'General', color: '#6b7280' };
+                    const maxProjectNameLength = Math.max(...(projects || []).map(p => (p?.name || '').length), 10);
+                    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 180), 320);
                     return (
-                        <div style={{ position: 'relative', minWidth: '150px', maxWidth: '240px' }}>
+                        <div style={{ position: 'relative', minWidth: `${dropdownMinWidth}px`, maxWidth: '340px' }}>
                             <button
                                 type="button"
                                 onClick={() => setIsProjectOpen(!isProjectOpen)}
                                 style={{
-                                    padding: '6px 10px',
+                                    width: '100%',
+                                    padding: '6px 12px',
                                     borderRadius: '6px',
                                     border: `1.5px solid ${activeProject.color || '#6b7280'}`,
                                     background: 'var(--item-bg)',
@@ -386,13 +389,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                         position: 'absolute',
                                         top: 'calc(100% + 4px)',
                                         left: 0,
-                                        minWidth: '180px',
+                                        minWidth: '100%',
+                                        width: 'max-content',
+                                        maxWidth: '340px',
                                         background: 'var(--surface-color)',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '6px',
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
                                         zIndex: 100,
-                                        maxHeight: '220px',
+                                        maxHeight: 'calc(100vh - 160px)',
                                         overflowY: 'auto',
                                         padding: '4px 0'
                                     }}>
@@ -413,7 +418,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                                         fontSize: '0.95rem',
                                                         fontWeight: isSel ? '700' : '600',
                                                         color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
-                                                        background: 'transparent',
+                                                        background: isSel ? `${p.color || 'var(--accent-color)'}15` : 'transparent',
                                                         cursor: 'pointer',
                                                         transition: 'background 0.15s ease'
                                                     }}

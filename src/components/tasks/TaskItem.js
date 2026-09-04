@@ -30,13 +30,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const wasSwipingRef = React.useRef(false);
     const isScrollingVerticalRef = React.useRef(false);
 
-    const THRESHOLD = 90;
+    const THRESHOLD = 65;
 
     const applyDamping = (diffX) => {
         const absX = Math.abs(diffX);
         if (absX <= THRESHOLD) return diffX;
         const over = absX - THRESHOLD;
-        const dampedOver = over * 0.35;
+        const dampedOver = over * 0.55;
         return Math.sign(diffX) * (THRESHOLD + dampedOver);
     };
 
@@ -54,7 +54,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         const diffY = clientY - touchStartRef.current.y;
 
         // If vertical movement is detected (scrolling down/up the screen), immediately CANCEL and lock out swiping!
-        if (Math.abs(diffY) > 12 || (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 6)) {
+        if (Math.abs(diffY) > 14 || (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 8)) {
             isScrollingVerticalRef.current = true;
             isSwipingRef.current = false;
             setSwipeOffset(0);
@@ -62,8 +62,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         }
 
         if (!isSwipingRef.current) {
-            // Require clear horizontal intent (horizontal distance exceeds vertical by 2.5x and > 20px)
-            if (Math.abs(diffX) > Math.abs(diffY) * 2.5 && Math.abs(diffX) > 20) {
+            // Require clear horizontal intent (horizontal distance exceeds vertical by 2x and > 14px)
+            if (Math.abs(diffX) > Math.abs(diffY) * 2 && Math.abs(diffX) > 14) {
                 isSwipingRef.current = true;
                 wasSwipingRef.current = true;
             }
@@ -72,7 +72,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (isSwipingRef.current) {
             if (e && e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
-            const clampedOffset = Math.max(-160, Math.min(160, rawOffset));
+            const clampedOffset = Math.max(-240, Math.min(240, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
@@ -388,58 +388,58 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     position: 'absolute',
                     top: 0, bottom: 0, left: 0, right: 0,
                     background: isLeftArmed 
-                        ? (leftSwipeAction.activeBg || leftSwipeAction.color) 
-                        : `linear-gradient(270deg, ${leftSwipeAction.color}e6 0%, ${leftSwipeAction.color}b3 100%)`,
+                        ? (leftSwipeAction.activeBg || `linear-gradient(270deg, ${leftSwipeAction.color} 0%, ${leftSwipeAction.color}ee 100%)`)
+                        : `linear-gradient(270deg, ${leftSwipeAction.color}d9 0%, ${leftSwipeAction.color}80 100%)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    paddingRight: `${Math.max(8, Math.min(16, Math.abs(swipeOffset) * 0.2))}px`,
+                    paddingRight: `${Math.max(10, Math.min(24, Math.abs(swipeOffset) * 0.18))}px`,
                     borderRadius: '6px',
                     color: '#ffffff',
                     fontWeight: isLeftArmed ? '800' : '700',
                     fontSize: '0.88rem',
-                    gap: '6px',
+                    gap: '8px',
                     pointerEvents: 'none',
                     zIndex: 1,
-                    transition: 'background 0.15s ease',
-                    boxShadow: isLeftArmed ? `inset 0 0 24px rgba(0,0,0,0.2)` : 'none'
+                    transition: 'background 0.2s ease, box-shadow 0.2s ease',
+                    boxShadow: isLeftArmed ? `inset 0 0 28px rgba(0,0,0,0.3)` : 'none'
                 }}>
                     <motion.span
                         animate={{
-                            opacity: Math.min(1, Math.abs(swipeOffset) / 10),
+                            opacity: Math.min(1, Math.abs(swipeOffset) / 12),
                             x: isLeftArmed ? -4 : 0,
-                            scale: isLeftArmed ? 1.05 : 1
+                            scale: isLeftArmed ? 1.08 : 1
                         }}
                         transition={{ duration: 0.12 }}
                         style={{
                             color: '#ffffff',
                             letterSpacing: '0.02em',
-                            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
-                            fontWeight: '700',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                            fontWeight: isLeftArmed ? '800' : '700',
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        {leftSwipeAction.actionHint || leftSwipeAction.label}
+                        {isLeftArmed ? `Release to ${leftSwipeAction.label}` : (leftSwipeAction.actionHint || leftSwipeAction.label)}
                     </motion.span>
                     <motion.div
                         animate={{
-                            scale: isLeftArmed ? 1.25 : (0.85 + leftProgress * 0.25),
-                            rotate: isLeftArmed ? [0, 10, 0] : 0
+                            scale: isLeftArmed ? 1.35 : (0.85 + leftProgress * 0.3),
+                            rotate: isLeftArmed ? [0, 8, 0] : 0
                         }}
-                        transition={{ type: "spring", stiffness: 550, damping: 18 }}
+                        transition={{ type: "spring", stiffness: 550, damping: 16 }}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '30px',
-                            height: '30px',
+                            width: '32px',
+                            height: '32px',
                             borderRadius: '50%',
-                            background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
-                            boxShadow: isLeftArmed ? '0 0 14px rgba(255, 255, 255, 0.6)' : 'none',
+                            background: isLeftArmed ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.22)',
+                            boxShadow: isLeftArmed ? '0 0 16px rgba(255, 255, 255, 0.7)' : 'none',
                             flexShrink: 0
                         }}
                     >
-                        {LeftIcon && <LeftIcon size={18} color="#ffffff" />}
+                        {LeftIcon && <LeftIcon size={19} color="#ffffff" />}
                     </motion.div>
 
                     {/* Threshold Snap Notch Marker line */}
@@ -451,7 +451,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             bottom: '15%',
                             width: '3px',
                             background: '#ffffff',
-                            opacity: 0.65,
+                            opacity: 0.75,
                             borderRadius: '1.5px',
                             boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
                         }} />

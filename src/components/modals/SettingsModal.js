@@ -27,13 +27,13 @@ const SwipeDemoCard = ({ swipeSettings }) => {
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
 
-    const THRESHOLD = 75;
+    const THRESHOLD = 65;
 
     const applyDamping = (diffX) => {
         const absX = Math.abs(diffX);
         if (absX <= THRESHOLD) return diffX;
         const over = absX - THRESHOLD;
-        return Math.sign(diffX) * (THRESHOLD + over * 0.35);
+        return Math.sign(diffX) * (THRESHOLD + over * 0.55);
     };
 
     const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
@@ -71,7 +71,7 @@ const SwipeDemoCard = ({ swipeSettings }) => {
         if (isSwipingRef.current) {
             if (e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
-            const clampedOffset = Math.max(-140, Math.min(140, rawOffset));
+            const clampedOffset = Math.max(-240, Math.min(240, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
@@ -125,7 +125,7 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                         ? (rightSwipeAction.activeBg || rightSwipeAction.color) 
                         : `linear-gradient(90deg, ${rightSwipeAction.color}e6 0%, ${rightSwipeAction.color}b3 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-                    paddingLeft: `${Math.max(8, Math.min(16, swipeOffset * 0.2))}px`,
+                    paddingLeft: `${Math.max(8, Math.min(20, swipeOffset * 0.2))}px`,
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontWeight: isRightArmed ? '800' : '700',
@@ -145,7 +145,7 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                         {RightIcon && <RightIcon size={18} color="#ffffff" />}
                     </div>
                     <span style={{ opacity: Math.min(1, Math.abs(swipeOffset) / 10), fontWeight: '700', whiteSpace: 'nowrap' }}>
-                        {rightSwipeAction.actionHint || rightSwipeAction.label}
+                        {isRightArmed ? `Release to ${rightSwipeAction.label}` : (rightSwipeAction.actionHint || rightSwipeAction.label)}
                     </span>
                     {!isRightArmed && (
                         <div style={{ position: 'absolute', left: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
@@ -156,33 +156,35 @@ const SwipeDemoCard = ({ swipeSettings }) => {
                 <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
                     background: isLeftArmed 
-                        ? (leftSwipeAction.activeBg || leftSwipeAction.color) 
-                        : `linear-gradient(270deg, ${leftSwipeAction.color}e6 0%, ${leftSwipeAction.color}b3 100%)`,
+                        ? (leftSwipeAction.activeBg || `linear-gradient(270deg, ${leftSwipeAction.color} 0%, ${leftSwipeAction.color}ee 100%)`) 
+                        : `linear-gradient(270deg, ${leftSwipeAction.color}d9 0%, ${leftSwipeAction.color}80 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-                    paddingRight: `${Math.max(8, Math.min(16, Math.abs(swipeOffset) * 0.2))}px`,
+                    paddingRight: `${Math.max(10, Math.min(24, Math.abs(swipeOffset) * 0.18))}px`,
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontWeight: isLeftArmed ? '800' : '700',
                     fontSize: '0.88rem',
-                    gap: '6px',
+                    gap: '8px',
                     zIndex: 1,
-                    transition: 'background 0.15s ease'
+                    transition: 'background 0.2s ease, box-shadow 0.2s ease',
+                    boxShadow: isLeftArmed ? `inset 0 0 28px rgba(0,0,0,0.3)` : 'none'
                 }}>
-                    <span style={{ opacity: Math.min(1, Math.abs(swipeOffset) / 10), fontWeight: '700', whiteSpace: 'nowrap' }}>
-                        {leftSwipeAction.actionHint || leftSwipeAction.label}
+                    <span style={{ opacity: Math.min(1, Math.abs(swipeOffset) / 12), fontWeight: isLeftArmed ? '800' : '700', whiteSpace: 'nowrap' }}>
+                        {isLeftArmed ? `Release to ${leftSwipeAction.label}` : (leftSwipeAction.actionHint || leftSwipeAction.label)}
                     </span>
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '30px', height: '30px', borderRadius: '50%',
-                        background: isLeftArmed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.2)',
-                        transform: isLeftArmed ? 'scale(1.25)' : `scale(${0.85 + leftProgress * 0.25})`,
+                        width: '32px', height: '32px', borderRadius: '50%',
+                        background: isLeftArmed ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.22)',
+                        transform: isLeftArmed ? 'scale(1.35)' : `scale(${0.85 + leftProgress * 0.3})`,
+                        boxShadow: isLeftArmed ? '0 0 16px rgba(255, 255, 255, 0.7)' : 'none',
                         transition: 'transform 0.15s ease',
                         flexShrink: 0
                     }}>
-                        {LeftIcon && <LeftIcon size={18} color="#ffffff" />}
+                        {LeftIcon && <LeftIcon size={19} color="#ffffff" />}
                     </div>
                     {!isLeftArmed && (
-                        <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.65, borderRadius: '1.5px' }} />
+                        <div style={{ position: 'absolute', right: `${THRESHOLD}px`, top: '15%', bottom: '15%', width: '3px', background: '#ffffff', opacity: 0.75, borderRadius: '1.5px', boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)' }} />
                     )}
                 </div>
             )}

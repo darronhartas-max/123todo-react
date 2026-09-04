@@ -386,13 +386,16 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 <div style={{
                                     position: 'absolute',
                                     top: 'calc(100% + 4px)',
-                                    left: 0, right: 0,
+                                    left: 0,
+                                    minWidth: '100%',
+                                    width: 'max-content',
+                                    maxWidth: '340px',
                                     background: 'var(--surface-color)',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '6px',
                                     boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
                                     zIndex: 100,
-                                    maxHeight: '220px',
+                                    maxHeight: 'calc(100vh - 200px)',
                                     overflowY: 'auto',
                                     padding: '4px 0'
                                 }}>
@@ -431,7 +434,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     })}
                                 </div>
                             </>
-                        )} )}
+                        )}
                     </div>
                 </div>
 
