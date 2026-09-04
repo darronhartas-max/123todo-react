@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.5.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.5.2** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -156,7 +156,15 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.5.1 (Current)
+### v3.5.2 (Current)
+
+- **Sync Provider Startup Guard & Optimization**: Startup checks and background polling now only run for your active sync provider, eliminating unnecessary Google Drive checks when syncing via Cloud Sync.
+- **Dynamic Provider-Aware Offline Notice**: Offline connection banner dynamically detects and announces your active sync provider ("Cloud Sync" vs "Google Drive").
+- **Extended Swipe Action Movement Range & Damping**: Refined swipe-to-act threshold with smoother damping for reliable task actions even during long quick swipes.
+- **Widened Project Selectors**: Expanded project selector dropdown in Add Task and Edit modals with dynamic height bounds to accommodate long project lists cleanly.
+- **Project Deletion Safety Spacing**: Increased spacing and visual separator between confirmation and delete buttons to prevent accidental project removal.
+
+### v3.5.1
 
 - **10-Tier Level Roadmap & Color-Coded Progress Ladder**: Expandable progression guide in the Achievements Hub detailing all 10 ranks from Focused Starter to 123 Immortal, complete with custom color themes, level descriptions, and point requirements.
 - **Featured Streaks & Milestones Blog Guide**: Directly linked our new illustrated guide on *"The Psychology of Productivity Streaks & Milestones"* on 123todo.com.

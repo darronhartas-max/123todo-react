@@ -88,9 +88,16 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.5.1';
+export const APP_VERSION = '3.5.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.5.2': [
+    { title: '🛡️ Sync Engine Startup Guard & Efficiency:', desc: 'Sync checks on launch and background polling now only run for your actively selected sync engine, ensuring zero unwanted Google Drive checks when syncing via Cloud Sync (Cloudflare / VPS).' },
+    { title: '📡 Dynamic Provider-Aware Offline Alerts:', desc: 'Offline status notifications now dynamically detect and display your chosen sync engine (Cloud Sync or Google Drive).' },
+    { title: '🖐️ Enhanced Swipe Action Range & Damping:', desc: 'Refined swipe gestures with extended travel range and smoother gesture triggers to prevent accidental action cancellation during rapid list management.' },
+    { title: '📂 Expanded Project Dropdown Selectors:', desc: 'Significantly widened project selectors in Add Task and Edit Modal views with dynamic viewport height bounds for long project lists.' },
+    { title: '🛡️ Project Deletion Safety Spacing:', desc: 'Separated confirmation and delete buttons in project management settings to prevent accidental project removal.' }
+  ],
   '3.5.1': [
     { title: '🎨 10-Tier Level Roadmap & Color-Coded Progress Ladder:', desc: 'Added an interactive progression guide in the Achievements Hub detailing all 10 ranks from Focused Starter to 123 Immortal, complete with custom color themes, level descriptions, and point requirements.' },
     { title: '📖 Featured Streaks & Milestones Blog Guide:', desc: 'Linked our comprehensive illustrated guide on "The Psychology of Productivity Streaks & Milestones" directly from the Achievements Hub.' }

@@ -1,6 +1,6 @@
 # Mastering the 1-2-3 Rule & Productivity Achievements Hub in 123 ToDo
 
-*Published by 123 ToDo Team • Version 3.5.1 Productivity Guide*
+*Published by 123 ToDo Team • Version 3.5.2 Productivity Guide*
 
 In version **3.5.1**, 123 ToDo introduces the all-new **Productivity & Achievements Hub**, designed to help you defeat decision fatigue, build unstoppable daily streaks, and master the proven 1-2-3 Rule.
 
