@@ -822,7 +822,7 @@ const SettingsModal = ({
                                                         <div style={styles.colorDot(project.color)} />
                                                         {project.name}
                                                     </div>
-                                                     <div style={styles.actions}>
+                                                     <div style={{ ...styles.actions, gap: '10px' }}>
                                                          <button
                                                              style={styles.actionBtn}
                                                              onClick={() => {
@@ -830,12 +830,19 @@ const SettingsModal = ({
                                                                  setEditName(project.name);
                                                                  setEditColor(project.color);
                                                              }}
-                                                             title="Edit project"
+                                                             title="Edit project name & color"
                                                          >
                                                              <Edit2 size={15} />
                                                          </button>
+                                                         <div style={{ width: '1px', height: '18px', background: 'var(--border-color)', margin: '0 4px', opacity: 0.7 }} />
                                                          <button
-                                                             style={{ ...styles.actionBtn, color: '#dc2626', borderColor: '#fee2e2' }}
+                                                             style={{
+                                                                 ...styles.actionBtn,
+                                                                 color: '#dc2626',
+                                                                 borderColor: '#fee2e2',
+                                                                 background: 'rgba(239, 68, 68, 0.05)',
+                                                                 padding: '4px 8px'
+                                                             }}
                                                              onClick={() => {
                                                                  if (projects.length === 1) {
                                                                      alert("You must have at least one project remaining.");

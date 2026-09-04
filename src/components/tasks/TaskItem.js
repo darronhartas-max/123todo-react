@@ -224,6 +224,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const styles = {
         taskItem: {
             display: 'flex',
+            width: '100%',
+            boxSizing: 'border-box',
             padding: 'var(--task-padding, 6px 10px)',
             borderTop: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
             borderRight: isDragging ? '1px solid var(--accent-color)' : '1px solid transparent',
@@ -249,12 +251,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             color: 'var(--text-color)',
             cursor: isArchived ? 'default' : 'pointer',
             fontFamily: 'Inter, sans-serif',
-            wordWrap: 'break-word',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
             whiteSpace: 'normal',
             textAlign: 'left',
             fontWeight: '400',
             lineHeight: '1.35',
-            margin: 0
+            margin: 0,
+            minWidth: 0
         },
         actionBtn: {
             background: 'transparent',
@@ -550,22 +554,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     <Trash2 size={18} />
                 </button>
             )}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', minWidth: 0 }}>
                     <span style={styles.taskText}>{task.text}</span>
                 </div>
 
                 {/* Compact Note Preview: first line only in smaller font, space-efficient */}
                 {(() => {
                     const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
-                    if (!firstNoteLine || showNotesExpanded) return null;
+                    if (!firstNoteLine) return null;
                     return (
                         <div
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setShowNotesExpanded(true);
-                            }}
-                            title="Click to view full notes"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -573,17 +572,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 fontSize: '0.78rem',
                                 color: 'var(--muted-text)',
                                 marginTop: '2px',
-                                cursor: 'pointer',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
                                 maxWidth: '100%',
                                 lineHeight: '1.25',
-                                opacity: 0.85
+                                opacity: 0.85,
+                                minWidth: 0
                             }}
                         >
                             <FileText size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                                 {firstNoteLine}
                             </span>
                         </div>
@@ -944,7 +943,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '4px', alignSelf: hasExtraDetails ? 'flex-start' : 'center', marginTop: hasExtraDetails ? '2px' : '0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '8px', alignSelf: hasExtraDetails ? 'flex-start' : 'center', marginTop: hasExtraDetails ? '2px' : '0' }}>
                 {isArchived ? (
                     <button
                         onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}

@@ -59,3 +59,27 @@ test('renders Calendar action icon for simple scheduled task and Repeat action i
 
   expect(screen.getByTitle('Recurring schedule / Defer task')).toBeInTheDocument();
 });
+
+test('renders the first line of notes in small font and opens edit modal on click', () => {
+  const onEditMock = jest.fn();
+  const taskWithNotes = {
+    id: 104,
+    text: 'Task with multi-line notes',
+    priority: 1,
+    notes: 'First line of note details\nSecond line with more private info'
+  };
+
+  render(<TaskItem task={taskWithNotes} onEdit={onEditMock} />);
+
+  // First line should be visible in task list view
+  expect(screen.getByText('First line of note details')).toBeInTheDocument();
+  // Second line should NOT be visible in compact list view
+  expect(screen.queryByText('Second line with more private info')).not.toBeInTheDocument();
+
+  // Clicking task opens edit modal
+  fireEvent.click(screen.getByText('Task with multi-line notes'));
+  expect(onEditMock).toHaveBeenCalledWith(taskWithNotes);
+
+  // Note preview is still present
+  expect(screen.getByText('First line of note details')).toBeInTheDocument();
+});
