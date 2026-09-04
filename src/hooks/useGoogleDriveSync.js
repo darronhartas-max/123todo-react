@@ -7,7 +7,7 @@ const CLIENT_ID = '831861694055-fco4oka90dc7npbglscjad0prqpeu2oh.apps.googleuser
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 const SYNC_FILE_NAME = '123todo_sync.json';
 
-export const useGoogleDriveSync = (localData, importDataCallback) => {
+export const useGoogleDriveSync = (localData, importDataCallback, enabled = true) => {
     const [isAuthed, setIsAuthed] = useState(false);
     const [syncStatus, setSyncStatus] = useState('offline'); // 'offline', 'syncing', 'synced', 'error'
     const [isSyncDropped, setIsSyncDropped] = useState(false);
@@ -45,7 +45,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
     }, []);
 
     const performSync = useCallback(async (isInitial = false, isUserAction = false) => {
-        if (!accessTokenRef.current || !passphrase || isSyncingRef.current) return;
+        if (!enabled || !accessTokenRef.current || !passphrase || isSyncingRef.current) return;
 
         isSyncingRef.current = true;
         if (isInitial || isUserAction) {
@@ -151,7 +151,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         } finally {
             isSyncingRef.current = false;
         }
-    }, [passphrase, importDataCallback, handleTokenExpired]);
+    }, [passphrase, importDataCallback, handleTokenExpired, enabled]);
 
     // Initialize Google Identity Services
     useEffect(() => {
@@ -166,8 +166,10 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                     accessTokenRef.current = storedToken;
                     setIsAuthed(true);
                     hasValidToken = true;
-                    // Trigger an initial pull/sync
-                    performSync(true);
+                    // Trigger an initial pull/sync only when enabled
+                    if (enabled) {
+                        performSync(true);
+                    }
                 }
 
                 tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
@@ -195,13 +197,15 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
                         const expiryTime = Date.now() + (parseInt(tokenResponse.expires_in, 10) || 3600) * 1000;
                         localStorage.setItem('123Todo_Google_AccessToken', tokenResponse.access_token);
                         localStorage.setItem('123Todo_Google_TokenExpiry', expiryTime.toString());
-                        // Trigger an initial pull/sync
-                        performSync(true);
+                        // Trigger an initial pull/sync only when enabled
+                        if (enabled) {
+                            performSync(true);
+                        }
                     },
                 });
 
-                // Attempt silent automatic token refresh if user previously signed in AND token is expired
-                if (!hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
+                // Attempt silent automatic token refresh only if Google Drive sync is enabled AND user previously signed in AND token is expired
+                if (enabled && !hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
                     try {
                         // prompt: 'none' requests token silently in background without displaying any popup/UI
                         tokenClientRef.current.requestAccessToken({ prompt: 'none' });
@@ -223,7 +227,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
         };
         initGoogleClient();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [performSync]);
+    }, [performSync, enabled]);
 
     const signIn = useCallback(() => {
         if (tokenClientRef.current) {
@@ -254,17 +258,17 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
 
     // Setup an effect to auto-sync when local data changes (with debounce)
     useEffect(() => {
-        if (isAuthed && passphrase) {
+        if (enabled && isAuthed && passphrase) {
             const timeoutId = setTimeout(() => {
                 performSync(false);
             }, 300); // 300ms debounce for immediate push
             return () => clearTimeout(timeoutId);
         }
-    }, [localData.timestamp, isAuthed, passphrase, performSync]);
+    }, [localData.timestamp, isAuthed, passphrase, performSync, enabled]);
 
     // Smart Sync: Focus, Pointer, Network Reconnect & 4s Active Polling
     useEffect(() => {
-        if (!isAuthed || !passphrase) return;
+        if (!enabled || !isAuthed || !passphrase) return;
 
         let intervalId;
 
@@ -330,7 +334,7 @@ export const useGoogleDriveSync = (localData, importDataCallback) => {
             window.removeEventListener('touchcancel', handleTouchEnd);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
-    }, [isAuthed, passphrase, performSync]);
+    }, [enabled, isAuthed, passphrase, performSync]);
 
     return {
         isAuthed,

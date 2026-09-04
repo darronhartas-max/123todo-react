@@ -120,5 +120,21 @@ describe('useCloudflareSync hook', () => {
 
         expect(result.current.syncStatus).toBe('synced');
     });
+
+    test('skips performSync when enabled is false', async () => {
+        localStorage.setItem('123Todo_CF_SyncId', 'sync-123');
+        localStorage.setItem('123Todo_CF_DeviceToken', 'token-abc');
+        localStorage.setItem('123Todo_Sync_Passphrase', 'pass123');
+
+        const dummyData = { tasks: [], timestamp: Date.now() };
+        const dummyImport = jest.fn();
+        const { result } = renderHook(() => useCloudflareSync(dummyData, dummyImport, false));
+
+        await act(async () => {
+            await result.current.performSync(true, true, false);
+        });
+
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
 });
 

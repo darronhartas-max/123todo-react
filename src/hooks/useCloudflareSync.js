@@ -64,7 +64,7 @@ export function getAdaptiveDebounceDelay() {
     return 800;                    // 800ms default debounce
 }
 
-export const useCloudflareSync = (localData, importDataCallback) => {
+export const useCloudflareSync = (localData, importDataCallback, enabled = true) => {
     const [isAuthed, setIsAuthed] = useState(() => {
         return Boolean(localStorage.getItem('123Todo_CF_SyncId') && localStorage.getItem('123Todo_CF_DeviceToken'));
     });
@@ -106,7 +106,7 @@ export const useCloudflareSync = (localData, importDataCallback) => {
     }, [syncId, deviceToken]);
 
     const performSync = useCallback(async (isInitial = false, isUserAction = false, isLocalDataChange = false) => {
-        if (!syncId || !deviceToken || !passphrase || isSyncingRef.current) return;
+        if (!enabled || !syncId || !deviceToken || !passphrase || isSyncingRef.current) return;
 
         // Check if under temporary rate-limit backoff (unless user action or local edit)
         if (Date.now() < backoffUntilRef.current && !isUserAction && !isLocalDataChange) {
@@ -219,7 +219,7 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         } finally {
             isSyncingRef.current = false;
         }
-    }, [syncId, deviceToken, passphrase, importDataCallback]);
+    }, [enabled, syncId, deviceToken, passphrase, importDataCallback]);
 
     // Connect / Initialize a new Cloudflare Sync Account
     const connectSync = useCallback(async (userPassphrase, pairCode = null) => {
@@ -286,20 +286,27 @@ export const useCloudflareSync = (localData, importDataCallback) => {
         localStorage.removeItem('123Todo_CF_DeviceToken');
     }, []);
 
+    // Initial pull on mount / when enabled and authed
+    useEffect(() => {
+        if (enabled && isAuthed && passphrase) {
+            performSync(true, false, false);
+        }
+    }, [enabled, isAuthed, passphrase, performSync]);
+
     // Auto-sync on local data change with adaptive debounce
     useEffect(() => {
-        if (isAuthed && passphrase) {
+        if (enabled && isAuthed && passphrase) {
             const debounceMs = getAdaptiveDebounceDelay();
             const timeoutId = setTimeout(() => {
                 performSync(false, false, true);
             }, debounceMs);
             return () => clearTimeout(timeoutId);
         }
-    }, [localData.timestamp, isAuthed, passphrase, performSync]);
+    }, [localData.timestamp, isAuthed, passphrase, performSync, enabled]);
 
     // Smart Adaptive Polling & Tab Lifecycle Listeners
     useEffect(() => {
-        if (!isAuthed || !passphrase) return;
+        if (!enabled || !isAuthed || !passphrase) return;
 
         let timeoutId;
         let isDisposed = false;
@@ -354,7 +361,7 @@ export const useCloudflareSync = (localData, importDataCallback) => {
             window.removeEventListener('pointerenter', handleFocusOrVisible);
             document.removeEventListener('visibilitychange', handleFocusOrVisible);
         };
-    }, [isAuthed, passphrase, performSync]);
+    }, [enabled, isAuthed, passphrase, performSync]);
 
     return {
         isAuthed,

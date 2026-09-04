@@ -67,8 +67,8 @@ const TodoApp = () => {
     adminPasswordHash: localStorage.getItem('123TodoAdminPassHash')
   }), [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp]);
 
-  const gdriveSync = useGoogleDriveSync(syncPayloadData, importData);
-  const cloudflareSync = useCloudflareSync(syncPayloadData, importData);
+  const gdriveSync = useGoogleDriveSync(syncPayloadData, importData, syncProvider === 'gdrive');
+  const cloudflareSync = useCloudflareSync(syncPayloadData, importData, syncProvider === 'cloudflare');
 
   const activeSync = syncProvider === 'gdrive' ? gdriveSync : cloudflareSync;
   const {
@@ -925,6 +925,7 @@ const TodoApp = () => {
           {(isOffline || !navigator.onLine) && showOfflinePrompt && (
             <SyncOfflinePrompt
               isAuthed={isAuthed}
+              syncProvider={syncProvider}
               onDismiss={() => setShowOfflinePrompt(false)}
             />
           )}
