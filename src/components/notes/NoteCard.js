@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, CheckCircle, Mic, MicOff, ChevronDown, 
-  ArrowUpRight, Check, Clock
+  ArrowUpRight, Check, Clock, Camera
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -265,6 +265,24 @@ const NoteCard = ({
               gap: '4px'
             }}>
               P{note.priority} {PRIORITIES[note.priority]?.label}
+            </span>
+          )}
+
+          {/* Photo indicator badge */}
+          {note.photos && note.photos.length > 0 && (
+            <span style={{
+              fontSize: '11px',
+              fontWeight: '700',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              backgroundColor: 'rgba(2, 132, 199, 0.12)',
+              color: '#0284c7',
+              border: '1px solid rgba(2, 132, 199, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }} title={`${note.photos.length} photo${note.photos.length > 1 ? 's' : ''} attached`}>
+              <Camera size={12} strokeWidth={2.2} /> {note.photos.length} {note.photos.length > 1 ? 'photos' : 'photo'}
             </span>
           )}
         </div>
