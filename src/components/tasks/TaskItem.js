@@ -590,17 +590,16 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     )}
                 </div>
 
-                {/* Compact Note & Photo Preview: space-efficient */}
+                {/* Compact Note Preview: first line only in smaller font, space-efficient */}
                 {(() => {
                     const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
-                    const hasPhotos = task.photos && task.photos.length > 0;
-                    if (!firstNoteLine && !hasPhotos) return null;
+                    if (!firstNoteLine) return null;
                     return (
                         <div
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '6px',
+                                gap: '4px',
                                 fontSize: '0.78rem',
                                 color: 'var(--muted-text)',
                                 marginTop: '2px',
@@ -613,39 +612,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 minWidth: 0
                             }}
                         >
-                            {firstNoteLine ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    <FileText size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
-                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                                        {firstNoteLine}
-                                    </span>
-                                </div>
-                            ) : null}
-                            {hasPhotos && !firstNoteLine && (
-                                <span
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowNotesExpanded(prev => !prev);
-                                    }}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700',
-                                        color: '#0284c7',
-                                        background: 'rgba(2, 132, 199, 0.08)',
-                                        border: '1px solid rgba(2, 132, 199, 0.25)',
-                                        padding: '1px 5px',
-                                        borderRadius: '4px',
-                                        flexShrink: 0,
-                                        cursor: 'pointer'
-                                    }}
-                                    title={`${task.photos.length} photo${task.photos.length > 1 ? 's' : ''} attached (click to ${showNotesExpanded ? 'hide' : 'view'})`}
-                                >
-                                    <Camera size={11} /> {task.photos.length} {task.photos.length > 1 ? 'photos' : 'photo'}
-                                </span>
-                            )}
+                            <FileText size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                                {firstNoteLine}
+                            </span>
                         </div>
                     );
                 })()}
@@ -973,7 +943,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 fontWeight: '600'
                             }}
                         >
-                            {showNotesExpanded ? '▾ Hide Notes' : `▸ Full Notes${task.photos && task.photos.length > 0 ? ` [${task.photos.length}📷]` : ''}`}
+                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Full Notes'}
                         </button>
                         <AnimatePresence>
                             {showNotesExpanded && (
@@ -1029,50 +999,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </button>
                 ) : (
                     <>
-                        {task.photos && task.photos.length > 0 && (
-                            <motion.button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowNotesExpanded(prev => !prev);
-                                }}
-                                style={{
-                                    ...styles.actionBtn,
-                                    color: '#0284c7',
-                                    background: showNotesExpanded ? 'rgba(2, 132, 199, 0.15)' : 'transparent',
-                                    border: '1px solid rgba(2, 132, 199, 0.4)',
-                                    marginRight: '6px',
-                                    opacity: 1.0,
-                                    width: '32px',
-                                    height: '32px',
-                                    minWidth: '32px',
-                                    position: 'relative'
-                                }}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                title={`${task.photos.length} photo${task.photos.length > 1 ? 's' : ''} attached (click to ${showNotesExpanded ? 'hide' : 'view'})`}
-                            >
-                                <Camera size={16} />
-                                {task.photos.length > 1 && (
-                                    <span style={{
-                                        position: 'absolute',
-                                        top: '-3px',
-                                        right: '-3px',
-                                        fontSize: '9px',
-                                        fontWeight: '800',
-                                        background: '#0284c7',
-                                        color: '#ffffff',
-                                        borderRadius: '8px',
-                                        padding: '0 3px',
-                                        lineHeight: '12px',
-                                        minWidth: '12px',
-                                        textAlign: 'center'
-                                    }}>
-                                        {task.photos.length}
-                                    </span>
-                                )}
-                            </motion.button>
-                        )}
                         {task.scheduledDate && (
                             <motion.button
                                 onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
