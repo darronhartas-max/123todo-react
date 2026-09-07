@@ -38,6 +38,13 @@ describe('voiceUtils - mergeBaseAndTranscript', () => {
 
   test('prevents duplication when speech is a subset of base', () => {
     expect(mergeBaseAndTranscript('Buy milk and eggs tomorrow', 'buy milk')).toBe('Buy milk and eggs tomorrow');
+    expect(mergeBaseAndTranscript('Buy milk. Call John. Take out trash.', 'Call John.')).toBe('Buy milk. Call John. Take out trash.');
+    expect(mergeBaseAndTranscript('Buy milk. Call John. Take out trash.', 'Call John. Take out trash.')).toBe('Buy milk. Call John. Take out trash.');
+  });
+
+  test('prevents sentence duplication when speech repeats earlier sentences and adds new words', () => {
+    expect(mergeBaseAndTranscript('Buy milk. Call John.', 'Call John. Pick up dry cleaning.')).toBe('Buy milk. Call John. Pick up dry cleaning.');
+    expect(mergeBaseAndTranscript('Buy milk. Call John. Take out trash.', 'Call John. Take out trash. Schedule meeting.')).toBe('Buy milk. Call John. Take out trash. Schedule meeting.');
   });
 
   test('prevents duplication when speech overlaps with suffix of base', () => {

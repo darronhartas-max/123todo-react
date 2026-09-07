@@ -41,8 +41,8 @@ export const formatSpokenPunctuation = (text) => {
 };
 
 /**
- * Intelligently merges baseText and speech transcript avoiding duplicate words or repeated prefixes.
- * Handles punctuation differences, case sensitivity, and word overlaps.
+ * Intelligently merges baseText and speechText avoiding duplicate words, repeated sentences, or repeated prefixes.
+ * Handles punctuation differences, case sensitivity, and sub-sequence overlaps.
  */
 export const mergeBaseAndTranscript = (baseText, speechText) => {
   const base = (baseText || '').trim();
@@ -51,35 +51,36 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
   if (!base) return speech;
   if (!speech) return base;
 
-  // Extract clean alphanumeric words for comparison alongside original raw tokens
+  // Extract raw words and clean alphanumeric tokens for comparison
   const baseRawWords = base.split(/\s+/);
   const speechRawWords = speech.split(/\s+/);
 
-  const baseCleanWords = baseRawWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/gi, ''));
-  const speechCleanWords = speechRawWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/gi, ''));
+  const cleanWord = (w) => w.toLowerCase().replace(/[^a-z0-9]/gi, '');
+
+  const baseCleanWords = baseRawWords.map(cleanWord);
+  const speechCleanWords = speechRawWords.map(cleanWord);
 
   const baseCleanList = baseCleanWords.filter(Boolean);
   const speechCleanList = speechCleanWords.filter(Boolean);
 
   if (speechCleanList.length === 0) {
-    // speechText consists only of punctuation marks or symbols (e.g. '.', ',', '?', '!', '\n')
-    // Append punctuation cleanly if base doesn't already end with punctuation
+    // Only punctuation / whitespace in speechText
     const punc = speech.replace(/\s+/g, '');
     if (!punc) return base;
-    if (/[.,?!:;]$/.test(base) && /[.,?!:;]/.test(punc)) {
-      return base;
-    }
-    if (base.endsWith(punc)) {
-      return base;
-    }
+    if (/[.,?!:;]$/.test(base) && /[.,?!:;]/.test(punc)) return base;
+    if (base.endsWith(punc)) return base;
     return `${base}${punc}`;
   }
+
   if (baseCleanList.length === 0) return speech;
 
   const baseCleanStr = baseCleanList.join(' ');
   const speechCleanStr = speechCleanList.join(' ');
 
-  // Helper to get raw speech words after skipping `cleanCount` non-empty clean words
+  // 1. Exact match or speech is completely contained within base
+  if (baseCleanStr === speechCleanStr) return base;
+
+  // Helper to slice raw speech words after cleanCount non-empty clean words
   const sliceSpeechRawAfterCleanCount = (cleanCount) => {
     let seen = 0;
     let idx = 0;
@@ -95,29 +96,27 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return speechRawWords.slice(idx);
   };
 
-  // Helper to append remaining speech words to base with clean spacing
+  // Helper to combine base and remaining speech words
   const combineBaseAndRemainingSpeech = (baseStr, remainingSpeechWords) => {
-    if (!remainingSpeechWords || remainingSpeechWords.length === 0) {
-      return baseStr;
-    }
+    if (!remainingSpeechWords || remainingSpeechWords.length === 0) return baseStr;
     const remainingText = remainingSpeechWords.join(' ');
     const separator = baseStr.endsWith(' ') ? '' : ' ';
     let result = `${baseStr}${separator}${remainingText}`.trim();
     return result.replace(/\s+/g, ' ').replace(/\s+([.,?!:;])/g, '$1');
   };
 
-  // Case 1: Speech starts with base (normalized)
+  // 2. Speech starts with Base (base is a prefix of speech)
   if (speechCleanStr.startsWith(baseCleanStr)) {
     const remainingRaw = sliceSpeechRawAfterCleanCount(baseCleanList.length);
     return combineBaseAndRemainingSpeech(base, remainingRaw);
   }
 
-  // Case 2: Base starts with speech (normalized) - speech is already contained in base
-  if (baseCleanStr.startsWith(speechCleanStr)) {
+  // 3. Base contains speech completely (speech is a sub-phrase or duplicate sentence of base)
+  if (baseCleanStr.includes(speechCleanStr)) {
     return base;
   }
 
-  // Case 3: Suffix of base matches Prefix of speech (word overlap)
+  // 4. Suffix of base matches Prefix of speech (standard overlap at boundary)
   let maxOverlap = 0;
   const maxCheck = Math.min(baseCleanList.length, speechCleanList.length);
 
@@ -134,7 +133,36 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return combineBaseAndRemainingSpeech(base, remainingRaw);
   }
 
-  // Case 4: Standard clean concatenation
+  // 5. Advanced: Check if speech shares a sub-segment overlap with base ending near the end of base
+  for (let len = speechCleanList.length; len >= 1; len--) {
+    const speechPrefix = speechCleanList.slice(0, len).join(' ');
+    const pos = baseCleanStr.lastIndexOf(speechPrefix);
+    if (pos !== -1) {
+      if (pos + speechPrefix.length >= baseCleanStr.length - 10 || pos + speechPrefix.length === baseCleanStr.length) {
+        const remainingRaw = sliceSpeechRawAfterCleanCount(len);
+        return combineBaseAndRemainingSpeech(base, remainingRaw);
+      }
+    }
+  }
+
+  // 6. Sentence-Level Deduplication: Check if speech contains sentences already in base
+  const speechSentences = speech.split(/(?<=[.?!])\s+/).filter(Boolean);
+  const filteredSpeechSentences = speechSentences.filter(s => {
+    const sClean = s.split(/\s+/).map(cleanWord).filter(Boolean).join(' ');
+    if (!sClean) return false;
+    return !baseCleanStr.includes(sClean);
+  });
+
+  if (filteredSpeechSentences.length < speechSentences.length) {
+    if (filteredSpeechSentences.length === 0) {
+      return base;
+    }
+    const deduplicatedSpeech = filteredSpeechSentences.join(' ');
+    const separator = base.endsWith(' ') ? '' : ' ';
+    return `${base}${separator}${deduplicatedSpeech}`;
+  }
+
+  // 7. Fallback standard concatenation with clean spacing
   const separator = base.endsWith(' ') ? '' : ' ';
   return `${base}${separator}${speech}`;
 };
