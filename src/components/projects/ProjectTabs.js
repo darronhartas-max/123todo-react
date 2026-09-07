@@ -37,13 +37,17 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
         mainWrapper: {
             padding: '6px 12px',
             borderBottom: '1px solid var(--border-color)',
-            background: 'var(--accent-bg)'
+            background: 'var(--accent-bg)',
+            boxSizing: 'border-box',
+            width: '100%'
         },
         tabContainer: {
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            gap: '10px'
+            gap: '8px',
+            minWidth: 0,
+            boxSizing: 'border-box'
         },
         actionBtn: {
             padding: '6px',
@@ -62,31 +66,40 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             position: 'relative',
             display: 'inline-flex',
             flexDirection: 'column',
-            flexShrink: 0
+            flex: '0 1 auto',
+            minWidth: 0,
+            maxWidth: `${dropdownMinWidth}px`
         },
         customSelectTrigger: (color) => ({
-            width: `${dropdownMinWidth}px`,
-            padding: '4px 10px',
+            width: '100%',
+            maxWidth: '100%',
+            minWidth: 0,
+            padding: '4px 8px',
             borderRadius: '6px',
             border: `1.5px solid ${color}`,
             background: 'var(--item-bg)',
             color: color,
-            fontSize: '0.95rem',
+            fontSize: '0.92rem',
             fontWeight: '600',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: '6px',
             outline: 'none',
             transition: 'all 0.2s ease',
             textAlign: 'left',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            lineHeight: '1.25',
+            boxSizing: 'border-box'
         }),
         customSelectDropdown: {
             position: 'absolute',
             top: 'calc(100% + 4px)',
             left: 0,
             minWidth: '100%',
+            maxWidth: 'min(320px, calc(100vw - 32px))',
             width: 'max-content',
             background: 'var(--surface-color)',
             border: '1px solid var(--border-color)',
@@ -95,7 +108,8 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             zIndex: 100,
             maxHeight: 'calc(100vh - 120px)',
             overflowY: 'auto',
-            padding: '4px 0'
+            padding: '4px 0',
+            boxSizing: 'border-box'
         },
         customOption: (isActive, color) => ({
             padding: '6px 12px',
@@ -107,7 +121,8 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             fontWeight: '600',
             color: isActive ? color : 'var(--text-color)',
             transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'normal',
+            wordBreak: 'break-word'
         }),
         customOptionBand: (color) => ({
             width: '4px',
@@ -115,7 +130,14 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             borderRadius: '2px',
             backgroundColor: color,
             flexShrink: 0
-        })
+        }),
+        rightActionsWrapper: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexShrink: 0,
+            marginLeft: 'auto'
+        }
     };
 
     return (
@@ -134,16 +156,23 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                     {showSearch ? <X size={16} /> : <SearchIcon size={16} />}
                 </button>
 
-                {/* 2. Projects drop-down, width determined by widest project text length */}
+                {/* 2. Projects drop-down, with flexible width and line-wrapping for long names */}
                 <div style={styles.customSelectWrapper}>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         style={styles.customSelectTrigger(activeColor)}
                     >
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ 
+                            flex: '1 1 auto',
+                            minWidth: 0,
+                            overflowWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'normal',
+                            lineHeight: '1.25'
+                        }}>
                             {activeProject?.name} ({activeCount})
                         </span>
-                        <ChevronDown size={16} style={{ color: activeColor, flexShrink: 0, marginLeft: '6px' }} />
+                        <ChevronDown size={16} style={{ color: activeColor, flexShrink: 0, marginLeft: '4px' }} />
                     </button>
                     {isOpen && (
                         <>
@@ -180,7 +209,7 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                                             }}
                                         >
                                             <div style={styles.customOptionBand(p.color)} />
-                                            <span style={{ flex: 1 }}>{p.name}</span>
+                                            <span style={{ flex: 1, minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{p.name}</span>
                                             <span style={{
                                                 fontSize: '0.78rem',
                                                 fontWeight: '700',
@@ -189,7 +218,8 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                                                 background: isSelected ? `${p.color}25` : 'var(--bg-color)',
                                                 color: isSelected ? p.color : 'var(--muted-text)',
                                                 border: '1px solid var(--border-color)',
-                                                marginLeft: '10px'
+                                                marginLeft: '8px',
+                                                flexShrink: 0
                                             }}>
                                                 {count}
                                             </span>
@@ -201,56 +231,58 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                     )}
                 </div>
 
-                {/* 3. Achievements Badge icon button */}
-                {onOpenAchievements && (
-                    <button
-                        onClick={onOpenAchievements}
-                        style={{
-                            ...styles.actionBtn,
-                            marginLeft: 'auto',
-                            borderColor: '#f59e0b',
-                            color: '#d97706',
-                            background: 'rgba(245, 158, 11, 0.12)',
-                            boxShadow: '0 1px 4px rgba(245, 158, 11, 0.2)'
-                        }}
-                        title="Productivity Achievements & Insights"
-                    >
-                        <Trophy size={17} />
-                    </button>
-                )}
+                {/* Right-aligned actions container ensuring icons are never pushed off-screen */}
+                <div style={styles.rightActionsWrapper}>
+                    {/* 3. Achievements Badge icon button */}
+                    {onOpenAchievements && (
+                        <button
+                            onClick={onOpenAchievements}
+                            style={{
+                                ...styles.actionBtn,
+                                borderColor: '#f59e0b',
+                                color: '#d97706',
+                                background: 'rgba(245, 158, 11, 0.12)',
+                                boxShadow: '0 1px 4px rgba(245, 158, 11, 0.2)'
+                            }}
+                            title="Productivity Achievements & Insights"
+                        >
+                            <Trophy size={17} />
+                        </button>
+                    )}
 
-                {/* 4. Settings cog icon on the right-hand side */}
-                <button 
-                    onClick={onOpenSettings} 
-                    style={{ ...styles.actionBtn, marginLeft: onOpenAchievements ? '8px' : 'auto' }} 
-                    title="Settings"
-                >
-                    <Settings size={18} />
-                </button>
-
-                {/* 4. Add Task + / - toggle button to the right of Settings with generous margin */}
-                {onToggleAdd && (
-                    <button
-                        onClick={onToggleAdd}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#dc2626',
-                            cursor: 'pointer',
-                            padding: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginLeft: '14px',
-                            flexShrink: 0,
-                            transition: 'transform 0.2s ease'
-                        }}
-                        aria-label={isAddOpen ? "Close add task" : "Open add task"}
-                        title={isAddOpen ? "Close add task form" : "Add new task"}
+                    {/* 4. Settings cog icon */}
+                    <button 
+                        onClick={onOpenSettings} 
+                        style={styles.actionBtn} 
+                        title="Settings"
                     >
-                        {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+                        <Settings size={18} />
                     </button>
-                )}
+
+                    {/* 5. Add Task + / - toggle button */}
+                    {onToggleAdd && (
+                        <button
+                            onClick={onToggleAdd}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#dc2626',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginLeft: '6px',
+                                flexShrink: 0,
+                                transition: 'transform 0.2s ease'
+                            }}
+                            aria-label={isAddOpen ? "Close add task" : "Open add task"}
+                            title={isAddOpen ? "Close add task form" : "Add new task"}
+                        >
+                            {isAddOpen ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

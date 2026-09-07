@@ -70,10 +70,37 @@ describe('ProjectTabs Component', () => {
                 onOpenAchievements={onOpenAchievementsMock}
             />
         );
-
         const trophyBtn = screen.getByTitle('Productivity Achievements & Insights');
         expect(trophyBtn).toBeInTheDocument();
         fireEvent.click(trophyBtn);
         expect(onOpenAchievementsMock).toHaveBeenCalled();
+    });
+
+    test('renders correctly with very long project name and preserves action buttons', () => {
+        const longProjects = [
+            { id: 'super-long', name: 'Very Long Project Name That Could Overflow On Mobile Screens', color: '#6366f1' }
+        ];
+        const onToggleAddMock = jest.fn();
+        const onOpenSettingsMock = jest.fn();
+
+        render(
+            <ProjectTabs
+                projects={longProjects}
+                tasks={[]}
+                currentProjectId="super-long"
+                onSelect={jest.fn()}
+                showSearch={false}
+                onToggleSearch={jest.fn()}
+                onOpenSettings={onOpenSettingsMock}
+                onToggleAdd={onToggleAddMock}
+                isAddOpen={false}
+            />
+        );
+
+        expect(screen.getByText(/Very Long Project Name That Could Overflow On Mobile Screens/i)).toBeInTheDocument();
+        const addBtn = screen.getByLabelText(/Open add task/i);
+        expect(addBtn).toBeInTheDocument();
+        fireEvent.click(addBtn);
+        expect(onToggleAddMock).toHaveBeenCalled();
     });
 });
