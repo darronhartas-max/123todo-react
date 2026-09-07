@@ -943,7 +943,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 fontWeight: '600'
                             }}
                         >
-                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Full Notes'}
+                            {(() => {
+                                const hasPhotos = task.photos && task.photos.length > 0;
+                                if (hasPhotos) {
+                                    return showNotesExpanded ? '▾ Hide Photos' : '▸ Show Photos';
+                                }
+                                return showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes';
+                            })()}
                         </button>
                         <AnimatePresence>
                             {showNotesExpanded && (
