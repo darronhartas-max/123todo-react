@@ -1,6 +1,19 @@
-import { getTodayDateString, getNextWeekDateString, parseDateString, formatDateString } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
+    test('getTomorrowDateString calculates exactly 1 day from today', () => {
+        const todayStr = getTodayDateString();
+        const tomorrowStr = getTomorrowDateString();
+
+        const todayDate = parseDateString(todayStr);
+        const tomorrowDate = parseDateString(tomorrowStr);
+
+        const diffTime = Math.abs(tomorrowDate - todayDate);
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        expect(diffDays).toBe(1);
+    });
+
     test('getNextWeekDateString calculates exactly 7 days from today', () => {
         const todayStr = getTodayDateString();
         const nextWeekStr = getNextWeekDateString();

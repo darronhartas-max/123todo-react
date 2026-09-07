@@ -74,4 +74,59 @@ describe('EditModal', () => {
       })
     );
   });
+
+  test('only shows defer alert when deferCount is 5 or greater', () => {
+    const { rerender } = render(
+      <EditModal
+        task={{ ...sampleTaskWithNotes, deferCount: 4 }}
+        onSave={jest.fn()}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    expect(screen.queryByText(/Consider breaking into/i)).not.toBeInTheDocument();
+
+    rerender(
+      <EditModal
+        task={{ ...sampleTaskWithNotes, deferCount: 5 }}
+        onSave={jest.fn()}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    expect(screen.getByText(/Consider breaking into/i)).toBeInTheDocument();
+    expect(screen.getByText(/Deferred 5x/i)).toBeInTheDocument();
+  });
+
+  test('sets scheduled date to tomorrow when Next Day button is clicked', () => {
+    const onSaveMock = jest.fn();
+    render(
+      <EditModal
+        task={sampleTaskWithNotes}
+        onSave={onSaveMock}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    // Open schedule section by clicking Schedule button
+    const scheduleToggle = screen.getByRole('button', { name: /Schedule/i });
+    fireEvent.click(scheduleToggle);
+
+    // Click Next Day button
+    const nextDayButton = screen.getByRole('button', { name: /Next Day/i });
+    expect(nextDayButton).toBeInTheDocument();
+    fireEvent.click(nextDayButton);
+
+    // Save and verify scheduledDate is set
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+    expect(onSaveMock).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        scheduledDate: expect.any(String)
+      })
+    );
+  });
 });

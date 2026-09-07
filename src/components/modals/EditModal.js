@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
 import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -638,8 +638,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                {/* Defer Alert (if deferred >= 2) */}
-                {task.deferCount >= 2 && (
+                {/* Defer Alert (if deferred >= 5) */}
+                {task.deferCount >= 5 && (
                     <div style={{
                         padding: '8px 12px',
                         background: 'rgba(239, 68, 68, 0.06)',
@@ -903,6 +903,24 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     minWidth: '140px'
                                 }}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setScheduledDate(getTomorrowDateString())}
+                                style={{
+                                    padding: '8px 14px',
+                                    background: 'var(--accent-bg)',
+                                    border: '1px solid var(--accent-color)',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    color: 'var(--accent-color)',
+                                    fontWeight: '600',
+                                    whiteSpace: 'nowrap'
+                                }}
+                                title="Schedule for tomorrow"
+                            >
+                                📅 Next Day
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => setScheduledDate(getNextWeekDateString())}

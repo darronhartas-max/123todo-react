@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
-import { formatDisplayDate, getNextWeekDateString } from '../../utils/dateUtils';
+import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 
 const ACTION_ICONS = {
@@ -687,6 +687,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             borderRadius: '6px',
                             border: '1px solid var(--border-color)',
                             width: 'fit-content',
+                            maxWidth: '100%',
+                            flexWrap: 'wrap',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                         }}
                     >
@@ -709,6 +711,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 outline: 'none'
                             }}
                         />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                onUpdate(task.id, { scheduledDate: getTomorrowDateString() });
+                                setShowQuickSchedule(false);
+                            }}
+                            style={{
+                                border: '1px solid var(--accent-color)',
+                                background: 'var(--accent-bg)',
+                                color: 'var(--accent-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600',
+                                padding: '3px 7px',
+                                borderRadius: '4px',
+                                whiteSpace: 'nowrap'
+                            }}
+                            title="Defer task to tomorrow"
+                        >
+                            📅 Next Day
+                        </button>
                         <button
                             type="button"
                             onClick={() => {
