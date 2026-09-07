@@ -88,9 +88,16 @@ export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.5.2';
+export const APP_VERSION = '3.6.0';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.0': [
+    { title: '📸 Photo Attachments in Notes & Tasks:', desc: 'Attach up to 3 photos or screenshots per note! Features native camera capture on mobile, file upload, drag-and-drop, direct clipboard pasting (Cmd+V / Ctrl+V) for screen grabs, ultra-fast client-side compression to preserve crisp receipts and 4K text, local IndexedDB caching, and a full-screen Lightbox viewer with zoom.' },
+    { title: '🖐️ Smooth Drag-and-Drop Task Reordering:', desc: 'Eliminated drag-and-drop snapback issues with stabilized pointer tracking and immediate local state settlement.' },
+    { title: '📱 Responsive Project Name Line-Wrapping:', desc: 'Long project names now wrap smoothly on mobile and compact desktop windows, ensuring the Add Task button and settings icons remain perfectly aligned and fully visible.' },
+    { title: '🔒 Persistent Admin Stats Security:', desc: 'Admin analytics credentials now persist across app version updates without unexpected resets.' },
+    { title: '🎙️ Clean Voice Dictation & Redesigned Note Controls:', desc: 'Resolved dictation sentence duplication, moved the bold Voice button to the right, renamed Focus Editor to Expand, and collapsed notes on recurring and scheduled tasks by default for a decluttered view.' }
+  ],
   '3.5.2': [
     { title: '🛡️ Sync Engine Startup Guard & Efficiency:', desc: 'Sync checks on launch and background polling now only run for your actively selected sync engine, ensuring zero unwanted Google Drive checks when syncing via Cloud Sync (Cloudflare / VPS).' },
     { title: '📡 Dynamic Provider-Aware Offline Alerts:', desc: 'Offline status notifications now dynamically detect and display your chosen sync engine (Cloud Sync or Google Drive).' },

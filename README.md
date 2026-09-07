@@ -1,13 +1,14 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.5.2** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.6.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
 ## 🌟 Highlights & Key Advantages
 
-- **100% Free & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, and unlimited notes without subscription paywalls.
+- **100% Free & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, unlimited notes, and photo attachments without subscription paywalls.
+- **Photo Attachments in Notes**: Attach up to 3 photos or screenshots per note on mobile (camera / gallery) and desktop (drag & drop, direct `Cmd+V` / `Ctrl+V` paste) with sharp client-side compression, IndexedDB caching, and full-screen Lightbox viewer.
 - **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Dual-Skin OS**: Instant 1-tap toggle between structured **Task Manager Mode** and distraction-free **Simple Voice Notes Mode**.
 - **Interactive Drag-and-Drop Subtasks**: Multi-line auto-wrapping checklist subtasks with draggable reordering across Add Task, Edit Task, and Task lists.
@@ -156,7 +157,15 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.5.2 (Current)
+### v3.6.0 (Current)
+
+- **Photo Attachments in Notes & Tasks**: Attach up to 3 photos or screenshots per note on mobile and desktop. Features instant camera capture (`capture="environment"`), file browser, drag-and-drop, direct clipboard pasting (`Cmd+V` / `Ctrl+V`), high-efficiency client-side WebP compression (max 2048px for sharp document legibility), IndexedDB caching, and a full-screen Lightbox viewer with zoom & download.
+- **Drag-and-Drop Task Reordering Stabilization**: Resolved pointer event tracking and immediate local state settling, eliminating task snapback issues.
+- **Responsive Project Name Line-Wrapping**: Project names in the top header now wrap onto multiple lines cleanly on mobile and compact desktop windows, ensuring the Add Task button and settings icons are never pushed off-screen.
+- **Persistent Admin Stats Password Security**: Admin analytics panel credentials now persist safely across version upgrades.
+- **Refined Voice Dictation & Notes UI**: Fixed spoken sentence duplication, right-aligned the bold Voice button, renamed Focus Editor to Expand, and defaulted notes on recurring and scheduled tasks to collapsed with 1-click expansion.
+
+### v3.5.2
 
 - **Sync Provider Startup Guard & Optimization**: Startup checks and background polling now only run for your active sync provider, eliminating unnecessary Google Drive checks when syncing via Cloud Sync.
 - **Dynamic Provider-Aware Offline Notice**: Offline connection banner dynamically detects and announces your active sync provider ("Cloud Sync" vs "Google Drive").

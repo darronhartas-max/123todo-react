@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
+import PhotoAttachments from './PhotoAttachments';
 
 const NoteCard = ({
   note,
@@ -316,6 +317,11 @@ const NoteCard = ({
                 lineHeight: 1.5
               }}
             />
+            <PhotoAttachments
+              photos={note.photos || []}
+              onChange={(newPhotos) => onUpdateNote(note.id, { photos: newPhotos })}
+              readOnly={false}
+            />
             {/* Subtasks Section in Edit Mode */}
             <div style={{ marginTop: '4px', padding: '8px', borderRadius: '8px', background: 'var(--item-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)' }}>
               <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '6px' }}>
@@ -496,6 +502,15 @@ const NoteCard = ({
               <p style={{ fontSize: `${Math.max(notesFontSize - 4, 12)}px`, color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>
                 Tap to add details or record voice...
               </p>
+            )}
+
+            {note.photos && note.photos.length > 0 && (
+              <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '8px' }}>
+                <PhotoAttachments
+                  photos={note.photos}
+                  readOnly={true}
+                />
+              </div>
             )}
 
             {/* Subtasks in View Mode */}

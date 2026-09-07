@@ -5,10 +5,11 @@ import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, 
 import { motion } from 'framer-motion';
 import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
+import PhotoAttachments from '../notes/PhotoAttachments';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
-    const [editingTask, setEditingTask] = useState({ ...task });
+    const [editingTask, setEditingTask] = useState({ ...task, photos: task.photos || [] });
     
     // Voice, Dropdowns & Expanded Editor State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
@@ -16,7 +17,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
-    const [showNotes, setShowNotes] = useState(() => Boolean(task.notes && task.notes.trim().length > 0));
+    const [showNotes, setShowNotes] = useState(() => Boolean((task.notes && task.notes.trim().length > 0) || (task.photos && task.photos.length > 0)));
 
     const titleRef = useRef(null);
     const notesRef = useRef(null);
@@ -152,6 +153,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
             priority: editingTask.priority,
             projectId: editingTask.projectId,
             notes: editingTask.notes,
+            photos: editingTask.photos || [],
             scheduledDate: finalScheduledDate,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
@@ -528,7 +530,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         style={toggleButtonStyle(showNotes)}
                     >
                         {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>Notes{editingTask.notes && editingTask.notes.trim().length > 0 ? ' •' : ''}</span>
+                        <span>Notes{(editingTask.notes && editingTask.notes.trim().length > 0) || (editingTask.photos && editingTask.photos.length > 0) ? ' •' : ''}</span>
                     </button>
                     <button
                         type="button"
@@ -627,6 +629,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 maxHeight: '180px',
                                 fontSize: '1.05rem'
                             }}
+                        />
+                        <PhotoAttachments
+                            photos={editingTask.photos || []}
+                            onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
+                            readOnly={false}
                         />
                     </div>
                 )}
@@ -1207,6 +1214,14 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     boxSizing: 'border-box'
                                 }}
                             />
+
+                            {expandedOverlayField === 'notes' && (
+                                <PhotoAttachments
+                                    photos={editingTask.photos || []}
+                                    onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
+                                    readOnly={false}
+                                />
+                            )}
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px' }}>
                                 <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', display: 'flex', gap: '14px' }}>

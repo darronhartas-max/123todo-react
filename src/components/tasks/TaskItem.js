@@ -3,6 +3,7 @@ import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCi
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getNextWeekDateString } from '../../utils/dateUtils';
+import PhotoAttachments from '../notes/PhotoAttachments';
 
 const ACTION_ICONS = {
     CheckSquare,
@@ -221,7 +222,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         (showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0)) ||
         showQuickSchedule ||
         subtasksCount > 0 ||
-        (showFullDetails && task.notes)
+        (showFullDetails && (task.notes || (task.photos && task.photos.length > 0)))
     );
 
     const styles = {
@@ -896,7 +897,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 )}
 
-                {showFullDetails && task.notes && (
+                {showFullDetails && (task.notes || (task.photos && task.photos.length > 0)) && (
                     <div style={{ marginTop: '6px' }}>
                         <button
                             type="button"
@@ -915,7 +916,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 fontWeight: '600'
                             }}
                         >
-                            {showNotesExpanded ? '▾ Hide Notes' : '▸ Full Notes'}
+                            {showNotesExpanded ? '▾ Hide Notes' : `▸ Full Notes${task.photos && task.photos.length > 0 ? ` [${task.photos.length}📷]` : ''}`}
                         </button>
                         <AnimatePresence>
                             {showNotesExpanded && (
@@ -938,7 +939,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                         overflow: 'hidden'
                                     }}
                                 >
-                                    {task.notes}
+                                    {task.notes && <div>{task.notes}</div>}
+                                    {task.photos && task.photos.length > 0 && (
+                                        <PhotoAttachments
+                                            photos={task.photos}
+                                            readOnly={true}
+                                        />
+                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>

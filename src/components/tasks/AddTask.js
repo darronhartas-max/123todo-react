@@ -3,6 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants
 import { Plus, Minus, Mic, MicOff, ChevronDown, GripVertical } from 'lucide-react';
 import { getTodayDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
+import PhotoAttachments from '../notes/PhotoAttachments';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -22,6 +23,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [text, setText] = useState('');
     const [notes, setNotes] = useState('');
+    const [photos, setPhotos] = useState([]);
     const [showNotes, setShowNotes] = useState(false);
     const [priority, setPriority] = useState(1);
     
@@ -211,7 +213,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             scheduledDate: finalScheduledDate,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
-            recurrence
+            recurrence,
+            photos
         });
 
         try {
@@ -223,6 +226,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         // Reset all states
         setText('');
         setNotes('');
+        setPhotos([]);
         setShowNotes(false);
         setSubtasks([]);
         setNewSubtaskText('');
@@ -529,7 +533,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     style={toggleButtonStyle(showNotes)}
                 >
                     {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                    Notes
+                    Notes{(notes && notes.trim().length > 0) || photos.length > 0 ? ' •' : ''}
                 </button>
                 <button
                     onClick={() => setShowSubtasks(!showSubtasks)}
@@ -580,6 +584,11 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         onInput={handleInput}
                         placeholder="Add notes..."
                         style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
+                    />
+                    <PhotoAttachments
+                        photos={photos}
+                        onChange={setPhotos}
+                        readOnly={false}
                     />
                 </div>
             )}
