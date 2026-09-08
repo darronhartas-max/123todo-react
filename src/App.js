@@ -291,7 +291,7 @@ const TodoApp = () => {
   const [syncSpeed, setSyncSpeedState] = useState(() => {
     return localStorage.getItem('123Todo_Sync_Speed') || 'adaptive';
   });
-  const [isChiefProgrammer, setIsChiefProgrammerState] = useState(() => {
+  const [, setIsChiefProgrammerState] = useState(() => {
     try {
       if (localStorage.getItem('123Todo_ChiefProgrammer') === 'true') return true;
       if (typeof window !== 'undefined' && window.location) {
@@ -1340,8 +1340,6 @@ const TodoApp = () => {
         setWideColumnView={setWideColumnView}
         syncSpeed={syncSpeed}
         setSyncSpeed={setSyncSpeed}
-        isChiefProgrammer={isChiefProgrammer}
-        onToggleChiefProgrammer={toggleChiefProgrammerMode}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         lightModeTone={lightModeTone}

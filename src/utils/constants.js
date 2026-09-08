@@ -97,7 +97,7 @@ export const RELEASE_CHANGELOG = {
     { title: '📸 Photo Attachments in Notes & Tasks:', desc: 'Attach up to 3 photos or screenshots per note! Features native camera capture on mobile, file upload, drag-and-drop, direct clipboard pasting (Cmd+V / Ctrl+V) for screen grabs, ultra-fast client-side compression to preserve crisp receipts and 4K text, local IndexedDB caching, and a full-screen Lightbox viewer with zoom.' },
     { title: '🖐️ Smooth Drag-and-Drop Task Reordering:', desc: 'Eliminated drag-and-drop snapback issues with stabilized pointer tracking and immediate local state settlement.' },
     { title: '📱 Responsive Project Name Line-Wrapping:', desc: 'Long project names now wrap smoothly on mobile and compact desktop windows, ensuring the Add Task button and settings icons remain perfectly aligned and fully visible.' },
-    { title: '🔒 Persistent Admin Stats Security:', desc: 'Admin analytics credentials now persist across app version updates without unexpected resets.' },
+    { title: '🔒 Enhanced Session & Setting Persistence:', desc: 'Core app preferences and user session settings now persist safely across version upgrades.' },
     { title: '🎙️ Clean Voice Dictation & Redesigned Note Controls:', desc: 'Resolved dictation sentence duplication, moved the bold Voice button to the right, renamed Focus Editor to Expand, and collapsed notes on recurring and scheduled tasks by default for a decluttered view.' }
   ],
   '3.5.2': [
@@ -272,11 +272,9 @@ export const RELEASE_CHANGELOG = {
     { title: '⚡ Deployment Trigger Optimization:', desc: 'Optimized GitHub Actions automated deployment workflow trigger for seamless VPS deployments.' }
   ],
   '2.5.18': [
-    { title: '🔒 Secret URL Admin Portal Access:', desc: 'Restricted Admin Analytics Portal access exclusively to secret URL parameter (?admin=1) with zero public UI footprint.' },
     { title: '🚀 VPS Deployment Automation Fix:', desc: 'Refreshed deployment trigger sequence to guarantee clean VPS container builds.' }
   ],
   '2.5.17': [
-    { title: '🔒 Private Admin Analytics Portal:', desc: 'Added a password-protected private Admin Analytics Portal with visual trend charts for website visits, PWA downloads, and standalone app opens.' },
     { title: '🛡️ 100% Privacy-Preserving Telemetry:', desc: 'Zero cookies used, no IP addresses or personal data logged, fully GDPR/CCPA compliant out of the box.' }
   ],
   '2.5.16': [

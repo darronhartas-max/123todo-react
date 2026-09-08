@@ -242,8 +242,6 @@ const SettingsModal = ({
     setWideColumnView,
     syncSpeed = 'adaptive',
     setSyncSpeed,
-    isChiefProgrammer = false,
-    onToggleChiefProgrammer,
     themeMode,
     setThemeMode,
     lightModeTone = 'soft',
@@ -271,24 +269,6 @@ const SettingsModal = ({
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
-
-    const versionClickCountRef = useRef(0);
-    const versionClickTimerRef = useRef(null);
-
-    const handleVersionBadgeClick = () => {
-        versionClickCountRef.current += 1;
-        if (versionClickTimerRef.current) clearTimeout(versionClickTimerRef.current);
-        if (versionClickCountRef.current >= 3) {
-            versionClickCountRef.current = 0;
-            if (onToggleChiefProgrammer) {
-                onToggleChiefProgrammer();
-            }
-        } else {
-            versionClickTimerRef.current = setTimeout(() => {
-                versionClickCountRef.current = 0;
-            }, 800);
-        }
-    };
 
     const handleManualCheckForUpdates = (e) => {
         if (onCheckForUpdates) {
@@ -1307,13 +1287,12 @@ const SettingsModal = ({
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
                                         <span>App Version & Updates</span>
-                                         <span 
-                                             onClick={handleVersionBadgeClick}
-                                             style={{ fontSize: '0.9rem', color: isChiefProgrammer ? '#10b981' : 'var(--muted-text)', fontWeight: '600', cursor: 'pointer', userSelect: 'none' }}
-                                             title={isChiefProgrammer ? "⚡ Chief Programmer Mode Active" : `v${APP_VERSION}`}
-                                         >
-                                             v{APP_VERSION} {isChiefProgrammer && '⚡'}
-                                         </span>
+                                        <span 
+                                            style={{ fontSize: '0.9rem', color: 'var(--muted-text)', fontWeight: '600' }}
+                                            title={`123 ToDo v${APP_VERSION}`}
+                                        >
+                                            v{APP_VERSION}
+                                        </span>
                                     </div>
                                     <div style={{
                                         display: 'flex',
@@ -1634,25 +1613,6 @@ const SettingsModal = ({
                                         </div>
                                     </label>
                                 </div>
-
-                                {isChiefProgrammer && (
-                                    <div style={{ marginBottom: '20px', background: 'rgba(16, 185, 129, 0.08)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                            <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                ⚡ Chief Programmer Mode Active
-                                            </div>
-                                            <button
-                                                onClick={() => onToggleChiefProgrammer && onToggleChiefProgrammer(false)}
-                                                style={{ fontSize: '0.75rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer' }}
-                                            >
-                                                Deactivate
-                                            </button>
-                                        </div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', lineHeight: '1.35' }}>
-                                            Zero-delay live sync active: 50ms instant push on local edits, 2s live background polling, and instant focus/hover sync across all your devices.
-                                        </div>
-                                    </div>
-                                )}
 
                                 <button
                                     onClick={() => {
