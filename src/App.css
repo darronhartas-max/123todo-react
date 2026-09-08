@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+/* Compact Tasks View (Clamp task title to 2 lines) */
+.task-text-compact {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

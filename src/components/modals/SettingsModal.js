@@ -263,7 +263,9 @@ const SettingsModal = ({
     setSyncProvider,
     onOpenSyncModal,
     appMode = 'tasks',
-    onSwitchMode = () => {}
+    onSwitchMode = () => {},
+    taskViewMode = 'compact',
+    setTaskViewMode
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -1114,6 +1116,30 @@ const SettingsModal = ({
                                          />
                                          <span>Enable Bold Text</span>
                                      </label>
+                                 </div>
+
+                                 {/* Tasks List View Mode */}
+                                 <div style={styles.settingRow}>
+                                     <div style={styles.settingLabel}>
+                                         <span>Tasks List View Mode</span>
+                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                             Choose between compact 2-line preview or full-length task titles in list views
+                                         </span>
+                                     </div>
+                                     <div style={styles.segmentContainer}>
+                                         <button
+                                             style={styles.segmentBtn(taskViewMode === 'compact')}
+                                             onClick={() => setTaskViewMode && setTaskViewMode('compact')}
+                                         >
+                                             Compact (2 Lines)
+                                         </button>
+                                         <button
+                                             style={styles.segmentBtn(taskViewMode === 'full')}
+                                             onClick={() => setTaskViewMode && setTaskViewMode('full')}
+                                         >
+                                             Full-Length
+                                         </button>
+                                     </div>
                                  </div>
 
                                  {/* Layout Width Constraint */}

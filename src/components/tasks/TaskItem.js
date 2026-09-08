@@ -14,7 +14,7 @@ const ACTION_ICONS = {
     Slash
 };
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK' }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK', taskViewMode = 'compact' }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
@@ -270,7 +270,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             fontWeight: '400',
             lineHeight: '1.35',
             margin: 0,
-            minWidth: 0
+            minWidth: 0,
+            ...(taskViewMode === 'compact' ? {
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            } : {})
         },
         actionBtn: {
             background: 'transparent',
@@ -574,7 +581,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
-                    <span style={styles.taskText}>{task.text}</span>
+                    <span 
+                        className={taskViewMode === 'compact' ? 'task-text-compact' : ''}
+                        style={styles.taskText}
+                        title={taskViewMode === 'compact' ? task.text : undefined}
+                    >
+                        {task.text}
+                    </span>
                     {task.photos && task.photos.length > 0 && (
                         <span
                             onClick={(e) => {

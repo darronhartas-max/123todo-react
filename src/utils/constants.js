@@ -30,7 +30,8 @@ export const STORAGE_KEYS = {
   CF_DEVICE_TOKEN: '123Todo_CF_DeviceToken',
   APP_MODE: '123TodoAppMode',
   MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount',
-  NOTES_FONT_SIZE: '123TodoNotesFontSize'
+  NOTES_FONT_SIZE: '123TodoNotesFontSize',
+  TASK_VIEW_MODE: '123TodoTaskViewMode'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -85,6 +86,7 @@ export const DEFAULT_PROJECTS = [
 export const MAX_TASK_LENGTH = 250;
 export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 export const DEFAULT_LIGHT_MODE_TONE = 'muted';
+export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;

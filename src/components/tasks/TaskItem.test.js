@@ -156,3 +156,24 @@ test('successfully completes and archives a task with multiple photo attachments
   expect(onCompleteMock).toHaveBeenCalledWith(106);
 });
 
+test('applies compact 2-line clamp class and title tooltip by default, but displays full text in full mode', () => {
+  const longTask = {
+    id: 107,
+    text: 'This is a very long task description that spans across multiple lines so that we can verify compact 2-line mode truncation versus full length mode.',
+    priority: 1,
+    projectId: 'general'
+  };
+
+  const { rerender } = render(<TaskItem task={longTask} />);
+  const textElement = screen.getByText(longTask.text);
+  
+  // By default (compact mode), should have task-text-compact class and title attribute
+  expect(textElement).toHaveClass('task-text-compact');
+  expect(textElement).toHaveAttribute('title', longTask.text);
+
+  // When taskViewMode is set to 'full', should NOT have task-text-compact class or title attribute
+  rerender(<TaskItem task={longTask} taskViewMode="full" />);
+  expect(textElement).not.toHaveClass('task-text-compact');
+  expect(textElement).not.toHaveAttribute('title');
+});
+

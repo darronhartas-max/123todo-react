@@ -190,3 +190,13 @@ html.bold-font-active b {
     box-shadow: 0 0 2px #10b981;
   }
 }
+
+/* Compact Tasks View (Clamp task title to 2 lines) */
+.task-text-compact {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

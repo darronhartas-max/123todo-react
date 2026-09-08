@@ -35,7 +35,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE } from './utils/constants';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 
@@ -347,6 +347,9 @@ const TodoApp = () => {
   const [isBoldFont, setIsBoldFontState] = useState(() => {
     return localStorage.getItem('123TodoBoldFont') === 'true';
   });
+  const [taskViewMode, setTaskViewModeState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.TASK_VIEW_MODE) || DEFAULT_TASK_VIEW_MODE;
+  });
   const [isDark, setIsDark] = useState(false);
 
   const setFontSize = (size) => {
@@ -401,8 +404,23 @@ const TodoApp = () => {
       console.error('Failed to save bold font preference:', e);
     }
   };
+  const setTaskViewMode = (val) => {
+    setTaskViewModeState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.TASK_VIEW_MODE, val);
+    } catch (e) {
+      console.error('Failed to save task view mode preference:', e);
+    }
+  };
 
   // Apply visual styling settings to root element
+  useEffect(() => {
+    if (taskViewMode === 'compact') {
+      document.documentElement.classList.add('task-view-compact');
+    } else {
+      document.documentElement.classList.remove('task-view-compact');
+    }
+  }, [taskViewMode]);
   useEffect(() => {
     if (isBoldFont) {
       document.documentElement.classList.add('bold-font-active');
@@ -1025,6 +1043,7 @@ const TodoApp = () => {
                       swipeSettings={swipeSettings}
                       onSwipeAction={handleSwipeAction}
                       dateFormat={dateFormat}
+                      taskViewMode={taskViewMode}
                     />
                   ))
                 ) : (
@@ -1046,6 +1065,7 @@ const TodoApp = () => {
                       swipeSettings={swipeSettings}
                       onSwipeAction={handleSwipeAction}
                       dateFormat={dateFormat}
+                      taskViewMode={taskViewMode}
                     />
                   ))
                 )}
@@ -1083,6 +1103,7 @@ const TodoApp = () => {
                               onSwipeAction={handleSwipeAction}
                               dateFormat={dateFormat}
                               showFullDetails={true}
+                              taskViewMode={taskViewMode}
                             />
                           );
                         })}
@@ -1120,6 +1141,7 @@ const TodoApp = () => {
                           onSwipeAction={handleSwipeAction}
                           dateFormat={dateFormat}
                           showFullDetails={true}
+                          taskViewMode={taskViewMode}
                         />
                       );
                     })}
@@ -1221,6 +1243,7 @@ const TodoApp = () => {
           onUpdate={updateTask}
           onClose={() => setShowArchive(false)}
           dateFormat={dateFormat}
+          taskViewMode={taskViewMode}
         />
       )}
 
@@ -1339,6 +1362,8 @@ const TodoApp = () => {
         onOpenSyncModal={() => setShowSyncModal(true)}
         appMode={appMode}
         onSwitchMode={handleSwitchMode}
+        taskViewMode={taskViewMode}
+        setTaskViewMode={setTaskViewMode}
       />
 
       <AdminStatsModal

@@ -5,7 +5,7 @@ import { DEFAULT_PROJECTS } from '../../utils/constants';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';
 
-const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpdate, onClose, dateFormat = 'UK' }) => {
+const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpdate, onClose, dateFormat = 'UK', taskViewMode = 'compact' }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProject, setSelectedProject] = useState('all');
     const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'oldest' | 'priority' | 'name'
@@ -602,6 +602,7 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                                 onUpdate={onUpdate}
                                                 showFullDetails={true}
                                                 dateFormat={dateFormat}
+                                                taskViewMode={taskViewMode}
                                             />
                                         </div>
                                     );
