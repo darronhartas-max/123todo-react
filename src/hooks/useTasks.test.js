@@ -183,5 +183,36 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(createdTask.notes).toBe('');
         expect(createdTask.priority).toBe(1); // Must Do
     });
+
+    test('completes task with multiple photos and persists lightweight versions without crashing quota', () => {
+        const taskWithPhotos = {
+            id: 1,
+            text: 'Task with 3 photos',
+            priority: 1,
+            projectId: 'general',
+            photos: [
+                { id: 'img_1', name: 'photo1.jpg', thumbnail: 'data:image/webp;base64,thumb1', dataUrl: 'data:image/webp;base64,verylongdataurl1' },
+                { id: 'img_2', name: 'photo2.jpg', thumbnail: 'data:image/webp;base64,thumb2', dataUrl: 'data:image/webp;base64,verylongdataurl2' },
+                { id: 'img_3', name: 'photo3.jpg', thumbnail: 'data:image/webp;base64,thumb3', dataUrl: 'data:image/webp;base64,verylongdataurl3' }
+            ]
+        };
+        localStorage.setItem('123TodoTasks', JSON.stringify([taskWithPhotos]));
+
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.completeTask(1);
+        });
+
+        expect(result.current.tasks.length).toBe(0);
+        expect(result.current.archived.length).toBe(1);
+        expect(result.current.archived[0].photos.length).toBe(3);
+
+        // Check localStorage persistence - dataUrl should be stripped to protect quota, thumbnail preserved
+        const savedArchive = JSON.parse(localStorage.getItem('123TodoArchive'));
+        expect(savedArchive[0].photos[0].thumbnail).toBe('data:image/webp;base64,thumb1');
+        expect(savedArchive[0].photos[0].dataUrl).toBeUndefined();
+    });
 });
+
 

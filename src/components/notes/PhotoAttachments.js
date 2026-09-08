@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, Image as ImageIcon, X, ZoomIn, Download, AlertCircle } from 'lucide-react';
 import { compressImage, isValidImageFile, formatFileSize, MAX_PHOTOS_PER_NOTE } from '../../utils/imageUtils';
-import { savePhoto, deletePhoto } from '../../utils/photoStorage';
+import { savePhoto, getPhoto, deletePhoto } from '../../utils/photoStorage';
 
 const PhotoAttachments = ({
   photos = [],
@@ -86,6 +86,24 @@ const PhotoAttachments = ({
     if (activeLightboxPhoto?.id === photoId) {
       setActiveLightboxPhoto(null);
     }
+  };
+
+  // Handle opening lightbox with full-resolution photo (hydrating from IndexedDB if needed)
+  const handleOpenLightbox = async (photo) => {
+    if (photo.dataUrl) {
+      setActiveLightboxPhoto(photo);
+      return;
+    }
+    try {
+      const full = await getPhoto(photo.id);
+      if (full && full.dataUrl) {
+        setActiveLightboxPhoto({ ...photo, ...full });
+        return;
+      }
+    } catch (e) {
+      console.warn('Could not load full photo from IndexedDB:', e);
+    }
+    setActiveLightboxPhoto(photo);
   };
 
   // Clipboard Paste Support (Cmd+V / Ctrl+V for Desktop Screen Grabs)
@@ -323,7 +341,7 @@ const PhotoAttachments = ({
             return (
               <div
                 key={photo.id || idx}
-                onClick={() => setActiveLightboxPhoto(photo)}
+                onClick={() => handleOpenLightbox(photo)}
                 style={{
                   position: 'relative',
                   width: '68px',

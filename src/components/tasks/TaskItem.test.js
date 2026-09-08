@@ -83,3 +83,76 @@ test('renders the first line of notes in small font and opens edit modal on clic
   // Note preview is still present
   expect(screen.getByText('First line of note details')).toBeInTheDocument();
 });
+
+test('successfully completes a task even after vertical touch scroll interactions on mobile', () => {
+  const onCompleteMock = jest.fn();
+  const task = {
+    id: 105,
+    text: 'Task tested during mobile scroll',
+    priority: 1,
+    projectId: 'general'
+  };
+
+  render(
+    <TaskItem
+      task={task}
+      onComplete={onCompleteMock}
+      swipeSettings={{ enabled: true, swipeRight: 'complete', swipeLeft: 'delete' }}
+    />
+  );
+
+  const listItem = screen.getByRole('listitem');
+
+  // Simulate user scrolling vertically down the task list
+  fireEvent.touchStart(listItem, { touches: [{ clientX: 100, clientY: 100 }] });
+  fireEvent.touchMove(listItem, { touches: [{ clientX: 102, clientY: 150 }] });
+  fireEvent.touchEnd(listItem);
+
+  // Now user taps complete button
+  const completeBtn = screen.getByTitle('Complete Task');
+  fireEvent.touchStart(completeBtn, { touches: [{ clientX: 200, clientY: 100 }] });
+  fireEvent.touchEnd(completeBtn);
+  fireEvent.click(completeBtn);
+
+  act(() => {
+    jest.advanceTimersByTime(400);
+  });
+
+  expect(onCompleteMock).toHaveBeenCalledWith(105);
+});
+
+test('successfully completes and archives a task with multiple photo attachments', () => {
+  const onCompleteMock = jest.fn();
+  const taskWithPhotos = {
+    id: 106,
+    text: 'Task with 3 photos',
+    priority: 1,
+    projectId: 'general',
+    notes: 'Receipt attached',
+    photos: [
+      { id: 'img_1', name: 'photo1.jpg', thumbnail: 'data:image/webp;base64,abc' },
+      { id: 'img_2', name: 'photo2.jpg', thumbnail: 'data:image/webp;base64,def' },
+      { id: 'img_3', name: 'photo3.jpg', thumbnail: 'data:image/webp;base64,ghi' }
+    ]
+  };
+
+  render(
+    <TaskItem
+      task={taskWithPhotos}
+      onComplete={onCompleteMock}
+    />
+  );
+
+  // Auto-updating photo badge should be present
+  expect(screen.getByTitle(/3 photos attached/i)).toBeInTheDocument();
+
+  const completeBtn = screen.getByTitle('Complete Task');
+  fireEvent.click(completeBtn);
+
+  act(() => {
+    jest.advanceTimersByTime(400);
+  });
+
+  expect(onCompleteMock).toHaveBeenCalledWith(106);
+});
+

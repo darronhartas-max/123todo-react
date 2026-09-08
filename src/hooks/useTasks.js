@@ -1,6 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS } from '../utils/constants';
 import { calculateNextRecurrenceDate, getTodayDateString } from '../utils/dateUtils';
+import { savePhotos } from '../utils/photoStorage';
+
+// Lightweight serializer for LocalStorage: keeps metadata and compact thumbnails in LocalStorage,
+// ensuring the heavy multi-megabyte dataUrl strings stay in IndexedDB to prevent QuotaExceededErrors.
+export const sanitizeTasksForStorage = (taskList) => {
+    if (!Array.isArray(taskList)) return [];
+    return taskList.map(task => {
+        if (!task) return null;
+        if (!task.photos || !Array.isArray(task.photos) || task.photos.length === 0) {
+            return task;
+        }
+        const lightweightPhotos = task.photos.map(p => {
+            if (!p) return p;
+            const { dataUrl, ...rest } = p;
+            return rest;
+        });
+        return { ...task, photos: lightweightPhotos };
+    }).filter(Boolean);
+};
 
 // Sanitizes task lists to resolve any duplicate task IDs or missing IDs,
 // ensuring every task has a unique integer ID and the counter is correct.
@@ -160,6 +179,16 @@ export const useTasks = () => {
             setArchived(sanitized.archived);
             setCounter(sanitized.counter);
 
+            // Cache any photos loaded from storage with full dataUrl into IndexedDB
+            const photosToPersist = [
+                ...loadedTasks.flatMap(t => t.photos || []),
+                ...loadedArchived.flatMap(t => t.photos || [])
+            ].filter(p => p && p.id && p.dataUrl);
+
+            if (photosToPersist.length > 0) {
+                savePhotos(photosToPersist).catch(err => console.warn('Could not cache loaded photos to IndexedDB:', err));
+            }
+
             // Add sample tasks if new user
             if (!savedTasks && !savedArchived) {
                 initializeSampleTasks();
@@ -176,13 +205,30 @@ export const useTasks = () => {
     // Save data to localStorage whenever state changes
     useEffect(() => {
         if (!isLoaded) return;
-        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
-        localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(archived));
-        localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
-        localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
-        localStorage.setItem(STORAGE_KEYS.DELETED_TASKS, JSON.stringify(deletedTaskKeys));
-        localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
-        localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
+        try {
+            const stTasks = sanitizeTasksForStorage(tasks);
+            const stArchived = sanitizeTasksForStorage(archived);
+            localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(stTasks));
+            localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(stArchived));
+            localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+            localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
+            localStorage.setItem(STORAGE_KEYS.DELETED_TASKS, JSON.stringify(deletedTaskKeys));
+            localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
+            localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
+        } catch (storageErr) {
+            console.warn('⚠️ LocalStorage save quota warning, performing safe recovery:', storageErr);
+            try {
+                // If quota is tight, strip photos completely from archived in localStorage
+                const minimalArchived = archived.map(t => {
+                    const { photos, ...rest } = t;
+                    return rest;
+                });
+                localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(minimalArchived));
+                localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(sanitizeTasksForStorage(tasks)));
+            } catch (fallbackErr) {
+                console.error('Critical: LocalStorage write failed:', fallbackErr);
+            }
+        }
 
         // SHADOW BACKUP STRATEGY: 
         // Automatically create an internal snapshot every 24 hours
@@ -193,8 +239,8 @@ export const useTasks = () => {
 
         if (!lastShadow || (now - parseInt(lastShadow)) > oneDay) {
             const snapshot = {
-                tasks,
-                archived,
+                tasks: sanitizeTasksForStorage(tasks),
+                archived: sanitizeTasksForStorage(archived),
                 projects,
                 counter,
                 timestamp: now

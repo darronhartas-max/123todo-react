@@ -113,6 +113,14 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         handleEnd();
     };
 
+    const handleCancel = () => {
+        setSwipeOffset(0);
+        isSwipingRef.current = false;
+        wasSwipingRef.current = false;
+        isScrollingVerticalRef.current = false;
+        touchStartRef.current = { x: 0, y: 0 };
+    };
+
     const handlePointerDown = (e) => {
         if (e.pointerType === 'mouse' || e.pointerType === 'touch') return;
         handleStart(e.clientX, e.clientY);
@@ -154,8 +162,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             if (e.preventDefault && e.cancelable) e.preventDefault();
         }
         
-        // Block completion click if user was swiping or vertical scrolling
-        if (wasSwipingRef.current || isSwipingRef.current || isScrollingVerticalRef.current) return;
+        // Only block if this task row is actively in the middle of a horizontal swipe gesture
+        if (isSwipingRef.current || Math.abs(swipeOffset) > 10) return;
 
         // Prevent double trigger / mid-flight cancellation
         if (isCompletingRef.current) return;
@@ -497,11 +505,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-                onTouchCancel={handleTouchEnd}
+                onTouchCancel={handleCancel}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerUp}
+                onPointerCancel={handleCancel}
                 onClick={(e) => {
                     if (wasSwipingRef.current || isSwipingRef.current || Math.abs(swipeOffset) > 5) {
                         e.stopPropagation();
@@ -541,6 +549,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             {isArchived && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerMove={(e) => e.stopPropagation()}
+                    onPointerUp={(e) => e.stopPropagation()}
                     style={{
                         ...styles.actionBtn,
                         color: '#ef4444',
@@ -1031,6 +1045,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         {task.scheduledDate && (
                             <motion.button
                                 onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchMove={(e) => e.stopPropagation()}
+                                onTouchEnd={(e) => e.stopPropagation()}
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onPointerMove={(e) => e.stopPropagation()}
+                                onPointerUp={(e) => e.stopPropagation()}
                                 style={{
                                     ...styles.actionBtn,
                                     color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
@@ -1051,9 +1071,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         )}
                         <motion.button
                             onClick={handleComplete}
-                            onTouchStart={(e) => e.stopPropagation()}
-                            onTouchEnd={(e) => e.stopPropagation()}
-                            onPointerDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => {
+                                e.stopPropagation();
+                                isSwipingRef.current = false;
+                                wasSwipingRef.current = false;
+                                isScrollingVerticalRef.current = false;
+                                setSwipeOffset(0);
+                            }}
+                            onTouchMove={(e) => e.stopPropagation()}
+                            onTouchEnd={(e) => {
+                                e.stopPropagation();
+                                isSwipingRef.current = false;
+                                wasSwipingRef.current = false;
+                                isScrollingVerticalRef.current = false;
+                            }}
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                isSwipingRef.current = false;
+                                wasSwipingRef.current = false;
+                                isScrollingVerticalRef.current = false;
+                            }}
+                            onPointerMove={(e) => e.stopPropagation()}
                             onPointerUp={(e) => e.stopPropagation()}
                             style={{
                                 ...styles.actionBtn,
