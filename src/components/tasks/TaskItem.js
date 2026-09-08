@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
+import { renderActionableText } from '../../utils/textUtils';
 
 const ACTION_ICONS = {
     CheckSquare,
@@ -586,7 +587,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         style={styles.taskText}
                         title={taskViewMode === 'compact' ? task.text : undefined}
                     >
-                        {task.text}
+                        {renderActionableText(task.text)}
                     </span>
                     {task.photos && task.photos.length > 0 && (
                         <span
@@ -638,10 +639,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 opacity: 0.85,
                                 minWidth: 0
                             }}
+                            title={firstNoteLine}
                         >
                             <FileText size={11} style={{ flexShrink: 0, opacity: 0.7 }} />
                             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                                {firstNoteLine}
+                                {renderActionableText(firstNoteLine)}
                             </span>
                         </div>
                     );
@@ -1022,7 +1024,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                         overflow: 'hidden'
                                     }}
                                 >
-                                    {task.notes && <div>{task.notes}</div>}
+                                    {task.notes && <div>{renderActionableText(task.notes)}</div>}
                                     {task.photos && task.photos.length > 0 && (
                                         <PhotoAttachments
                                             photos={task.photos}

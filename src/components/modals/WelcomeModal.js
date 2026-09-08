@@ -28,33 +28,64 @@ const WelcomeModal = ({ onAccept }) => {
                 </div>
 
                 <div style={{
-                    background: 'rgba(55, 48, 163, 0.1)',
-                    border: '1px solid var(--accent-color)',
-                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08))',
+                    border: '1.5px solid var(--accent-color)',
+                    borderRadius: '12px',
                     padding: '16px',
                     margin: '16px 0',
-                    fontSize: '1rem',
+                    fontSize: '0.95rem',
                     textAlign: 'left'
                 }}>
-                    <h4 style={{ margin: '0 0 12px 0', color: 'var(--accent-color)', fontSize: '1.1rem' }}>
-                        For mobile use - Install as Home Screen App
-                    </h4>
-                    <div style={{ marginBottom: '12px' }}>
-                        <strong>iPhone/iPad:</strong>
-                        <ol style={{ margin: '8px 0 0 16px', color: 'var(--text-color)' }}>
-                            <li>Tap the Share button (square with arrow)</li>
-                            <li>Scroll down and tap "Add to Home Screen"</li>
-                            <li>Tap "Add" to confirm</li>
-                        </ol>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '1.25rem' }}>📲</span>
+                        <h4 style={{ margin: 0, color: 'var(--accent-color)', fontSize: '1.1rem', fontWeight: '700' }}>
+                            Download & Install on Your Device (Recommended!)
+                        </h4>
                     </div>
-                    <div style={{ marginBottom: '12px' }}>
-                        <strong>Android:</strong>
-                        <ol style={{ margin: '8px 0 0 16px', color: 'var(--text-color)' }}>
-                            <li>Tap the menu button (3 dots)</li>
-                            <li>Tap "Add to Home screen" or "Install app"</li>
-                            <li>Tap "Add" or "Install" to confirm</li>
-                        </ol>
+                    <p style={{ margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '0.9rem', lineHeight: '1.45' }}>
+                        123 To Do is a modern <strong>Progressive Web App (PWA)</strong>. You don't need to visit an app store—you can install it directly onto your phone, tablet, or computer right now in under 10 seconds! Installing gives you 1-tap home screen access, full-screen view without browser bars, and 100% offline capability.
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
+                        <div style={{ background: 'var(--bg-color)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <strong style={{ color: 'var(--text-color)', display: 'block', marginBottom: '4px' }}>
+                                📱 iPhone & iPad (Safari):
+                            </strong>
+                            <div style={{ color: 'var(--muted-text)', fontSize: '0.86rem', lineHeight: '1.4' }}>
+                                Tap the <strong>Share button</strong> (square with up arrow ⬆️) ➔ scroll down and tap <strong>"Add to Home Screen"</strong> ➔ tap <strong>"Add"</strong>.
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'var(--bg-color)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <strong style={{ color: 'var(--text-color)', display: 'block', marginBottom: '4px' }}>
+                                🤖 Android (Chrome):
+                            </strong>
+                            <div style={{ color: 'var(--muted-text)', fontSize: '0.86rem', lineHeight: '1.4' }}>
+                                Tap the <strong>three dots (⋮)</strong> menu ➔ tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong> ➔ tap <strong>Install</strong>.
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'var(--bg-color)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <strong style={{ color: 'var(--text-color)', display: 'block', marginBottom: '4px' }}>
+                                💻 Mac & Windows PC (Chrome / Edge / Safari):
+                            </strong>
+                            <div style={{ color: 'var(--muted-text)', fontSize: '0.86rem', lineHeight: '1.4' }}>
+                                Click the <strong>Install icon</strong> in your browser address bar (or Safari ➔ File ➔ "Add to Dock").
+                            </div>
+                        </div>
                     </div>
+
+                    <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+                        <a 
+                            href="/how-to-install-123todo-pwa.md" 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            style={{ color: 'var(--accent-color)', fontSize: '0.85rem', fontWeight: '600', textDecoration: 'none' }}
+                        >
+                            📖 Read our beginner PWA guide ➔
+                        </a>
+                    </div>
+
                     <div style={{ background: 'var(--bg-color)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                         <h5 style={{ margin: '0 0 8px 0', fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-color)' }}>
                             ✨ Powerful Features Included:

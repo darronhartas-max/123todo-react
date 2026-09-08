@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
 
@@ -263,7 +263,11 @@ const SettingsModal = ({
     appMode = 'tasks',
     onSwitchMode = () => {},
     taskViewMode = 'compact',
-    setTaskViewMode
+    setTaskViewMode,
+    isStandalone = false,
+    canNativeInstall = false,
+    onNativeInstall,
+    onOpenInstallGuide
 }) => {
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
@@ -724,6 +728,13 @@ const SettingsModal = ({
                         >
                             <Cloud size={18} />
                             Cloud Sync
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'install')}
+                            onClick={() => setActiveTab('install')}
+                        >
+                            <Download size={18} />
+                            Install App
                         </button>
                     </div>
 
@@ -1347,6 +1358,87 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+
+                                {/* App Mode & Installation (PWA) Row */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>📲 App Mode & Installation (PWA)</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            {isStandalone 
+                                                ? 'Currently running as an installed standalone app with full-screen focus and offline storage.' 
+                                                : 'Currently running in your web browser. Installing 123 To Do gives you 1-tap home screen access and 100% offline support.'}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        background: 'var(--bg-color)',
+                                        padding: '12px 16px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--border-color)',
+                                        gap: '12px',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        <div style={{ fontSize: '0.88rem', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {isStandalone ? (
+                                                <span style={{ color: '#10b981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <CheckCircle2 size={16} /> Installed App (Standalone)
+                                                </span>
+                                            ) : (
+                                                <span style={{ color: 'var(--accent-color)', fontWeight: '600' }}>
+                                                    Web Browser Mode
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                            {canNativeInstall && !isStandalone && (
+                                                <button
+                                                    onClick={onNativeInstall}
+                                                    style={{
+                                                        padding: '6px 14px',
+                                                        borderRadius: '6px',
+                                                        border: 'none',
+                                                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                                        color: '#ffffff',
+                                                        fontWeight: '700',
+                                                        fontSize: '0.85rem',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px'
+                                                    }}
+                                                >
+                                                    <Download size={14} /> Install Now
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    if (onOpenInstallGuide) {
+                                                        onOpenInstallGuide();
+                                                    } else {
+                                                        setActiveTab('install');
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '6px 12px',
+                                                    borderRadius: '6px',
+                                                    border: '1px solid var(--border-color)',
+                                                    background: 'var(--surface-color)',
+                                                    color: 'var(--accent-color)',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.85rem',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px'
+                                                }}
+                                            >
+                                                How to Install Instructions
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -1615,10 +1707,7 @@ const SettingsModal = ({
                                 </div>
 
                                 <button
-                                    onClick={() => {
-                                        onClose();
-                                        if (onOpenSyncModal) onOpenSyncModal();
-                                    }}
+                                    onClick={onOpenSyncModal}
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
@@ -1637,6 +1726,157 @@ const SettingsModal = ({
                                 >
                                     <Cloud size={18} /> Manage Sync Credentials & Device Pairing
                                 </button>
+                            </div>
+                        )}
+
+                        {activeTab === 'install' && (
+                            <div>
+                                <div style={styles.sectionTitle}>
+                                    <Download size={20} /> Install App & PWA Guide
+                                </div>
+
+                                {/* Status Card */}
+                                <div style={{
+                                    background: isStandalone ? 'rgba(16, 185, 129, 0.1)' : 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))',
+                                    border: `1.5px solid ${isStandalone ? '#10b981' : 'var(--accent-color)'}`,
+                                    borderRadius: '12px',
+                                    padding: '16px',
+                                    marginBottom: '18px'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        {isStandalone ? <CheckCircle2 size={20} color="#10b981" /> : <Download size={20} color="var(--accent-color)" />}
+                                        <div style={{ fontSize: '1rem', fontWeight: '700', color: isStandalone ? '#10b981' : 'var(--accent-color)' }}>
+                                            {isStandalone ? 'Installed & Running in App Mode' : 'Currently in Web Browser Mode'}
+                                        </div>
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-color)', lineHeight: '1.45' }}>
+                                        {isStandalone 
+                                            ? 'You are currently using 123 To Do as an installed application with full-screen focus and offline database protection.' 
+                                            : '123 To Do is a Progressive Web App (PWA). You can install it directly onto your phone, tablet, or computer right now without downloading from an app store.'}
+                                    </p>
+                                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                        {canNativeInstall && !isStandalone && (
+                                            <button
+                                                onClick={onNativeInstall}
+                                                style={{
+                                                    padding: '8px 16px',
+                                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                                    color: '#ffffff',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    fontSize: '0.88rem',
+                                                    fontWeight: '700',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px'
+                                                }}
+                                            >
+                                                <Download size={15} /> 1-Click Install Now
+                                            </button>
+                                        )}
+                                        {onOpenInstallGuide && (
+                                            <button
+                                                onClick={onOpenInstallGuide}
+                                                style={{
+                                                    padding: '8px 14px',
+                                                    background: 'var(--surface-color)',
+                                                    color: 'var(--accent-color)',
+                                                    border: '1px solid var(--border-color)',
+                                                    borderRadius: '6px',
+                                                    fontSize: '0.88rem',
+                                                    fontWeight: '600',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px'
+                                                }}
+                                            >
+                                                Open Interactive Device Guide
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Step-by-Step Instructions */}
+                                <div style={{ fontSize: '0.95rem', fontWeight: '700', marginBottom: '10px', color: 'var(--text-color)' }}>
+                                    How to Install on Your Device:
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
+                                    <div style={{ background: 'var(--bg-color)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ fontWeight: '700', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                            <Smartphone size={16} /> iPhone & iPad (Safari)
+                                        </div>
+                                        <div style={{ fontSize: '0.86rem', color: 'var(--text-color)', lineHeight: '1.45' }}>
+                                            1. Open <strong>123todo.com</strong> in Safari.<br />
+                                            2. Tap the <strong>Share button</strong> (square with up arrow ⬆️) at the bottom.<br />
+                                            3. Scroll down and tap <strong>"Add to Home Screen"</strong>.<br />
+                                            4. Tap <strong>"Add"</strong> in the top-right corner.
+                                        </div>
+                                    </div>
+
+                                    <div style={{ background: 'var(--bg-color)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ fontWeight: '700', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                            <Smartphone size={16} /> Android (Chrome)
+                                        </div>
+                                        <div style={{ fontSize: '0.86rem', color: 'var(--text-color)', lineHeight: '1.45' }}>
+                                            1. Open <strong>123todo.com</strong> in Google Chrome.<br />
+                                            2. Tap the <strong>three dots (⋮)</strong> menu in the top-right.<br />
+                                            3. Tap <strong>"Install app"</strong> (or "Add to Home screen").<br />
+                                            4. Tap <strong>"Install"</strong> to confirm.
+                                        </div>
+                                    </div>
+
+                                    <div style={{ background: 'var(--bg-color)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ fontWeight: '700', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                            <Laptop size={16} /> Mac & Windows PC (Chrome, Edge, Safari)
+                                        </div>
+                                        <div style={{ fontSize: '0.86rem', color: 'var(--text-color)', lineHeight: '1.45' }}>
+                                            • <strong>Chrome / Edge:</strong> Click the <strong>Install icon</strong> on the right side of the address bar.<br />
+                                            • <strong>Safari on macOS Sonoma+:</strong> Choose <strong>File ➔ Add to Dock...</strong> from the top menu bar.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Full Blog Post Link */}
+                                <div style={{
+                                    background: 'var(--item-bg)',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    flexWrap: 'wrap',
+                                    gap: '10px'
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Want to learn more?</div>
+                                        <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>
+                                            Read our beginner-friendly article on what a PWA is and why to install it.
+                                        </div>
+                                    </div>
+                                    <a
+                                        href="/how-to-install-123todo-pwa.md"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            background: 'var(--accent-color)',
+                                            color: '#ffffff',
+                                            textDecoration: 'none',
+                                            fontSize: '0.84rem',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        Read PWA Article <ExternalLink size={13} />
+                                    </a>
+                                </div>
                             </div>
                         )}
                     </div>

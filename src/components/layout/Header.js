@@ -1,7 +1,7 @@
 import React from 'react';
-import { CheckSquare, Mic } from 'lucide-react';
+import { CheckSquare, Mic, Download } from 'lucide-react';
 
-const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
+const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -67,24 +67,53 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {} }) => {
                     />
                 </a>
 
-                {/* Dual Skin Mode Switcher Toggle Pill */}
-                <div style={styles.modeToggleContainer}>
-                    <button
-                        style={styles.modeButton(appMode === 'tasks')}
-                        onClick={() => onSwitchMode('tasks')}
-                        title="Switch to Task Manager Mode"
-                    >
-                        <CheckSquare size={16} />
-                        <span>Tasks</span>
-                    </button>
-                    <button
-                        style={styles.modeButton(appMode === 'notes')}
-                        onClick={() => onSwitchMode('notes')}
-                        title="Switch to Notes Mode"
-                    >
-                        <Mic size={16} />
-                        <span>Notes</span>
-                    </button>
+                {/* Right Header Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {!isStandalone && onOpenInstall && (
+                        <button
+                            onClick={onOpenInstall}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                border: '1.5px solid var(--accent-color)',
+                                backgroundColor: 'var(--accent-bg, rgba(99, 102, 241, 0.1))',
+                                color: 'var(--accent-color)',
+                                fontSize: '13px',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                                transition: 'all 0.2s ease'
+                            }}
+                            title="Install 123 To Do on your device"
+                        >
+                            <Download size={14} />
+                            <span>Install</span>
+                        </button>
+                    )}
+
+                    {/* Dual Skin Mode Switcher Toggle Pill */}
+                    <div style={styles.modeToggleContainer}>
+                        <button
+                            style={styles.modeButton(appMode === 'tasks')}
+                            onClick={() => onSwitchMode('tasks')}
+                            title="Switch to Task Manager Mode"
+                        >
+                            <CheckSquare size={16} />
+                            <span>Tasks</span>
+                        </button>
+                        <button
+                            style={styles.modeButton(appMode === 'notes')}
+                            onClick={() => onSwitchMode('notes')}
+                            title="Switch to Notes Mode"
+                        >
+                            <Mic size={16} />
+                            <span>Notes</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>

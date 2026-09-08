@@ -1,7 +1,7 @@
 import React from 'react';
 import { APP_VERSION } from '../../utils/constants';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, isOffline, version = APP_VERSION, onCheckForUpdates, updateCheckStatus }) => {
+const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, isOffline, version = APP_VERSION, onCheckForUpdates, updateCheckStatus, onInstallClick, isStandalone = false }) => {
     const styles = {
         footer: {
             flexShrink: 0,
@@ -18,7 +18,7 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
             color: 'var(--text-color)',
             cursor: 'pointer',
             fontSize: '1rem',
-            margin: '0 8px',
+            margin: '0 6px',
             fontWeight: '700',
             padding: '8px 16px',
             borderRadius: '6px',
@@ -66,7 +66,21 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
                     </div>
                 </button>
             </div>
-            <div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                {!isStandalone && onInstallClick && (
+                    <button
+                        onClick={onInstallClick}
+                        style={{
+                            ...styles.footerButton,
+                            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15))',
+                            borderColor: 'var(--accent-color)',
+                            color: 'var(--accent-color)'
+                        }}
+                        title="Download & Install 123 To Do on your device"
+                    >
+                        📲 Install App
+                    </button>
+                )}
                 <button onClick={onExport} style={styles.footerButton}>Export</button>
                 <button onClick={onImportClick} style={styles.footerButton}>Import</button>
             </div>
@@ -86,8 +100,11 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
                 </div>
             </div>
 
-            <div style={{ marginTop: '8px', fontSize: '1rem' }}>
-                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', marginRight: '20px' }}>
+            <div style={{ marginTop: '8px', fontSize: '0.95rem', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <a href="/how-to-install-123todo-pwa.md" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
+                    How to Install (PWA)
+                </a>
+                <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
                     Terms of Service
                 </a>
                 <a href="https://www.123todo.com/privacy" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>

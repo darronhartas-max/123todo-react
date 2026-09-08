@@ -5,6 +5,11 @@ import { checkForUpdates as triggerSWUpdateCheck } from '../serviceWorkerRegistr
 export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
+    const [isStandalone, setIsStandalone] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return Boolean(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone);
+    });
     const [showBackupReminder, setShowBackupReminder] = useState(false);
     const [showCongrats, setShowCongrats] = useState(false);
     const [achievedMilestones, setAchievedMilestones] = useState([]);
@@ -19,6 +24,33 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         };
         window.addEventListener('swUpdateAvailable', handleUpdate);
 
+        // Track beforeinstallprompt for 1-click install support
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredInstallPrompt(e);
+            setShowInstallPrompt(true);
+        };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        const handleAppInstalled = () => {
+            setDeferredInstallPrompt(null);
+            setShowInstallPrompt(false);
+            setIsStandalone(true);
+        };
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        // Check standalone mode change
+        const mql = window.matchMedia('(display-mode: standalone)');
+        const handleDisplayModeChange = (e) => {
+            if (e.matches) {
+                setIsStandalone(true);
+                setShowInstallPrompt(false);
+            }
+        };
+        if (mql.addEventListener) {
+            mql.addEventListener('change', handleDisplayModeChange);
+        }
+
         // MOBILE-FIRST PERSISTENCE: 
         // Request persistent storage to prevent the browser from automatically 
         // clearing localStorage/IndexedDB on mobile devices when space is low.
@@ -30,7 +62,14 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
             }).catch(err => console.error('Persistence request failed:', err));
         }
 
-        return () => window.removeEventListener('swUpdateAvailable', handleUpdate);
+        return () => {
+            window.removeEventListener('swUpdateAvailable', handleUpdate);
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+            if (mql.removeEventListener) {
+                mql.removeEventListener('change', handleDisplayModeChange);
+            }
+        };
     }, []);
 
     const checkBackupReminder = useCallback((count) => {
@@ -131,6 +170,19 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         return await triggerSWUpdateCheck(forceSimulate);
     }, []);
 
+    const triggerNativeInstall = useCallback(async () => {
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const choiceResult = await deferredInstallPrompt.userChoice;
+            if (choiceResult && choiceResult.outcome === 'accepted') {
+                setShowInstallPrompt(false);
+                setDeferredInstallPrompt(null);
+                return true;
+            }
+        }
+        return false;
+    }, [deferredInstallPrompt]);
+
     return {
         showWelcome,
         showInstallPrompt,
@@ -145,6 +197,9 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         dismissInstallPrompt,
         dismissBackupReminder,
         recordBackup,
-        checkForUpdates
+        checkForUpdates,
+        isStandalone,
+        canNativeInstall: Boolean(deferredInstallPrompt),
+        triggerNativeInstall
     };
 };

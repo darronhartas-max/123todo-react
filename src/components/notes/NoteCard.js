@@ -7,6 +7,7 @@ import {
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from './PhotoAttachments';
+import { renderActionableText } from '../../utils/textUtils';
 
 const NoteCard = ({
   note,
@@ -497,7 +498,7 @@ const NoteCard = ({
               margin: '0 0 6px 0',
               lineHeight: 1.3
             }}>
-              {note.text}
+              {renderActionableText(note.text)}
             </h3>
 
             {note.notes ? (
@@ -514,7 +515,7 @@ const NoteCard = ({
                   overflowY: 'auto'
                 }}
               >
-                {note.notes}
+                {renderActionableText(note.notes)}
               </p>
             ) : (
               <p style={{ fontSize: `${Math.max(notesFontSize - 4, 12)}px`, color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>

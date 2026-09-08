@@ -1,12 +1,14 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.6.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.6.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
 ## 🌟 Highlights & Key Advantages
 
+- **Actionable Links, Emails & Phone Numbers**: Email addresses (`mailto:`), phone numbers (`tel:`), and web URLs in tasks, task notes, and notes are automatically clickable for instant dialing, emailing, and browsing without opening edit mode.
+- **PWA Installation & Awareness Hub**: Simple, device-detected installation guidance (iOS Safari, Android Chrome, Mac/PC) and 1-click install prompt support so users can run 123 To Do as a full-screen, offline native app.
 - **100% Free & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, unlimited notes, and photo attachments without subscription paywalls.
 - **Photo Attachments in Notes**: Attach up to 3 photos or screenshots per note on mobile (camera / gallery) and desktop (drag & drop, direct `Cmd+V` / `Ctrl+V` paste) with sharp client-side compression, IndexedDB caching, and full-screen Lightbox viewer.
 - **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.

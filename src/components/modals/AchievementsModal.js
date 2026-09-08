@@ -62,6 +62,14 @@ const BLOG_ARTICLES = [
         icon: '🌱'
     },
     {
+        id: 'how-to-install-pwa',
+        title: 'How to Install 123 To Do (PWA Guide)',
+        subtitle: 'Why downloading 123 To Do to your phone or PC gives you instant offline access, persistent storage, and full-screen focus.',
+        url: '/how-to-install-123todo-pwa.md',
+        tag: 'PWA & Setup',
+        icon: '📲'
+    },
+    {
         id: 'full-blog',
         title: 'Explore All Guides on 123todo.com',
         subtitle: 'Read all expert tutorials, productivity insights, and focus strategies on our blog.',

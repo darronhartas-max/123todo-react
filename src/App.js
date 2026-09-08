@@ -29,6 +29,7 @@ import SharePromptModal from './components/modals/SharePromptModal';
 import ArchiveModal from './components/modals/ArchiveModal';
 import AdminStatsModal from './components/modals/AdminStatsModal';
 import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
+import InstallGuideModal from './components/modals/InstallGuideModal';
 import NotesView from './components/notes/NotesView';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
@@ -79,7 +80,8 @@ const TodoApp = () => {
     showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
     showUpdateReady, swRegistration,
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
-    dismissBackupReminder, recordBackup, checkForUpdates
+    dismissBackupReminder, recordBackup, checkForUpdates,
+    isStandalone, canNativeInstall, triggerNativeInstall
   } = useAppSystem(archived.length, tasks.length, isAuthed);
 
   const [showOfflinePrompt, setShowOfflinePrompt] = useState(true);
@@ -192,6 +194,18 @@ const TodoApp = () => {
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
   const [prevVersionStr, setPrevVersionStr] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showInstallGuideModal, setShowInstallGuideModal] = useState(false);
+
+  const handleInstallClick = async () => {
+    if (canNativeInstall) {
+      const installed = await triggerNativeInstall();
+      if (!installed) {
+        setShowInstallGuideModal(true);
+      }
+    } else {
+      setShowInstallGuideModal(true);
+    }
+  };
 
   // Check if app has been updated to a newer version and show What's New modal
   useEffect(() => {
@@ -922,6 +936,8 @@ const TodoApp = () => {
           isDark={isDark}
           appMode={appMode}
           onSwitchMode={handleSwitchMode}
+          isStandalone={isStandalone}
+          onOpenInstall={handleInstallClick}
         />
 
         <AddTask
@@ -949,7 +965,7 @@ const TodoApp = () => {
           )}
 
           {showInstallPrompt && (
-            <InstallPrompt onInstall={() => { }} onDismiss={dismissInstallPrompt} />
+            <InstallPrompt onInstall={handleInstallClick} onDismiss={dismissInstallPrompt} />
           )}
 
           {showUpdateReady && (
@@ -1173,6 +1189,8 @@ const TodoApp = () => {
           isOffline={isOffline}
           onCheckForUpdates={handleManualCheckForUpdates}
           updateCheckStatus={updateCheckStatus}
+          isStandalone={isStandalone}
+          onInstallClick={handleInstallClick}
         />
         <input
           type="file"
@@ -1362,6 +1380,18 @@ const TodoApp = () => {
         onSwitchMode={handleSwitchMode}
         taskViewMode={taskViewMode}
         setTaskViewMode={setTaskViewMode}
+        isStandalone={isStandalone}
+        canNativeInstall={canNativeInstall}
+        onNativeInstall={handleInstallClick}
+        onOpenInstallGuide={() => setShowInstallGuideModal(true)}
+      />
+
+      <InstallGuideModal
+        isOpen={showInstallGuideModal}
+        onClose={() => setShowInstallGuideModal(false)}
+        onNativeInstall={handleInstallClick}
+        canNativeInstall={canNativeInstall}
+        isStandalone={isStandalone}
       />
 
       <AdminStatsModal

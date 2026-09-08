@@ -1,48 +1,59 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Download } from 'lucide-react';
 
 export const InstallPrompt = ({ onInstall, onDismiss }) => (
     <div style={{
-        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
         color: 'white',
         border: 'none',
-        borderRadius: '6px',
-        padding: '8px 12px',
+        borderRadius: '8px',
+        padding: '10px 14px',
         margin: '8px 12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        fontSize: '0.8rem',
-        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+        fontSize: '0.85rem',
+        boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
+        gap: '12px',
+        flexWrap: 'wrap'
     }}>
-        <div style={{ flex: 1, fontWeight: '600' }}>
-            Add 123 To Do to your home screen for easy access!
+        <div style={{ flex: '1 1 240px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.1rem' }}>📱</span>
+            <span>
+                <strong>Install 123 To Do as an app</strong> — 1-tap home screen access, works 100% offline, no app store needed!
+            </span>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
                 onClick={onInstall}
                 style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    borderRadius: '4px',
-                    padding: '4px 8px',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer'
+                    background: '#ffffff',
+                    color: '#4f46e5',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '6px 14px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
                 }}
             >
-                Install
+                <Download size={14} />
+                <span>Install / How to</span>
             </button>
             <button
                 onClick={onDismiss}
                 style={{
-                    background: 'transparent',
+                    background: 'rgba(255,255,255,0.15)',
                     color: 'white',
-                    border: '1px solid rgba(255,255,255,0.5)',
-                    borderRadius: '4px',
-                    padding: '4px 8px',
-                    fontSize: '0.75rem',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    borderRadius: '6px',
+                    padding: '6px 10px',
+                    fontSize: '0.8rem',
                     cursor: 'pointer'
                 }}
             >

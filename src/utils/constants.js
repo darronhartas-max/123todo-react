@@ -90,9 +90,13 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.0';
+export const APP_VERSION = '3.6.1';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.1': [
+    { title: '📞 Actionable Email Addresses & Phone Numbers:', desc: 'Email addresses (mailto:) and phone numbers (tel:) in tasks, task notes, and notes are now automatically actionable and clickable on all devices with direct dialing, emailing, and browsing.' },
+    { title: '📲 PWA Installation Guide & Awareness:', desc: 'Added dedicated Progressive Web App (PWA) installation guide modal with device auto-detection (iOS, Android, Desktop), 1-click install prompt support, and a comprehensive beginner guide article.' }
+  ],
   '3.6.0': [
     { title: '📸 Photo Attachments in Notes & Tasks:', desc: 'Attach up to 3 photos or screenshots per note! Features native camera capture on mobile, file upload, drag-and-drop, direct clipboard pasting (Cmd+V / Ctrl+V) for screen grabs, ultra-fast client-side compression to preserve crisp receipts and 4K text, local IndexedDB caching, and a full-screen Lightbox viewer with zoom.' },
     { title: '🖐️ Smooth Drag-and-Drop Task Reordering:', desc: 'Eliminated drag-and-drop snapback issues with stabilized pointer tracking and immediate local state settlement.' },
