@@ -30,6 +30,7 @@ import ArchiveModal from './components/modals/ArchiveModal';
 import AdminStatsModal from './components/modals/AdminStatsModal';
 import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
 import InstallGuideModal from './components/modals/InstallGuideModal';
+import EmailClientModal from './components/modals/EmailClientModal';
 import NotesView from './components/notes/NotesView';
 import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
@@ -37,6 +38,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE } from './utils/constants';
+import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 
@@ -195,6 +197,27 @@ const TodoApp = () => {
   const [prevVersionStr, setPrevVersionStr] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showInstallGuideModal, setShowInstallGuideModal] = useState(false);
+  const [emailModalState, setEmailModalState] = useState({
+    isOpen: false,
+    email: '',
+    options: {}
+  });
+  const [emailClientPreference, setEmailClientPreference] = useState(() => getEmailClientPreference() || 'default');
+
+  useEffect(() => {
+    const handleOpenEmailModal = (e) => {
+      const { email, options } = e.detail || {};
+      if (email) {
+        setEmailModalState({
+          isOpen: true,
+          email,
+          options: options || {}
+        });
+      }
+    };
+    window.addEventListener('123todo:open-email-modal', handleOpenEmailModal);
+    return () => window.removeEventListener('123todo:open-email-modal', handleOpenEmailModal);
+  }, []);
 
   const handleInstallClick = async () => {
     if (canNativeInstall) {
@@ -1384,6 +1407,16 @@ const TodoApp = () => {
         canNativeInstall={canNativeInstall}
         onNativeInstall={handleInstallClick}
         onOpenInstallGuide={() => setShowInstallGuideModal(true)}
+        emailClientPreference={emailClientPreference}
+        setEmailClientPreference={setEmailClientPreference}
+      />
+
+      <EmailClientModal
+        isOpen={emailModalState.isOpen}
+        onClose={() => setEmailModalState(prev => ({ ...prev, isOpen: false }))}
+        targetEmail={emailModalState.email}
+        options={emailModalState.options}
+        onPreferenceChanged={(newPref) => setEmailClientPreference(newPref)}
       />
 
       <InstallGuideModal

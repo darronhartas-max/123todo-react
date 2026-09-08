@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
+import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
 
 const SHORTCUTS_LIST = [
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
@@ -267,8 +268,11 @@ const SettingsModal = ({
     isStandalone = false,
     canNativeInstall = false,
     onNativeInstall,
-    onOpenInstallGuide
+    onOpenInstallGuide,
+    emailClientPreference,
+    setEmailClientPreference
 }) => {
+    const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
@@ -1265,6 +1269,54 @@ const SettingsModal = ({
                                          })}
                                      </div>
                                  </div>
+
+                                  {/* Preferred Email Service */}
+                                  <div style={styles.settingRow}>
+                                      <div style={styles.settingLabel}>
+                                          <span>Preferred Email Service</span>
+                                          <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                              Choose which email app or web service opens when clicking email links
+                                          </span>
+                                      </div>
+                                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                          {EMAIL_CLIENT_OPTIONS.map(opt => {
+                                              const currentPref = emailClientPreference || localEmailPref;
+                                              const isSelected = currentPref === opt.id;
+                                              return (
+                                                  <div
+                                                      key={opt.id}
+                                                      onClick={() => {
+                                                          setLocalEmailPref(opt.id);
+                                                          saveEmailClientPreference(opt.id);
+                                                          if (setEmailClientPreference) setEmailClientPreference(opt.id);
+                                                      }}
+                                                      style={{
+                                                          padding: '10px 12px',
+                                                          borderRadius: '8px',
+                                                          border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                          background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                          cursor: 'pointer',
+                                                          display: 'flex',
+                                                          flexDirection: 'column',
+                                                          gap: '2px',
+                                                          transition: 'all 0.15s ease'
+                                                      }}
+                                                  >
+                                                      <div style={{
+                                                          fontSize: '0.85rem',
+                                                          fontWeight: isSelected ? '700' : '600',
+                                                          color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                      }}>
+                                                          {opt.name}
+                                                      </div>
+                                                      <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
+                                                          {opt.badge} • {opt.description}
+                                                      </div>
+                                                  </div>
+                                              );
+                                          })}
+                                      </div>
+                                  </div>
 
                                  {/* Voice Input & Voice Notes */}
                                  <div style={styles.settingRow}>

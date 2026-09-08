@@ -31,7 +31,8 @@ export const STORAGE_KEYS = {
   APP_MODE: '123TodoAppMode',
   MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount',
   NOTES_FONT_SIZE: '123TodoNotesFontSize',
-  TASK_VIEW_MODE: '123TodoTaskViewMode'
+  TASK_VIEW_MODE: '123TodoTaskViewMode',
+  EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference'
 };
 
 export const DATE_FORMAT_OPTIONS = [
@@ -90,9 +91,12 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.1';
+export const APP_VERSION = '3.6.2';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.2': [
+    { title: '✉️ Preferred Email Service Picker:', desc: 'Clicking an actionable email link now prompts you to choose your preferred email app or web service (Apple Mail / System, Gmail, Outlook.com, or Yahoo Mail). It remembers your choice once and can be changed anytime in Settings.' }
+  ],
   '3.6.1': [
     { title: '📞 Actionable Email Addresses & Phone Numbers:', desc: 'Email addresses (mailto:) and phone numbers (tel:) in tasks, task notes, and notes are now automatically actionable and clickable on all devices with direct dialing, emailing, and browsing.' },
     { title: '📲 PWA Installation Guide & Awareness:', desc: 'Added dedicated Progressive Web App (PWA) installation guide modal with device auto-detection (iOS, Android, Desktop), 1-click install prompt support, and a comprehensive beginner guide article.' }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Phone, Mail, ExternalLink } from 'lucide-react';
+import { promptOrOpenEmail } from './emailUtils';
 
 /**
  * Regular expressions for identifying actionable links in text
@@ -183,7 +184,11 @@ export const renderActionableText = (text, options = {}) => {
                 <a
                     key={`email-${idx}`}
                     href={`mailto:${m.text}`}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        promptOrOpenEmail(m.text);
+                    }}
                     style={linkStyle}
                     title={`Email ${m.text}`}
                 >
@@ -377,7 +382,13 @@ export const ActionableEntitiesBar = ({ text, style = {}, compact = false, label
                         href={item.href}
                         target={item.type === 'url' ? '_blank' : undefined}
                         rel={item.type === 'url' ? 'noopener noreferrer' : undefined}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (item.type === 'email') {
+                                e.preventDefault();
+                                promptOrOpenEmail(item.text);
+                            }
+                        }}
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
