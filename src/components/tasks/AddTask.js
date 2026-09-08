@@ -4,6 +4,7 @@ import { Plus, Minus, Mic, MicOff, ChevronDown, GripVertical } from 'lucide-reac
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
+import { ActionableEntitiesBar } from '../../utils/textUtils';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -526,6 +527,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 style={styles.taskInput}
                 maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (text || '').length + 500)}
             />
+            <ActionableEntitiesBar text={text} />
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
                 <button
@@ -585,6 +587,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         placeholder="Add notes..."
                         style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
                     />
+                    <ActionableEntitiesBar text={notes} />
                     <PhotoAttachments
                         photos={photos}
                         onChange={setPhotos}

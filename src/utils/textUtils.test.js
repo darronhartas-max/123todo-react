@@ -1,5 +1,6 @@
 import React from 'react';
-import { isValidPhoneNumber, sanitizePhoneHref, renderActionableText } from './textUtils';
+import { render, screen } from '@testing-library/react';
+import { isValidPhoneNumber, sanitizePhoneHref, renderActionableText, extractActionableEntities, ActionableEntitiesBar } from './textUtils';
 
 describe('textUtils', () => {
     describe('isValidPhoneNumber', () => {
@@ -75,6 +76,65 @@ describe('textUtils', () => {
             expect(email).toBeDefined();
             expect(phone).toBeDefined();
             expect(url).toBeDefined();
+        });
+    });
+
+    describe('extractActionableEntities', () => {
+        test('returns empty array if no actionable entities found', () => {
+            expect(extractActionableEntities('Plain text with no contact info')).toEqual([]);
+            expect(extractActionableEntities('')).toEqual([]);
+            expect(extractActionableEntities(null)).toEqual([]);
+        });
+
+        test('extracts phone, email, and URLs with correct metadata', () => {
+            const text = 'Call 07123 456789 or email test@123todo.com or check https://app.123todo.com';
+            const entities = extractActionableEntities(text);
+            expect(entities).toHaveLength(3);
+
+            expect(entities[0]).toMatchObject({
+                type: 'phone',
+                href: 'tel:07123456789',
+                actionVerb: 'Call'
+            });
+
+            expect(entities[1]).toMatchObject({
+                type: 'email',
+                href: 'mailto:test@123todo.com',
+                actionVerb: 'Email'
+            });
+
+            expect(entities[2]).toMatchObject({
+                type: 'url',
+                href: 'https://app.123todo.com',
+                actionVerb: 'Open'
+            });
+        });
+    });
+
+    describe('ActionableEntitiesBar', () => {
+        test('renders nothing when text has no actionable entities', () => {
+            const { container } = render(<ActionableEntitiesBar text="Simple note without contacts" />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        test('renders actionable links in edit mode with call, email, and web links', () => {
+            render(
+                <ActionableEntitiesBar
+                    text="Call +44 20 7946 0919, email support@123todo.com or visit https://123todo.com"
+                />
+            );
+
+            expect(screen.getByText('Actionable:')).toBeInTheDocument();
+
+            const callLink = screen.getByRole('link', { name: /Call/i });
+            expect(callLink).toHaveAttribute('href', 'tel:+442079460919');
+
+            const emailLink = screen.getByRole('link', { name: /Email/i });
+            expect(emailLink).toHaveAttribute('href', 'mailto:support@123todo.com');
+
+            const webLink = screen.getByRole('link', { name: /Open/i });
+            expect(webLink).toHaveAttribute('href', 'https://123todo.com');
+            expect(webLink).toHaveAttribute('target', '_blank');
         });
     });
 });

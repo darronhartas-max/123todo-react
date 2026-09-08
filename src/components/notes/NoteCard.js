@@ -7,7 +7,7 @@ import {
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from './PhotoAttachments';
-import { renderActionableText } from '../../utils/textUtils';
+import { renderActionableText, ActionableEntitiesBar } from '../../utils/textUtils';
 
 const NoteCard = ({
   note,
@@ -317,6 +317,7 @@ const NoteCard = ({
               }}
               autoFocus
             />
+            <ActionableEntitiesBar text={titleText} />
             <textarea
               ref={noteTextareaRef}
               value={notesText}
@@ -336,6 +337,7 @@ const NoteCard = ({
                 lineHeight: 1.5
               }}
             />
+            <ActionableEntitiesBar text={notesText} />
             <PhotoAttachments
               photos={note.photos || []}
               onChange={(newPhotos) => onUpdateNote(note.id, { photos: newPhotos })}
@@ -360,61 +362,64 @@ const NoteCard = ({
                         }}
                         style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0 }}
                       />
-                      <textarea
-                        ref={(el) => {
-                          if (el) {
-                            el.style.height = 'auto';
-                            el.style.height = `${Math.max(el.scrollHeight, 24)}px`;
-                          }
-                        }}
-                        value={st.text}
-                        rows={1}
-                        onChange={(e) => {
-                          const updatedText = e.target.value;
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
-                          setSubtasks(updated);
-                          onUpdateNote(note.id, { subtasks: updated });
-                        }}
-                        onInput={(e) => {
-                          e.target.style.height = 'auto';
-                          e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
-                        }}
-                        placeholder="Subtask step..."
-                        style={{
-                          flex: 1,
-                          border: 'none',
-                          background: 'transparent',
-                          fontSize: '13px',
-                          color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
-                          textDecoration: st.completed ? 'line-through' : 'none',
-                          outline: 'none',
-                          padding: '2px 4px',
-                          borderRadius: '4px',
-                          fontFamily: 'inherit',
-                          resize: 'none',
-                          overflowY: 'hidden',
-                          wordBreak: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                          lineHeight: '1.4',
-                          minHeight: '24px',
-                          boxSizing: 'border-box'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.background = 'var(--card-bg, #ffffff)';
-                          e.target.style.boxShadow = '0 0 0 1px #2563eb';
-                          e.target.style.height = 'auto';
-                          e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.background = 'transparent';
-                          e.target.style.boxShadow = 'none';
-                          if (!st.text.trim()) {
-                            const updated = subtasks.filter(s => s.id !== st.id);
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                        <textarea
+                          ref={(el) => {
+                            if (el) {
+                              el.style.height = 'auto';
+                              el.style.height = `${Math.max(el.scrollHeight, 24)}px`;
+                            }
+                          }}
+                          value={st.text}
+                          rows={1}
+                          onChange={(e) => {
+                            const updatedText = e.target.value;
+                            const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
                             setSubtasks(updated);
                             onUpdateNote(note.id, { subtasks: updated });
-                          }
-                        }}
-                      />
+                          }}
+                          onInput={(e) => {
+                            e.target.style.height = 'auto';
+                            e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
+                          }}
+                          placeholder="Subtask step..."
+                          style={{
+                            width: '100%',
+                            border: 'none',
+                            background: 'transparent',
+                            fontSize: '13px',
+                            color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
+                            textDecoration: st.completed ? 'line-through' : 'none',
+                            outline: 'none',
+                            padding: '2px 4px',
+                            borderRadius: '4px',
+                            fontFamily: 'inherit',
+                            resize: 'none',
+                            overflowY: 'hidden',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            lineHeight: '1.4',
+                            minHeight: '24px',
+                            boxSizing: 'border-box'
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.background = 'var(--card-bg, #ffffff)';
+                            e.target.style.boxShadow = '0 0 0 1px #2563eb';
+                            e.target.style.height = 'auto';
+                            e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.background = 'transparent';
+                            e.target.style.boxShadow = 'none';
+                            if (!st.text.trim()) {
+                              const updated = subtasks.filter(s => s.id !== st.id);
+                              setSubtasks(updated);
+                              onUpdateNote(note.id, { subtasks: updated });
+                            }
+                          }}
+                        />
+                        <ActionableEntitiesBar text={st.text} compact />
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
@@ -470,6 +475,7 @@ const NoteCard = ({
                   Add
                 </button>
               </div>
+              <ActionableEntitiesBar text={newSubtaskText} compact />
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
@@ -551,41 +557,44 @@ const NoteCard = ({
                         }}
                         style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
                       />
-                      <input
-                        type="text"
-                        value={st.text}
-                        onChange={(e) => {
-                          const updatedText = e.target.value;
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
-                          setSubtasks(updated);
-                          onUpdateNote(note.id, { subtasks: updated });
-                        }}
-                        placeholder="Subtask step..."
-                        style={{
-                          flex: 1,
-                          border: 'none',
-                          background: 'transparent',
-                          fontSize: '13px',
-                          color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
-                          textDecoration: st.completed ? 'line-through' : 'none',
-                          outline: 'none',
-                          padding: '2px 4px',
-                          borderRadius: '4px'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.background = 'var(--card-bg, #ffffff)';
-                          e.target.style.boxShadow = '0 0 0 1px #2563eb';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.background = 'transparent';
-                          e.target.style.boxShadow = 'none';
-                          if (!st.text.trim()) {
-                            const updated = subtasks.filter(s => s.id !== st.id);
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                        <input
+                          type="text"
+                          value={st.text}
+                          onChange={(e) => {
+                            const updatedText = e.target.value;
+                            const updated = subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s);
                             setSubtasks(updated);
                             onUpdateNote(note.id, { subtasks: updated });
-                          }
-                        }}
-                      />
+                          }}
+                          placeholder="Subtask step..."
+                          style={{
+                            width: '100%',
+                            border: 'none',
+                            background: 'transparent',
+                            fontSize: '13px',
+                            color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
+                            textDecoration: st.completed ? 'line-through' : 'none',
+                            outline: 'none',
+                            padding: '2px 4px',
+                            borderRadius: '4px'
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.background = 'var(--card-bg, #ffffff)';
+                            e.target.style.boxShadow = '0 0 0 1px #2563eb';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.background = 'transparent';
+                            e.target.style.boxShadow = 'none';
+                            if (!st.text.trim()) {
+                              const updated = subtasks.filter(s => s.id !== st.id);
+                              setSubtasks(updated);
+                              onUpdateNote(note.id, { subtasks: updated });
+                            }
+                          }}
+                        />
+                        <ActionableEntitiesBar text={st.text} compact />
+                      </div>
                     </li>
                   ))}
                 </ul>

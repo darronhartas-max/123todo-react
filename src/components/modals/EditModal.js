@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
+import { ActionableEntitiesBar } from '../../utils/textUtils';
 
 const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -520,6 +521,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         }}
                         maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
                     />
+                    <ActionableEntitiesBar text={editingTask.text} />
                 </div>
 
                 {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, and Schedule on the SAME line */}
@@ -630,6 +632,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 fontSize: '1.05rem'
                             }}
                         />
+                        <ActionableEntitiesBar text={editingTask.notes} />
                         <PhotoAttachments
                             photos={editingTask.photos || []}
                             onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
@@ -741,59 +744,62 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                 }}
                                                 style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
                                             />
-                                            <textarea
-                                                ref={(el) => {
-                                                    if (el) {
-                                                        el.style.height = 'auto';
-                                                        el.style.height = `${Math.max(el.scrollHeight, 28)}px`;
-                                                    }
-                                                }}
-                                                value={st.text}
-                                                rows={1}
-                                                onChange={(e) => {
-                                                    const updatedText = e.target.value;
-                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
-                                                }}
-                                                onInput={(e) => {
-                                                    e.target.style.height = 'auto';
-                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
-                                                }}
-                                                placeholder="Subtask description..."
-                                                style={{
-                                                    flex: 1,
-                                                    border: 'none',
-                                                    background: 'transparent',
-                                                    fontSize: '1.05rem',
-                                                    fontWeight: '500',
-                                                    color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                    textDecoration: st.completed ? 'line-through' : 'none',
-                                                    outline: 'none',
-                                                    padding: '3px 6px',
-                                                    borderRadius: '4px',
-                                                    fontFamily: 'inherit',
-                                                    resize: 'none',
-                                                    overflowY: 'hidden',
-                                                    wordBreak: 'break-word',
-                                                    whiteSpace: 'pre-wrap',
-                                                    lineHeight: '1.4',
-                                                    minHeight: '28px',
-                                                    boxSizing: 'border-box',
-                                                    transition: 'all 0.15s ease'
-                                                }}
-                                                onFocus={(e) => {
-                                                    e.target.style.background = 'var(--bg-color)';
-                                                    e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
-                                                    e.target.style.height = 'auto';
-                                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
-                                                }}
-                                                onBlur={(e) => {
-                                                    e.target.style.background = 'transparent';
-                                                    e.target.style.boxShadow = 'none';
-                                                    if (!st.text.trim()) {
-                                                        setSubtasks(subtasks.filter(s => s.id !== st.id));
-                                                    }
-                                                }}
-                                            />
+                                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                                                <textarea
+                                                    ref={(el) => {
+                                                        if (el) {
+                                                            el.style.height = 'auto';
+                                                            el.style.height = `${Math.max(el.scrollHeight, 28)}px`;
+                                                        }
+                                                    }}
+                                                    value={st.text}
+                                                    rows={1}
+                                                    onChange={(e) => {
+                                                        const updatedText = e.target.value;
+                                                        setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
+                                                    }}
+                                                    onInput={(e) => {
+                                                        e.target.style.height = 'auto';
+                                                        e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
+                                                    }}
+                                                    placeholder="Subtask description..."
+                                                    style={{
+                                                        width: '100%',
+                                                        border: 'none',
+                                                        background: 'transparent',
+                                                        fontSize: '1.05rem',
+                                                        fontWeight: '500',
+                                                        color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
+                                                        textDecoration: st.completed ? 'line-through' : 'none',
+                                                        outline: 'none',
+                                                        padding: '3px 6px',
+                                                        borderRadius: '4px',
+                                                        fontFamily: 'inherit',
+                                                        resize: 'none',
+                                                        overflowY: 'hidden',
+                                                        wordBreak: 'break-word',
+                                                        whiteSpace: 'pre-wrap',
+                                                        lineHeight: '1.4',
+                                                        minHeight: '28px',
+                                                        boxSizing: 'border-box',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.target.style.background = 'var(--bg-color)';
+                                                        e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
+                                                        e.target.style.height = 'auto';
+                                                        e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        e.target.style.background = 'transparent';
+                                                        e.target.style.boxShadow = 'none';
+                                                        if (!st.text.trim()) {
+                                                            setSubtasks(subtasks.filter(s => s.id !== st.id));
+                                                        }
+                                                    }}
+                                                />
+                                                <ActionableEntitiesBar text={st.text} compact />
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
@@ -871,6 +877,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 Add
                             </button>
                         </div>
+                        <ActionableEntitiesBar text={newSubtaskText} compact />
                     </div>
                 )}
 
@@ -1232,6 +1239,7 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     boxSizing: 'border-box'
                                 }}
                             />
+                            <ActionableEntitiesBar text={expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')} />
 
                             {expandedOverlayField === 'notes' && (
                                 <PhotoAttachments

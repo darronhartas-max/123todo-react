@@ -129,4 +129,36 @@ describe('EditModal', () => {
       })
     );
   });
+
+  test('renders actionable contact links for phone, email, and web address in edit mode', () => {
+    const taskWithLinks = {
+      id: 2,
+      text: 'Call client on 07123 456789 or visit https://123todo.com',
+      notes: 'Email them at client@example.com for quote',
+      priority: 1,
+      projectId: 'general',
+      subtasks: []
+    };
+
+    render(
+      <EditModal
+        task={taskWithLinks}
+        onSave={jest.fn()}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    const callLink = screen.getByRole('link', { name: /Call 07123 456789/i });
+    expect(callLink).toBeInTheDocument();
+    expect(callLink).toHaveAttribute('href', 'tel:07123456789');
+
+    const emailLink = screen.getByRole('link', { name: /Email client@example.com/i });
+    expect(emailLink).toBeInTheDocument();
+    expect(emailLink).toHaveAttribute('href', 'mailto:client@example.com');
+
+    const webLink = screen.getByRole('link', { name: /Open 123todo.com/i });
+    expect(webLink).toBeInTheDocument();
+    expect(webLink).toHaveAttribute('href', 'https://123todo.com');
+  });
 });
