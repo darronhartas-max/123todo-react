@@ -889,21 +889,22 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         padding: '12px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
-                        background: 'var(--item-bg)'
+                        background: 'var(--item-bg)',
+                        boxSizing: 'border-box'
                     }}>
                         <div style={{ fontSize: '1.05rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
                             📅 Date & Recurrence Scheduling
                         </div>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'nowrap' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 140px', minWidth: '130px', maxWidth: '145px' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px', flexWrap: 'nowrap', width: '100%', boxSizing: 'border-box' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>
                                 <input
                                     id="edit-scheduled-date"
                                     type="date"
                                     value={scheduledDate || ''}
                                     onChange={(e) => setScheduledDate(e.target.value || null)}
                                     style={{
-                                        padding: '7px 8px',
-                                        fontSize: '0.92rem',
+                                        padding: '6px 4px',
+                                        fontSize: '0.82rem',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         background: 'var(--bg-color)',
@@ -919,12 +920,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 onClick={() => setScheduledDate(getTomorrowDateString())}
                                 style={{
                                     flex: 1,
-                                    padding: '7px 8px',
+                                    minWidth: 0,
+                                    padding: '6px 4px',
                                     background: 'var(--accent-bg)',
                                     border: '1px solid var(--accent-color)',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.88rem',
+                                    fontSize: '0.82rem',
                                     color: 'var(--accent-color)',
                                     fontWeight: '600',
                                     whiteSpace: 'nowrap',
@@ -940,12 +942,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 onClick={() => setScheduledDate(getNextWeekDateString())}
                                 style={{
                                     flex: 1,
-                                    padding: '7px 8px',
+                                    minWidth: 0,
+                                    padding: '6px 4px',
                                     background: 'var(--accent-bg)',
                                     border: '1px solid var(--accent-color)',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.88rem',
+                                    fontSize: '0.82rem',
                                     color: 'var(--accent-color)',
                                     fontWeight: '600',
                                     whiteSpace: 'nowrap',
@@ -961,12 +964,12 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     type="button"
                                     onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                     style={{
-                                        padding: '7px 10px',
+                                        padding: '6px 8px',
                                         background: 'transparent',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontSize: '0.88rem',
+                                        fontSize: '0.82rem',
                                         color: '#ef4444',
                                         fontWeight: '600',
                                         whiteSpace: 'nowrap',

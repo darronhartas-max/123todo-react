@@ -821,22 +821,23 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     padding: '12px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '6px',
-                    background: 'var(--bg-color)'
+                    background: 'var(--item-bg)',
+                    boxSizing: 'border-box'
                 }}>
                     <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
                         📅 Date & Recurrence Scheduling
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px', alignItems: 'flex-end', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '0 0 140px', minWidth: '130px', maxWidth: '145px' }}>
-                            <label htmlFor="start-scheduled-date" style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500', whiteSpace: 'nowrap' }}>Start/Scheduled Date</label>
+                    <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '6px', alignItems: 'flex-end', marginBottom: '10px', width: '100%', boxSizing: 'border-box' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>
+                            <label htmlFor="start-scheduled-date" style={{ fontSize: '0.78rem', color: 'var(--muted-text)', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title="Start/Scheduled Date">Start/Scheduled Date</label>
                             <input
                                 id="start-scheduled-date"
                                 type="date"
                                 value={scheduledDate || ''}
                                 onChange={(e) => setScheduledDate(e.target.value || null)}
                                 style={{
-                                    padding: '7px 8px',
-                                    fontSize: '0.92rem',
+                                    padding: '6px 4px',
+                                    fontSize: '0.82rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--item-bg)',
@@ -852,12 +853,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             onClick={() => setScheduledDate(getTomorrowDateString())}
                             style={{
                                 flex: 1,
-                                padding: '7px 8px',
+                                minWidth: 0,
+                                padding: '6px 4px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '0.88rem',
+                                fontSize: '0.82rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
                                 whiteSpace: 'nowrap',
@@ -873,12 +875,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             onClick={() => setScheduledDate(getNextWeekDateString())}
                             style={{
                                 flex: 1,
-                                padding: '7px 8px',
+                                minWidth: 0,
+                                padding: '6px 4px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '0.88rem',
+                                fontSize: '0.82rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
                                 whiteSpace: 'nowrap',
@@ -894,12 +897,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 type="button"
                                 onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                 style={{
-                                    padding: '7px 10px',
+                                    padding: '6px 8px',
                                     background: 'var(--surface-color)',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '0.88rem',
+                                    fontSize: '0.82rem',
                                     fontWeight: '600',
                                     color: 'var(--muted-text)',
                                     whiteSpace: 'nowrap',
