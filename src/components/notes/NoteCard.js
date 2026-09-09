@@ -28,15 +28,12 @@ const NoteCard = ({
   const [newSubtaskText, setNewSubtaskText] = useState('');
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
-  const [isDictating, setIsDictating] = useState(false);
   const [isDictatingTitle, setIsDictatingTitle] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   
-  const recognitionRef = useRef(null);
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
   const titleTextareaRef = useRef(null);
-  const noteViewBodyRef = useRef(null);
 
   // Keep title textarea auto-expanded to fit content without truncation
   useEffect(() => {
@@ -55,30 +52,15 @@ const NoteCard = ({
     }
   }, [titleText, isEditing, isDictatingTitle]);
 
-  // Keep latest spoken lines visible at all times during dictation / editing
+  // Keep note textarea auto-expanded
   useEffect(() => {
     if (noteTextareaRef.current) {
       const el = noteTextareaRef.current;
       el.style.height = 'auto';
       const targetHeight = Math.max(el.scrollHeight, 60);
       el.style.height = `${targetHeight}px`;
-      el.scrollTop = el.scrollHeight;
-
-      if (isDictating) {
-        try {
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (e) {}
-      }
     }
-  }, [notesText, isEditing, isDictating]);
-
-  useEffect(() => {
-    if (isDictating && noteViewBodyRef.current) {
-      try {
-        noteViewBodyRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch (e) {}
-    }
-  }, [note.notes, isDictating]);
+  }, [notesText, isEditing]);
 
   useEffect(() => {
     setTitleText(note.text || '');
@@ -104,10 +86,6 @@ const NoteCard = ({
   // Clean up speech recognition on unmount
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch (e) {}
-        recognitionRef.current = null;
-      }
       if (titleRecognitionRef.current) {
         try { titleRecognitionRef.current.stop(); } catch (e) {}
         titleRecognitionRef.current = null;
@@ -116,15 +94,10 @@ const NoteCard = ({
   }, []);
 
   const handleSaveEdits = () => {
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch (e) {}
-      recognitionRef.current = null;
-    }
     if (titleRecognitionRef.current) {
       try { titleRecognitionRef.current.stop(); } catch (e) {}
       titleRecognitionRef.current = null;
     }
-    setIsDictating(false);
     setIsDictatingTitle(false);
 
     setIsEditing(false);
@@ -144,12 +117,6 @@ const NoteCard = ({
       }
       setIsDictatingTitle(false);
       return;
-    }
-
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch (e) {}
-      recognitionRef.current = null;
-      setIsDictating(false);
     }
 
     if (!isSpeechRecognitionSupported()) {
@@ -190,54 +157,6 @@ const NoteCard = ({
         titleTextareaRef.current.setSelectionRange(len, len);
       }
     }, 100);
-  };
-
-  const handleToggleDictation = (e) => {
-    e.stopPropagation();
-    if (isDictating) {
-      if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch (e) {}
-        recognitionRef.current = null;
-      }
-      setIsDictating(false);
-      return;
-    }
-
-    if (titleRecognitionRef.current) {
-      try { titleRecognitionRef.current.stop(); } catch (e) {}
-      titleRecognitionRef.current = null;
-      setIsDictatingTitle(false);
-    }
-
-    if (!isSpeechRecognitionSupported()) {
-      setStatusMessage('Voice input is not supported');
-      setTimeout(() => setStatusMessage(''), 3000);
-      return;
-    }
-
-    setIsDictating(true);
-    const initialNoteBody = notesText;
-
-    recognitionRef.current = startVoiceDictation({
-      initialText: initialNoteBody,
-      onTranscript: (updatedText, isSubmitCommand) => {
-        if (isSubmitCommand) {
-          if (recognitionRef.current) {
-            try { recognitionRef.current.stop(); } catch (e) {}
-            recognitionRef.current = null;
-          }
-          setIsDictating(false);
-        } else {
-          setNotesText(updatedText);
-          onUpdateNote(note.id, { notes: updatedText });
-        }
-      },
-      onStatusChange: (msg) => setStatusMessage(msg),
-      onEnd: () => {
-        setIsDictating(false);
-        recognitionRef.current = null;
-      }
-    });
   };
 
   const formattedDate = note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
@@ -676,7 +595,6 @@ const NoteCard = ({
 
             {note.notes ? (
               <p
-                ref={noteViewBodyRef}
                 style={{ 
                   fontSize: `${Math.max(notesFontSize - 2, 12)}px`, 
                   color: 'var(--text-color, #374151)', 
@@ -772,7 +690,7 @@ const NoteCard = ({
       </div>
 
       {/* Dictation Status Bar if Active */}
-      {(isDictating || isDictatingTitle || statusMessage) && (
+      {(isDictatingTitle || statusMessage) && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -793,47 +711,12 @@ const NoteCard = ({
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'space-between', 
+        justifyContent: 'flex-end', 
         gap: '8px',
         paddingTop: '10px',
         borderTop: '1px solid var(--border-color, #f3f4f6)',
         flexWrap: 'wrap'
       }}>
-        {/* Append Voice Button */}
-        <button
-          onClick={handleToggleDictation}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 12px',
-            borderRadius: '10px',
-            border: `1px solid ${isDictating ? '#ef4444' : 'var(--border-color, #d1d5db)'}`,
-            backgroundColor: isDictating ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg, #f3f4f6)',
-            color: isDictating ? '#ef4444' : 'var(--text-color, #374151)',
-            fontSize: '13px',
-            fontWeight: '600',
-            cursor: 'pointer'
-          }}
-        >
-          {isDictating ? (
-            <>
-              <span style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                background: '#ef4444',
-                boxShadow: '0 0 6px #ef4444',
-                animation: 'pulse 1s infinite'
-              }} />
-              <Mic size={14} color="#ef4444" />
-            </>
-          ) : (
-            <Mic size={14} color="#2563eb" />
-          )}
-          <span>{isDictating ? 'Listening...' : '+ Voice'}</span>
-        </button>
-
         {/* Action Group: Make Task & Complete */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {/* Turn into Task Popover */}
