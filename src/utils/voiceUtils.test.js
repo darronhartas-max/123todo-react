@@ -1,4 +1,4 @@
-import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands, isMobileDevice, startVoiceDictation } from './voiceUtils';
+import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands, isMobileDevice, startVoiceDictation, processSpellingConstructs } from './voiceUtils';
 
 describe('voiceUtils - formatSpokenPunctuation', () => {
   test('formats spoken punctuation and capitalizes sentences correctly', () => {
@@ -85,6 +85,40 @@ describe('voiceUtils - processVoiceCommands', () => {
     expect(processVoiceCommands('Buy organic melk. replace last word with milk').text).toBe('Buy organic milk.');
     expect(processVoiceCommands('Call Dave tomorrow at noon change Dave to David').text).toBe('Call David tomorrow at noon');
     expect(processVoiceCommands('Buy apples and oranges replace apples with pears').text).toBe('Buy pears and oranges');
+  });
+
+  test('handles letter-by-letter spelling constructs (spell S M Y T H E, Rice spelled R H Y S)', () => {
+    // Basic spelling letter-by-letter
+    expect(processSpellingConstructs('Meet with Dr spell S M Y T H E tomorrow')).toBe('Meet with Dr Smythe tomorrow');
+    expect(processSpellingConstructs('Book ticket for spell out D A R R O N')).toBe('Book ticket for Darron');
+
+    // Spelled word replacing immediately preceding misheard word
+    expect(processSpellingConstructs('Call Rice spelled R H Y S at 5pm')).toBe('Call Rhys at 5pm');
+    expect(processSpellingConstructs('Meeting with Smith spelt S M Y T H E')).toBe('Meeting with Smythe');
+
+    // "double [letter]" support
+    expect(processSpellingConstructs('His name is spell A double N A')).toBe('His name is Anna');
+    expect(processSpellingConstructs('Order spell C O double F E E')).toBe('Order Coffee');
+
+    // All caps / acronyms
+    expect(processSpellingConstructs('Work on spell all caps N A S A project')).toBe('Work on NASA project');
+    expect(processSpellingConstructs('Support spell H T M L formatting')).toBe('Support HTML formatting');
+
+    // NATO phonetic alphabet support
+    expect(processSpellingConstructs('Client is spell Sierra Mike Yankee Tango Hotel Echo')).toBe('Client is Smythe');
+
+    // Hyphenated letters (e.g. S-M-Y-T-H-E)
+    expect(processSpellingConstructs('Call spell S-M-Y-T-H-E today')).toBe('Call Smythe today');
+
+    // Dotted letter transcriptions from speech engine (e.g. S. M. Y. T. H. E.)
+    expect(processSpellingConstructs('Doctor is spell S. M. Y. T. H. E.')).toBe('Doctor is Smythe.');
+
+    // Composition through processVoiceCommands
+    expect(processVoiceCommands('Meeting with Jon change last word to spell J O H N').text).toBe('Meeting with John');
+
+    // Non-spelling phrases with "spell" must not be corrupted
+    expect(processSpellingConstructs('How do you spell that')).toBe('How do you spell that');
+    expect(processSpellingConstructs('I can spell words')).toBe('I can spell words');
   });
 
   test('detects spoken auto-submit commands (add task, add note) and appends full stop', () => {

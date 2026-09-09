@@ -170,6 +170,166 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
 };
 
 /**
+ * NATO phonetic alphabet mapping for accurate spoken character transcription
+ */
+export const NATO_PHONETIC_MAP = {
+  alpha: 'A', bravo: 'B', charlie: 'C', delta: 'D', echo: 'E',
+  foxtrot: 'F', golf: 'G', hotel: 'H', india: 'I', juliet: 'J',
+  juliett: 'J', kilo: 'K', lima: 'L', mike: 'M', november: 'N',
+  oscar: 'O', papa: 'P', quebec: 'Q', romeo: 'R', sierra: 'S',
+  tango: 'T', uniform: 'U', victor: 'V', whiskey: 'W',
+  xray: 'X', 'x-ray': 'X', yankee: 'Y', zulu: 'Z'
+};
+
+/**
+ * Parses spoken spelling constructs to build unusual words, names, and acronyms letter-by-letter.
+ * Supports:
+ * - "spell S M Y T H E" -> "Smythe"
+ * - "spell out D A R R O N" -> "Darron"
+ * - "Rice spelled R H Y S" -> "Rhys" (replaces previous misheard word with correct spelling)
+ * - "spell A double N A" -> "Anna"
+ * - "spell all caps N A S A" -> "NASA"
+ * - "spell H T M L" -> "HTML" (acronyms automatically uppercase)
+ * - "spell Sierra Mike Yankee Tango Hotel Echo" -> "Smythe" (NATO phonetic alphabet)
+ */
+export const processSpellingConstructs = (text) => {
+  if (!text || typeof text !== 'string') return text;
+
+  // Triggers: "spell out", "spell", "spelled", "spelt", "spelling"
+  const triggerRegex = /\b(spell\s*out|spelled|spelt|spelling|spell)\b/gi;
+
+  let processed = text;
+  let match;
+
+  while ((match = triggerRegex.exec(processed)) !== null) {
+    const triggerWord = match[1].toLowerCase();
+    const matchIndex = match.index;
+    const matchEnd = matchIndex + match[0].length;
+
+    const afterText = processed.substring(matchEnd).trim();
+    if (!afterText) break;
+
+    // Check for optional "all caps" / "capital letters" / "uppercase"
+    let forceAllCaps = false;
+    let remainder = afterText;
+
+    const allCapsMatch = remainder.match(/^(in\s+)?(all\s*caps|capital\s*letters|uppercase)\s+/i);
+    if (allCapsMatch) {
+      forceAllCaps = true;
+      remainder = remainder.substring(allCapsMatch[0].length);
+    }
+
+    // Split remainder by whitespace into tokens
+    const rawTokens = remainder.split(/\s+/);
+    const letterList = [];
+    let tokensConsumed = 0;
+
+    for (let i = 0; i < rawTokens.length; i++) {
+      const rawToken = rawTokens[i];
+      const cleanToken = rawToken.replace(/[.,?!:;]+$/, '');
+      const lower = cleanToken.toLowerCase();
+
+      // Check for hyphenated letter sequence e.g. "S-M-Y-T-H-E"
+      if (cleanToken.includes('-')) {
+        const parts = cleanToken.split('-');
+        if (parts.every(p => /^[a-z]$/i.test(p) || NATO_PHONETIC_MAP[p.toLowerCase()])) {
+          for (const p of parts) {
+            if (/^[a-z]$/i.test(p)) {
+              letterList.push(p.toUpperCase());
+            } else if (NATO_PHONETIC_MAP[p.toLowerCase()]) {
+              letterList.push(NATO_PHONETIC_MAP[p.toLowerCase()]);
+            }
+          }
+          tokensConsumed = i + 1;
+          continue;
+        }
+      }
+
+      // Check for "double [letter]"
+      if (lower === 'double' && i + 1 < rawTokens.length) {
+        const nextRaw = rawTokens[i + 1];
+        const nextClean = nextRaw.replace(/[.,?!:;]+$/, '');
+        const nextLower = nextClean.toLowerCase();
+
+        let char = null;
+        if (/^[a-z]$/i.test(nextClean)) {
+          char = nextClean.toUpperCase();
+        } else if (NATO_PHONETIC_MAP[nextLower]) {
+          char = NATO_PHONETIC_MAP[nextLower];
+        }
+
+        if (char) {
+          letterList.push(char, char);
+          i++; // Skip the next token
+          tokensConsumed = i + 1;
+          continue;
+        }
+      }
+
+      // Check for single letter (e.g. "S", "s", "S.")
+      if (/^[a-z]$/i.test(cleanToken)) {
+        letterList.push(cleanToken.toUpperCase());
+        tokensConsumed = i + 1;
+        continue;
+      }
+
+      // Check for NATO phonetic word (e.g. "Sierra", "Mike")
+      if (NATO_PHONETIC_MAP[lower]) {
+        letterList.push(NATO_PHONETIC_MAP[lower]);
+        tokensConsumed = i + 1;
+        continue;
+      }
+
+      // Stop collecting letters once a non-letter token is encountered
+      break;
+    }
+
+    // Require at least one letter token (or 2 if trigger is just "spell" to prevent false positives)
+    const minLetters = /^(spelled|spelt|spell\s*out)$/i.test(triggerWord) ? 1 : 2;
+    if (letterList.length < minLetters) {
+      continue;
+    }
+
+    // Determine casing of constructed word
+    let constructedWord = letterList.join('');
+    const hasVowels = /[AEIOUY]/.test(constructedWord);
+
+    if (forceAllCaps || (!hasVowels && constructedWord.length <= 5)) {
+      constructedWord = constructedWord.toUpperCase();
+    } else {
+      // Title Case: First letter uppercase, rest lowercase (e.g. Smythe, Rhys, Aaron)
+      constructedWord = constructedWord.charAt(0).toUpperCase() + constructedWord.slice(1).toLowerCase();
+    }
+
+    // Check trailing punctuation on the last consumed token
+    const lastConsumedRaw = rawTokens[tokensConsumed - 1];
+    const trailingPuncMatch = lastConsumedRaw ? lastConsumedRaw.match(/([.,?!:;]+)$/) : null;
+    if (trailingPuncMatch) {
+      constructedWord += trailingPuncMatch[1];
+    }
+
+    const restOfSentence = rawTokens.slice(tokensConsumed).join(' ');
+    let beforeTrigger = processed.substring(0, matchIndex).trimEnd();
+
+    // If trigger is "spelled" or "spelt", replace the word immediately preceding it if present
+    if (/^(spelled|spelt)$/i.test(triggerWord)) {
+      const beforeWords = beforeTrigger.split(/\s+/).filter(Boolean);
+      if (beforeWords.length > 0) {
+        beforeWords.pop();
+        beforeTrigger = beforeWords.join(' ');
+      }
+    }
+
+    const newBefore = beforeTrigger ? `${beforeTrigger} ${constructedWord}` : constructedWord;
+    processed = restOfSentence ? `${newBefore} ${restOfSentence}` : newBefore;
+
+    triggerRegex.lastIndex = 0;
+  }
+
+  return processed;
+};
+
+/**
  * Processes spoken deletion commands ("delete last word", "scratch that", "delete last 3 words", "clear all")
  * and auto-submit commands ("add task", "add note", "submit task", "save note", etc.).
  */
@@ -206,6 +366,9 @@ export const processVoiceCommands = (text) => {
   if (clearAllRegex.test(processed)) {
     return { text: '', isSubmitCommand: false };
   }
+
+  // 3. Process letter-by-letter spelling constructs ("spell S M Y T H E", "Rice spelled R H Y S", "spell out D A R R O N")
+  processed = processSpellingConstructs(processed);
 
   // 3. Process "change last word to [X]" / "replace last word with [X]" / "correct last word to [X]"
   const replaceLastWordRegex = /\b(change|replace|correct)\s+(the\s+)?last\s+word\s+(to|with)\s+([a-zA-Z0-9'-]+)\b[.,?!]*/gi;

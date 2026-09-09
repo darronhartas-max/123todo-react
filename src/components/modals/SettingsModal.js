@@ -1724,6 +1724,28 @@ const SettingsModal = ({
                                     </div>
 
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
+                                        🔤 Spell Words Letter-by-Letter:
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"spell S M Y T H E"</kbd> or <kbd style={styles.kbdBadge}>"spell out D A R R O N"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Spells unusual names or words letter-by-letter</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"Rice spelled R H Y S"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Corrects previous misheard word with your spelling</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"spell A double N A"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Supports "double [letter]" naturally</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"spell all caps N A S A"</kbd> or <kbd style={styles.kbdBadge}>"spell H T M L"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Constructs uppercase acronyms</span>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
                                         🚀 Auto-Submit Command:
                                     </div>
                                     <div style={styles.voiceGuideRow}>
