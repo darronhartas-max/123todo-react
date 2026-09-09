@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { STORAGE_KEYS, DEFAULT_PROJECTS } from '../utils/constants';
+import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
 import { calculateNextRecurrenceDate, getTodayDateString } from '../utils/dateUtils';
 import { savePhotos } from '../utils/photoStorage';
 
@@ -143,14 +143,24 @@ export const useTasks = () => {
             if (savedTasks) {
                 const parsed = JSON.parse(savedTasks);
                 // MIGRATION: Ensure every task has a projectId, support fallback from legacy categoryId
-                loadedTasks = parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
+                loadedTasks = parsed.map(t => {
+                    const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
+                    if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
+                    if (item.color) item.color = migrateProjectColor(item.color);
+                    return item;
+                });
             }
 
             let loadedArchived = [];
             if (savedArchived) {
                 const parsed = JSON.parse(savedArchived);
                 // MIGRATION: Ensure every archived task has a projectId, support fallback from legacy categoryId
-                loadedArchived = parsed.map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
+                loadedArchived = parsed.map(t => {
+                    const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
+                    if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
+                    if (item.color) item.color = migrateProjectColor(item.color);
+                    return item;
+                });
             }
 
             if (savedProjects) {
@@ -162,6 +172,11 @@ export const useTasks = () => {
                 if (!parsed.some(p => p.id === 'general')) {
                     parsed.unshift({ id: 'general', name: 'General', color: '#285a82' });
                 }
+                // MIGRATION: Migrate any project colors that changed or matched master priorities
+                parsed = parsed.map(p => ({
+                    ...p,
+                    color: migrateProjectColor(p.color)
+                }));
                 setProjects(parsed);
             } else {
                 setProjects([{ id: 'general', name: 'General', color: '#285a82' }]);
@@ -536,9 +551,22 @@ export const useTasks = () => {
 
     const importData = useCallback((data) => {
         // Map tasks and fallback legacy categoryId to projectId
-        const mappedTasks = (data.tasks || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
-        const mappedArchived = (data.archived || []).map(t => ({ ...t, projectId: t.projectId || t.categoryId || 'general' }));
-        let mappedProjects = data.projects || data.categories || [{ id: 'general', name: 'General', color: '#285a82' }];
+        const mappedTasks = (data.tasks || []).map(t => {
+            const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
+            if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
+            if (item.color) item.color = migrateProjectColor(item.color);
+            return item;
+        });
+        const mappedArchived = (data.archived || []).map(t => {
+            const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
+            if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
+            if (item.color) item.color = migrateProjectColor(item.color);
+            return item;
+        });
+        let mappedProjects = (data.projects || data.categories || [{ id: 'general', name: 'General', color: '#285a82' }]).map(p => ({
+            ...p,
+            color: migrateProjectColor(p.color)
+        }));
         
         // MIGRATION: Ensure General project exists dynamically in imported projects
         if (!mappedProjects.some(p => p.id === 'general')) {

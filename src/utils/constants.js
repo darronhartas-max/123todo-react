@@ -60,25 +60,44 @@ export const DEFAULT_SWIPE_SETTINGS = {
 };
 
 export const PROJECT_COLORS = [
-  '#285a82', // Ocean Blue
-  '#10b981', // Emerald Green
-  '#f59e0b', // Amber Orange
-  '#ec4899', // Sweet Pink
-  '#8b5cf6', // Royal Violet
-  '#06b6d4', // Bright Cyan
-  '#f43f5e', // Ruby Rose
-  '#14b8a6', // Teal Green
-  '#3b82f6', // Sky Blue
-  '#eab308', // Sunflower Yellow
-  '#d946ef', // Fuchsia Purple
-  '#84cc16', // Lime Green
-  '#f97316', // Mandarin Orange
-  '#6366f1', // Indigo Blue
-  '#a855f7', // Amethyst Purple
-  '#065f46', // Forest Green
-  '#b91c1c', // Crimson Red
-  '#78716c', // Slate Gray
+  // Line 1: Warm & Green spectrum
+  '#b91c1c', // 1. Crimson Red
+  '#ea580c', // 2. Burnt Orange / Coral
+  '#f97316', // 3. Mandarin Orange
+  '#d97706', // 4. Warm Amber
+  '#eab308', // 5. Sunflower Yellow
+  '#84cc16', // 6. Lime Green
+  '#22c55e', // 7. Leaf Green
+  '#065f46', // 8. Forest Green
+  '#10b981', // 9. Emerald Green
+  '#14b8a6', // 10. Teal Green
+  // Line 2: Cool, Purple & Pink spectrum
+  '#06b6d4', // 11. Bright Cyan
+  '#0ea5e9', // 12. Cerulean Sky Blue
+  '#3b82f6', // 13. Vivid Blue
+  '#285a82', // 14. Ocean Blue
+  '#6366f1', // 15. Indigo Blue
+  '#8b5cf6', // 16. Royal Violet
+  '#a855f7', // 17. Amethyst Purple
+  '#d946ef', // 18. Fuchsia Purple
+  '#ec4899', // 19. Sweet Pink
+  '#f43f5e', // 20. Ruby Rose
 ];
+
+export const PROJECT_COLOR_MIGRATION = {
+  '#f59e0b': '#d97706', // Old Amber (matched P2) -> new Warm Amber
+  '#78716c': '#285a82', // Old Slate Gray -> Ocean Blue
+  '#dc2626': '#b91c1c', // Master Priority 1 Red -> Crimson Red
+  '#6b7280': '#285a82', // Master Priority 3 Slate -> Ocean Blue
+  '#9333ea': '#a855f7', // Master Priority 4 Purple -> Amethyst Purple
+};
+
+export const migrateProjectColor = (color) => {
+  if (!color || typeof color !== 'string') return color;
+  const normalized = color.trim().toLowerCase();
+  return PROJECT_COLOR_MIGRATION[normalized] || color;
+};
+
 
 export const DEFAULT_PROJECTS = [
   { id: 'all', name: 'All', color: '#6b7280' }
@@ -91,9 +110,14 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.2';
+export const APP_VERSION = '3.6.3';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.3': [
+    { title: '🎨 Spectrum Project Palette & Auto-Migration:', desc: 'Reorganized project color palette into a 20-color natural spectrum across 2 lines of 10, avoiding master priority colors, with seamless auto-migration for existing projects and tasks.' },
+    { title: '📅 Single-Row Schedule Date Controls:', desc: 'Optimized date picker width in Add Task and aligned Next Day and Next Week quick-schedule buttons onto a single neat row.' },
+    { title: '📁 Full-Height Project Dropdown in Add Task:', desc: 'Expanded Add Task projects dropdown to display full project list cleanly above the blurred background without container clipping.' }
+  ],
   '3.6.2': [
     { title: '✉️ Preferred Email Service Picker:', desc: 'Clicking an actionable email link now prompts you to choose your preferred email app or web service (Apple Mail / System, Gmail, Outlook.com, or Yahoo Mail). It remembers your choice once and can be changed anytime in Settings.' }
   ],

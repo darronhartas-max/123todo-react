@@ -1,6 +1,7 @@
 /**
  * Utility functions for 2-way Google Drive data sync merging and conflict resolution.
  */
+import { migrateProjectColor } from './constants';
 
 /**
  * Performs a 2-way merge of local device data and remote Google Drive data.
@@ -38,15 +39,16 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
   [...secondaryProjects, ...primaryProjects].forEach(p => {
     if (!p || !p.id || p.id === 'all') return;
     if (mergedDeletedProjects.includes(p.id)) return; // Ignore deleted project
+    const migratedColor = migrateProjectColor(p.color);
     if (!projectMap.has(p.id)) {
-      projectMap.set(p.id, { ...p });
+      projectMap.set(p.id, { ...p, color: migratedColor });
     } else {
       const existing = projectMap.get(p.id);
       projectMap.set(p.id, {
         ...existing,
         ...p,
         name: p.name || existing.name,
-        color: p.color || existing.color
+        color: migratedColor || existing.color
       });
     }
   });

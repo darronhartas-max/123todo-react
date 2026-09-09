@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS } from '../../utils/constants';
+import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
 
 const SHORTCUTS_LIST = [
@@ -555,20 +555,23 @@ const SettingsModal = ({
             outline: 'none'
         },
         colorGrid: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(10, 1fr)',
+            gap: '10px 4px',
+            justifyItems: 'center',
+            alignItems: 'center',
             marginBottom: '16px'
         },
         colorBtn: (color, isSelected) => ({
-            width: '28px',
-            height: '28px',
+            width: '26px',
+            height: '26px',
             borderRadius: '50%',
             background: color,
             cursor: 'pointer',
-            border: isSelected ? '3px solid var(--text-color)' : 'none',
-            transition: 'transform 0.15s',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            border: isSelected ? '2.5px solid var(--text-color)' : '1.5px solid transparent',
+            transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+            transition: 'transform 0.15s ease',
+            boxShadow: isSelected ? '0 0 0 1px var(--text-color), 0 1px 3px rgba(0,0,0,0.2)' : '0 1px 3px rgba(0,0,0,0.1)'
         }),
         submitBtn: {
             width: '100%',
@@ -797,20 +800,31 @@ const SettingsModal = ({
                                                             <X size={14} />
                                                         </button>
                                                     </div>
-                                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                                                    <div style={{
+                                                        display: 'grid',
+                                                        gridTemplateColumns: 'repeat(10, 1fr)',
+                                                        gap: '8px 4px',
+                                                        justifyItems: 'center',
+                                                        alignItems: 'center',
+                                                        marginTop: '6px',
+                                                        marginBottom: '4px'
+                                                    }}>
                                                         {PROJECT_COLORS.map(c => (
                                                             <div
                                                                 key={c}
                                                                 onClick={() => setEditColor(c)}
                                                                 style={{
-                                                                    width: '20px',
-                                                                    height: '20px',
+                                                                    width: '22px',
+                                                                    height: '22px',
                                                                     borderRadius: '50%',
                                                                     background: c,
                                                                     cursor: 'pointer',
-                                                                    border: editColor === c ? '2px solid var(--text-color)' : 'none',
-                                                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                                                    border: editColor === c ? '2.5px solid var(--text-color)' : '1.5px solid transparent',
+                                                                    transform: editColor === c ? 'scale(1.15)' : 'scale(1)',
+                                                                    transition: 'transform 0.15s ease',
+                                                                    boxShadow: editColor === c ? '0 0 0 1px var(--text-color), 0 1px 3px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.1)'
                                                                 }}
+                                                                title={c}
                                                             />
                                                         ))}
                                                     </div>
@@ -828,7 +842,7 @@ const SettingsModal = ({
                                                              onClick={() => {
                                                                  setEditingProjectId(project.id);
                                                                  setEditName(project.name);
-                                                                 setEditColor(project.color);
+                                                                 setEditColor(migrateProjectColor(project.color));
                                                              }}
                                                              title="Edit project name & color"
                                                          >
@@ -915,6 +929,7 @@ const SettingsModal = ({
                                                         key={c}
                                                         style={styles.colorBtn(c, selectedColor === c)}
                                                         onClick={() => setSelectedColor(c)}
+                                                        title={c}
                                                     />
                                                 ))}
                                             </div>

@@ -37,7 +37,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
@@ -780,7 +780,8 @@ const TodoApp = () => {
         if (existingMatch) {
           projectId = existingMatch.id;
         } else {
-          projectId = addProject(ip.name, ip.color || PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)]);
+          const assignedColor = ip.color ? migrateProjectColor(ip.color) : PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)];
+          projectId = addProject(ip.name, assignedColor);
         }
       }
 
@@ -906,7 +907,7 @@ const TodoApp = () => {
       flexDirection: 'column',
       border: '1px solid var(--border-color)',
       borderRadius: '8px',
-      overflow: 'hidden',
+      overflow: showAddSection ? 'visible' : 'hidden',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
       marginTop: '0px',
       flex: 1

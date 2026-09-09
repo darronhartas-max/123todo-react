@@ -303,11 +303,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
     const styles = {
         addSection: {
+            position: 'relative',
+            zIndex: isProjectOpen ? 120 : 60,
             padding: isOpen ? '12px' : '0',
             background: 'var(--surface-color)',
-            maxHeight: isOpen ? '900px' : '0',
-            overflowY: 'auto',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            maxHeight: isOpen ? 'none' : '0',
+            overflow: isOpen ? 'visible' : 'hidden',
+            transition: isOpen ? 'padding 0.3s ease, box-shadow 0.3s ease' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
             boxSizing: 'border-box'
         },
@@ -342,7 +344,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
     return (
         <div style={styles.addSection}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', position: 'relative', zIndex: 50 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', position: 'relative', zIndex: isProjectOpen ? 121 : 50 }}>
                 {/* Project Custom Dropdown */}
                 {(() => {
                     const activeProject = (projects || []).find(p => p.id === projectId) || projects?.[0] || { id: 'general', name: 'General', color: '#6b7280' };
@@ -389,22 +391,23 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
                             {isProjectOpen && (
                                 <>
-                                    <div onClick={() => setIsProjectOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }} />
+                                    <div onClick={() => setIsProjectOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 120, background: 'transparent' }} />
                                     <div style={{
                                         position: 'absolute',
                                         top: 'calc(100% + 4px)',
                                         left: 0,
                                         minWidth: '100%',
                                         width: 'max-content',
-                                        maxWidth: '340px',
+                                        maxWidth: 'min(340px, calc(100vw - 32px))',
                                         background: 'var(--surface-color)',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '6px',
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-                                        zIndex: 100,
-                                        maxHeight: 'calc(100vh - 160px)',
+                                        boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
+                                        zIndex: 125,
+                                        maxHeight: 'calc(100vh - 120px)',
                                         overflowY: 'auto',
-                                        padding: '4px 0'
+                                        padding: '4px 0',
+                                        boxSizing: 'border-box'
                                     }}>
                                         {(projects || []).map(p => {
                                             const isSel = p.id === projectId;
@@ -823,22 +826,24 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
                         📅 Date & Recurrence Scheduling
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '150px' }}>
-                            <label style={{ fontSize: '0.95rem', color: 'var(--muted-text)', fontWeight: '500' }}>Start/Scheduled Date</label>
+                    <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px', alignItems: 'flex-end', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '0 0 140px', minWidth: '130px', maxWidth: '145px' }}>
+                            <label htmlFor="start-scheduled-date" style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500', whiteSpace: 'nowrap' }}>Start/Scheduled Date</label>
                             <input
+                                id="start-scheduled-date"
                                 type="date"
                                 value={scheduledDate || ''}
                                 onChange={(e) => setScheduledDate(e.target.value || null)}
                                 style={{
-                                    padding: '8px 10px',
-                                    fontSize: '1.05rem',
+                                    padding: '7px 8px',
+                                    fontSize: '0.92rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--item-bg)',
                                     color: 'var(--text-color)',
                                     width: '100%',
-                                    boxSizing: 'border-box'
+                                    boxSizing: 'border-box',
+                                    outline: 'none'
                                 }}
                             />
                         </div>
@@ -846,15 +851,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             type="button"
                             onClick={() => setScheduledDate(getTomorrowDateString())}
                             style={{
-                                padding: '8px 14px',
+                                flex: 1,
+                                padding: '7px 8px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '0.9rem',
+                                fontSize: '0.88rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                                boxSizing: 'border-box'
                             }}
                             title="Schedule for tomorrow"
                         >
@@ -864,15 +872,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             type="button"
                             onClick={() => setScheduledDate(getNextWeekDateString())}
                             style={{
-                                padding: '8px 14px',
+                                flex: 1,
+                                padding: '7px 8px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '0.9rem',
+                                fontSize: '0.88rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                                boxSizing: 'border-box'
                             }}
                             title="Schedule for 7 days from today"
                         >
@@ -883,15 +894,19 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 type="button"
                                 onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
                                 style={{
-                                    padding: '8px 16px',
-                                    background: '#e5e7eb',
-                                    border: 'none',
+                                    padding: '7px 10px',
+                                    background: 'var(--surface-color)',
+                                    border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    fontSize: '1.05rem',
+                                    fontSize: '0.88rem',
                                     fontWeight: '600',
-                                    color: '#333'
+                                    color: 'var(--muted-text)',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                    boxSizing: 'border-box'
                                 }}
+                                title="Clear date"
                             >
                                 Clear
                             </button>
