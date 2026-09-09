@@ -65,3 +65,35 @@ test('displays full list of projects when project dropdown is opened', () => {
   expect(screen.getByText('Fitness & Health')).toBeInTheDocument();
 });
 
+test('renders Voice Task button and activates listening indicator on click', () => {
+  const { fireEvent } = require('@testing-library/react');
+  // Mock SpeechRecognition in window
+  class MockSpeechRecognition {
+    constructor() {
+      this.start = jest.fn();
+      this.stop = jest.fn();
+      this.abort = jest.fn();
+    }
+  }
+  window.SpeechRecognition = MockSpeechRecognition;
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+    />
+  );
+
+  const voiceBtn = screen.getByRole('button', { name: /voice task/i });
+  expect(voiceBtn).toBeInTheDocument();
+  fireEvent.click(voiceBtn);
+
+  // When listening, should display Listening... without MicOff confusion
+  expect(screen.getByText(/listening\.\.\./i)).toBeInTheDocument();
+
+  delete window.SpeechRecognition;
+});
+
+

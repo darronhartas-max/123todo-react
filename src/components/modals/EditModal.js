@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
@@ -445,15 +445,30 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                 {/* Voice Status Alert */}
                 {voiceStatus && (
                     <div style={{
-                        fontSize: '0.85rem',
-                        padding: '6px 10px',
-                        borderRadius: '6px',
+                        fontSize: '0.82rem',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
                         marginBottom: '8px',
-                        background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
-                        color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
-                        fontWeight: '600'
+                        background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.12)',
+                        color: listeningTarget ? '#ef4444' : '#15803d',
+                        border: `1px solid ${listeningTarget ? 'rgba(239, 68, 68, 0.25)' : 'rgba(34, 197, 94, 0.25)'}`,
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease'
                     }}>
-                        {voiceStatus}
+                        {listeningTarget && (
+                            <span style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: '#ef4444',
+                                boxShadow: '0 0 8px #ef4444',
+                                animation: 'pulse 1s infinite'
+                            }} />
+                        )}
+                        <span>{voiceStatus}</span>
                     </div>
                 )}
 
@@ -486,11 +501,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             <button
                                 type="button"
                                 onClick={() => toggleVoiceInput('title')}
-                                title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
+                                title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '4px',
+                                    gap: '5px',
                                     padding: '3px 8px',
                                     borderRadius: '12px',
                                     border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
@@ -501,8 +516,25 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     fontWeight: '600'
                                 }}
                             >
-                                {listeningTarget === 'title' ? <MicOff size={13} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={13} color="var(--accent-color)" />}
-                                <span>{listeningTarget === 'title' ? 'Listening...' : 'Voice Task'}</span>
+                                {listeningTarget === 'title' ? (
+                                    <>
+                                        <span style={{
+                                            width: '7px',
+                                            height: '7px',
+                                            borderRadius: '50%',
+                                            background: '#ef4444',
+                                            boxShadow: '0 0 6px #ef4444',
+                                            animation: 'pulse 1s infinite'
+                                        }} />
+                                        <Mic size={13} color="#ef4444" />
+                                        <span>Listening...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Mic size={13} color="var(--accent-color)" />
+                                        <span>Voice Task</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -600,11 +632,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 <button
                                     type="button"
                                     onClick={() => toggleVoiceInput('notes')}
-                                    title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
+                                    title={listeningTarget === 'notes' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '4px',
+                                        gap: '5px',
                                         padding: '3px 8px',
                                         borderRadius: '12px',
                                         border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
@@ -615,8 +647,25 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                         fontWeight: '600'
                                     }}
                                 >
-                                    {listeningTarget === 'notes' ? <MicOff size={13} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={13} color="var(--accent-color)" />}
-                                    <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
+                                    {listeningTarget === 'notes' ? (
+                                        <>
+                                            <span style={{
+                                                width: '7px',
+                                                height: '7px',
+                                                borderRadius: '50%',
+                                                background: '#ef4444',
+                                                boxShadow: '0 0 6px #ef4444',
+                                                animation: 'pulse 1s infinite'
+                                            }} />
+                                            <Mic size={13} color="#ef4444" />
+                                            <span>Listening...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Mic size={13} color="var(--accent-color)" />
+                                            <span>Voice Notes</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -1208,8 +1257,25 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                             fontWeight: '600'
                                         }}
                                     >
-                                        {listeningTarget === expandedOverlayField ? <MicOff size={14} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={14} color="var(--accent-color)" />}
-                                        <span>{listeningTarget === expandedOverlayField ? 'Listening...' : 'Voice Dictation'}</span>
+                                        {listeningTarget === expandedOverlayField ? (
+                                            <>
+                                                <span style={{
+                                                    width: '7px',
+                                                    height: '7px',
+                                                    borderRadius: '50%',
+                                                    background: '#ef4444',
+                                                    boxShadow: '0 0 6px #ef4444',
+                                                    animation: 'pulse 1s infinite'
+                                                }} />
+                                                <Mic size={14} color="#ef4444" />
+                                                <span>Listening...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Mic size={14} color="var(--accent-color)" />
+                                                <span>Voice Dictation</span>
+                                            </>
+                                        )}
                                     </button>
                                     <button
                                         type="button"

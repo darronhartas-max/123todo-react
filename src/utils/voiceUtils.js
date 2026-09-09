@@ -237,20 +237,38 @@ export const processVoiceCommands = (text) => {
 
 /**
  * Starts continuous speech recognition and appends transcript to existing text.
- * Maintains continuous dictation across silence pauses and handles regional language accents.
+/**
+ * Detects if the current client is a mobile or touch device.
+ */
+export const isMobileDevice = () => {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
+};
+
+/**
+ * Starts speech recognition and appends transcript to existing text.
+ * On mobile devices, avoids aggressive restart loops that trigger repeated OS confirmation chimes.
+ * Handles regional language accents, punctuation formatting, and voice commands.
  */
 export const startVoiceDictation = ({
   initialText = '',
   onTranscript,
   onStatusChange,
   onEnd,
-  lang
+  lang,
+  continuous
 }) => {
   if (!isSpeechRecognitionSupported()) {
     onStatusChange('Voice input is not supported in this browser.');
     setTimeout(() => onStatusChange(''), 4000);
     return null;
   }
+
+  const isMobile = isMobileDevice();
+  // On mobile devices, native Speech Recognition emits an OS chime on every start.
+  // Disable automatic continuous restarting on mobile to eliminate repeated confirmation noises.
+  const isContinuous = continuous !== undefined ? continuous : !isMobile;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -261,19 +279,20 @@ export const startVoiceDictation = ({
   let lastRestartTime = Date.now();
   let currentSessionBaseText = baseText;
   let lastEmittedText = baseText;
+  let hadSpeech = false;
 
   const createAndStartRecognition = () => {
     if (!isActive) return;
 
     try {
       recognition = new SpeechRecognition();
-      recognition.continuous = true;
+      recognition.continuous = isContinuous;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
       recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
       recognition.onstart = () => {
-        onStatusChange('Listening...');
+        onStatusChange(isMobile ? '🎙️ Listening... Speak naturally (tap button when done)' : '🎙️ Listening... Speak naturally (supports punctuation & commands)');
       };
 
       recognition.onresult = (event) => {
@@ -288,6 +307,8 @@ export const startVoiceDictation = ({
           const rawChunk = res[0].transcript;
           const formattedChunk = formatSpokenPunctuation(rawChunk).trim();
           if (!formattedChunk) continue;
+
+          hadSpeech = true;
 
           if (res.isFinal) {
             cleanFinal = mergeBaseAndTranscript(cleanFinal, formattedChunk);
@@ -326,7 +347,11 @@ export const startVoiceDictation = ({
           setTimeout(() => onStatusChange(''), 4000);
           if (onEnd) onEnd();
         } else if (event.error === 'no-speech') {
-          onStatusChange('🎙️ Listening... (Paused - keep speaking)');
+          if (!isMobile) {
+            onStatusChange('🎙️ Listening... (Paused - keep speaking)');
+          } else {
+            onStatusChange('🎙️ Tap mic when ready to speak');
+          }
         } else if (event.error === 'aborted') {
           // Aborted manually or by stop()
         } else {
@@ -335,16 +360,31 @@ export const startVoiceDictation = ({
       };
 
       recognition.onend = () => {
+        // If mobile or single-utterance mode, do NOT automatically restart in a loop.
+        // This prevents the phone from playing repeated confirmation chimes.
+        if (isMobile || !isContinuous) {
+          isActive = false;
+          if (hadSpeech) {
+            onStatusChange('✨ Voice input captured!');
+          } else {
+            onStatusChange('');
+          }
+          setTimeout(() => onStatusChange(''), 3000);
+          if (onEnd) onEnd();
+          return;
+        }
+
+        // Desktop continuous mode restart logic (only if active and not excessive)
         if (isActive) {
           const now = Date.now();
-          if (now - lastRestartTime < 1000) {
+          if (now - lastRestartTime < 1500) {
             restartCount++;
           } else {
             restartCount = 0;
           }
           lastRestartTime = now;
 
-          if (restartCount < 10) {
+          if (restartCount < 3) {
             try {
               currentSessionBaseText = lastEmittedText;
               createAndStartRecognition();

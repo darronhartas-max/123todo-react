@@ -1718,6 +1718,10 @@ const SettingsModal = ({
                                         <div><kbd style={styles.kbdBadge}>"add task"</kbd> or <kbd style={styles.kbdBadge}>"submit task"</kbd></div>
                                         <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#10b981' }}>Strips command & automatically saves task!</span>
                                     </div>
+
+                                    <p style={{ margin: '14px 0 0 0', fontSize: '0.82rem', color: 'var(--muted-text)', borderTop: '1px solid var(--border-color)', paddingTop: '10px' }}>
+                                        💡 <strong>Mobile Friendly:</strong> On phones and tablets, dictation captures your phrase cleanly and concludes without triggering repetitive system confirmation chimes. Simply tap the mic again anytime to append more thoughts seamlessly!
+                                    </p>
                                 </div>
                             </div>
                         )}

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, CheckCircle, Mic, MicOff, ChevronDown, 
+  Folder, CheckCircle, Mic, ChevronDown, 
   ArrowUpRight, Check, Clock, Camera
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
@@ -649,8 +649,22 @@ const NoteCard = ({
             cursor: 'pointer'
           }}
         >
-          {isDictating ? <MicOff size={14} /> : <Mic size={14} color="#2563eb" />}
-          <span>{isDictating ? 'Stop Voice' : '+ Voice'}</span>
+          {isDictating ? (
+            <>
+              <span style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                background: '#ef4444',
+                boxShadow: '0 0 6px #ef4444',
+                animation: 'pulse 1s infinite'
+              }} />
+              <Mic size={14} color="#ef4444" />
+            </>
+          ) : (
+            <Mic size={14} color="#2563eb" />
+          )}
+          <span>{isDictating ? 'Listening...' : '+ Voice'}</span>
         </button>
 
         {/* Action Group: Make Task & Complete */}

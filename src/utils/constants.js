@@ -110,9 +110,13 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.4';
+export const APP_VERSION = '3.6.5';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.5': [
+    { title: '🎙️ User-Friendly Mobile Voice Dictation:', desc: 'Eliminated aggressive auto-restart loops on mobile phones, stopping repeated system confirmation beeps and chimes during natural speech pauses.' },
+    { title: '🔴 Clear Visual Recording Indicators:', desc: 'Replaced confusing muted/strikethrough mic icons with live glowing recording indicators, clear "Listening... (Tap to finish)" tooltips, and reassuring captured feedback.' }
+  ],
   '3.6.4': [
     { title: '📁 Full Project List in Task Edit:', desc: 'Task Edit modal dynamically elevates overflow when opening the projects dropdown, ensuring the complete project list displays without being cut off by the modal dialog boundary.' },
     { title: '📅 Single-Row Schedule Controls in Task Edit:', desc: 'Auto-sized scheduled date picker and aligned Next Day and Next Week quick buttons onto a single neat row without line-wrapping.' }

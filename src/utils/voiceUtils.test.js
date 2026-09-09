@@ -1,4 +1,4 @@
-import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands } from './voiceUtils';
+import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands, isMobileDevice, startVoiceDictation } from './voiceUtils';
 
 describe('voiceUtils - formatSpokenPunctuation', () => {
   test('formats spoken punctuation and capitalizes sentences correctly', () => {
@@ -116,3 +116,95 @@ describe('voiceUtils - processVoiceCommands', () => {
     expect(res11.isSubmitCommand).toBe(true);
   });
 });
+
+describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
+  test('isMobileDevice detects mobile user agents accurately', () => {
+    const originalUserAgent = navigator.userAgent;
+
+    // Simulate iPhone
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15',
+      configurable: true
+    });
+    expect(isMobileDevice()).toBe(true);
+
+    // Simulate Android
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36',
+      configurable: true
+    });
+    expect(isMobileDevice()).toBe(true);
+
+    // Simulate Desktop Chrome
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      configurable: true
+    });
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      value: 0,
+      configurable: true
+    });
+    expect(isMobileDevice()).toBe(false);
+
+    // Restore
+    Object.defineProperty(navigator, 'userAgent', {
+      value: originalUserAgent,
+      configurable: true
+    });
+  });
+
+  test('startVoiceDictation on mobile does not auto-restart on onend to prevent confirmation chimes', () => {
+    // Mock SpeechRecognition
+    const startMock = jest.fn();
+    const abortMock = jest.fn();
+    let instance = null;
+
+    class MockSpeechRecognition {
+      constructor() {
+        this.continuous = true;
+        this.interimResults = true;
+        this.start = startMock;
+        this.abort = abortMock;
+        this.stop = jest.fn();
+        instance = this;
+      }
+    }
+
+    window.SpeechRecognition = MockSpeechRecognition;
+
+    const onTranscript = jest.fn();
+    const onStatusChange = jest.fn();
+    const onEnd = jest.fn();
+
+    // Start with continuous: false (mobile mode)
+    const rec = startVoiceDictation({
+      initialText: '',
+      onTranscript,
+      onStatusChange,
+      onEnd,
+      continuous: false
+    });
+
+    expect(rec).not.toBeNull();
+    expect(startMock).toHaveBeenCalledTimes(1);
+
+    // Simulate transcript received
+    instance.onresult({
+      results: [
+        [{ transcript: 'Buy fresh bread' }]
+      ]
+    });
+    expect(onTranscript).toHaveBeenCalledWith('Buy fresh bread', false);
+
+    // Simulate utterance end on mobile
+    instance.onend();
+
+    // Should gracefully complete with confirmation and call onEnd, NOT restart!
+    expect(onStatusChange).toHaveBeenCalledWith('✨ Voice input captured!');
+    expect(onEnd).toHaveBeenCalled();
+    expect(startMock).toHaveBeenCalledTimes(1); // Crucial: did NOT call start() again!
+
+    delete window.SpeechRecognition;
+  });
+});
+

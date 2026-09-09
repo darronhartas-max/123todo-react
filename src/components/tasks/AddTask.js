@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, MicOff, ChevronDown, GripVertical } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
@@ -456,7 +456,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     <button
                         type="button"
                         onClick={() => toggleVoiceInput('title')}
-                        title={listeningTarget === 'title' ? "Stop Listening" : (speechSupported ? "Speak to add or append to task title" : "Voice input not supported")}
+                        title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to add or append to task title" : "Voice input not supported")}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -475,7 +475,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     >
                         {listeningTarget === 'title' ? (
                             <>
-                                <MicOff size={14} style={{ animation: 'pulse 1.2s infinite' }} />
+                                <span style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: '#ef4444',
+                                    boxShadow: '0 0 8px #ef4444',
+                                    animation: 'pulse 1s infinite'
+                                }} />
+                                <Mic size={14} color="#ef4444" />
                                 <span>Listening...</span>
                             </>
                         ) : (
@@ -500,18 +508,30 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             {voiceStatus && (
                 <div style={{
                     fontSize: '0.82rem',
-                    padding: '6px 10px',
-                    borderRadius: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
                     marginTop: '6px',
-                    marginBottom: '4px',
-                    background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'var(--accent-bg)',
-                    color: listeningTarget ? '#ef4444' : 'var(--accent-color)',
+                    marginBottom: '6px',
+                    background: listeningTarget ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.12)',
+                    color: listeningTarget ? '#ef4444' : '#15803d',
+                    border: `1px solid ${listeningTarget ? 'rgba(239, 68, 68, 0.25)' : 'rgba(34, 197, 94, 0.25)'}`,
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '8px',
+                    transition: 'all 0.2s ease'
                 }}>
-                    {voiceStatus}
+                    {listeningTarget && (
+                        <span style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            background: '#ef4444',
+                            boxShadow: '0 0 8px #ef4444',
+                            animation: 'pulse 1s infinite'
+                        }} />
+                    )}
+                    <span>{voiceStatus}</span>
                 </div>
             )}
 
@@ -563,7 +583,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         <button
                             type="button"
                             onClick={() => toggleVoiceInput('notes')}
-                            title={listeningTarget === 'notes' ? "Stop Listening" : (speechSupported ? "Speak to add/append notes" : "Voice input not supported")}
+                            title={listeningTarget === 'notes' ? "Listening - Tap to finish" : (speechSupported ? "Speak to add/append notes" : "Voice input not supported")}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -578,8 +598,25 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 fontWeight: '600'
                             }}
                         >
-                            {listeningTarget === 'notes' ? <MicOff size={12} style={{ animation: 'pulse 1.2s infinite' }} /> : <Mic size={12} color="var(--accent-color)" />}
-                            <span>{listeningTarget === 'notes' ? 'Listening...' : 'Voice Notes'}</span>
+                            {listeningTarget === 'notes' ? (
+                                <>
+                                    <span style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: '#ef4444',
+                                        boxShadow: '0 0 6px #ef4444',
+                                        animation: 'pulse 1s infinite'
+                                    }} />
+                                    <Mic size={12} color="#ef4444" />
+                                    <span>Listening...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Mic size={12} color="var(--accent-color)" />
+                                    <span>Voice Notes</span>
+                                </>
+                            )}
                         </button>
                     </div>
                     <textarea
