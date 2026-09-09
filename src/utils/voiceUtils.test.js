@@ -295,5 +295,69 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
 
     delete window.SpeechRecognition;
   });
+
+  test('startVoiceDictation on mobile concludes cleanly onend after speech without restart loops or chimes', () => {
+    const originalUserAgent = navigator.userAgent;
+
+    // Simulate iPhone
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15',
+      configurable: true
+    });
+
+    const startMock = jest.fn();
+    let instance = null;
+
+    class MockSpeechRecognition {
+      constructor() {
+        this.continuous = false;
+        this.interimResults = true;
+        this.start = startMock;
+        this.stop = jest.fn();
+        this.abort = jest.fn();
+        instance = this;
+      }
+    }
+
+    window.SpeechRecognition = MockSpeechRecognition;
+
+    const onTranscript = jest.fn();
+    const onStatusChange = jest.fn();
+    const onEnd = jest.fn();
+
+    const rec = startVoiceDictation({
+      initialText: '',
+      onTranscript,
+      onStatusChange,
+      onEnd
+    });
+
+    expect(rec).not.toBeNull();
+    expect(startMock).toHaveBeenCalledTimes(1);
+
+    // Simulate transcript received
+    instance.onresult({
+      results: [
+        [{ transcript: 'Buy milk and eggs' }]
+      ]
+    });
+    expect(onTranscript).toHaveBeenCalledWith('Buy milk and eggs', false);
+
+    // Mobile browser finishes utterance
+    instance.onend();
+
+    // On mobile, should NOT call startMock again (avoids hardware chime and deaf mic dead-zone)
+    expect(startMock).toHaveBeenCalledTimes(1);
+    expect(onEnd).toHaveBeenCalledTimes(1);
+    expect(onStatusChange).toHaveBeenCalledWith('✨ Captured! Tap mic to speak more.');
+
+    delete window.SpeechRecognition;
+
+    // Restore userAgent
+    Object.defineProperty(navigator, 'userAgent', {
+      value: originalUserAgent,
+      configurable: true
+    });
+  });
 });
 

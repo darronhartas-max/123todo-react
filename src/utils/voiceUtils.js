@@ -531,7 +531,8 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const isContinuous = continuous !== undefined ? continuous : true;
+  const isMobile = isMobileDevice();
+  const isContinuous = continuous !== undefined ? continuous : !isMobile;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -646,6 +647,23 @@ export const startVoiceDictation = ({
 
       recognition.onend = () => {
         if (!isActive) return;
+
+        // On mobile devices (iOS/Android), the OS speech recognizer finishes when the user stops speaking.
+        // Attempting to auto-restart recognition on mobile triggers the operating system's hardware chime
+        // after every pause and creates an audio ducking window where words spoken over the chime are permanently lost.
+        // Therefore, on mobile, when the utterance finishes, we cleanly conclude dictation.
+        if (isMobile) {
+          isActive = false;
+          if (silenceTimer) clearTimeout(silenceTimer);
+          if (hadSpeech) {
+            onStatusChange('✨ Captured! Tap mic to speak more.');
+          } else {
+            onStatusChange('');
+          }
+          setTimeout(() => onStatusChange(''), 4000);
+          if (onEnd) onEnd();
+          return;
+        }
 
         const timeSinceSpeech = Date.now() - lastSpeechTime;
 
