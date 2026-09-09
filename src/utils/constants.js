@@ -110,9 +110,12 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.7';
+export const APP_VERSION = '3.6.8';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.8': [
+    { title: '🎙️ Continuous Natural Dictation Across Thinking Pauses:', desc: 'Refined speech recognition engine to seamlessly remain listening across 2-3 second thinking pauses (up to 20 seconds of silence) without cutting off or requiring you to tap the record button again.' }
+  ],
   '3.6.7': [
     { title: '🎙️ Reliable Mobile Dictation without Chime Interruptions:', desc: 'Prevented audio interruption cycles and hardware chime loops on mobile phones when speech ends, ensuring words are captured completely without dropping spoken text during system tones.' }
   ],

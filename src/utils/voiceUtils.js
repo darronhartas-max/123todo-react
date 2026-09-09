@@ -531,8 +531,7 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const isMobile = isMobileDevice();
-  const isContinuous = continuous !== undefined ? continuous : !isMobile;
+  const isContinuous = continuous !== undefined ? continuous : true;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -544,15 +543,18 @@ export const startVoiceDictation = ({
   let hadSpeech = false;
   let lastSpeechTime = Date.now();
   let silenceTimer = null;
+  let restartTimer = null;
 
   const resetSilenceTimer = () => {
     if (silenceTimer) clearTimeout(silenceTimer);
     silenceTimer = setTimeout(() => {
       if (isActive) {
         isActive = false;
+        if (restartTimer) clearTimeout(restartTimer);
         if (recognition) {
           try { recognition.abort(); } catch {}
           try { recognition.stop(); } catch {}
+          recognition = null;
         }
         if (hadSpeech) {
           onStatusChange('✨ Voice input captured!');
@@ -565,8 +567,40 @@ export const startVoiceDictation = ({
     }, silenceTimeout);
   };
 
+  const scheduleRestart = (delay = 60) => {
+    if (!isActive) return;
+    if (restartTimer) clearTimeout(restartTimer);
+    restartTimer = setTimeout(() => {
+      if (!isActive) return;
+      try {
+        currentSessionBaseText = lastEmittedText;
+        createAndStartRecognition();
+      } catch (err) {
+        console.warn('Recognition restart attempt 1 failed:', err);
+        if (isActive) {
+          restartTimer = setTimeout(() => {
+            if (isActive) {
+              try {
+                currentSessionBaseText = lastEmittedText;
+                createAndStartRecognition();
+              } catch (e) {
+                console.error('Recognition restart attempt 2 failed:', e);
+              }
+            }
+          }, 200);
+        }
+      }
+    }, delay);
+  };
+
   const createAndStartRecognition = () => {
     if (!isActive) return;
+
+    // Clean up any stale recognition instance before starting fresh
+    if (recognition) {
+      try { recognition.abort(); } catch {}
+      recognition = null;
+    }
 
     try {
       recognition = new SpeechRecognition();
@@ -576,7 +610,7 @@ export const startVoiceDictation = ({
       recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
       recognition.onstart = () => {
-        onStatusChange('🎙️ Listening... Speak naturally (tap button when done)');
+        onStatusChange('🎙️ Listening... (Tap mic when done)');
         resetSilenceTimer();
       };
 
@@ -617,9 +651,11 @@ export const startVoiceDictation = ({
         if (isSubmitCommand) {
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
+          if (restartTimer) clearTimeout(restartTimer);
           if (recognition) {
             try { recognition.abort(); } catch {}
             try { recognition.stop(); } catch {}
+            recognition = null;
           }
         }
 
@@ -628,49 +664,35 @@ export const startVoiceDictation = ({
       };
 
       recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          console.error('Speech recognition permission error:', event.error);
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
+          if (restartTimer) clearTimeout(restartTimer);
           onStatusChange('⚠️ Microphone permission denied.');
           setTimeout(() => onStatusChange(''), 4000);
           if (onEnd) onEnd();
         } else if (event.error === 'no-speech') {
-          // Keep listening during pauses - don't cancel prematurely
-          onStatusChange('🎙️ Listening... (Tap button when done)');
+          // Expected during natural thinking pauses - don't cancel dictation!
+          onStatusChange('🎙️ Listening... (Tap mic when done)');
         } else if (event.error === 'aborted') {
-          // Aborted manually or by stop()
+          // Normal when switching sessions or stopping
         } else {
-          onStatusChange(`Voice status: ${event.error}`);
+          console.warn('Speech recognition non-fatal error:', event.error);
+          onStatusChange('🎙️ Listening... (Tap mic when done)');
         }
       };
 
       recognition.onend = () => {
         if (!isActive) return;
 
-        // On mobile devices (iOS/Android), the OS speech recognizer finishes when the user stops speaking.
-        // Attempting to auto-restart recognition on mobile triggers the operating system's hardware chime
-        // after every pause and creates an audio ducking window where words spoken over the chime are permanently lost.
-        // Therefore, on mobile, when the utterance finishes, we cleanly conclude dictation.
-        if (isMobile) {
-          isActive = false;
-          if (silenceTimer) clearTimeout(silenceTimer);
-          if (hadSpeech) {
-            onStatusChange('✨ Captured! Tap mic to speak more.');
-          } else {
-            onStatusChange('');
-          }
-          setTimeout(() => onStatusChange(''), 4000);
-          if (onEnd) onEnd();
-          return;
-        }
-
         const timeSinceSpeech = Date.now() - lastSpeechTime;
 
-        // If the user hasn't spoken for silenceTimeout (e.g. 8s), finish dictation cleanly
+        // If the user has been silent for the full silence timeout (e.g. 20s), finish cleanly
         if (timeSinceSpeech >= silenceTimeout) {
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
+          if (restartTimer) clearTimeout(restartTimer);
           if (hadSpeech) {
             onStatusChange('✨ Voice input captured!');
           } else {
@@ -681,27 +703,16 @@ export const startVoiceDictation = ({
           return;
         }
 
-        // Otherwise, browser speech recognition closed due to a brief pause,
-        // but the user is still in active dictation mode: smoothly reconnect to keep listening!
-        try {
-          currentSessionBaseText = lastEmittedText;
-          createAndStartRecognition();
-        } catch (e) {
-          console.warn('Failed to restart speech recognition:', e);
-          isActive = false;
-          if (silenceTimer) clearTimeout(silenceTimer);
-          if (onEnd) onEnd();
-        }
+        // Keep listening across pauses: schedule immediate smooth restart
+        scheduleRestart(50);
       };
 
       recognition.start();
     } catch (e) {
-      console.error('Failed to initialize speech recognition:', e);
-      isActive = false;
-      if (silenceTimer) clearTimeout(silenceTimer);
-      onStatusChange('Voice recognition error.');
-      setTimeout(() => onStatusChange(''), 3000);
-      if (onEnd) onEnd();
+      console.warn('Failed to start speech recognition, retrying:', e);
+      if (isActive) {
+        scheduleRestart(150);
+      }
     }
   };
 
@@ -711,9 +722,11 @@ export const startVoiceDictation = ({
     stop: () => {
       isActive = false;
       if (silenceTimer) clearTimeout(silenceTimer);
+      if (restartTimer) clearTimeout(restartTimer);
       if (recognition) {
         try { recognition.abort(); } catch {}
         try { recognition.stop(); } catch {}
+        recognition = null;
       }
       if (hadSpeech) {
         onStatusChange('✨ Voice input captured!');
