@@ -415,8 +415,8 @@ export const processVoiceCommands = (text) => {
     replaceWordRegex.lastIndex = 0;
   }
 
-  // 5. Process "delete last sentence" / "scratch last sentence" / "delete sentence" / "undo sentence"
-  const deleteSentenceRegex = /\b(delete|scratch|remove|undo)\s+(the\s+|last\s+)?sentence\b[.,?!]*/gi;
+  // 5. Process "delete (the) (last/previous) sentence" / "scratch last sentence" / "undo sentence"
+  const deleteSentenceRegex = /\b(delete|scratch|remove|undo)\s+(?:the\s+)?(?:last\s+|previous\s+)?sentence\b[.,?!]*/gi;
   while ((match = deleteSentenceRegex.exec(processed)) !== null) {
     const matchPos = match.index;
     const beforeMatch = processed.substring(0, matchPos).trim();
@@ -437,8 +437,8 @@ export const processVoiceCommands = (text) => {
     deleteSentenceRegex.lastIndex = 0;
   }
 
-  // 6. Process "delete last line" / "scratch last line" / "delete line"
-  const deleteLineRegex = /\b(delete|scratch|remove|undo)\s+(the\s+|last\s+)?line\b[.,?!]*/gi;
+  // 6. Process "delete (the) (last/previous) line" / "scratch last line" / "delete line"
+  const deleteLineRegex = /\b(delete|scratch|remove|undo)\s+(?:the\s+)?(?:last\s+|previous\s+)?line\b[.,?!]*/gi;
   while ((match = deleteLineRegex.exec(processed)) !== null) {
     const matchPos = match.index;
     const beforeMatch = processed.substring(0, matchPos);
@@ -453,16 +453,33 @@ export const processVoiceCommands = (text) => {
     deleteLineRegex.lastIndex = 0;
   }
 
-  // 7. Process "delete last N words" (e.g., "delete last 2 words", "delete last 3 words")
-  const deleteNRegex = /\bdelete\s+last\s+(\d+|one|two|three|four|five)\s+words?\b/gi;
-  processed = processed.replace(deleteNRegex, (m, numStr) => {
-    const wordMap = { one: 1, two: 2, three: 3, four: 4, five: 5 };
-    const count = parseInt(numStr, 10) || wordMap[numStr.toLowerCase()] || 1;
+  const WORD_COUNT_MAP = {
+    one: 1, won: 1,
+    two: 2, to: 2, too: 2,
+    three: 3,
+    four: 4, for: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8, ate: 8,
+    nine: 9,
+    ten: 10,
+    couple: 2, 'couple of': 2, 'a couple': 2, 'a couple of': 2,
+    few: 3, 'a few': 3
+  };
+
+  // 7. Process "delete (the) (last/previous) N words"
+  // Supports: "delete the last 2 words", "delete last two words", "scratch the last 2 words", "delete the last two", "delete 2 words", etc.
+  const deleteNRegex = /\b(delete|remove|scratch|erase|undo)\s+(?:the\s+)?(?:last\s+|previous\s+)?(\d+|one|won|two|to|too|three|four|for|five|six|seven|eight|ate|nine|ten|a\s+couple\s+of|couple\s+of|a\s+couple|couple|a\s+few|few)(?:\s+words?)?\b[.,?!]*/gi;
+  processed = processed.replace(deleteNRegex, (m, verb, countStr) => {
+    const cleanCount = (countStr || '').toLowerCase().trim();
+    const count = parseInt(cleanCount, 10) || WORD_COUNT_MAP[cleanCount] || 1;
     return `__DEL_${count}__`;
   });
 
-  // 8. Process "delete last word", "scratch that", "undo that"
-  processed = processed.replace(/\b(delete\s+last\s+word|scratch\s+that|undo\s+that)\b/gi, '__DEL_1__');
+  // 8. Process "delete (the) (last/previous/that) word", "scratch that", "undo that"
+  const deleteSingleWordRegex = /\b(delete|remove|scratch|erase|undo)\s+(?:the\s+|this\s+|that\s+)?(?:last\s+|previous\s+)?words?\b[.,?!]*|\b(scratch\s+that|undo\s+that)\b[.,?!]*/gi;
+  processed = processed.replace(deleteSingleWordRegex, '__DEL_1__');
 
   // Perform deletion of previous N words for each __DEL_N__ marker
   while (processed.includes('__DEL_')) {
@@ -471,7 +488,10 @@ export const processVoiceCommands = (text) => {
     if (!markerMatch) break;
     const numToDelete = parseInt(markerMatch[1], 10) || 1;
     const beforeMarker = processed.substring(0, matchPos).trim();
-    const afterMarker = processed.substring(matchPos + markerMatch[0].length).trim();
+    let afterMarker = processed.substring(matchPos + markerMatch[0].length).trim();
+
+    // Clean leading punctuation left behind after deletion command
+    afterMarker = afterMarker.replace(/^[,:;\s]+/, '').trim();
 
     const words = beforeMarker.split(/\s+/).filter(Boolean);
     const remainingWords = words.slice(0, Math.max(0, words.length - numToDelete));

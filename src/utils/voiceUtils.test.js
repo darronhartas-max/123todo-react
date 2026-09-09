@@ -69,15 +69,49 @@ describe('voiceUtils - processVoiceCommands', () => {
   test('handles spoken deletion commands (delete last word, scratch that)', () => {
     expect(processVoiceCommands('buy milk and bread scratch that wholemeal').text).toBe('buy milk and wholemeal');
     expect(processVoiceCommands('call John tomorrow delete last word').text).toBe('call John');
-    expect(processVoiceCommands('buy milk and bread delete last 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('call John tomorrow delete the last word').text).toBe('call John');
     expect(processVoiceCommands('buy milk clear all').text).toBe('');
+  });
+
+  test('handles spoken N words deletion with all natural phrasing variations', () => {
+    // "delete the last 2 words" vs "delete last 2 words"
+    expect(processVoiceCommands('buy milk and bread delete last 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last two words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete last two words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete two words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last two').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete last two').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete last 2').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last 2').text).toBe('buy milk');
+
+    // With attached period (e.g. from speech engine)
+    expect(processVoiceCommands('buy milk and bread delete last 2 words.').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last 2 words.').text).toBe('buy milk');
+
+    // Homophones ("to", "too")
+    expect(processVoiceCommands('buy milk and bread delete last to words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last too words').text).toBe('buy milk');
+
+    // Synonyms ("remove", "scratch", "erase", "undo", "couple", "few")
+    expect(processVoiceCommands('buy milk and bread remove the last 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread scratch the last two words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread erase last 2 words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete the last couple of words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk and bread delete last couple words').text).toBe('buy milk');
+    expect(processVoiceCommands('buy milk bread and eggs delete a few words').text).toBe('buy milk');
   });
 
   test('handles spoken sentence and line deletion commands (delete last sentence, delete last line)', () => {
     expect(processVoiceCommands('Buy milk and bread. Call John tomorrow delete last sentence').text).toBe('Buy milk and bread.');
+    expect(processVoiceCommands('Buy milk and bread. Call John tomorrow delete the last sentence').text).toBe('Buy milk and bread.');
     expect(processVoiceCommands('Buy milk and bread. Call John tomorrow. scratch last sentence').text).toBe('Buy milk and bread.');
+    expect(processVoiceCommands('Buy milk and bread. Call John tomorrow. scratch the last sentence').text).toBe('Buy milk and bread.');
     expect(processVoiceCommands('Call John tomorrow delete last sentence').text).toBe('');
+    expect(processVoiceCommands('Call John tomorrow delete the last sentence').text).toBe('');
     expect(processVoiceCommands('First line\nSecond line delete last line').text).toBe('First line');
+    expect(processVoiceCommands('First line\nSecond line delete the last line').text).toBe('First line');
   });
 
   test('handles spoken word replacement commands (change last word to, replace X with Y)', () => {
