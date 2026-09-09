@@ -153,7 +153,7 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     });
   });
 
-  test('startVoiceDictation on mobile does not auto-restart on onend to prevent confirmation chimes', () => {
+  test('startVoiceDictation keeps listening across brief pauses until user stops or silenceTimeout expires', () => {
     // Mock SpeechRecognition
     const startMock = jest.fn();
     const abortMock = jest.fn();
@@ -176,13 +176,13 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     const onStatusChange = jest.fn();
     const onEnd = jest.fn();
 
-    // Start with continuous: false (mobile mode)
+    // Start voice dictation with 8s silence timeout
     const rec = startVoiceDictation({
       initialText: '',
       onTranscript,
       onStatusChange,
       onEnd,
-      continuous: false
+      silenceTimeout: 8000
     });
 
     expect(rec).not.toBeNull();
@@ -196,13 +196,18 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     });
     expect(onTranscript).toHaveBeenCalledWith('Buy fresh bread', false);
 
-    // Simulate utterance end on mobile
+    // Simulate brief pause (onend fires while still within silenceTimeout)
     instance.onend();
 
-    // Should gracefully complete with confirmation and call onEnd, NOT restart!
+    // Should seamlessly keep listening across pause
+    expect(startMock).toHaveBeenCalledTimes(2);
+    expect(onEnd).not.toHaveBeenCalled();
+
+    // User explicitly stops listening (e.g. taps button to finish)
+    rec.stop();
+
     expect(onStatusChange).toHaveBeenCalledWith('✨ Voice input captured!');
     expect(onEnd).toHaveBeenCalled();
-    expect(startMock).toHaveBeenCalledTimes(1); // Crucial: did NOT call start() again!
 
     delete window.SpeechRecognition;
   });

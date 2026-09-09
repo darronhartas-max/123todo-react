@@ -66,4 +66,26 @@ describe('NoteCard', () => {
     expect(emailChip).toBeInTheDocument();
     expect(emailChip).toHaveAttribute('href', 'mailto:quote@plumbing.co.uk');
   });
+
+  test('displays note text in multi-line textarea and shows prominent Dictate at End button in edit mode', () => {
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText(/Send quote to/i));
+
+    // Note title/content must be a textarea (not a single-line input) so it is not truncated
+    const titleTextarea = screen.getByPlaceholderText('Note Title...');
+    expect(titleTextarea).toBeInTheDocument();
+    expect(titleTextarea.tagName).toBe('TEXTAREA');
+
+    // Prominent "Dictate at End" button should be easily located in edit mode
+    const dictateBtn = screen.getByRole('button', { name: /Dictate at End/i });
+    expect(dictateBtn).toBeInTheDocument();
+  });
 });

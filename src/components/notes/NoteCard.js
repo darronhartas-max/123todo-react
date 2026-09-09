@@ -29,11 +29,31 @@ const NoteCard = ({
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isDictating, setIsDictating] = useState(false);
+  const [isDictatingTitle, setIsDictatingTitle] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   
   const recognitionRef = useRef(null);
+  const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
+  const titleTextareaRef = useRef(null);
   const noteViewBodyRef = useRef(null);
+
+  // Keep title textarea auto-expanded to fit content without truncation
+  useEffect(() => {
+    if (titleTextareaRef.current) {
+      const el = titleTextareaRef.current;
+      el.style.height = 'auto';
+      const targetHeight = Math.max(el.scrollHeight, 46);
+      el.style.height = `${targetHeight}px`;
+
+      if (isDictatingTitle) {
+        el.scrollTop = el.scrollHeight;
+        try {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
+      }
+    }
+  }, [titleText, isEditing, isDictatingTitle]);
 
   // Keep latest spoken lines visible at all times during dictation / editing
   useEffect(() => {
@@ -88,6 +108,10 @@ const NoteCard = ({
         try { recognitionRef.current.stop(); } catch (e) {}
         recognitionRef.current = null;
       }
+      if (titleRecognitionRef.current) {
+        try { titleRecognitionRef.current.stop(); } catch (e) {}
+        titleRecognitionRef.current = null;
+      }
     };
   }, []);
 
@@ -96,7 +120,12 @@ const NoteCard = ({
       try { recognitionRef.current.stop(); } catch (e) {}
       recognitionRef.current = null;
     }
+    if (titleRecognitionRef.current) {
+      try { titleRecognitionRef.current.stop(); } catch (e) {}
+      titleRecognitionRef.current = null;
+    }
     setIsDictating(false);
+    setIsDictatingTitle(false);
 
     setIsEditing(false);
     onUpdateNote(note.id, {
@@ -104,6 +133,63 @@ const NoteCard = ({
       notes: notesText.trim(),
       subtasks
     });
+  };
+
+  const handleToggleTitleDictation = (e) => {
+    if (e) e.stopPropagation();
+    if (isDictatingTitle) {
+      if (titleRecognitionRef.current) {
+        try { titleRecognitionRef.current.stop(); } catch (e) {}
+        titleRecognitionRef.current = null;
+      }
+      setIsDictatingTitle(false);
+      return;
+    }
+
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (e) {}
+      recognitionRef.current = null;
+      setIsDictating(false);
+    }
+
+    if (!isSpeechRecognitionSupported()) {
+      setStatusMessage('Voice input is not supported');
+      setTimeout(() => setStatusMessage(''), 3000);
+      return;
+    }
+
+    setIsDictatingTitle(true);
+    const initialNoteTitle = titleText;
+
+    titleRecognitionRef.current = startVoiceDictation({
+      initialText: initialNoteTitle,
+      onTranscript: (updatedText, isSubmitCommand) => {
+        if (isSubmitCommand) {
+          if (titleRecognitionRef.current) {
+            try { titleRecognitionRef.current.stop(); } catch (e) {}
+            titleRecognitionRef.current = null;
+          }
+          setIsDictatingTitle(false);
+        } else {
+          setTitleText(updatedText);
+          onUpdateNote(note.id, { text: updatedText });
+        }
+      },
+      onStatusChange: (msg) => setStatusMessage(msg),
+      onEnd: () => {
+        setIsDictatingTitle(false);
+        titleRecognitionRef.current = null;
+      }
+    });
+
+    // Move cursor to end of textarea
+    setTimeout(() => {
+      if (titleTextareaRef.current) {
+        titleTextareaRef.current.focus();
+        const len = titleTextareaRef.current.value.length;
+        titleTextareaRef.current.setSelectionRange(len, len);
+      }
+    }, 100);
   };
 
   const handleToggleDictation = (e) => {
@@ -115,6 +201,12 @@ const NoteCard = ({
       }
       setIsDictating(false);
       return;
+    }
+
+    if (titleRecognitionRef.current) {
+      try { titleRecognitionRef.current.stop(); } catch (e) {}
+      titleRecognitionRef.current = null;
+      setIsDictatingTitle(false);
     }
 
     if (!isSpeechRecognitionSupported()) {
@@ -141,7 +233,10 @@ const NoteCard = ({
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),
-      onEnd: () => setIsDictating(false)
+      onEnd: () => {
+        setIsDictating(false);
+        recognitionRef.current = null;
+      }
     });
   };
 
@@ -299,21 +394,87 @@ const NoteCard = ({
       <div style={{ cursor: isEditing ? 'default' : 'pointer' }} onClick={() => !isEditing && setIsEditing(true)}>
         {isEditing ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <input
-              type="text"
+            {/* Header toolbar for editing note text with prominent Dictate button */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+              flexWrap: 'wrap'
+            }}>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: '700',
+                color: 'var(--text-secondary, #6b7280)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Note / Task Text
+              </span>
+
+              {/* Prominent Dictate at End Record Button */}
+              <button
+                type="button"
+                onClick={handleToggleTitleDictation}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  borderRadius: '10px',
+                  border: `1.5px solid ${isDictatingTitle ? '#ef4444' : '#2563eb'}`,
+                  backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.1)',
+                  color: isDictatingTitle ? '#ef4444' : '#2563eb',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: isDictatingTitle ? '0 0 10px rgba(239, 68, 68, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  transition: 'all 0.15s ease'
+                }}
+                title={isDictatingTitle ? "Tap to stop listening" : "Begin dictating at the end of this note"}
+              >
+                {isDictatingTitle ? (
+                  <>
+                    <span style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: '#ef4444',
+                      boxShadow: '0 0 8px #ef4444',
+                      display: 'inline-block',
+                      animation: 'pulse 1s infinite'
+                    }} />
+                    <Mic size={15} color="#ef4444" />
+                    <span>Listening... (Tap to Stop)</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic size={15} color="#2563eb" />
+                    <span>🎙️ Dictate at End</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <textarea
+              ref={titleTextareaRef}
               value={titleText}
               onChange={(e) => setTitleText(e.target.value)}
               placeholder="Note Title..."
+              rows={2}
               style={{
-                fontSize: '18px',
+                fontSize: '17px',
                 fontWeight: '700',
-                padding: '8px 12px',
+                padding: '10px 12px',
                 borderRadius: '8px',
-                border: '1px solid #2563eb',
+                border: '1.5px solid #2563eb',
                 backgroundColor: 'var(--item-bg, #f9fafb)',
                 color: 'var(--text-color, #111827)',
                 outline: 'none',
-                width: '100%'
+                width: '100%',
+                resize: 'none',
+                lineHeight: 1.45,
+                boxSizing: 'border-box'
               }}
               autoFocus
             />
@@ -605,7 +766,7 @@ const NoteCard = ({
       </div>
 
       {/* Dictation Status Bar if Active */}
-      {(isDictating || statusMessage) && (
+      {(isDictating || isDictatingTitle || statusMessage) && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
