@@ -26,7 +26,9 @@ export const formatSpokenPunctuation = (text) => {
     .replace(/\b(exclamation\s*(marks?|points?)|exclamationmark|exclamationpoint)\b/gi, '!')
     .replace(/\b(colons?)\b/gi, ':')
     .replace(/\b(semi\s*colons?|semicolon|semi-colon)\b/gi, ';')
-    .replace(/\b(new\s*lines?|newlines?|new\s*paragraphs?|paragraphs?)\b/gi, '\n')
+    .replace(/\s*\b(new\s*paragraphs?|next\s*paragraphs?)\b\s*/gi, '\n\n')
+    .replace(/\s*\b(new\s*lines?|newlines?|next\s*lines?)\b\s*/gi, '\n')
+    .replace(/\s*\b(bullet\s*points?|bullet)\b\s*/gi, '\n- ')
     .replace(/\b(dash|hyphen)\b/gi, ' - ');
 
   // Fix spacing around punctuation: remove space before punctuation marks, ensure space after punctuation marks if followed by text
@@ -205,15 +207,98 @@ export const processVoiceCommands = (text) => {
     return { text: '', isSubmitCommand: false };
   }
 
-  // 3. Process "delete last N words" (e.g., "delete last 2 words", "delete last 3 words")
+  // 3. Process "change last word to [X]" / "replace last word with [X]" / "correct last word to [X]"
+  const replaceLastWordRegex = /\b(change|replace|correct)\s+(the\s+)?last\s+word\s+(to|with)\s+([a-zA-Z0-9'-]+)\b[.,?!]*/gi;
+  let match;
+  while ((match = replaceLastWordRegex.exec(processed)) !== null) {
+    const matchPos = match.index;
+    const replacementWord = match[4];
+    const beforeMatch = processed.substring(0, matchPos).trim();
+    const afterMatch = processed.substring(matchPos + match[0].length).trim();
+
+    const words = beforeMatch.split(/\s+/).filter(Boolean);
+    if (words.length > 0) {
+      const lastWord = words[words.length - 1];
+      const puncMatch = lastWord.match(/([.,?!:;]+)$/);
+      const trailingPunc = puncMatch ? puncMatch[1] : '';
+      words[words.length - 1] = replacementWord + trailingPunc;
+      const newBefore = words.join(' ');
+      processed = newBefore ? (afterMatch ? `${newBefore} ${afterMatch}` : newBefore) : afterMatch;
+    } else {
+      processed = replacementWord + (afterMatch ? ` ${afterMatch}` : '');
+    }
+    replaceLastWordRegex.lastIndex = 0;
+  }
+
+  // 4. Process "change [wordA] to [wordB]" / "replace [wordA] with [wordB]"
+  const replaceWordRegex = /\b(change|replace|correct)\s+([a-zA-Z0-9'-]+)\s+(to|with)\s+([a-zA-Z0-9'-]+)\b[.,?!]*/gi;
+  while ((match = replaceWordRegex.exec(processed)) !== null) {
+    const wordA = match[2];
+    const wordB = match[4];
+    // Skip if wordA is a reserved keyword in other commands
+    if (/^(the|last|sentence|line|word|words|paragraph|all)$/i.test(wordA)) {
+      break;
+    }
+    const matchPos = match.index;
+    const beforeMatch = processed.substring(0, matchPos);
+    const afterMatch = processed.substring(matchPos + match[0].length).trim();
+
+    // Replace the last occurrence of wordA in beforeMatch (case-insensitive)
+    const wordARegex = new RegExp(`\\b${wordA}\\b(?=[^\\b]*$)`, 'i');
+    if (wordARegex.test(beforeMatch)) {
+      const newBefore = beforeMatch.replace(wordARegex, wordB).trim();
+      processed = newBefore ? (afterMatch ? `${newBefore} ${afterMatch}` : newBefore) : afterMatch;
+    }
+    replaceWordRegex.lastIndex = 0;
+  }
+
+  // 5. Process "delete last sentence" / "scratch last sentence" / "delete sentence" / "undo sentence"
+  const deleteSentenceRegex = /\b(delete|scratch|remove|undo)\s+(the\s+|last\s+)?sentence\b[.,?!]*/gi;
+  while ((match = deleteSentenceRegex.exec(processed)) !== null) {
+    const matchPos = match.index;
+    const beforeMatch = processed.substring(0, matchPos).trim();
+    const afterMatch = processed.substring(matchPos + match[0].length).trim();
+
+    const trimmedBefore = beforeMatch.replace(/[.?!]+$/, '');
+    const lastTerminatorIndex = Math.max(
+      trimmedBefore.lastIndexOf('.'),
+      trimmedBefore.lastIndexOf('?'),
+      trimmedBefore.lastIndexOf('!')
+    );
+
+    let newBefore = '';
+    if (lastTerminatorIndex !== -1) {
+      newBefore = beforeMatch.substring(0, lastTerminatorIndex + 1).trim();
+    }
+    processed = newBefore ? (afterMatch ? `${newBefore} ${afterMatch}` : newBefore) : afterMatch;
+    deleteSentenceRegex.lastIndex = 0;
+  }
+
+  // 6. Process "delete last line" / "scratch last line" / "delete line"
+  const deleteLineRegex = /\b(delete|scratch|remove|undo)\s+(the\s+|last\s+)?line\b[.,?!]*/gi;
+  while ((match = deleteLineRegex.exec(processed)) !== null) {
+    const matchPos = match.index;
+    const beforeMatch = processed.substring(0, matchPos);
+    const afterMatch = processed.substring(matchPos + match[0].length).trim();
+
+    const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
+    let newBefore = '';
+    if (lastNewlineIndex !== -1) {
+      newBefore = beforeMatch.substring(0, lastNewlineIndex).trimEnd();
+    }
+    processed = newBefore ? (afterMatch ? `${newBefore} ${afterMatch}` : newBefore) : afterMatch;
+    deleteLineRegex.lastIndex = 0;
+  }
+
+  // 7. Process "delete last N words" (e.g., "delete last 2 words", "delete last 3 words")
   const deleteNRegex = /\bdelete\s+last\s+(\d+|one|two|three|four|five)\s+words?\b/gi;
-  processed = processed.replace(deleteNRegex, (match, numStr) => {
+  processed = processed.replace(deleteNRegex, (m, numStr) => {
     const wordMap = { one: 1, two: 2, three: 3, four: 4, five: 5 };
     const count = parseInt(numStr, 10) || wordMap[numStr.toLowerCase()] || 1;
     return `__DEL_${count}__`;
   });
 
-  // 4. Process "delete last word", "scratch that", "undo that"
+  // 8. Process "delete last word", "scratch that", "undo that"
   processed = processed.replace(/\b(delete\s+last\s+word|scratch\s+that|undo\s+that)\b/gi, '__DEL_1__');
 
   // Perform deletion of previous N words for each __DEL_N__ marker

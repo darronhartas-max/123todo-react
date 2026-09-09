@@ -7,6 +7,8 @@ describe('voiceUtils - formatSpokenPunctuation', () => {
     expect(formatSpokenPunctuation('buy milk dot call John')).toBe('buy milk. Call John');
     expect(formatSpokenPunctuation('is task done question mark yes exclamation mark')).toBe('is task done? Yes!');
     expect(formatSpokenPunctuation('is task done questionmark yes exclamationpoint')).toBe('is task done? Yes!');
+    expect(formatSpokenPunctuation('first thought new paragraph second thought')).toBe('first thought\n\nsecond thought');
+    expect(formatSpokenPunctuation('to do list bullet point buy milk')).toBe('to do list\n- buy milk');
   });
 });
 
@@ -69,6 +71,20 @@ describe('voiceUtils - processVoiceCommands', () => {
     expect(processVoiceCommands('call John tomorrow delete last word').text).toBe('call John');
     expect(processVoiceCommands('buy milk and bread delete last 2 words').text).toBe('buy milk');
     expect(processVoiceCommands('buy milk clear all').text).toBe('');
+  });
+
+  test('handles spoken sentence and line deletion commands (delete last sentence, delete last line)', () => {
+    expect(processVoiceCommands('Buy milk and bread. Call John tomorrow delete last sentence').text).toBe('Buy milk and bread.');
+    expect(processVoiceCommands('Buy milk and bread. Call John tomorrow. scratch last sentence').text).toBe('Buy milk and bread.');
+    expect(processVoiceCommands('Call John tomorrow delete last sentence').text).toBe('');
+    expect(processVoiceCommands('First line\nSecond line delete last line').text).toBe('First line');
+  });
+
+  test('handles spoken word replacement commands (change last word to, replace X with Y)', () => {
+    expect(processVoiceCommands('Meeting with Jon change last word to John').text).toBe('Meeting with John');
+    expect(processVoiceCommands('Buy organic melk. replace last word with milk').text).toBe('Buy organic milk.');
+    expect(processVoiceCommands('Call Dave tomorrow at noon change Dave to David').text).toBe('Call David tomorrow at noon');
+    expect(processVoiceCommands('Buy apples and oranges replace apples with pears').text).toBe('Buy pears and oranges');
   });
 
   test('detects spoken auto-submit commands (add task, add note) and appends full stop', () => {

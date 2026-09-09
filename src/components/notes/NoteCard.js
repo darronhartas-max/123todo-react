@@ -462,6 +462,9 @@ const NoteCard = ({
               onChange={(e) => setTitleText(e.target.value)}
               placeholder="Note Title..."
               rows={2}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
               style={{
                 fontSize: '17px',
                 fontWeight: '700',
@@ -485,6 +488,9 @@ const NoteCard = ({
               onChange={(e) => setNotesText(e.target.value)}
               placeholder="Write note details or dictation..."
               rows={3}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
               style={{
                 fontSize: '16px',
                 padding: '10px 12px',

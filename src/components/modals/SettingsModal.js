@@ -1706,6 +1706,18 @@ const SettingsModal = ({
                                             <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Removes N words from input</span>
                                         </div>
                                         <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"delete last sentence"</kbd> or <kbd style={styles.kbdBadge}>"scratch last sentence"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Deletes the most recent sentence</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"change last word to [word]"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Replaces the previous word with your correction</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
+                                            <div><kbd style={styles.kbdBadge}>"change [wordA] to [wordB]"</kbd></div>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Replaces any prior word with a new one</span>
+                                        </div>
+                                        <div style={styles.voiceGuideRow}>
                                             <div><kbd style={styles.kbdBadge}>"clear all"</kbd> or <kbd style={styles.kbdBadge}>"delete all"</kbd></div>
                                             <span style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>Clears the entire text field</span>
                                         </div>
