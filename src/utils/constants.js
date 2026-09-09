@@ -110,9 +110,13 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.3';
+export const APP_VERSION = '3.6.4';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.4': [
+    { title: '📁 Full Project List in Task Edit:', desc: 'Task Edit modal dynamically elevates overflow when opening the projects dropdown, ensuring the complete project list displays without being cut off by the modal dialog boundary.' },
+    { title: '📅 Single-Row Schedule Controls in Task Edit:', desc: 'Auto-sized scheduled date picker and aligned Next Day and Next Week quick buttons onto a single neat row without line-wrapping.' }
+  ],
   '3.6.3': [
     { title: '🎨 Spectrum Project Palette & Auto-Migration:', desc: 'Reorganized project color palette into a 20-color natural spectrum across 2 lines of 10, avoiding master priority colors, with seamless auto-migration for existing projects and tasks.' },
     { title: '📅 Single-Row Schedule Date Controls:', desc: 'Optimized date picker width in Add Task and aligned Next Day and Next Week quick-schedule buttons onto a single neat row.' },

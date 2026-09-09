@@ -161,4 +161,63 @@ describe('EditModal', () => {
     expect(webLink).toBeInTheDocument();
     expect(webLink).toHaveAttribute('href', 'https://123todo.com');
   });
+
+  test('sets scheduled date to next week when Next Week button is clicked', () => {
+    const onSaveMock = jest.fn();
+    render(
+      <EditModal
+        task={sampleTaskWithNotes}
+        onSave={onSaveMock}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    // Open schedule section by clicking Schedule button
+    const scheduleToggle = screen.getByRole('button', { name: /Schedule/i });
+    fireEvent.click(scheduleToggle);
+
+    // Next Week button should be present on the same line
+    const nextWeekButton = screen.getByRole('button', { name: /Next Week/i });
+    expect(nextWeekButton).toBeInTheDocument();
+    fireEvent.click(nextWeekButton);
+
+    // Save and verify scheduledDate is set
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+    expect(onSaveMock).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        scheduledDate: expect.any(String)
+      })
+    );
+  });
+
+  test('displays all project options when opening project dropdown in edit modal', () => {
+    const manyProjects = [
+      { id: 'general', name: 'General', color: '#6b7280' },
+      { id: 'work', name: 'Work', color: '#3b82f6' },
+      { id: 'p3', name: 'Project 3', color: '#10b981' },
+      { id: 'p4', name: 'Project 4', color: '#f59e0b' },
+      { id: 'p5', name: 'Project 5', color: '#8b5cf6' }
+    ];
+
+    render(
+      <EditModal
+        task={sampleTaskWithNotes}
+        onSave={jest.fn()}
+        onClose={jest.fn()}
+        projects={manyProjects}
+      />
+    );
+
+    // Click project dropdown button to open
+    const projectButton = screen.getByRole('button', { name: /General/i });
+    fireEvent.click(projectButton);
+
+    // All projects should be visible and rendered in the dropdown
+    expect(screen.getByText('Project 3')).toBeInTheDocument();
+    expect(screen.getByText('Project 4')).toBeInTheDocument();
+    expect(screen.getByText('Project 5')).toBeInTheDocument();
+  });
 });
+
