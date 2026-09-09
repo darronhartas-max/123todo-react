@@ -339,14 +339,11 @@ export const processVoiceCommands = (text) => {
   let processed = text;
   let isSubmitCommand = false;
 
-  // 1. Check for spoken submit command ("add task", "add note", "add a note", "add a task", "submit task", "save note", "create task", "add new note", "add new task", etc.)
-  // Matches action verbs: add, ad, at, and, had, create, save, submit, finish, done, complete
-  // Optional determiners: a, an, the, this, my, new
-  // Noun targets: task, tax, text, note, node, noat, know
-  const submitRegex = /\b(add|ad|at|and|had|create|save|submit|finish|done|complete)\s*(a|an|the|this|my|new)?\s*(task|tax|text|note|node|noat|know)\b/gi;
+  // 1. Check for explicit spoken submit command ("add task", "add note", "add a note", "add a task", "submit task", "save note", "create task", "submit", etc.)
+  const submitRegex = /\b(add|ad|at|and|create|save|submit)\s*(a\s+|an\s+|the\s+|this\s+|my\s+|new\s+)?(task|tax|note|node)\b/gi;
   
-  // Standalone submit triggers anywhere at the end of speech (e.g. "... buy milk submit", "... save note", "... add task.", "... finish")
-  const endSubmitRegex = /\b(add\s*task|add\s*note|submit\s*task|submit\s*note|save\s*task|save\s*note|create\s*task|create\s*note|submit|save|finish|done|complete)\b[.,?!]*$/gi;
+  // Standalone submit triggers anywhere at the end of speech (e.g. "... buy milk add task", "... save note", "... submit")
+  const endSubmitRegex = /\b(add\s*task|add\s*note|submit\s*task|submit\s*note|save\s*task|save\s*note|create\s*task|create\s*note|submit)\b[.,?!]*$/gi;
 
   if (submitRegex.test(processed) || endSubmitRegex.test(processed)) {
     isSubmitCommand = true;
@@ -526,7 +523,7 @@ export const startVoiceDictation = ({
   onEnd,
   lang,
   continuous,
-  silenceTimeout = 8000
+  silenceTimeout = 20000
 }) => {
   if (!isSpeechRecognitionSupported()) {
     onStatusChange('Voice input is not supported in this browser.');
@@ -534,8 +531,7 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const isMobile = isMobileDevice();
-  const isContinuous = continuous !== undefined ? continuous : !isMobile;
+  const isContinuous = continuous !== undefined ? continuous : true;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;

@@ -110,9 +110,13 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.5';
+export const APP_VERSION = '3.6.6';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.6': [
+    { title: '🎙️ Continuous Voice Dictation & Natural Pauses:', desc: 'Enabled true continuous recognition and an extended 20-second pause window so your phone mic stays open and listening through your thoughts without cutting out or chiming off prematurely.' },
+    { title: '🔤 Natural Spoken Editing & Letter-by-Letter Spelling:', desc: 'Refined deletion commands ("delete last 2 words", "delete last sentence") and added intuitive spelling commands ("spell out...", "letter by letter...") for unusual names and words.' }
+  ],
   '3.6.5': [
     { title: '🎙️ User-Friendly Mobile Voice Dictation:', desc: 'Eliminated aggressive auto-restart loops on mobile phones, stopping repeated system confirmation beeps and chimes during natural speech pauses.' },
     { title: '🔴 Clear Visual Recording Indicators:', desc: 'Replaced confusing muted/strikethrough mic icons with live glowing recording indicators, clear "Listening... (Tap to finish)" tooltips, and reassuring captured feedback.' }
