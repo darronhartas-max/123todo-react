@@ -1336,9 +1336,9 @@ const SettingsModal = ({
                                  {/* Voice Input & Voice Notes */}
                                  <div style={styles.settingRow}>
                                      <div style={styles.settingLabel}>
-                                         <span>🎙️ Voice Input & Voice Notes</span>
+                                         <span>🎙️ Voice Input & Dictation Guide</span>
                                          <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Tap the Voice buttons when adding or editing tasks to speak naturally. Speech automatically appends to existing text so you can pause or think freely without losing progress.
+                                             Speak tasks and notes naturally. 123 ToDo optimizes dictation specifically for your device so you never lose spoken words.
                                          </span>
                                      </div>
                                      <div style={{
@@ -1351,12 +1351,13 @@ const SettingsModal = ({
                                          lineHeight: '1.5'
                                      }}>
                                          <div style={{ fontWeight: '700', marginBottom: '6px', color: 'var(--accent-color)' }}>
-                                             Voice Input Features:
+                                             How Voice Dictation Works:
                                          </div>
                                          <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)' }}>
-                                             <li><strong>Voice Task Input</strong>: Speaks new tasks directly into the title field. New voice tasks automatically default to <strong>Top Priority (Priority 1)</strong> and the selected project.</li>
-                                             <li><strong>Voice Notes Input</strong>: Tap <strong>Voice Notes</strong> on any task to dictate long descriptions, links, or detailed instructions.</li>
-                                             <li><strong>Continuous Dictation & Appending</strong>: Stalling or pausing while thinking won't erase your words—new speech seamlessly appends to your existing text.</li>
+                                             <li><strong>💻 Desktop Dictation (Mac / PC)</strong>: Hands-free continuous dictation across thinking pauses. Speaks directly into titles or notes with live spoken punctuation (<em>"comma"</em>, <em>"full stop"</em>) and editing commands (<em>"delete last 2 words"</em>, <em>"spell out..."</em>).</li>
+                                             <li><strong>📱 Mobile Quick-Capture (Phones / Tablets)</strong>: Tap the in-app Voice button to dictate a quick thought or task. When you finish speaking, it captures cleanly without repetitive system bleep loops or dropped words. Tap again anytime to append more.</li>
+                                             <li><strong>⚡ Continuous Long-Form Dictation on Mobile</strong>: For uninterrupted, multi-minute continuous dictation on your phone without pauses cutting off, tap into the text area and press the <strong>🎙️ microphone icon on your keyboard</strong> (Gboard on Android, or Apple Dictation on iPhone). It provides hardware-accelerated continuous voice capture with zero interruptions!</li>
+                                             <li><strong>🚀 Spoken Auto-Submit</strong>: Say <em>"add task"</em> or <em>"save note"</em> at the end of speech to instantly save hands-free.</li>
                                          </ul>
                                      </div>
                                  </div>

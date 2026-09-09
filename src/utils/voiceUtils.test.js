@@ -307,5 +307,69 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     delete window.SpeechRecognition;
     jest.useRealTimers();
   });
+
+  test('startVoiceDictation on mobile concludes cleanly onend without bleep loops or dropped words', () => {
+    const originalUserAgent = navigator.userAgent;
+
+    // Simulate Android device
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      configurable: true
+    });
+
+    const startMock = jest.fn();
+    let instance = null;
+
+    class MockSpeechRecognition {
+      constructor() {
+        this.continuous = false;
+        this.interimResults = true;
+        this.start = startMock;
+        this.stop = jest.fn();
+        this.abort = jest.fn();
+        instance = this;
+      }
+    }
+
+    window.SpeechRecognition = MockSpeechRecognition;
+
+    const onTranscript = jest.fn();
+    const onStatusChange = jest.fn();
+    const onEnd = jest.fn();
+
+    const rec = startVoiceDictation({
+      initialText: '',
+      onTranscript,
+      onStatusChange,
+      onEnd
+    });
+
+    expect(rec).not.toBeNull();
+    expect(startMock).toHaveBeenCalledTimes(1);
+
+    // Simulate transcript received
+    instance.onresult({
+      results: [
+        [{ transcript: 'Pick up laundry' }]
+      ]
+    });
+    expect(onTranscript).toHaveBeenCalledWith('Pick up laundry', false);
+
+    // Android/iOS speech engine finishes sentence on natural pause
+    instance.onend();
+
+    // On mobile, does NOT schedule restart loop (eliminating bleep loops and dead-zones)
+    expect(startMock).toHaveBeenCalledTimes(1);
+    expect(onEnd).toHaveBeenCalledTimes(1);
+    expect(onStatusChange).toHaveBeenCalledWith('✨ Captured! (Tap to append, or use keyboard 🎙️ for continuous)');
+
+    delete window.SpeechRecognition;
+
+    // Restore userAgent
+    Object.defineProperty(navigator, 'userAgent', {
+      value: originalUserAgent,
+      configurable: true
+    });
+  });
 });
 

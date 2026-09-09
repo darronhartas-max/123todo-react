@@ -110,9 +110,12 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.8';
+export const APP_VERSION = '3.6.9';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.9': [
+    { title: '🎙️ Clean Zero-Drop Mobile Voice Capture & Desktop Continuous Dictation:', desc: 'Tailored dictation by device: zero-drop clean phrase capture on mobile phones (stopping operating-system bleep loops and audio interruptions), unbroken continuous dictation across thinking pauses on desktop computers, and integrated guidance for native keyboard dictation.' }
+  ],
   '3.6.8': [
     { title: '🎙️ Continuous Natural Dictation Across Thinking Pauses:', desc: 'Refined speech recognition engine to seamlessly remain listening across 2-3 second thinking pauses (up to 20 seconds of silence) without cutting off or requiring you to tap the record button again.' }
   ],

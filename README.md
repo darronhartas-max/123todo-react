@@ -68,9 +68,11 @@ npm run build
 
 ### 3. Voice Input & Smart Commands
 
-- Continuous listening with speech accumulation buffers (no truncation during thinking pauses).
-- Natural language spoken commands: _"delete last word"_, _"scratch that"_, _"add task"_, _"save note"_.
-- Automatic punctuation conversion (_"comma"_, _"full stop"_, _"question mark"_, _"new line"_).
+- **Desktop Continuous Dictation**: Hands-free continuous listening across thinking pauses with speech accumulation buffers (Mac / Windows / Linux).
+- **Mobile Zero-Drop Capture**: Quick single-tap phrase capture engineered to eliminate operating-system bleep loops and audio cutoffs. Seamlessly appends additional speech upon tapping.
+- **Native Mobile Keyboard Integration**: Compatible with Gboard (Android) and Apple Dictation (iOS) for continuous, hardware-accelerated long-form dictation.
+- **Natural Language Editing Commands**: Spoken deletions (_"delete last word"_, _"delete last 2 words"_, _"scratch that"_), letter-by-letter spelling (_"spell S M Y T H E"_), and auto-submission (_"add task"_, _"save note"_).
+- **Automatic Punctuation Conversion**: Live formatting for _"comma"_, _"full stop"_, _"question mark"_, and _"new line"_.
 
 ### 4. Customizable Swipe Gestures
 

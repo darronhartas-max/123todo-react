@@ -531,7 +531,8 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const isContinuous = continuous !== undefined ? continuous : true;
+  const isMobile = isMobileDevice();
+  const isContinuous = continuous !== undefined ? continuous : !isMobile;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -568,7 +569,7 @@ export const startVoiceDictation = ({
   };
 
   const scheduleRestart = (delay = 60) => {
-    if (!isActive) return;
+    if (!isActive || isMobile) return;
     if (restartTimer) clearTimeout(restartTimer);
     restartTimer = setTimeout(() => {
       if (!isActive) return;
@@ -610,7 +611,7 @@ export const startVoiceDictation = ({
       recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
       recognition.onstart = () => {
-        onStatusChange('🎙️ Listening... (Tap mic when done)');
+        onStatusChange(isMobile ? '🎙️ Listening... Speak naturally' : '🎙️ Listening... (Tap mic when done)');
         resetSilenceTimer();
       };
 
@@ -673,22 +674,47 @@ export const startVoiceDictation = ({
           setTimeout(() => onStatusChange(''), 4000);
           if (onEnd) onEnd();
         } else if (event.error === 'no-speech') {
-          // Expected during natural thinking pauses - don't cancel dictation!
-          onStatusChange('🎙️ Listening... (Tap mic when done)');
+          if (isMobile) {
+            // Mobile pause: let onend conclude cleanly
+          } else {
+            onStatusChange('🎙️ Listening... (Tap mic when done)');
+          }
         } else if (event.error === 'aborted') {
           // Normal when switching sessions or stopping
         } else {
           console.warn('Speech recognition non-fatal error:', event.error);
-          onStatusChange('🎙️ Listening... (Tap mic when done)');
+          if (!isMobile) {
+            onStatusChange('🎙️ Listening... (Tap mic when done)');
+          }
         }
       };
 
       recognition.onend = () => {
         if (!isActive) return;
 
+        // On mobile devices (Android / iOS):
+        // Conclude dictation cleanly on utterance finish to prevent OS bleep loops and hardware dead-zones.
+        if (isMobile) {
+          isActive = false;
+          if (silenceTimer) clearTimeout(silenceTimer);
+          if (restartTimer) clearTimeout(restartTimer);
+          if (recognition) {
+            try { recognition.abort(); } catch {}
+            recognition = null;
+          }
+          if (hadSpeech) {
+            onStatusChange('✨ Captured! (Tap to append, or use keyboard 🎙️ for continuous)');
+          } else {
+            onStatusChange('');
+          }
+          setTimeout(() => onStatusChange(''), 4500);
+          if (onEnd) onEnd();
+          return;
+        }
+
         const timeSinceSpeech = Date.now() - lastSpeechTime;
 
-        // If the user has been silent for the full silence timeout (e.g. 20s), finish cleanly
+        // On desktop: If user has been silent for full silenceTimeout (e.g. 20s), finish cleanly
         if (timeSinceSpeech >= silenceTimeout) {
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
@@ -703,15 +729,18 @@ export const startVoiceDictation = ({
           return;
         }
 
-        // Keep listening across pauses: schedule immediate smooth restart
+        // On desktop: Keep listening across pauses with smooth 50ms restart
         scheduleRestart(50);
       };
 
       recognition.start();
     } catch (e) {
       console.warn('Failed to start speech recognition, retrying:', e);
-      if (isActive) {
+      if (isActive && !isMobile) {
         scheduleRestart(150);
+      } else if (isMobile) {
+        isActive = false;
+        if (onEnd) onEnd();
       }
     }
   };

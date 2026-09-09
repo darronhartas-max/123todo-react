@@ -92,27 +92,31 @@ Stop manually copying phone numbers or email addresses out of your task descript
 
 ## Pillar 3: Voice-First Field Capture (Simple Voice Notes Mode)
 
-Typing on a small mobile touchscreen keyboard while walking down the street, driving between appointments, or inspecting a construction job site is slow, dangerous, and frustrating.
+Typing on a small mobile touchscreen keyboard while walking down the street, driving between appointments, or inspecting a job site is slow and frustrating.
 
-123 ToDo includes a dedicated **Simple Voice Notes Skin** tailored for high-speed field capture:
+123 ToDo includes a dedicated **Simple Voice Notes Skin** and universal voice integration engineered for high-speed capture across both mobile and desktop:
 
 ### 1. Toggle to Simple Voice Notes Mode
-Tap the dual-skin switcher icon in the header or press `M` on desktop. The UI instantly transforms into a high-contrast, large-button voice dictation workspace designed for one-handed operation.
+Tap the dual-skin switcher icon in the header or press `M` on desktop. The UI instantly transforms into a high-contrast, large-button voice dictation workspace designed for effortless operation.
 
-### 2. Speak with Real-Time Punctuation
-Tap the prominent red **Talk** button and speak naturally. 123 ToDo's voice engine leverages native browser Web Speech AI to insert formatting in real time:
-- Say *"comma"* ➔ inserts `,`
-- Say *"period"* or *"full stop"* ➔ inserts `.`
-- Say *"new line"* or *"new paragraph"* ➔ breaks the text cleanly.
-- Say *"question mark"* ➔ inserts `?`
+### 2. Device-Optimized Dictation (Desktop vs. Mobile)
+To deliver the most reliable, zero-drop voice experience possible on every device, 123 ToDo tailors voice input to the platform:
 
-### 3. Live Voice Editing Commands
-Made a slip of the tongue while dictating? Don't stop to fiddle with the cursor:
-- Say **`"scratch that"`** to delete the last sentence immediately.
-- Say **`"delete last word"`** to trim errors hands-free.
+- **💻 On Desktop (Mac / Windows / Chromebook)**:
+  Tap the red **Talk** button or in-app mic icon. Desktop browsers natively support **continuous hands-free dictation across thinking pauses**. You can pause to think, check notes, or breathe, and the microphone stays open without interrupting your flow.
+- **📱 On Mobile (Android & iPhone)**:
+  - **Quick-Capture Mode (In-App Mic)**: Tap the in-app Voice button to dictate a quick task, thought, or note. When you finish speaking and pause, it captures cleanly without annoying operating-system bleep loops or dropped words. Tap the button again at any time to append further thoughts.
+  - **Unbroken Continuous Dictation (Pro Tip)**: For long-form, uninterrupted multi-minute dictation on your phone without pauses cutting off, tap into the text area and tap the **🎙️ microphone icon on your on-screen keyboard** (Gboard on Android, or Apple Dictation on iPhone). Because keyboard dictation is integrated directly into the mobile operating system's hardware audio layer, it runs continuously and silently without any web browser restrictions!
+
+### 3. Spoken Punctuation & Smart Voice Editing Commands
+123 ToDo's voice engine leverages native speech recognition to insert formatting and execute live edits:
+- **Punctuation**: Say *"comma"*, *"full stop"* (or *"period"*), *"question mark"*, or *"new line"* to format naturally.
+- **Spoken Deletions**: Say **`"delete last word"`**, **`"delete last 2 words"`**, or **`"scratch that"`** to erase mistakes hands-free.
+- **Letter-by-Letter Spelling**: Need to record an unusual surname, acronym, or foreign term? Say **`"spell S M Y T H E"`** or **`"spell out D A R R O N"`** and 123 ToDo accurately constructs the exact word!
+- **Spoken Submission**: Say **`"add task"`** or **`"save note"`** at the end of your speech to auto-save instantly.
 
 ### 4. The "Brain Dump to Actionable Queue" Workflow
-When inspiration strikes or a client calls while you're on the move, dictate a 30-second stream of consciousness into Simple Voice Notes. It automatically saves to your **Unassigned Inbox**. 
+When inspiration strikes or a client calls while you're on the move, dictate your thoughts into Simple Voice Notes. It automatically saves to your **Unassigned Inbox**. 
 
 When you return to your desk at the end of the day, take 2 minutes to triage those raw notes: assign them to a project stream, add a P1 or P2 badge, and you're ready for tomorrow.
 
