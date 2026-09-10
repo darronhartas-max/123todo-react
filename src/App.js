@@ -1294,7 +1294,12 @@ const TodoApp = () => {
       )}
 
       {showWelcome && (
-        <WelcomeModal onAccept={dismissWelcome} />
+        <WelcomeModal
+          onAccept={dismissWelcome}
+          canNativeInstall={canNativeInstall}
+          onInstall={triggerNativeInstall}
+          isStandalone={isStandalone}
+        />
       )}
 
       {showCongrats && (

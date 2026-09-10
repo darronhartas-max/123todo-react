@@ -1,6 +1,6 @@
 {
   "name": "123todo-react",
-  "version": "3.6.12",
+  "version": "3.6.13",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
