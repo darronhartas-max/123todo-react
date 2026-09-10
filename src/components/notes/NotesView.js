@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, Settings, Trophy, Check
+  Folder, Search, X, Settings, Trophy, Check
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -264,15 +264,16 @@ const NotesView = ({
     <div className="notes-container">
       {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact single-row order) */}
       <div className="notes-header-bar" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px', width: '100%', paddingBottom: '4px' }}>
-        {/* 1. Search Toggle Icon Button */}
+        {/* 1. Search Toggle Icon Button (identical circular style as Task mode) */}
         <button
           onClick={() => setShowSearch(!showSearch)}
           style={{
-            padding: '7px',
-            borderRadius: '10px',
-            backgroundColor: showSearch || searchQuery ? 'rgba(37, 99, 235, 0.1)' : 'var(--card-bg, #ffffff)',
-            border: '1.5px solid var(--border-color, #d1d5db)',
-            color: showSearch || searchQuery ? '#2563eb' : 'var(--text-color, #4b5563)',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: showSearch || searchQuery ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--bg-color, #ffffff)',
+            border: `1.5px solid ${showSearch || searchQuery ? 'var(--accent-color, #2563eb)' : 'var(--border-color, #d1d5db)'}`,
+            color: showSearch || searchQuery ? 'var(--accent-color, #2563eb)' : 'var(--muted-text, #4b5563)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -280,9 +281,9 @@ const NotesView = ({
             transition: 'all 0.2s ease',
             flexShrink: 0
           }}
-          title="Search notes"
+          title={showSearch ? "Hide Search" : "Show Search"}
         >
-          <Search size={18} />
+          {showSearch ? <X size={16} /> : <Search size={16} />}
         </button>
 
         {/* 2. Projects Filter Dropdown */}
@@ -314,13 +315,14 @@ const NotesView = ({
           })}
         </select>
 
-        {/* 3. Achievements Badge Button */}
+        {/* 3. Achievements Badge Button (identical circular style as Task mode) */}
         {onOpenAchievements && (
           <button
             onClick={onOpenAchievements}
             style={{
-              padding: '7px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
               backgroundColor: 'rgba(245, 158, 11, 0.12)',
               border: '1.5px solid #f59e0b',
               color: '#d97706',
@@ -334,17 +336,18 @@ const NotesView = ({
             }}
             title="Productivity Achievements & Insights"
           >
-            <Trophy size={18} />
+            <Trophy size={17} />
           </button>
         )}
 
-        {/* 4. Settings Cog Icon Button */}
+        {/* 4. Settings Cog Icon Button (identical circular style as Task mode) */}
         {onOpenSettings && (
           <button
             onClick={onOpenSettings}
             style={{
-              padding: '7px',
-              borderRadius: '10px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
               backgroundColor: 'var(--card-bg, #ffffff)',
               border: '1.5px solid var(--border-color, #d1d5db)',
               color: 'var(--text-color, #4b5563)',

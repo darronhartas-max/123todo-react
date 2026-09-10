@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, CheckCircle, Mic, ChevronDown, 
-  ArrowUpRight, Check, Clock, Camera, Copy
+  Folder, Mic, ChevronDown, 
+  Flag, Check, Clock, Camera, Copy,
+  Square, CheckSquare, ListChecks
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -33,11 +34,51 @@ const NoteCard = ({
   const [isDictatingTitle, setIsDictatingTitle] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [copiedEvidence, setCopiedEvidence] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
   const titleTextareaRef = useRef(null);
   const editAutoSaveTimerRef = useRef(null);
+  const archiveTimeoutRef = useRef(null);
+
+  // Reset local checked state whenever note ID changes
+  useEffect(() => {
+    setIsChecked(false);
+    if (archiveTimeoutRef.current) {
+      clearTimeout(archiveTimeoutRef.current);
+      archiveTimeoutRef.current = null;
+    }
+  }, [note.id]);
+
+  // Clean up archive timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (archiveTimeoutRef.current) {
+        clearTimeout(archiveTimeoutRef.current);
+        archiveTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleComplete = (e) => {
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault && e.cancelable) e.preventDefault();
+    }
+    if (isChecked) return;
+    setIsChecked(true);
+
+    if (archiveTimeoutRef.current) {
+      clearTimeout(archiveTimeoutRef.current);
+    }
+
+    archiveTimeoutRef.current = setTimeout(() => {
+      archiveTimeoutRef.current = null;
+      setIsChecked(false);
+      onCompleteNote(note.id);
+    }, 300);
+  };
 
   // Keep title textarea auto-expanded to fit content without truncation
   useEffect(() => {
@@ -405,7 +446,8 @@ const NoteCard = ({
               alignItems: 'center',
               gap: '4px'
             }}>
-              P{note.priority} {PRIORITIES[note.priority]?.label}
+              <Flag size={11} fill={PRIORITIES[note.priority]?.color} color={PRIORITIES[note.priority]?.color} />
+              <span>P{note.priority} {PRIORITIES[note.priority]?.label}</span>
             </span>
           )}
 
@@ -428,11 +470,66 @@ const NoteCard = ({
           )}
         </div>
 
-        {formattedDate && (
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary, #9ca3af)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={12} /> {formattedDate}
-          </span>
-        )}
+        {/* Right side: formatted time & Archive Checkbox in exact same style as Task mode */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, marginLeft: 'auto' }}>
+          {formattedDate && (
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary, #9ca3af)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={12} /> {formattedDate}
+            </span>
+          )}
+
+          {/* Archive Checkbox - Same style as Task mode */}
+          <motion.button
+            onClick={handleComplete}
+            onTouchStart={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            style={{
+              background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              minWidth: '32px',
+              minHeight: '32px',
+              touchAction: 'manipulation',
+              color: isChecked ? '#10b981' : 'var(--muted-text, #9ca3af)',
+              padding: '2px',
+              transition: 'all 0.15s ease'
+            }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+            title={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+            aria-label={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isChecked ? (
+                <motion.div
+                  key="check"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <CheckSquare size={18} strokeWidth={2.5} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="square"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <Square size={18} opacity={0.65} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
       </div>
 
       {/* Note Main Text Area (Large Builder Font) */}
@@ -624,8 +721,9 @@ const NoteCard = ({
             />
             {/* Subtasks Section in Edit Mode */}
             <div style={{ marginTop: '4px', padding: '8px', borderRadius: '8px', background: 'var(--item-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)' }}>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '6px' }}>
-                📋 Subtasks ({subtasks.length})
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '8px' }}>
+                <ListChecks size={14} />
+                <span>Subtasks ({subtasks.length})</span>
               </div>
               {subtasks.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 8px 0' }}>
@@ -838,8 +936,9 @@ const NoteCard = ({
             {/* Subtasks in View Mode */}
             {subtasks.length > 0 && (
               <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }} onClick={(e) => e.stopPropagation()}>
-                <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', marginBottom: '4px' }}>
-                  📋 Steps ({subtasks.filter(s => s.completed).length}/{subtasks.length}):
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', marginBottom: '4px' }}>
+                  <ListChecks size={14} />
+                  <span>Steps ({subtasks.filter(s => s.completed).length}/{subtasks.length}):</span>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {subtasks.map((st) => (
@@ -986,7 +1085,7 @@ const NoteCard = ({
           </div>
         </div>
 
-        {/* Right: Action Group: Make Task & Complete */}
+        {/* Right: Action Group: Make Task (Priority) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {/* Turn into Task Popover */}
           <div style={{ position: 'relative' }}>
@@ -995,7 +1094,7 @@ const NoteCard = ({
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '5px',
                 padding: '6px 12px',
                 borderRadius: '10px',
                 border: 'none',
@@ -1006,7 +1105,7 @@ const NoteCard = ({
                 cursor: 'pointer'
               }}
             >
-              <ArrowUpRight size={14} />
+              <Flag size={13} fill="#2563eb" color="#2563eb" />
               <span>Priority</span>
               <ChevronDown size={12} />
             </button>
@@ -1053,32 +1152,13 @@ const NoteCard = ({
                       textAlign: 'left'
                     }}
                   >
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: PRIORITIES[p].color }} />
+                    <Flag size={13} fill={PRIORITIES[p].color} color={PRIORITIES[p].color} />
                     <span>P{p} ({PRIORITIES[p].label})</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
-
-          {/* Complete Button */}
-          <button
-            onClick={() => onCompleteNote(note.id)}
-            style={{
-              padding: '6px 10px',
-              borderRadius: '10px',
-              border: 'none',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              color: '#10b981',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            title="Complete / Archive Note"
-          >
-            <CheckCircle size={16} />
-          </button>
         </div>
       </div>
     </motion.div>

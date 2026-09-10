@@ -291,5 +291,62 @@ describe('NoteCard', () => {
 
     jest.useRealTimers();
   });
+
+  test('renders archive checkbox in Task mode style on right-hand side and triggers completion after 300ms', () => {
+    jest.useFakeTimers();
+    const onCompleteMock = jest.fn();
+
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+        onCompleteNote={onCompleteMock}
+      />
+    );
+
+    // Archive checkbox should be present with label
+    const archiveBtn = screen.getByRole('button', { name: /Complete \/ Archive Note/i });
+    expect(archiveBtn).toBeInTheDocument();
+
+    // Click checkbox
+    fireEvent.click(archiveBtn);
+
+    // Should not fire immediately due to 300ms animation delay
+    expect(onCompleteMock).not.toHaveBeenCalled();
+
+    // Fast-forward 300ms
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+
+    expect(onCompleteMock).toHaveBeenCalledWith(sampleNote.id);
+    jest.useRealTimers();
+  });
+
+  test('allows converting note to prioritized task from bottom Priority popover', () => {
+    const onConvertMock = jest.fn();
+
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+        onConvertNoteToTask={onConvertMock}
+      />
+    );
+
+    // Click Priority button in bottom toolbar
+    const priorityBtn = screen.getByRole('button', { name: /Priority/i });
+    expect(priorityBtn).toBeInTheDocument();
+    fireEvent.click(priorityBtn);
+
+    // Popover options P1, P2, P3 should appear
+    const p1Option = screen.getByText(/P1 \(Must do\)/i);
+    expect(p1Option).toBeInTheDocument();
+
+    fireEvent.click(p1Option);
+    expect(onConvertMock).toHaveBeenCalledWith(sampleNote.id, 1);
+  });
 });
 
