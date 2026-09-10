@@ -26,7 +26,14 @@ const getInitialPlatform = () => {
     return 'desktop';
 };
 
-const InstallGuideModal = ({ isOpen, onClose, onNativeInstall, canNativeInstall = false, isStandalone = false }) => {
+const InstallGuideModal = ({ 
+    isOpen, 
+    onClose, 
+    onNativeInstall, 
+    canNativeInstall = false, 
+    isStandalone = false,
+    isReminder = false 
+}) => {
     const [selectedTab, setSelectedTab] = useState(getInitialPlatform);
 
     if (!isOpen) return null;
@@ -173,6 +180,28 @@ const InstallGuideModal = ({ isOpen, onClose, onNativeInstall, canNativeInstall 
                         <X size={20} />
                     </button>
                 </div>
+
+                {/* Reminder Context Banner */}
+                {isReminder && (
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.12))',
+                        border: '1.5px solid rgba(37, 99, 235, 0.3)',
+                        borderRadius: '10px',
+                        padding: '12px 14px',
+                        marginBottom: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: 'var(--text-color)',
+                        fontSize: '0.88rem',
+                        lineHeight: 1.45
+                    }}>
+                        <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>⭐</span>
+                        <div>
+                            <strong>Enjoying 123 To Do?</strong> Download the app to your Home Screen for lightning speed, 100% offline access, and zero address bar clutter!
+                        </div>
+                    </div>
+                )}
 
                 {/* Status Notice if already standalone */}
                 {isStandalone && (
@@ -482,21 +511,41 @@ const InstallGuideModal = ({ isOpen, onClose, onNativeInstall, canNativeInstall 
                         <ExternalLink size={14} />
                     </a>
 
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: '8px 20px',
-                            background: 'var(--item-bg)',
-                            color: 'var(--text-color)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '8px',
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Got It
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '8px 16px',
+                                background: 'transparent',
+                                color: 'var(--text-secondary, #6b7280)',
+                                border: '1px solid var(--border-color, #d1d5db)',
+                                borderRadius: '8px',
+                                fontSize: '0.88rem',
+                                fontWeight: '600',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Maybe Later
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '8px 22px',
+                                background: '#2563eb',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '0.9rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)'
+                            }}
+                        >
+                            Got It
+                        </button>
+                    </div>
                 </div>
             </motion.div>
         </div>

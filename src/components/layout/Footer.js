@@ -101,9 +101,6 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
             </div>
 
             <div style={{ marginTop: '8px', fontSize: '0.95rem', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <a href="/how-to-install-123todo-pwa.md" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
-                    How to Install (PWA)
-                </a>
                 <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
                     Terms of Service
                 </a>

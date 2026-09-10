@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { STORAGE_KEYS, INSTALL_PROMPT_DAYS } from '../utils/constants';
+import { STORAGE_KEYS } from '../utils/constants';
 import { checkForUpdates as triggerSWUpdateCheck } from '../serviceWorkerRegistration';
 
-export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
+export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = false) => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [showInstallModal, setShowInstallModal] = useState(false);
     const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
     const [isStandalone, setIsStandalone] = useState(() => {
         if (typeof window === 'undefined') return false;
@@ -17,6 +18,43 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     const [showUpdateReady, setShowUpdateReady] = useState(false);
     const [swRegistration, setSwRegistration] = useState(null);
 
+    // Progressive Snooze and Engagement Checker
+    const canShowInstallReminder = useCallback(() => {
+        if (typeof window === 'undefined') return false;
+        const inStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (inStandalone) return false;
+
+        // Migrate legacy permanent dismiss key if present
+        const legacyDismissed = localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISSED);
+        if (legacyDismissed === 'true' && !localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISS_COUNT)) {
+            localStorage.setItem(STORAGE_KEYS.INSTALL_DISMISS_COUNT, '1');
+            localStorage.removeItem(STORAGE_KEYS.INSTALL_DISMISSED);
+        }
+
+        const dismissCount = parseInt(localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISS_COUNT) || '0', 10);
+        if (dismissCount >= 4) {
+            return false; // Cap at 4 reminders to respect user decision
+        }
+
+        const lastDismissed = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_INSTALL_DISMISSED) || '0', 10);
+        if (!lastDismissed) {
+            return true; // Never dismissed yet
+        }
+
+        const now = Date.now();
+        const hoursSinceDismiss = (now - lastDismissed) / (1000 * 60 * 60);
+        // Progressive intervals: 24h -> 48h -> 7 days
+        const requiredHours = dismissCount === 1 ? 24 : dismissCount === 2 ? 48 : 168;
+        if (hoursSinceDismiss < requiredHours) {
+            return false;
+        }
+
+        // Also ensure user has performed active actions since last dismiss
+        const actionsCount = parseInt(localStorage.getItem(STORAGE_KEYS.INSTALL_ACTIONS_COUNT) || '0', 10);
+        const requiredActions = dismissCount === 1 ? 2 : 3;
+        return actionsCount >= requiredActions;
+    }, []);
+
     useEffect(() => {
         const handleUpdate = (event) => {
             setSwRegistration(event.detail);
@@ -28,13 +66,20 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
             setDeferredInstallPrompt(e);
-            setShowInstallPrompt(true);
+            // Only show prompt banner if user has started using app properly and not in snooze
+            if (canShowInstallReminder()) {
+                const totalActivity = (tasksCount || 0) + (archivedCount || 0);
+                if (totalActivity >= 2 || (archivedCount || 0) >= 1) {
+                    setShowInstallPrompt(true);
+                }
+            }
         };
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
         const handleAppInstalled = () => {
             setDeferredInstallPrompt(null);
             setShowInstallPrompt(false);
+            setShowInstallModal(false);
             setIsStandalone(true);
         };
         window.addEventListener('appinstalled', handleAppInstalled);
@@ -45,6 +90,7 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
             if (e.matches) {
                 setIsStandalone(true);
                 setShowInstallPrompt(false);
+                setShowInstallModal(false);
             }
         };
         if (mql.addEventListener) {
@@ -52,8 +98,6 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         }
 
         // MOBILE-FIRST PERSISTENCE: 
-        // Request persistent storage to prevent the browser from automatically 
-        // clearing localStorage/IndexedDB on mobile devices when space is low.
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(persistent => {
                 if (persistent) {
@@ -70,26 +114,49 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
                 mql.removeEventListener('change', handleDisplayModeChange);
             }
         };
-    }, []);
+    }, [canShowInstallReminder, tasksCount, archivedCount]);
 
     const checkBackupReminder = useCallback((count) => {
-        // Redundant due to automatic 24-hour shadow backups, persistent storage API, and Google Drive sync.
         setShowBackupReminder(false);
     }, []);
 
     const checkInstallPrompt = useCallback(() => {
-        const installDismissed = localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISSED);
-        const lastInstallPrompt = localStorage.getItem(STORAGE_KEYS.LAST_INSTALL_PROMPT);
-        const now = Date.now();
-        const promptPeriod = INSTALL_PROMPT_DAYS * 24 * 60 * 60 * 1000;
+        const hasSeenWelcome = localStorage.getItem(STORAGE_KEYS.WELCOME_SEEN);
+        if (!hasSeenWelcome) return; // Wait until after initial onboarding
 
-        if (!installDismissed && (!lastInstallPrompt || (now - parseInt(lastInstallPrompt)) > promptPeriod)) {
-            if (!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone) {
+        if (canShowInstallReminder()) {
+            const totalActivity = (tasksCount || 0) + (archivedCount || 0);
+            if (totalActivity >= 2 || (archivedCount || 0) >= 1) {
                 setShowInstallPrompt(true);
-                localStorage.setItem(STORAGE_KEYS.LAST_INSTALL_PROMPT, now.toString());
+                localStorage.setItem(STORAGE_KEYS.LAST_INSTALL_PROMPT, Date.now().toString());
             }
         }
-    }, []);
+    }, [canShowInstallReminder, tasksCount, archivedCount]);
+
+    // Call when user adds or completes tasks (starting to use app properly)
+    const recordAppUsageAction = useCallback((actionType = 'action') => {
+        if (typeof window === 'undefined') return;
+        const inStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (inStandalone) return;
+
+        const currentActions = parseInt(localStorage.getItem(STORAGE_KEYS.INSTALL_ACTIONS_COUNT) || '0', 10);
+        const updatedActions = currentActions + 1;
+        localStorage.setItem(STORAGE_KEYS.INSTALL_ACTIONS_COUNT, updatedActions.toString());
+
+        if (canShowInstallReminder()) {
+            const totalActivity = (tasksCount || 0) + (archivedCount || 0);
+            // Trigger reminder modal after meaningful engagement (completed task or 2+ items created)
+            if ((actionType === 'complete' || totalActivity >= 2) && !showWelcome) {
+                setTimeout(() => {
+                    const stillNotStandalone = !window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone;
+                    if (stillNotStandalone) {
+                        setShowInstallModal(true);
+                        localStorage.setItem(STORAGE_KEYS.LAST_INSTALL_PROMPT, Date.now().toString());
+                    }
+                }, 1200);
+            }
+        }
+    }, [canShowInstallReminder, tasksCount, archivedCount, showWelcome]);
 
     // Initialize system states
     useEffect(() => {
@@ -151,10 +218,16 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         localStorage.setItem(STORAGE_KEYS.WELCOME_SEEN, 'true');
     };
 
-    const dismissInstallPrompt = () => {
+    const dismissInstallPrompt = useCallback((fromModal = false) => {
         setShowInstallPrompt(false);
-        localStorage.setItem(STORAGE_KEYS.INSTALL_DISMISSED, 'true');
-    };
+        setShowInstallModal(false);
+        const now = Date.now();
+        const currentCount = parseInt(localStorage.getItem(STORAGE_KEYS.INSTALL_DISMISS_COUNT) || '0', 10);
+        const newCount = currentCount + 1;
+        localStorage.setItem(STORAGE_KEYS.INSTALL_DISMISS_COUNT, newCount.toString());
+        localStorage.setItem(STORAGE_KEYS.LAST_INSTALL_DISMISSED, now.toString());
+        localStorage.setItem(STORAGE_KEYS.INSTALL_ACTIONS_COUNT, '0');
+    }, []);
 
     const dismissBackupReminder = () => {
         setShowBackupReminder(false);
@@ -176,6 +249,7 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
             const choiceResult = await deferredInstallPrompt.userChoice;
             if (choiceResult && choiceResult.outcome === 'accepted') {
                 setShowInstallPrompt(false);
+                setShowInstallModal(false);
                 setDeferredInstallPrompt(null);
                 return true;
             }
@@ -186,6 +260,8 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
     return {
         showWelcome,
         showInstallPrompt,
+        showInstallModal,
+        setShowInstallModal,
         showBackupReminder,
         showCongrats,
         showUpdateReady,
@@ -195,6 +271,7 @@ export const useAppSystem = (archivedCount, tasksCount, isSyncAuthed) => {
         checkMilestones,
         dismissWelcome,
         dismissInstallPrompt,
+        recordAppUsageAction,
         dismissBackupReminder,
         recordBackup,
         checkForUpdates,

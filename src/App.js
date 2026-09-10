@@ -79,9 +79,10 @@ const TodoApp = () => {
   } = activeSync;
 
   const {
-    showWelcome, showInstallPrompt, showBackupReminder, showCongrats,
+    showWelcome, showInstallPrompt, showInstallModal, showBackupReminder, showCongrats,
     showUpdateReady, swRegistration,
     setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
+    recordAppUsageAction,
     dismissBackupReminder, recordBackup, checkForUpdates,
     isStandalone, canNativeInstall, triggerNativeInstall
   } = useAppSystem(archived.length, tasks.length, isAuthed);
@@ -155,19 +156,6 @@ const TodoApp = () => {
   };
 
   const [showSkinDiscoveryModal, setShowSkinDiscoveryModal] = useState(false);
-
-  useEffect(() => {
-    try {
-      const rawCount = localStorage.getItem(STORAGE_KEYS.MODE_DISCOVERY_COUNT);
-      const count = rawCount ? parseInt(rawCount, 10) : 0;
-      if (count < 3) {
-        localStorage.setItem(STORAGE_KEYS.MODE_DISCOVERY_COUNT, String(count + 1));
-        setShowSkinDiscoveryModal(true);
-      }
-    } catch (e) {
-      console.warn('Failed to read/write mode discovery count:', e);
-    }
-  }, []);
 
   // UI State
   const [showAddSection, setShowAddSection] = useState(false);
@@ -597,9 +585,20 @@ const TodoApp = () => {
     }
   };
 
+  const handleAddTask = useCallback((text, priority, projectId, notes, scheduledDate, extraFields) => {
+    addTask(text, priority, projectId, notes, scheduledDate, extraFields);
+    recordAppUsageAction('add');
+  }, [addTask, recordAppUsageAction]);
+
+  const handleAddNote = useCallback((title, body, projId) => {
+    addNote(title, body, projId);
+    recordAppUsageAction('add');
+  }, [addNote, recordAppUsageAction]);
+
   const handleCompleteTask = useCallback((id) => {
     completeTask(id);
     recordTaskCompleted();
+    recordAppUsageAction('complete');
     setShowArchiveToast(true);
     setTimeout(() => {
       setShowArchiveToast(false);
@@ -614,7 +613,7 @@ const TodoApp = () => {
         setTimeout(() => setShowShareModal(true), 1200);
       }
     } catch (e) {}
-  }, [completeTask]);
+  }, [completeTask, recordAppUsageAction]);
 
   // Filtering
   const filteredBySearch = (list) => list.filter(t => {
@@ -966,7 +965,7 @@ const TodoApp = () => {
 
         <AddTask
           isOpen={showAddSection}
-          onAdd={addTask}
+          onAdd={handleAddTask}
           onClose={() => setShowAddSection(false)}
           projects={availableProjects}
           defaultProjectId={currentProjectId}
@@ -1007,7 +1006,7 @@ const TodoApp = () => {
             <NotesView
               tasks={tasks}
               projects={availableProjects}
-              onAddNote={(title, body, projId) => addNote(title, body, projId)}
+              onAddNote={handleAddNote}
               onUpdateTask={updateTask}
               onConvertNoteToTask={(id, p) => convertNoteToTask(id, p)}
               onCompleteTask={handleCompleteTask}
@@ -1430,11 +1429,15 @@ const TodoApp = () => {
       />
 
       <InstallGuideModal
-        isOpen={showInstallGuideModal}
-        onClose={() => setShowInstallGuideModal(false)}
+        isOpen={showInstallGuideModal || showInstallModal}
+        onClose={() => {
+          setShowInstallGuideModal(false);
+          dismissInstallPrompt(true);
+        }}
         onNativeInstall={handleInstallClick}
         canNativeInstall={canNativeInstall}
         isStandalone={isStandalone}
+        isReminder={showInstallModal}
       />
 
       <AdminStatsModal
