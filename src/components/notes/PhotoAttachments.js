@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, Image as ImageIcon, X, ZoomIn, Download, AlertCircle } from 'lucide-react';
+import { Camera, Image as ImageIcon, X, ZoomIn, Download, AlertCircle, Share2, Clock, Check, Copy } from 'lucide-react';
 import { compressImage, isValidImageFile, formatFileSize, MAX_PHOTOS_PER_NOTE } from '../../utils/imageUtils';
 import { savePhoto, getPhoto, deletePhoto } from '../../utils/photoStorage';
+import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 
 const PhotoAttachments = ({
   photos = [],
@@ -14,12 +15,63 @@ const PhotoAttachments = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [copiedPhotoTimestamp, setCopiedPhotoTimestamp] = useState(false);
+  const [shareStatus, setShareStatus] = useState('');
 
   const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
   const containerRef = useRef(null);
 
   const clearError = () => setErrorMessage('');
+
+  const handleShareOrSavePhoto = async (photo) => {
+    try {
+      const dataUrl = photo.dataUrl || (await getPhoto(photo.id))?.dataUrl;
+      if (!dataUrl) return;
+
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
+      const fileName = photo.name || `123todo-photo-${Date.now()}.${ext}`;
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: photo.name || 'Photo from 123 ToDo'
+        });
+        setShareStatus('Saved/Shared!');
+        setTimeout(() => setShareStatus(''), 2500);
+        return;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      console.warn('Web Share unavailable, falling back to download:', err);
+    }
+
+    // Fallback: direct browser download
+    try {
+      const link = document.createElement('a');
+      link.href = photo.dataUrl;
+      link.download = photo.name || '123todo-photo.webp';
+      link.click();
+      setShareStatus('Downloaded!');
+      setTimeout(() => setShareStatus(''), 2500);
+    } catch (e) {
+      console.error('Download error:', e);
+    }
+  };
+
+  const handleCopyPhotoTimestamp = (ts) => {
+    if (!ts) return;
+    const str = `123 ToDo Photo | Captured: ${formatEvidentiaryTimestamp(ts)}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(() => {
+        setCopiedPhotoTimestamp(true);
+        setTimeout(() => setCopiedPhotoTimestamp(false), 2500);
+      }).catch(() => {});
+    }
+  };
 
   // Handle new incoming files (from Camera, File picker, Drag & Drop, or Clipboard Paste)
   const processFiles = useCallback(async (files) => {
@@ -355,7 +407,9 @@ const PhotoAttachments = ({
                   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
                   flexShrink: 0
                 }}
-                title={`${photo.name || 'Photo'} (${formatFileSize(photo.size)}) - Click to view full size`}
+                title={photo.timestamp 
+                  ? `${photo.name || 'Photo'} (${formatFileSize(photo.size)}) • Captured: ${formatEvidentiaryTimestamp(photo.timestamp)} - Click to view full size`
+                  : `${photo.name || 'Photo'} (${formatFileSize(photo.size)}) - Click to view full size`}
               >
                 <img
                   src={displaySrc}
@@ -450,21 +504,71 @@ const PhotoAttachments = ({
               marginBottom: '10px'
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.95rem', fontWeight: '600' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <span style={{ fontSize: '0.95rem', fontWeight: '700' }}>
                 {activeLightboxPhoto.name || 'Photo Attachment'}
               </span>
-              <span style={{ fontSize: '0.75rem', opacity: 0.75 }}>
-                {formatFileSize(activeLightboxPhoto.size)}
-                {activeLightboxPhoto.width && activeLightboxPhoto.height ? ` • ${activeLightboxPhoto.width}×${activeLightboxPhoto.height}` : ''}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.75rem', opacity: 0.85 }}>
+                <span>{formatFileSize(activeLightboxPhoto.size)}</span>
+                {activeLightboxPhoto.width && activeLightboxPhoto.height ? (
+                  <span>• {activeLightboxPhoto.width}×{activeLightboxPhoto.height}</span>
+                ) : null}
+                {activeLightboxPhoto.timestamp ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                    <Clock size={11} />
+                    <span>Captured: {formatEvidentiaryTimestamp(activeLightboxPhoto.timestamp)}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPhotoTimestamp(activeLightboxPhoto.timestamp)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: copiedPhotoTimestamp ? '#10b981' : '#60a5fa',
+                        cursor: 'pointer',
+                        padding: '1px 3px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        fontWeight: '700'
+                      }}
+                      title="Copy photo evidentiary timestamp"
+                    >
+                      {copiedPhotoTimestamp ? <Check size={11} strokeWidth={3} /> : <Copy size={11} />}
+                      <span>{copiedPhotoTimestamp ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </span>
+                ) : null}
+              </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Share / Save to Photos button (Native Web Share on iOS & Android, or fallback) */}
+              <button
+                type="button"
+                onClick={() => handleShareOrSavePhoto(activeLightboxPhoto)}
+                title="Save to Photos / Share (AirDrop, WhatsApp, Files, etc.)"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  background: 'rgba(37, 99, 235, 0.9)',
+                  color: '#ffffff',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '700'
+                }}
+              >
+                <Share2 size={15} />
+                <span>{shareStatus ? `✓ ${shareStatus}` : 'Save to Photos / Share'}</span>
+              </button>
+
               {/* Download button */}
               <a
                 href={activeLightboxPhoto.dataUrl}
-                download={activeLightboxPhoto.name || 'attachment.webp'}
+                download={activeLightboxPhoto.name || '123todo-photo.webp'}
                 title="Download original photo"
                 style={{
                   display: 'flex',

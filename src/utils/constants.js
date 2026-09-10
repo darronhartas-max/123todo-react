@@ -110,9 +110,14 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.11';
+export const APP_VERSION = '3.6.12';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.12': [
+    { title: '⚡ Fast Notes Mode & Top Save Buttons:', desc: 'Redesigned Notes mode for lightning-fast capture. Added prominent, large Save Note buttons right at the top of both Quick Add and Note Edit cards, alongside Cmd+Enter keyboard shortcut support.' },
+    { title: '📅 Bottom Evidentiary Timestamps & 1-Tap Copy:', desc: 'Added full date and time timestamps at the bottom of all note and task cards with a 1-tap Copy Evidence button for official job logs, client proof, and invoices.' },
+    { title: '📸 Native Phone Photo Export & Capture Evidence:', desc: 'Added 1-tap Save to Photos / Share via native Web Share API so iPhone and Android users can save photos directly to their Apple Photos Camera Roll, plus exact capture timestamps in the Lightbox.' }
+  ],
   '3.6.11': [
     { title: '⚙️ Reorganized Settings Hub:', desc: 'Restructured Settings into 8 intuitive, priority-ordered tabs (Appearance, Tasks, Projects, Swipe, Cloud Sync, Voice, Shortcuts, App & Updates) for lightning-fast configuration.' },
     { title: '📋 Dedicated Tasks & Workflow Preferences:', desc: 'Grouped list view modes (compact vs full-length), date formats, character limits, and preferred email clients into a dedicated Tasks settings panel.' },

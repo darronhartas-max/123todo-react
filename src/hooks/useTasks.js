@@ -287,6 +287,7 @@ export const useTasks = () => {
             isRecurring: extraFields.isRecurring || false,
             recurrence: extraFields.recurrence || null,
             completedAt: null,
+            createdAt: extraFields.createdAt || now,
             updatedAt: now
         };
 

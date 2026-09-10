@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, CheckCircle, Mic, ChevronDown, 
-  ArrowUpRight, Check, Clock, Camera
+  ArrowUpRight, Check, Clock, Camera, Copy
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from './PhotoAttachments';
 import { renderActionableText, ActionableEntitiesBar } from '../../utils/textUtils';
+import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 
 const NoteCard = ({
   note,
@@ -30,6 +31,7 @@ const NoteCard = ({
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isDictatingTitle, setIsDictatingTitle] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [copiedEvidence, setCopiedEvidence] = useState(false);
   
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
@@ -157,6 +159,44 @@ const NoteCard = ({
         titleTextareaRef.current.setSelectionRange(len, len);
       }
     }, 100);
+  };
+
+  const handleCancelEdits = (e) => {
+    if (e) e.stopPropagation();
+    if (titleRecognitionRef.current) {
+      try { titleRecognitionRef.current.stop(); } catch (err) {}
+      titleRecognitionRef.current = null;
+    }
+    setIsDictatingTitle(false);
+    setTitleText(note.text || '');
+    setNotesText(note.notes || '');
+    setSubtasks(note.subtasks || []);
+    setIsEditing(false);
+  };
+
+  const createdTs = note.createdAt || note.id;
+  const createdFormatted = formatEvidentiaryTimestamp(createdTs);
+  const updatedFormatted = note.updatedAt && (note.updatedAt - createdTs > 60000)
+    ? formatEvidentiaryTimestamp(note.updatedAt)
+    : null;
+
+  const handleCopyEvidence = (e) => {
+    if (e) e.stopPropagation();
+    let textToCopy = `123 ToDo Entry Log | Created: ${createdFormatted}`;
+    if (updatedFormatted) {
+      textToCopy += ` | Edited: ${updatedFormatted}`;
+    }
+    textToCopy += ` | Task: "${note.text || ''}"`;
+    if (note.notes) {
+      textToCopy += ` | Notes: "${note.notes}"`;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        setCopiedEvidence(true);
+        setTimeout(() => setCopiedEvidence(false), 2500);
+      }).catch(() => {});
+    }
   };
 
   const formattedDate = note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
@@ -313,66 +353,117 @@ const NoteCard = ({
       <div style={{ cursor: isEditing ? 'default' : 'pointer' }} onClick={() => !isEditing && setIsEditing(true)}>
         {isEditing ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* Header toolbar for editing note text with prominent Dictate button */}
+            {/* Top Action Toolbar for Edit Mode: Large Save Button, Dictate Button, Cancel Button */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '8px',
-              flexWrap: 'wrap'
+              gap: '10px',
+              flexWrap: 'wrap',
+              paddingBottom: '10px',
+              borderBottom: '1.5px solid rgba(37, 99, 235, 0.2)'
             }}>
-              <span style={{
-                fontSize: '12px',
-                fontWeight: '700',
-                color: 'var(--text-secondary, #6b7280)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Note / Task Text
-              </span>
-
-              {/* Prominent Dictate at End Record Button */}
-              <button
-                type="button"
-                onClick={handleToggleTitleDictation}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 14px',
-                  borderRadius: '10px',
-                  border: `1.5px solid ${isDictatingTitle ? '#ef4444' : '#2563eb'}`,
-                  backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.1)',
-                  color: isDictatingTitle ? '#ef4444' : '#2563eb',
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
                   fontSize: '13px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  boxShadow: isDictatingTitle ? '0 0 10px rgba(239, 68, 68, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.08)',
-                  transition: 'all 0.15s ease'
-                }}
-                title={isDictatingTitle ? "Tap to stop listening" : "Begin dictating at the end of this note"}
-              >
-                {isDictatingTitle ? (
-                  <>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: '#ef4444',
-                      boxShadow: '0 0 8px #ef4444',
-                      display: 'inline-block',
-                      animation: 'pulse 1s infinite'
-                    }} />
-                    <Mic size={15} color="#ef4444" />
-                    <span>Listening... (Tap to Stop)</span>
-                  </>
-                ) : (
-                  <>
-                    <Mic size={15} color="#2563eb" />
-                    <span>🎙️ Dictate at End</span>
-                  </>
-                )}
-              </button>
+                  fontWeight: '800',
+                  color: '#2563eb',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  ✏️ Edit Note
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCancelEdits}
+                  style={{
+                    border: '1px solid var(--border-color, #d1d5db)',
+                    background: 'transparent',
+                    color: 'var(--text-secondary, #6b7280)',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    padding: '4px 10px',
+                    borderRadius: '8px'
+                  }}
+                  title="Discard unsaved changes"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                {/* Prominent Dictate at End Record Button */}
+                <button
+                  type="button"
+                  onClick={handleToggleTitleDictation}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '10px',
+                    border: `1.5px solid ${isDictatingTitle ? '#ef4444' : '#2563eb'}`,
+                    backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.1)',
+                    color: isDictatingTitle ? '#ef4444' : '#2563eb',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    minHeight: '40px',
+                    boxSizing: 'border-box',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title={isDictatingTitle ? "Tap to stop listening" : "Begin dictating at the end of this note"}
+                >
+                  {isDictatingTitle ? (
+                    <>
+                      <span style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ef4444',
+                        boxShadow: '0 0 8px #ef4444',
+                        display: 'inline-block',
+                        animation: 'pulse 1s infinite'
+                      }} />
+                      <Mic size={15} color="#ef4444" />
+                      <span>Listening...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic size={15} color="#2563eb" />
+                      <span>🎙️ Dictate at End</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Large Prominent Save Note Button at the TOP */}
+                <button
+                  type="button"
+                  onClick={handleSaveEdits}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 22px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    minHeight: '40px',
+                    boxSizing: 'border-box',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Save Note / Task changes"
+                >
+                  <Check size={18} strokeWidth={2.6} />
+                  <span>Save Note</span>
+                </button>
+              </div>
             </div>
 
             <textarea
@@ -563,21 +654,44 @@ const NoteCard = ({
               </div>
               <ActionableEntitiesBar text={newSubtaskText} compact />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
               <button
-                onClick={handleSaveEdits}
+                type="button"
+                onClick={handleCancelEdits}
                 style={{
-                  padding: '6px 14px',
+                  padding: '8px 14px',
                   borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: '#2563eb',
-                  color: '#ffffff',
-                  fontWeight: '700',
+                  border: '1px solid var(--border-color, #d1d5db)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary, #6b7280)',
+                  fontWeight: '600',
                   fontSize: '13px',
                   cursor: 'pointer'
                 }}
               >
-                Done
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveEdits}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 22px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  fontWeight: '800',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  minHeight: '38px',
+                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)'
+                }}
+              >
+                <Check size={16} strokeWidth={2.4} />
+                <span>Save Note</span>
               </button>
             </div>
           </div>
@@ -707,17 +821,74 @@ const NoteCard = ({
         </div>
       )}
 
-      {/* Bottom Action Bar */}
+      {/* Bottom Action Bar & Evidentiary Timestamp */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'flex-end', 
-        gap: '8px',
+        justifyContent: 'space-between', 
+        gap: '10px',
         paddingTop: '10px',
         borderTop: '1px solid var(--border-color, #f3f4f6)',
         flexWrap: 'wrap'
       }}>
-        {/* Action Group: Make Task & Complete */}
+        {/* Left: Evidentiary Timestamp Display with 1-Tap Copy Proof */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <div 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: '8px',
+              backgroundColor: 'var(--item-bg, #f3f4f6)',
+              border: '1px solid var(--border-color, #e5e7eb)',
+              fontSize: '11px',
+              color: 'var(--text-secondary, #6b7280)',
+              fontFamily: 'monospace, sans-serif'
+            }}
+            title="Timestamp evidence: Created date & time of this note/task"
+          >
+            <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+            <span>
+              {createdFormatted}
+              {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopyEvidence}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                border: 'none',
+                background: copiedEvidence ? '#10b981' : 'rgba(37, 99, 235, 0.1)',
+                color: copiedEvidence ? '#ffffff' : '#2563eb',
+                borderRadius: '5px',
+                padding: '2px 6px',
+                fontSize: '10px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                marginLeft: '4px'
+              }}
+              title="Copy evidentiary timestamp & note to clipboard"
+            >
+              {copiedEvidence ? (
+                <>
+                  <Check size={10} strokeWidth={3} />
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={10} />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Right: Action Group: Make Task & Complete */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {/* Turn into Task Popover */}
           <div style={{ position: 'relative' }}>

@@ -64,4 +64,28 @@ describe('PhotoAttachments Component', () => {
     fireEvent.click(closeBtn);
     expect(screen.queryByText('receipt.webp')).not.toBeInTheDocument();
   });
+
+  test('displays Save to Photos / Share button and photo timestamp in lightbox', () => {
+    const photosWithTimestamp = [
+      {
+        ...mockPhotos[0],
+        timestamp: new Date(2026, 8, 10, 11, 30, 0).getTime()
+      }
+    ];
+
+    render(<PhotoAttachments photos={photosWithTimestamp} readOnly={false} />);
+
+    const images = screen.getAllByRole('img');
+    fireEvent.click(images[0]);
+
+    // Save to Photos / Share button should be present in Lightbox
+    const shareBtn = screen.getByRole('button', { name: /Save to Photos \/ Share/i });
+    expect(shareBtn).toBeInTheDocument();
+
+    // Timestamp should be displayed
+    expect(screen.getByText(/Captured: 10 Sep 2026/i)).toBeInTheDocument();
+
+    // Copy photo timestamp button should be present
+    expect(screen.getByTitle(/Copy photo evidentiary timestamp/i)).toBeInTheDocument();
+  });
 });

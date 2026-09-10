@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Folder, Search, Settings, Trophy
+  Folder, Search, Settings, Trophy, Check
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
+import { ActionableEntitiesBar } from '../../utils/textUtils';
 
 const NotesView = ({
   tasks = [],
@@ -286,30 +287,25 @@ const NotesView = ({
         />
       )}
 
-      {/* Quick Add Note Card (Single note field) */}
+      {/* Quick Add Note Card (Single note field with top-action header) */}
       <div className="quick-add-note-card">
-        <textarea
-          ref={quickAddTextareaRef}
-          className="quick-add-body-textarea"
-          rows={3}
-          value={newNotes}
-          onChange={(e) => setNewNotes(e.target.value)}
-          placeholder="Add New Note (Saved as a Task in your Unified Inbox)"
-          style={{ fontSize: `${notesFontSize}px` }}
-        />
-
-        {statusMessage && (
-          <div style={{ fontSize: '13px', color: '#2563eb', fontWeight: '600' }}>
-            {statusMessage}
-          </div>
-        )}
-
-        <div className="quick-add-footer">
-          {/* Target Project Dropdown for Quick Add */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Prominent Top Action Toolbar: Project Selector on Left, Talk + Large Save Note Button on Right */}
+        <div className="quick-add-top-bar" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+          flexWrap: 'wrap',
+          paddingBottom: '10px',
+          borderBottom: '1px solid var(--border-color, #e5e7eb)'
+        }}>
+          {/* Target Project Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+            <Folder size={16} color="#6b7280" style={{ flexShrink: 0 }} />
             <select
               value={targetProjectId}
               onChange={(e) => setTargetProjectId(e.target.value)}
+              aria-label="Target Project"
               style={{
                 padding: '6px 10px',
                 borderRadius: '8px',
@@ -318,7 +314,8 @@ const NotesView = ({
                 color: 'var(--text-color, #111827)',
                 fontSize: '13px',
                 fontWeight: '600',
-                outline: 'none'
+                outline: 'none',
+                maxWidth: '200px'
               }}
             >
               <option value="general">Unassigned Inbox</option>
@@ -328,15 +325,17 @@ const NotesView = ({
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Primary Quick-Action Buttons at Top: Talk + Large Prominent Save Note Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {/* Red Tape Recorder 'Talk' / 'Stop' Button */}
             <button
+              type="button"
               onClick={toggleQuickAddDictation}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
+                gap: '6px',
+                padding: '9px 14px',
                 borderRadius: '10px',
                 border: '1.5px solid #ef4444',
                 backgroundColor: isDictatingQuickAdd ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.08)',
@@ -344,7 +343,9 @@ const NotesView = ({
                 fontWeight: '700',
                 fontSize: '14px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                minHeight: '42px',
+                boxSizing: 'border-box'
               }}
               title={isDictatingQuickAdd ? "Click to stop voice dictation" : "Click to speak and append to note"}
             >
@@ -360,25 +361,88 @@ const NotesView = ({
               <span>{isDictatingQuickAdd ? 'Stop' : 'Talk'}</span>
             </button>
 
+            {/* Large Prominent Save Note Button at Top */}
             <button
+              type="button"
               onClick={() => handleCreateNote()}
               style={{
-                padding: '8px 20px',
+                padding: '9px 20px',
                 borderRadius: '10px',
                 border: 'none',
                 backgroundColor: '#2563eb',
                 color: '#ffffff',
-                fontWeight: '700',
-                fontSize: '14px',
+                fontWeight: '800',
+                fontSize: '15px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+                transition: 'all 0.15s ease',
+                minHeight: '42px',
+                boxSizing: 'border-box'
               }}
+              title="Save Note / Task (Cmd+Enter)"
             >
-              <span>Save</span>
+              <Check size={18} strokeWidth={2.6} />
+              <span>Save Note</span>
             </button>
           </div>
+        </div>
+
+        {/* Textarea for note text */}
+        <textarea
+          ref={quickAddTextareaRef}
+          className="quick-add-body-textarea"
+          rows={3}
+          value={newNotes}
+          onChange={(e) => setNewNotes(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault();
+              handleCreateNote();
+            }
+          }}
+          placeholder="Add New Note (Saved as a Task in your Unified Inbox)..."
+          style={{ fontSize: `${notesFontSize}px` }}
+        />
+
+        {newNotes && <ActionableEntitiesBar text={newNotes} />}
+
+        {statusMessage && (
+          <div style={{ fontSize: '13px', color: '#2563eb', fontWeight: '600' }}>
+            {statusMessage}
+          </div>
+        )}
+
+        {/* Subtle helper footer */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '12px',
+          color: 'var(--text-secondary, #9ca3af)',
+          paddingTop: '6px',
+          borderTop: '1px dashed var(--border-color, #f3f4f6)'
+        }}>
+          <span>💡 Tip: Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
+          {newNotes.trim() && (
+            <button
+              type="button"
+              onClick={() => handleCreateNote()}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#2563eb',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                padding: '2px 6px'
+              }}
+            >
+              ✓ Quick Save
+            </button>
+          )}
         </div>
       </div>
 

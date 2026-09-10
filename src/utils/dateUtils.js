@@ -161,3 +161,24 @@ export const adjustStartDateForWeekdays = (dateStr, daysOfWeek) => {
     }
     return formatDateString(date);
 };
+
+/**
+ * Formats a timestamp into an evidentiary proof string (e.g., "10 Sep 2026, 17:15:32").
+ * @param {number|string|Date} timestamp - Milliseconds timestamp or Date
+ * @returns {string} Formatted evidentiary date & time
+ */
+export const formatEvidentiaryTimestamp = (timestamp) => {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '';
+    
+    const day = d.getDate();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    
+    return `${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+};

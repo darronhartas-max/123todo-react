@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import NoteCard from './NoteCard';
 
 describe('NoteCard', () => {
@@ -87,5 +87,75 @@ describe('NoteCard', () => {
     // Prominent "Dictate at End" button should be easily located in edit mode
     const dictateBtn = screen.getByRole('button', { name: /Dictate at End/i });
     expect(dictateBtn).toBeInTheDocument();
+  });
+
+  test('displays prominent Save Note buttons at top and bottom in edit mode, saving changes on click', () => {
+    const onUpdateMock = jest.fn();
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={onUpdateMock}
+      />
+    );
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText(/Send quote to/i));
+
+    // There should be Save Note buttons (top and bottom)
+    const saveButtons = screen.getAllByRole('button', { name: /Save Note/i });
+    expect(saveButtons.length).toBeGreaterThanOrEqual(1);
+
+    // The top save button should be prominent
+    expect(saveButtons[0]).toBeInTheDocument();
+
+    // Click Save Note
+    fireEvent.click(saveButtons[0]);
+    expect(onUpdateMock).toHaveBeenCalledWith(sampleNote.id, expect.objectContaining({
+      text: sampleNote.text,
+      notes: sampleNote.notes
+    }));
+  });
+
+  test('displays evidentiary timestamp at the bottom and copies proof to clipboard when clicked', async () => {
+    const originalClipboard = navigator.clipboard;
+    const writeTextMock = jest.fn().mockResolvedValue();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock
+      }
+    });
+
+    const noteWithTimestamp = {
+      ...sampleNote,
+      createdAt: new Date(2026, 8, 10, 14, 20, 0).getTime(),
+      updatedAt: new Date(2026, 8, 10, 14, 25, 0).getTime()
+    };
+
+    render(
+      <NoteCard
+        note={noteWithTimestamp}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // Evidentiary timestamp should be present at the bottom
+    expect(screen.getByText(/10 Sep 2026/i)).toBeInTheDocument();
+
+    // Copy evidence button should be present
+    const copyButton = screen.getByTitle(/Copy evidentiary timestamp/i);
+    expect(copyButton).toBeInTheDocument();
+
+    // Click copy button
+    await act(async () => {
+      fireEvent.click(copyButton);
+    });
+    expect(writeTextMock).toHaveBeenCalled();
+    expect(writeTextMock.mock.calls[0][0]).toContain('123 ToDo Entry Log');
+    expect(writeTextMock.mock.calls[0][0]).toContain('10 Sep 2026');
+
+    // Restore clipboard
+    Object.assign(navigator, { clipboard: originalClipboard });
   });
 });
