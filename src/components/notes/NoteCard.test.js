@@ -216,4 +216,74 @@ describe('NoteCard', () => {
     expect(screen.getByPlaceholderText('Note Title...')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Write note details or dictation...')).toBeInTheDocument();
   });
+
+  test('prompts confirmation when cancelling edits with unsaved changes', () => {
+    const confirmSpy = jest.spyOn(window, 'confirm');
+    confirmSpy.mockReturnValue(false); // User clicks Cancel on prompt
+
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText(/Send quote to/i));
+
+    const titleTextarea = screen.getByPlaceholderText('Note Title...');
+    fireEvent.change(titleTextarea, { target: { value: 'Modified note text on site' } });
+
+    const cancelButtons = screen.getAllByRole('button', { name: /Cancel/i });
+    fireEvent.click(cancelButtons[0]);
+
+    expect(confirmSpy).toHaveBeenCalledWith('Discard unsaved changes to this note?');
+    // Still in edit mode because user declined discard
+    expect(screen.getByPlaceholderText('Note Title...')).toBeInTheDocument();
+
+    // Now user confirms discard
+    confirmSpy.mockReturnValue(true);
+    fireEvent.click(cancelButtons[0]);
+    // Back to view mode
+    expect(screen.queryByPlaceholderText('Note Title...')).not.toBeInTheDocument();
+
+    confirmSpy.mockRestore();
+  });
+
+  test('auto-saves existing note edits after 5 seconds of idle time', () => {
+    jest.useFakeTimers();
+    const onUpdateMock = jest.fn();
+
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={onUpdateMock}
+      />
+    );
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText(/Send quote to/i));
+
+    const titleTextarea = screen.getByPlaceholderText('Note Title...');
+    fireEvent.change(titleTextarea, { target: { value: 'Site note updated hurriedly' } });
+
+    expect(onUpdateMock).not.toHaveBeenCalled();
+
+    // Fast-forward 5 seconds
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(onUpdateMock).toHaveBeenCalledWith(
+      sampleNote.id,
+      expect.objectContaining({
+        text: 'Site note updated hurriedly'
+      })
+    );
+
+    jest.useRealTimers();
+  });
 });
+

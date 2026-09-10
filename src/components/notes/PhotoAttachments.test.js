@@ -41,7 +41,8 @@ describe('PhotoAttachments Component', () => {
     expect(images[1]).toHaveAttribute('src', 'data:image/webp;base64,mockthumb2');
   });
 
-  test('calls onChange with remaining photos when a photo is deleted', () => {
+  test('calls onChange with remaining photos when a photo is deleted and user confirms', () => {
+    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true);
     const onChangeMock = jest.fn();
     render(<PhotoAttachments photos={mockPhotos} onChange={onChangeMock} readOnly={false} />);
     
@@ -49,7 +50,23 @@ describe('PhotoAttachments Component', () => {
     expect(removeButtons.length).toBe(2);
 
     fireEvent.click(removeButtons[0]);
+    expect(confirmSpy).toHaveBeenCalledWith('Delete this photo attachment?');
     expect(onChangeMock).toHaveBeenCalledWith([mockPhotos[1]]);
+
+    confirmSpy.mockRestore();
+  });
+
+  test('does not delete photo when user cancels deletion prompt', () => {
+    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const onChangeMock = jest.fn();
+    render(<PhotoAttachments photos={mockPhotos} onChange={onChangeMock} readOnly={false} />);
+    
+    const removeButtons = screen.getAllByTitle('Remove photo');
+    fireEvent.click(removeButtons[0]);
+    expect(confirmSpy).toHaveBeenCalledWith('Delete this photo attachment?');
+    expect(onChangeMock).not.toHaveBeenCalled();
+
+    confirmSpy.mockRestore();
   });
 
   test('opens and closes lightbox when thumbnail is clicked', () => {

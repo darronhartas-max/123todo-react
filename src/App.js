@@ -590,8 +590,8 @@ const TodoApp = () => {
     recordAppUsageAction('add');
   }, [addTask, recordAppUsageAction]);
 
-  const handleAddNote = useCallback((title, body, projId) => {
-    addNote(title, body, projId);
+  const handleAddNote = useCallback((title, body, projId, extraFields) => {
+    addNote(title, body, projId, extraFields);
     recordAppUsageAction('add');
   }, [addNote, recordAppUsageAction]);
 

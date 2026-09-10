@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
   Folder, Search, Settings, Trophy, Check
 } from 'lucide-react';
 import NoteCard from './NoteCard';
+import PhotoAttachments from './PhotoAttachments';
 import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -28,6 +29,7 @@ const NotesView = ({
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
+  const [newPhotos, setNewPhotos] = useState([]);
   const [targetProjectId, setTargetProjectId] = useState(activeProjectFilter === 'all' ? 'general' : activeProjectFilter);
   const [isDictatingQuickAdd, setIsDictatingQuickAdd] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
@@ -36,6 +38,7 @@ const NotesView = ({
 
   const quickRecognitionRef = useRef(null);
   const quickAddTextareaRef = useRef(null);
+  const autoSaveTimerRef = useRef(null);
 
   // Auto-expand textarea height & keep the latest spoken/typed lines visible in viewport at all times
   useEffect(() => {
@@ -98,10 +101,34 @@ const NotesView = ({
     };
   }, []);
 
-  const handleCreateNote = (overrideBody) => {
-    const rawContent = typeof overrideBody === 'string' ? overrideBody : newNotes;
+  // Restore uncommitted draft on mount
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('123Todo_Draft_Note');
+      const savedPhotos = localStorage.getItem('123Todo_Draft_Photos');
+      if (savedDraft) setNewNotes(savedDraft);
+      if (savedPhotos) setNewPhotos(JSON.parse(savedPhotos));
+    } catch (e) {}
+  }, []);
 
-    if (!rawContent.trim()) return;
+  // Sync draft to localStorage in real-time
+  useEffect(() => {
+    try {
+      if (newNotes.trim() || newPhotos.length > 0) {
+        localStorage.setItem('123Todo_Draft_Note', newNotes);
+        localStorage.setItem('123Todo_Draft_Photos', JSON.stringify(newPhotos));
+      } else {
+        localStorage.removeItem('123Todo_Draft_Note');
+        localStorage.removeItem('123Todo_Draft_Photos');
+      }
+    } catch (e) {}
+  }, [newNotes, newPhotos]);
+
+  const handleCreateNote = useCallback((overrideBody, overridePhotos) => {
+    const rawContent = typeof overrideBody === 'string' ? overrideBody : newNotes;
+    const photosToSave = overridePhotos || newPhotos;
+
+    if (!rawContent.trim() && (!photosToSave || photosToSave.length === 0)) return;
 
     // Unconditionally stop voice dictation if running
     if (quickRecognitionRef.current) {
@@ -110,10 +137,56 @@ const NotesView = ({
     }
     setIsDictatingQuickAdd(false);
 
-    // Treat the note as a Task: add text directly to the Task text field, leaving note body empty for subsequent editing
-    onAddNote(rawContent.trim(), '', targetProjectId || 'general');
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+
+    const title = rawContent.trim() || (photosToSave && photosToSave.length > 0 ? `Photo Note (${photosToSave.length})` : 'Untitled Note');
+
+    onAddNote(title, '', targetProjectId || 'general', { photos: photosToSave });
     setNewNotes('');
-  };
+    setNewPhotos([]);
+
+    try {
+      localStorage.removeItem('123Todo_Draft_Note');
+      localStorage.removeItem('123Todo_Draft_Photos');
+    } catch (e) {}
+
+    setStatusMessage('✓ Note saved');
+    setTimeout(() => setStatusMessage(''), 2500);
+  }, [newNotes, newPhotos, targetProjectId, onAddNote]);
+
+  // Auto-save: automatically saves note after 4s idle period so rushing on site never loses data
+  useEffect(() => {
+    if ((newNotes.trim().length > 0 || newPhotos.length > 0) && !isDictatingQuickAdd) {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+      autoSaveTimerRef.current = setTimeout(() => {
+        handleCreateNote();
+      }, 4000);
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [newNotes, newPhotos, isDictatingQuickAdd, handleCreateNote]);
+
+  // Also auto-save on visibility change (switching apps or locking phone on site)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (newNotes.trim() || newPhotos.length > 0) {
+          handleCreateNote();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [newNotes, newPhotos, handleCreateNote]);
 
   // Toggle Dictation for Quick Add Card
   const toggleQuickAddDictation = () => {
@@ -325,9 +398,36 @@ const NotesView = ({
             </select>
           </div>
 
-          {/* Primary Quick-Action Buttons at Top: Talk + Large Prominent Save Note Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {/* Red Tape Recorder 'Talk' / 'Stop' Button */}
+          {/* Primary Quick-Action Buttons at Top: Save on Left, Talk at Top Right with reasonable space */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+            {/* Large Prominent Save Button to the left of Talk */}
+            <button
+              type="button"
+              onClick={() => handleCreateNote()}
+              style={{
+                padding: '9px 20px',
+                borderRadius: '10px',
+                border: 'none',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                fontWeight: '800',
+                fontSize: '15px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+                transition: 'all 0.15s ease',
+                minHeight: '42px',
+                boxSizing: 'border-box'
+              }}
+              title="Save Note / Task (Cmd+Enter)"
+            >
+              <Check size={18} strokeWidth={2.6} />
+              <span>Save</span>
+            </button>
+
+            {/* Red Tape Recorder 'Talk' / 'Stop' Button at top right */}
             <button
               type="button"
               onClick={toggleQuickAddDictation}
@@ -335,7 +435,7 @@ const NotesView = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '9px 14px',
+                padding: '9px 16px',
                 borderRadius: '10px',
                 border: '1.5px solid #ef4444',
                 backgroundColor: isDictatingQuickAdd ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.08)',
@@ -360,33 +460,6 @@ const NotesView = ({
               }} />
               <span>{isDictatingQuickAdd ? 'Stop' : 'Talk'}</span>
             </button>
-
-            {/* Large Prominent Save Note Button at Top */}
-            <button
-              type="button"
-              onClick={() => handleCreateNote()}
-              style={{
-                padding: '9px 20px',
-                borderRadius: '10px',
-                border: 'none',
-                backgroundColor: '#2563eb',
-                color: '#ffffff',
-                fontWeight: '800',
-                fontSize: '15px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
-                transition: 'all 0.15s ease',
-                minHeight: '42px',
-                boxSizing: 'border-box'
-              }}
-              title="Save Note / Task (Cmd+Enter)"
-            >
-              <Check size={18} strokeWidth={2.6} />
-              <span>Save Note</span>
-            </button>
           </div>
         </div>
 
@@ -403,15 +476,24 @@ const NotesView = ({
               handleCreateNote();
             }
           }}
-          placeholder="Add New Note (Saved as a Task in your Unified Inbox)..."
+          placeholder="Add New Note..."
           style={{ fontSize: `${notesFontSize}px` }}
         />
 
         {newNotes && <ActionableEntitiesBar text={newNotes} />}
 
+        {/* Photos at the Note Taking Stage */}
+        <div style={{ marginTop: '6px' }}>
+          <PhotoAttachments
+            photos={newPhotos}
+            onChange={setNewPhotos}
+            readOnly={false}
+          />
+        </div>
+
         {statusMessage && (
-          <div style={{ fontSize: '13px', color: '#2563eb', fontWeight: '600' }}>
-            {statusMessage}
+          <div style={{ fontSize: '13px', color: '#2563eb', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+            <span>{statusMessage}</span>
           </div>
         )}
 
@@ -423,10 +505,12 @@ const NotesView = ({
           fontSize: '12px',
           color: 'var(--text-secondary, #9ca3af)',
           paddingTop: '6px',
-          borderTop: '1px dashed var(--border-color, #f3f4f6)'
+          borderTop: '1px dashed var(--border-color, #f3f4f6)',
+          flexWrap: 'wrap',
+          gap: '6px'
         }}>
-          <span>💡 Tip: Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
-          {newNotes.trim() && (
+          <span>💡 Auto-saves after 4s idle • Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
+          {(newNotes.trim() || newPhotos.length > 0) && (
             <button
               type="button"
               onClick={() => handleCreateNote()}
@@ -440,7 +524,7 @@ const NotesView = ({
                 padding: '2px 6px'
               }}
             >
-              ✓ Quick Save
+              ✓ Save Now
             </button>
           )}
         </div>

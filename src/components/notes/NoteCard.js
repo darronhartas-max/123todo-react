@@ -36,6 +36,7 @@ const NoteCard = ({
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
   const titleTextareaRef = useRef(null);
+  const editAutoSaveTimerRef = useRef(null);
 
   // Keep title textarea auto-expanded to fit content without truncation
   useEffect(() => {
@@ -98,6 +99,10 @@ const NoteCard = ({
   }, []);
 
   const handleSaveEdits = () => {
+    if (editAutoSaveTimerRef.current) {
+      clearTimeout(editAutoSaveTimerRef.current);
+      editAutoSaveTimerRef.current = null;
+    }
     if (titleRecognitionRef.current) {
       try { titleRecognitionRef.current.stop(); } catch (e) {}
       titleRecognitionRef.current = null;
@@ -111,6 +116,57 @@ const NoteCard = ({
       subtasks
     });
   };
+
+  // Auto-save existing note edits after 5s idle period so user never loses edits on site
+  useEffect(() => {
+    if (!isEditing || isDictatingTitle) return;
+
+    const hasChanges =
+      titleText !== (note.text || '') ||
+      notesText !== (note.notes || '') ||
+      JSON.stringify(subtasks) !== JSON.stringify(note.subtasks || []);
+
+    if (hasChanges) {
+      if (editAutoSaveTimerRef.current) {
+        clearTimeout(editAutoSaveTimerRef.current);
+      }
+      editAutoSaveTimerRef.current = setTimeout(() => {
+        onUpdateNote(note.id, {
+          text: titleText.trim() || 'Untitled Task',
+          notes: notesText.trim(),
+          subtasks
+        });
+      }, 5000);
+    }
+
+    return () => {
+      if (editAutoSaveTimerRef.current) {
+        clearTimeout(editAutoSaveTimerRef.current);
+      }
+    };
+  }, [isEditing, titleText, notesText, subtasks, isDictatingTitle, note, onUpdateNote]);
+
+  // Auto-save edits on phone lock / app switch
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        const hasChanges =
+          titleText !== (note.text || '') ||
+          notesText !== (note.notes || '') ||
+          JSON.stringify(subtasks) !== JSON.stringify(note.subtasks || []);
+        if (hasChanges) {
+          onUpdateNote(note.id, {
+            text: titleText.trim() || 'Untitled Task',
+            notes: notesText.trim(),
+            subtasks
+          });
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isEditing, titleText, notesText, subtasks, note, onUpdateNote]);
 
   const handleToggleTitleDictation = (e) => {
     if (e) e.stopPropagation();
@@ -165,6 +221,21 @@ const NoteCard = ({
 
   const handleCancelEdits = (e) => {
     if (e) e.stopPropagation();
+    const hasChanges = 
+      titleText !== (note.text || '') ||
+      notesText !== (note.notes || '') ||
+      JSON.stringify(subtasks) !== JSON.stringify(note.subtasks || []);
+
+    if (hasChanges && window.confirm) {
+      const confirmDiscard = window.confirm('Discard unsaved changes to this note?');
+      if (!confirmDiscard) return;
+    }
+
+    if (editAutoSaveTimerRef.current) {
+      clearTimeout(editAutoSaveTimerRef.current);
+      editAutoSaveTimerRef.current = null;
+    }
+
     if (titleRecognitionRef.current) {
       try { titleRecognitionRef.current.stop(); } catch (err) {}
       titleRecognitionRef.current = null;

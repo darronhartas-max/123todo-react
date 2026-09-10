@@ -138,6 +138,9 @@ const PhotoAttachments = ({
   const handleDelete = (e, photoId) => {
     e.stopPropagation();
     if (readOnly) return;
+    if (window.confirm && !window.confirm('Delete this photo attachment?')) {
+      return;
+    }
     deletePhoto(photoId).catch(() => {});
     if (onChange) {
       onChange(photos.filter(p => p.id !== photoId));

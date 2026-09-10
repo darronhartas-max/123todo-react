@@ -654,7 +654,7 @@ export const useTasks = () => {
         setTimestamp(Date.now());
     }, [counter]);
 
-    const addNote = useCallback((text, notes = '', projectId = 'general') => {
+    const addNote = useCallback((text, notes = '', projectId = 'general', extraFields = {}) => {
         const newId = counter + 1;
         const now = Date.now();
         let finalTitle = (text || '').trim();
@@ -664,7 +664,13 @@ export const useTasks = () => {
             finalTitle = finalNotes;
             finalNotes = '';
         }
-        if (!finalTitle) finalTitle = 'Untitled Task';
+        if (!finalTitle) {
+            if (extraFields && extraFields.photos && extraFields.photos.length > 0) {
+                finalTitle = `Photo Note (${extraFields.photos.length})`;
+            } else {
+                finalTitle = 'Untitled Note';
+            }
+        }
 
         const newNote = {
             id: newId,
@@ -680,7 +686,9 @@ export const useTasks = () => {
             recurrence: null,
             completedAt: null,
             createdAt: now,
-            updatedAt: now
+            updatedAt: now,
+            photos: (extraFields && extraFields.photos) || [],
+            ...(extraFields || {})
         };
 
         setCounter(newId);
