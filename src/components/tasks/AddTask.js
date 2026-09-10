@@ -550,7 +550,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 style={styles.taskInput}
                 maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (text || '').length + 500)}
             />
-            <ActionableEntitiesBar text={text} />
+            <ActionableEntitiesBar texts={[text, notes, ...(subtasks.map(s => s.text))]} />
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
                 <button
@@ -627,7 +627,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         placeholder="Add notes..."
                         style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
                     />
-                    <ActionableEntitiesBar text={notes} />
                     <PhotoAttachments
                         photos={photos}
                         onChange={setPhotos}

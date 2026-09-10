@@ -1250,6 +1250,10 @@ const TodoApp = () => {
           projects={[...DEFAULT_PROJECTS.filter(p => p.id !== 'all'), ...projects]}
           onSave={updateTask}
           onClose={() => setEditingTask(null)}
+          onArchive={(taskToArchive) => {
+            handleCompleteTask(taskToArchive?.id || editingTask.id);
+            setEditingTask(null);
+          }}
           dateFormat={dateFormat}
           taskLengthLimit={taskLengthLimit}
         />

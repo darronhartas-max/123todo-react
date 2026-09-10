@@ -3,12 +3,12 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
 
-const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
+const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task, photos: task.photos || [] });
     
@@ -175,17 +175,18 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     };
 
     const toggleButtonStyle = (isActive) => ({
-        border: `1px solid ${isActive ? 'var(--accent-color)' : 'var(--accent-color)'}`,
-        color: isActive ? 'white' : 'var(--accent-color)',
+        border: `1.5px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}`,
+        color: isActive ? '#ffffff' : 'var(--text-color)',
         cursor: 'pointer',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         gap: '6px',
-        fontSize: '0.9rem',
+        fontSize: '0.85rem',
         fontWeight: '600',
-        padding: '6px 12px',
-        borderRadius: '6px',
+        padding: '6px 13px',
+        borderRadius: '8px',
         background: isActive ? 'var(--accent-color)' : 'var(--item-bg)',
+        boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.15)' : 'none',
         transition: 'all 0.15s ease',
         boxSizing: 'border-box'
     });
@@ -193,13 +194,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
     const styles = {
         modalContent: {
             background: 'var(--surface-color)',
-            borderRadius: '12px',
-            padding: '20px',
-            width: '94%',
-            maxWidth: '560px',
-            maxHeight: '90vh',
-            overflow: (isProjectOpen || isPriorityOpen) ? 'visible' : 'auto',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
+            borderRadius: '16px',
+            padding: '18px 22px 20px 22px',
+            width: '95%',
+            maxWidth: '580px',
+            maxHeight: '92vh',
+            overflowY: (isProjectOpen || isPriorityOpen) ? 'visible' : 'auto',
+            boxShadow: '0 24px 64px -8px rgba(0, 0, 0, 0.4)',
             color: 'var(--text-color)',
             boxSizing: 'border-box',
             position: 'relative',
@@ -207,27 +208,36 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
             transition: 'width 0.2s ease, max-height 0.2s ease'
         },
         sectionLabel: {
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: 'var(--muted-text)',
-            letterSpacing: '0.2px'
+            fontSize: '0.75rem',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '0.6px',
+            color: 'var(--muted-text)'
+        },
+        cardSection: {
+            marginBottom: '12px',
+            padding: '12px 14px',
+            borderRadius: '10px',
+            border: '1px solid var(--border-color)',
+            background: 'var(--item-bg)',
+            boxSizing: 'border-box'
         },
         textarea: {
             width: '100%',
-            padding: '10px 12px',
-            fontSize: '1.1rem',
-            lineHeight: '1.5',
-            border: '1px solid var(--border-color)',
-            borderRadius: '6px',
+            padding: '11px 13px',
+            fontSize: '1.05rem',
+            lineHeight: '1.55',
+            border: '1.5px solid var(--border-color)',
+            borderRadius: '8px',
             resize: 'none',
             overflowY: 'auto',
-            marginBottom: '10px',
-            fontFamily: 'Inter, sans-serif',
+            marginBottom: '8px',
+            fontFamily: 'inherit',
             boxSizing: 'border-box',
             background: 'var(--item-bg)',
             color: 'var(--text-color)',
             outline: 'none',
-            transition: 'border-color 0.15s ease'
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
         },
         select: {
             width: '100%',
@@ -248,11 +258,98 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
             <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 
+                {/* MODAL HEADER: Title, Quick Archive Button, Close */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '14px',
+                    paddingBottom: '10px',
+                    borderBottom: '1px solid var(--border-color)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                            fontSize: '1.08rem',
+                            fontWeight: '700',
+                            letterSpacing: '-0.01em',
+                            color: 'var(--text-color)'
+                        }}>
+                            Edit Task
+                        </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {onArchive && (
+                            <button
+                                type="button"
+                                onClick={() => onArchive(editingTask)}
+                                title="Mark task completed and move to Archive"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '6px 12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'var(--item-bg)',
+                                    color: 'var(--text-color)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                                    e.currentTarget.style.color = '#ef4444';
+                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                                    e.currentTarget.style.color = 'var(--text-color)';
+                                    e.currentTarget.style.background = 'var(--item-bg)';
+                                }}
+                            >
+                                <Archive size={15} />
+                                <span>Archive</span>
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            title="Close without saving"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '32px',
+                                height: '32px',
+                                padding: 0,
+                                borderRadius: '8px',
+                                border: '1px solid transparent',
+                                background: 'transparent',
+                                color: 'var(--muted-text)',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = 'var(--text-color)';
+                                e.currentTarget.style.background = 'var(--item-bg)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--muted-text)';
+                                e.currentTarget.style.background = 'transparent';
+                            }}
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                </div>
+
                 {/* 1. TOP ROW: Color-Coded Priority and Project Dropdowns */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', position: 'relative', zIndex: (isProjectOpen || isPriorityOpen) ? 120 : 1 }}>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', position: 'relative', zIndex: (isProjectOpen || isPriorityOpen) ? 120 : 1 }}>
                     {/* Priority Custom Dropdown */}
                     <div style={{ flex: 1, position: 'relative', zIndex: isPriorityOpen ? 121 : 1 }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '4px' }}>Priority</div>
+                        <div style={{ ...styles.sectionLabel, marginBottom: '5px' }}>Priority</div>
                         <button
                             type="button"
                             onClick={() => { setIsPriorityOpen(!isPriorityOpen); setIsProjectOpen(false); }}
@@ -472,10 +569,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                {/* 2. TASK TITLE */}
-                <div style={{ marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={styles.sectionLabel}>Task Title / Description</span>
+                {/* 2. TASK TITLE / DESCRIPTION */}
+                <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={styles.sectionLabel}>Task Description</span>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                             <button
                                 type="button"
@@ -485,11 +582,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '4px',
-                                    padding: '3px 8px',
-                                    borderRadius: '12px',
-                                    border: '1px solid var(--accent-color)',
-                                    background: 'var(--accent-bg)',
-                                    color: 'var(--accent-color)',
+                                    padding: '4px 9px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'var(--item-bg)',
+                                    color: 'var(--text-color)',
                                     cursor: 'pointer',
                                     fontSize: '0.8rem',
                                     fontWeight: '600'
@@ -506,8 +603,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '5px',
-                                    padding: '3px 8px',
-                                    borderRadius: '12px',
+                                    padding: '4px 9px',
+                                    borderRadius: '8px',
                                     border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
                                     background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
                                     color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
@@ -545,20 +642,33 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                         value={editingTask.text}
                         onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
                         onInput={handleInput}
+                        onFocus={(e) => {
+                            e.target.style.borderColor = 'var(--accent-color)';
+                            e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                        }}
+                        onBlur={(e) => {
+                            e.target.style.borderColor = 'var(--border-color)';
+                            e.target.style.boxShadow = 'none';
+                        }}
                         style={{
                             ...styles.textarea,
-                            minHeight: '52px',
-                            maxHeight: '150px',
+                            minHeight: '56px',
+                            maxHeight: '160px',
                             fontWeight: '500',
-                            fontSize: '1.1rem'
+                            fontSize: '1.08rem'
                         }}
                         maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
                     />
-                    <ActionableEntitiesBar text={editingTask.text} />
+                    {/* SINGLE ACTIONABLE PANEL FOR ENTIRE TASK */}
+                    <ActionableEntitiesBar texts={[
+                        editingTask.text,
+                        editingTask.notes,
+                        ...(subtasks.map(s => s.text))
+                    ]} />
                 </div>
 
                 {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, and Schedule on the SAME line */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                     <button
                         type="button"
                         onClick={() => setShowNotes(!showNotes)}
@@ -587,10 +697,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                 {/* Notes Editor (Visible when Notes button is active) */}
                 {showNotes && (
-                    <div style={{ marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={styles.cardSection}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={styles.sectionLabel}>Notes</span>
+                                <span style={styles.sectionLabel}>Notes & Details</span>
                                 <button
                                     type="button"
                                     onClick={() => setShowNotes(false)}
@@ -600,11 +710,13 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                         border: 'none',
                                         cursor: 'pointer',
                                         color: 'var(--muted-text)',
-                                        padding: 0,
-                                        display: 'flex'
+                                        padding: '2px 4px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        borderRadius: '4px'
                                     }}
                                 >
-                                    <Minus size={14} />
+                                    <Minus size={13} />
                                 </button>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -617,10 +729,10 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                         alignItems: 'center',
                                         gap: '4px',
                                         padding: '3px 8px',
-                                        borderRadius: '12px',
-                                        border: '1px solid var(--accent-color)',
-                                        background: 'var(--accent-bg)',
-                                        color: 'var(--accent-color)',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--border-color)',
+                                        background: 'var(--surface-color)',
+                                        color: 'var(--text-color)',
                                         cursor: 'pointer',
                                         fontSize: '0.8rem',
                                         fontWeight: '600'
@@ -638,9 +750,9 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                         alignItems: 'center',
                                         gap: '5px',
                                         padding: '3px 8px',
-                                        borderRadius: '12px',
+                                        borderRadius: '8px',
                                         border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
-                                        background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                        background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--surface-color)',
                                         color: listeningTarget === 'notes' ? '#ef4444' : 'var(--text-color)',
                                         cursor: 'pointer',
                                         fontSize: '0.82rem',
@@ -674,15 +786,24 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             value={editingTask.notes || ''}
                             onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
                             onInput={handleInput}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = 'var(--accent-color)';
+                                e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = 'var(--border-color)';
+                                e.target.style.boxShadow = 'none';
+                            }}
                             placeholder="Add notes or extra details..."
                             style={{
                                 ...styles.textarea,
                                 minHeight: '85px',
                                 maxHeight: '180px',
-                                fontSize: '1.05rem'
+                                fontSize: '1.05rem',
+                                background: 'var(--surface-color)',
+                                marginBottom: '8px'
                             }}
                         />
-                        <ActionableEntitiesBar text={editingTask.notes} />
                         <PhotoAttachments
                             photos={editingTask.photos || []}
                             onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
@@ -710,15 +831,11 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
 
                 {/* Compact Subtask Editor */}
                 {showSubtasks && (
-                    <div style={{
-                        marginBottom: '10px',
-                        padding: '12px',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '6px',
-                        background: 'var(--item-bg)'
-                    }}>
-                        <div style={{ fontSize: '1.05rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
-                            📋 Subtasks Checklist
+                    <div style={styles.cardSection}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={styles.sectionLabel}>
+                                Subtasks {subtasks.length > 0 ? `(${subtasks.filter(s => s.completed).length}/${subtasks.length})` : ''}
+                            </span>
                         </div>
                         {subtasks.length > 0 && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
@@ -848,7 +965,6 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                                         }
                                                     }}
                                                 />
-                                                <ActionableEntitiesBar text={st.text} compact />
                                             </div>
                                             <button
                                                 type="button"
@@ -889,8 +1005,8 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     padding: '8px 12px',
                                     fontSize: '1.05rem',
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '4px',
-                                    background: 'var(--bg-color)',
+                                    borderRadius: '6px',
+                                    background: 'var(--surface-color)',
                                     color: 'var(--text-color)',
                                     resize: 'none',
                                     overflowY: 'hidden',
@@ -917,9 +1033,9 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                     background: 'var(--accent-color)',
                                     color: 'white',
                                     border: 'none',
-                                    borderRadius: '4px',
+                                    borderRadius: '6px',
                                     cursor: 'pointer',
-                                    fontSize: '1.05rem',
+                                    fontSize: '1rem',
                                     fontWeight: '600',
                                     alignSelf: 'flex-start'
                                 }}
@@ -927,22 +1043,14 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 Add
                             </button>
                         </div>
-                        <ActionableEntitiesBar text={newSubtaskText} compact />
                     </div>
                 )}
 
                 {/* Compact Schedule and Recurrence Editor */}
                 {showSchedule && (
-                    <div style={{
-                        marginBottom: '10px',
-                        padding: '12px',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '6px',
-                        background: 'var(--item-bg)',
-                        boxSizing: 'border-box'
-                    }}>
-                        <div style={{ fontSize: '1.05rem', fontWeight: '600', marginBottom: '8px', color: 'var(--muted-text)' }}>
-                            📅 Date & Recurrence Scheduling
+                    <div style={styles.cardSection}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={styles.sectionLabel}>Date & Recurrence</span>
                         </div>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px', flexWrap: 'nowrap', width: '100%', boxSizing: 'border-box' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>
@@ -1135,7 +1243,14 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                     </div>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    paddingTop: '12px',
+                    borderTop: '1px solid var(--border-color)'
+                }}>
                     <div>
                         {!isUnlimited && (
                             <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
@@ -1153,10 +1268,17 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                                 fontSize: '0.95rem',
                                 fontWeight: '600',
                                 border: '1px solid var(--border-color)',
-                                borderRadius: '6px',
+                                borderRadius: '8px',
                                 cursor: 'pointer',
                                 background: 'transparent',
-                                color: 'var(--text-color)'
+                                color: 'var(--text-color)',
+                                transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'var(--item-bg)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent';
                             }}
                         >
                             Cancel
@@ -1165,28 +1287,27 @@ const EditModal = ({ task, onSave, onClose, projects, dateFormat = 'UK', taskLen
                             type="button"
                             onClick={handleSave}
                             style={{
-                                padding: '8px 20px',
+                                padding: '8px 22px',
                                 fontSize: '0.95rem',
-                                fontWeight: '800',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
-                                border: '2px solid #059669',
-                                borderRadius: '6px',
+                                fontWeight: '700',
+                                letterSpacing: '0.3px',
+                                border: '1.5px solid #059669',
+                                borderRadius: '8px',
                                 cursor: 'pointer',
                                 background: '#10b981',
                                 color: '#ffffff',
-                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                boxShadow: '0 2px 5px rgba(16, 185, 129, 0.25)',
+                                transition: 'all 0.15s ease'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.background = '#059669';
                                 e.currentTarget.style.transform = 'translateY(-1px)';
-                                e.currentTarget.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.3)';
+                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(16, 185, 129, 0.35)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.background = '#10b981';
                                 e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 2px 4px rgba(16, 185, 129, 0.2)';
+                                e.currentTarget.style.boxShadow = '0 2px 5px rgba(16, 185, 129, 0.25)';
                             }}
                         >
                             Save

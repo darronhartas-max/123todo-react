@@ -219,5 +219,54 @@ describe('EditModal', () => {
     expect(screen.getByText('Project 4')).toBeInTheDocument();
     expect(screen.getByText('Project 5')).toBeInTheDocument();
   });
+
+  test('calls onArchive when Archive button near the top is clicked', () => {
+        const onArchiveMock = jest.fn();
+        render(
+            <EditModal
+                task={sampleTaskWithNotes}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                onArchive={onArchiveMock}
+                projects={sampleProjects}
+            />
+        );
+
+        const archiveButton = screen.getByRole('button', { name: /^Archive$/i });
+        expect(archiveButton).toBeInTheDocument();
+        fireEvent.click(archiveButton);
+        expect(onArchiveMock).toHaveBeenCalledTimes(1);
+        expect(onArchiveMock).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    test('renders a single consolidated actionable panel under the Tasks section', () => {
+        const taskWithMultipleActionables = {
+            id: 3,
+            text: 'Meeting notes from https://example.com and call 07123456789',
+            notes: 'Follow up at boss@example.com or visit https://example.com',
+            priority: 2,
+            projectId: 'general',
+            subtasks: []
+        };
+
+        const { container } = render(
+            <EditModal
+                task={taskWithMultipleActionables}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // There should be exactly ONE actionable bar in the entire modal
+        const actionableBars = container.querySelectorAll('.actionable-entities-bar');
+        expect(actionableBars).toHaveLength(1);
+
+        // It should contain all entities deduplicated (1 url, 1 phone, 1 email)
+        expect(screen.getByRole('link', { name: /Open example.com/i })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Call 07123456789/i })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Email boss@example.com/i })).toBeInTheDocument();
+    });
 });
+
 

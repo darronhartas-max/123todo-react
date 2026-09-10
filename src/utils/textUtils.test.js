@@ -136,5 +136,23 @@ describe('textUtils', () => {
             expect(webLink).toHaveAttribute('href', 'https://123todo.com');
             expect(webLink).toHaveAttribute('target', '_blank');
         });
+
+        test('consolidates and deduplicates actionable links from multiple texts array', () => {
+            render(
+                <ActionableEntitiesBar
+                    texts={[
+                        'Call +44 20 7946 0919 or visit https://123todo.com',
+                        'Email support@123todo.com or visit https://123todo.com'
+                    ]}
+                />
+            );
+
+            expect(screen.getByRole('link', { name: /Call/i })).toBeInTheDocument();
+            expect(screen.getByRole('link', { name: /Email/i })).toBeInTheDocument();
+            // Should deduplicate https://123todo.com so only 1 web link exists
+            const webLinks = screen.getAllByRole('link', { name: /Open/i });
+            expect(webLinks).toHaveLength(1);
+        });
+
     });
 });

@@ -323,8 +323,16 @@ export const extractActionableEntities = (text) => {
  * Renders an interactive quick-action strip of detected phone, email, and web links
  * right beneath text inputs or textareas in edit mode.
  */
-export const ActionableEntitiesBar = ({ text, style = {}, compact = false, label = 'Actionable:' }) => {
-    const entities = extractActionableEntities(text);
+export const ActionableEntitiesBar = ({ text, texts, style = {}, compact = false, label = 'Actionable:' }) => {
+    let combinedText = '';
+    if (Array.isArray(texts)) {
+        combinedText = texts.filter(t => typeof t === 'string' && t.trim().length > 0).join('\n');
+    } else if (Array.isArray(text)) {
+        combinedText = text.filter(t => typeof t === 'string' && t.trim().length > 0).join('\n');
+    } else if (typeof text === 'string') {
+        combinedText = text;
+    }
+    const entities = extractActionableEntities(combinedText);
     if (!entities || entities.length === 0) return null;
 
     return (
