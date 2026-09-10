@@ -271,9 +271,15 @@ describe('NoteCard', () => {
 
     expect(onUpdateMock).not.toHaveBeenCalled();
 
-    // Fast-forward 5 seconds
+    // After 30 seconds, still not saved (giving time to think or inspect)
     act(() => {
-      jest.advanceTimersByTime(5000);
+      jest.advanceTimersByTime(30000);
+    });
+    expect(onUpdateMock).not.toHaveBeenCalled();
+
+    // Advance to 60 seconds total (default auto-save)
+    act(() => {
+      jest.advanceTimersByTime(30000);
     });
 
     expect(onUpdateMock).toHaveBeenCalledWith(

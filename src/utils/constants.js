@@ -35,8 +35,19 @@ export const STORAGE_KEYS = {
   MODE_DISCOVERY_COUNT: '123TodoModeDiscoveryCount',
   NOTES_FONT_SIZE: '123TodoNotesFontSize',
   TASK_VIEW_MODE: '123TodoTaskViewMode',
-  EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference'
+  EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference',
+  NOTES_AUTOSAVE_DELAY: '123TodoNotesAutosaveDelay'
 };
+
+export const NOTES_AUTOSAVE_OPTIONS = [
+  { id: '30s', label: '30 Seconds', seconds: 30, desc: 'Quick on-site saving' },
+  { id: '60s', label: '1 Minute (Default)', seconds: 60, desc: 'Balanced for notes & estimating' },
+  { id: '120s', label: '2 Minutes', seconds: 120, desc: 'Relaxed note-taking & contemplation' },
+  { id: '300s', label: '5 Minutes', seconds: 300, desc: 'Extended drafting for detailed quotes' },
+  { id: 'off', label: 'Manual Only', seconds: 0, desc: 'Auto-save disabled; save via button or app switch' }
+];
+
+export const DEFAULT_NOTES_AUTOSAVE_DELAY = '60s';
 
 export const DATE_FORMAT_OPTIONS = [
   { id: 'UK', label: 'UK / International', format: 'DD/MM/YYYY', example: '15/08/2026' },

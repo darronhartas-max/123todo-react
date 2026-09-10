@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, migrateProjectColor } from '../../utils/constants';
+import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
 
 const SHORTCUTS_LIST = [
@@ -237,6 +237,8 @@ const SettingsModal = ({
     setFontSize,
     notesFontSize = 18,
     setNotesFontSize,
+    notesAutosaveDelay = '60s',
+    setNotesAutosaveDelay,
     layoutWidth,
     setLayoutWidth,
     wideColumnView = 'priorities',
@@ -1299,6 +1301,49 @@ const SettingsModal = ({
                                                         {opt.label}
                                                     </div>
                                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>
+                                                        {opt.desc}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Notes Mode Auto-Save Delay */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Notes Auto-Save Delay</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Inactivity delay before a drafted note, quote, or job estimate is automatically saved
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {NOTES_AUTOSAVE_OPTIONS.map(opt => {
+                                            const isSelected = (notesAutosaveDelay || DEFAULT_NOTES_AUTOSAVE_DELAY) === opt.id;
+                                            return (
+                                                <div
+                                                    key={opt.id}
+                                                    onClick={() => setNotesAutosaveDelay && setNotesAutosaveDelay(opt.id)}
+                                                    style={{
+                                                        padding: '10px 12px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                        background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: '2px',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: isSelected ? '700' : '600',
+                                                        color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                    }}>
+                                                        {opt.label}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
                                                         {opt.desc}
                                                     </div>
                                                 </div>

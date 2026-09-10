@@ -73,7 +73,7 @@ describe('NotesView', () => {
     expect(textarea.value).toBe('');
   });
 
-  test('auto-saves draft after 4 seconds of idle time without losing notes', () => {
+  test('auto-saves draft after default 60 seconds (1 min) of idle time without premature interruption', () => {
     const onAddNoteMock = jest.fn();
     render(
       <NotesView
@@ -84,22 +84,80 @@ describe('NotesView', () => {
     );
 
     const textarea = screen.getByPlaceholderText('Add New Note...');
-    fireEvent.change(textarea, { target: { value: 'Site note taken in a hurry' } });
+    fireEvent.change(textarea, { target: { value: 'Site note estimating electrical wiring' } });
 
-    // Not saved immediately
-    expect(onAddNoteMock).not.toHaveBeenCalled();
-
-    // Advance 4 seconds
+    // Should NOT save at 4 seconds or 30 seconds when thinking or taking measurements
     act(() => {
       jest.advanceTimersByTime(4000);
     });
+    expect(onAddNoteMock).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(26000); // 30s total
+    });
+    expect(onAddNoteMock).not.toHaveBeenCalled();
+
+    // Advance to 60 seconds total
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
 
     expect(onAddNoteMock).toHaveBeenCalledWith(
-      'Site note taken in a hurry',
+      'Site note estimating electrical wiring',
       '',
       'general',
       expect.objectContaining({ photos: [] })
     );
+  });
+
+  test('respects configurable notesAutosaveDelay prop (e.g. 30s)', () => {
+    const onAddNoteMock = jest.fn();
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        onAddNote={onAddNoteMock}
+        notesAutosaveDelay="30s"
+      />
+    );
+
+    const textarea = screen.getByPlaceholderText('Add New Note...');
+    fireEvent.change(textarea, { target: { value: 'Quick notes 30s test' } });
+
+    act(() => {
+      jest.advanceTimersByTime(29000);
+    });
+    expect(onAddNoteMock).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+    expect(onAddNoteMock).toHaveBeenCalledWith(
+      'Quick notes 30s test',
+      '',
+      'general',
+      expect.objectContaining({ photos: [] })
+    );
+  });
+
+  test('disables idle auto-save when notesAutosaveDelay is set to off', () => {
+    const onAddNoteMock = jest.fn();
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        onAddNote={onAddNoteMock}
+        notesAutosaveDelay="off"
+      />
+    );
+
+    const textarea = screen.getByPlaceholderText('Add New Note...');
+    fireEvent.change(textarea, { target: { value: 'Manual only note' } });
+
+    act(() => {
+      jest.advanceTimersByTime(300000); // 5 minutes
+    });
+    expect(onAddNoteMock).not.toHaveBeenCalled();
   });
 
   test('auto-saves draft on document visibilitychange when user switches app or locks phone', () => {

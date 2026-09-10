@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, CheckCircle, Mic, ChevronDown, 
@@ -20,7 +20,8 @@ const NoteCard = ({
   onAssignProject,
   isSelected,
   onToggleSelect,
-  notesFontSize = 18
+  notesFontSize = 18,
+  notesAutosaveDelay = '60s'
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [titleText, setTitleText] = useState(note.text || '');
@@ -117,9 +118,21 @@ const NoteCard = ({
     });
   };
 
-  // Auto-save existing note edits after 5s idle period so user never loses edits on site
+  // Inactivity timeout in ms based on user preference ('30s' -> 30s, '60s' -> 1 min, '120s' -> 2 min, '300s' -> 5 min, 'off' -> 0)
+  const autosaveDelayMs = useMemo(() => {
+    switch (notesAutosaveDelay) {
+      case '30s': return 30000;
+      case '60s': return 60000;
+      case '120s': return 120000;
+      case '300s': return 300000;
+      case 'off': return 0;
+      default: return 60000; // 1 minute default
+    }
+  }, [notesAutosaveDelay]);
+
+  // Auto-save existing note edits after configured idle period so user never loses edits on site
   useEffect(() => {
-    if (!isEditing || isDictatingTitle) return;
+    if (!isEditing || isDictatingTitle || autosaveDelayMs === 0) return;
 
     const hasChanges =
       titleText !== (note.text || '') ||
@@ -136,7 +149,7 @@ const NoteCard = ({
           notes: notesText.trim(),
           subtasks
         });
-      }, 5000);
+      }, autosaveDelayMs);
     }
 
     return () => {
@@ -144,7 +157,7 @@ const NoteCard = ({
         clearTimeout(editAutoSaveTimerRef.current);
       }
     };
-  }, [isEditing, titleText, notesText, subtasks, isDictatingTitle, note, onUpdateNote]);
+  }, [isEditing, titleText, notesText, subtasks, isDictatingTitle, autosaveDelayMs, note, onUpdateNote]);
 
   // Auto-save edits on phone lock / app switch
   useEffect(() => {

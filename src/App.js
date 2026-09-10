@@ -37,7 +37,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
@@ -375,6 +375,9 @@ const TodoApp = () => {
   const [taskViewMode, setTaskViewModeState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.TASK_VIEW_MODE) || DEFAULT_TASK_VIEW_MODE;
   });
+  const [notesAutosaveDelay, setNotesAutosaveDelayState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.NOTES_AUTOSAVE_DELAY) || DEFAULT_NOTES_AUTOSAVE_DELAY;
+  });
   const [isDark, setIsDark] = useState(false);
 
   const setFontSize = (size) => {
@@ -384,6 +387,10 @@ const TodoApp = () => {
   const setNotesFontSize = (size) => {
     setNotesFontSizeState(size);
     localStorage.setItem('123TodoNotesFontSize', size.toString());
+  };
+  const setNotesAutosaveDelay = (val) => {
+    setNotesAutosaveDelayState(val);
+    localStorage.setItem(STORAGE_KEYS.NOTES_AUTOSAVE_DELAY, val);
   };
   const setLayoutWidth = (val) => {
     setLayoutWidthState(val);
@@ -1020,6 +1027,7 @@ const TodoApp = () => {
               onOpenSettings={() => setShowSettings(true)}
               onOpenAchievements={() => setShowAchievements(true)}
               notesFontSize={notesFontSize}
+              notesAutosaveDelay={notesAutosaveDelay}
             />
           ) : (
             <>
@@ -1384,6 +1392,8 @@ const TodoApp = () => {
         setFontSize={setFontSize}
         notesFontSize={notesFontSize}
         setNotesFontSize={setNotesFontSize}
+        notesAutosaveDelay={notesAutosaveDelay}
+        setNotesAutosaveDelay={setNotesAutosaveDelay}
         layoutWidth={layoutWidth}
         setLayoutWidth={setLayoutWidth}
         wideColumnView={wideColumnView}

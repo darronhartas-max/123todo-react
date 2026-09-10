@@ -25,7 +25,8 @@ const NotesView = ({
   onSearchChange,
   onOpenSettings,
   onOpenAchievements,
-  notesFontSize = 18
+  notesFontSize = 18,
+  notesAutosaveDelay = '60s'
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
@@ -39,6 +40,18 @@ const NotesView = ({
   const quickRecognitionRef = useRef(null);
   const quickAddTextareaRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
+
+  // Inactivity timeout in ms based on user preference ('30s' -> 30s, '60s' -> 1 min, '120s' -> 2 min, '300s' -> 5 min, 'off' -> 0)
+  const autosaveDelayMs = useMemo(() => {
+    switch (notesAutosaveDelay) {
+      case '30s': return 30000;
+      case '60s': return 60000;
+      case '120s': return 120000;
+      case '300s': return 300000;
+      case 'off': return 0;
+      default: return 60000; // 1 minute default
+    }
+  }, [notesAutosaveDelay]);
 
   // Auto-expand textarea height & keep the latest spoken/typed lines visible in viewport at all times
   useEffect(() => {
@@ -157,15 +170,17 @@ const NotesView = ({
     setTimeout(() => setStatusMessage(''), 2500);
   }, [newNotes, newPhotos, targetProjectId, onAddNote]);
 
-  // Auto-save: automatically saves note after 4s idle period so rushing on site never loses data
+  // Auto-save: automatically saves note after configured idle period so taking notes, inspecting jobs, or walking away never loses data
   useEffect(() => {
+    if (autosaveDelayMs === 0) return;
+
     if ((newNotes.trim().length > 0 || newPhotos.length > 0) && !isDictatingQuickAdd) {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
       autoSaveTimerRef.current = setTimeout(() => {
         handleCreateNote();
-      }, 4000);
+      }, autosaveDelayMs);
     }
 
     return () => {
@@ -173,7 +188,7 @@ const NotesView = ({
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [newNotes, newPhotos, isDictatingQuickAdd, handleCreateNote]);
+  }, [newNotes, newPhotos, isDictatingQuickAdd, autosaveDelayMs, handleCreateNote]);
 
   // Also auto-save on visibility change (switching apps or locking phone on site)
   useEffect(() => {
@@ -509,7 +524,7 @@ const NotesView = ({
           flexWrap: 'wrap',
           gap: '6px'
         }}>
-          <span>💡 Auto-saves after 4s idle • Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
+          <span>💡 {notesAutosaveDelay !== 'off' ? `Auto-saves after ${notesAutosaveDelay === '30s' ? '30s' : notesAutosaveDelay === '60s' ? '1 min' : notesAutosaveDelay === '120s' ? '2 mins' : '5 mins'} idle • ` : ''}Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
           {(newNotes.trim() || newPhotos.length > 0) && (
             <button
               type="button"
@@ -560,6 +575,7 @@ const NotesView = ({
               isSelected={selectedNoteIds.includes(note.id)}
               onToggleSelect={handleToggleSelectNote}
               notesFontSize={notesFontSize}
+              notesAutosaveDelay={notesAutosaveDelay}
             />
           ))}
         </div>
