@@ -129,6 +129,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.6.21': [
+    { title: '🎙️ Continuous Voice Dictation & Pause Resilience:', desc: 'Resolved premature 4-second dictation cutoffs. Enabled true continuous recognition across Mac and mobile devices with seamless auto-restart across natural thinking pauses, keeping the mic active until you tap to finish.' }
+  ],
   '3.6.20': [
     { title: '🎯 Task-Style Archive Checkbox in Notes Mode:', desc: 'Moved the archive checkbox to the top-right header on each note card with smooth square-to-check animation and 300ms completion delay, identical to Task mode.' },
     { title: '🎨 Cohesive Notes Mode Iconography:', desc: 'Aligned priority flag icons, subtask checklist icons, and circular 32px header action buttons across Notes mode for visual consistency.' }

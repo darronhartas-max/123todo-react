@@ -1,5 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import App from './App';
+import { APP_VERSION } from './utils/constants';
 
 test('renders app logo', () => {
   render(<App />);
@@ -58,7 +59,7 @@ test('displays UpdatedModal when previous version in localStorage is older than 
 
   expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
   expect(screen.getByText('v3.6.12')).toBeInTheDocument();
-  expect(screen.getAllByText('v3.6.20').length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText(`v${APP_VERSION}`).length).toBeGreaterThanOrEqual(1);
 
   // Closing modal sets last seen version to current version
   const goBtn = screen.getByRole('button', { name: /Awesome, Let's Go!/i });
@@ -66,7 +67,7 @@ test('displays UpdatedModal when previous version in localStorage is older than 
     goBtn.click();
   });
 
-  expect(localStorage.getItem('123Todo_Last_Seen_Version')).toBe('3.6.20');
+  expect(localStorage.getItem('123Todo_Last_Seen_Version')).toBe(APP_VERSION);
 });
 
 

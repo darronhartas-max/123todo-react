@@ -507,13 +507,13 @@ export const processVoiceCommands = (text) => {
  */
 export const isMobileDevice = () => {
   if (typeof navigator === 'undefined') return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
 
 /**
- * Starts speech recognition and appends transcript to existing text.
- * Keeps listening across natural pauses until the user turns it off or a reasonable silence timeout passes (default 8s).
+ * Starts continuous speech recognition and appends transcript to existing text.
+ * Keeps listening continuously across natural thinking pauses until the user turns it off,
+ * an auto-submit command is spoken, or a full silence timeout passes (default 25s).
  * Handles regional language accents, punctuation formatting, and voice commands.
  */
 export const startVoiceDictation = ({
@@ -523,7 +523,7 @@ export const startVoiceDictation = ({
   onEnd,
   lang,
   continuous,
-  silenceTimeout = 20000
+  silenceTimeout = 25000
 }) => {
   if (!isSpeechRecognitionSupported()) {
     onStatusChange('Voice input is not supported in this browser.');
@@ -531,8 +531,8 @@ export const startVoiceDictation = ({
     return null;
   }
 
-  const isMobile = isMobileDevice();
-  const isContinuous = continuous !== undefined ? continuous : !isMobile;
+  // True continuous recognition across all platforms
+  const isContinuous = continuous !== undefined ? continuous : true;
 
   const baseText = (initialText || '').trim();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -553,6 +553,10 @@ export const startVoiceDictation = ({
         isActive = false;
         if (restartTimer) clearTimeout(restartTimer);
         if (recognition) {
+          recognition.onstart = null;
+          recognition.onresult = null;
+          recognition.onerror = null;
+          recognition.onend = null;
           try { recognition.abort(); } catch {}
           try { recognition.stop(); } catch {}
           recognition = null;
@@ -568,8 +572,8 @@ export const startVoiceDictation = ({
     }, silenceTimeout);
   };
 
-  const scheduleRestart = (delay = 60) => {
-    if (!isActive || isMobile) return;
+  const scheduleRestart = (delay = 80) => {
+    if (!isActive) return;
     if (restartTimer) clearTimeout(restartTimer);
     restartTimer = setTimeout(() => {
       if (!isActive) return;
@@ -599,6 +603,10 @@ export const startVoiceDictation = ({
 
     // Clean up any stale recognition instance before starting fresh
     if (recognition) {
+      recognition.onstart = null;
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
       try { recognition.abort(); } catch {}
       recognition = null;
     }
@@ -611,7 +619,7 @@ export const startVoiceDictation = ({
       recognition.lang = lang || (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 
       recognition.onstart = () => {
-        onStatusChange(isMobile ? '🎙️ Listening... Speak naturally' : '🎙️ Listening... (Tap mic when done)');
+        onStatusChange('🎙️ Listening... Speak naturally');
         resetSilenceTimer();
       };
 
@@ -654,6 +662,10 @@ export const startVoiceDictation = ({
           if (silenceTimer) clearTimeout(silenceTimer);
           if (restartTimer) clearTimeout(restartTimer);
           if (recognition) {
+            recognition.onstart = null;
+            recognition.onresult = null;
+            recognition.onerror = null;
+            recognition.onend = null;
             try { recognition.abort(); } catch {}
             try { recognition.stop(); } catch {}
             recognition = null;
@@ -674,51 +686,34 @@ export const startVoiceDictation = ({
           setTimeout(() => onStatusChange(''), 4000);
           if (onEnd) onEnd();
         } else if (event.error === 'no-speech') {
-          if (isMobile) {
-            // Mobile pause: let onend conclude cleanly
-          } else {
-            onStatusChange('🎙️ Listening... (Tap mic when done)');
-          }
+          // Natural pause in speech: do not abort session, continue listening smoothly
+          onStatusChange('🎙️ Listening... Speak naturally');
         } else if (event.error === 'aborted') {
           // Normal when switching sessions or stopping
         } else {
           console.warn('Speech recognition non-fatal error:', event.error);
-          if (!isMobile) {
-            onStatusChange('🎙️ Listening... (Tap mic when done)');
-          }
+          onStatusChange('🎙️ Listening... Speak naturally');
         }
       };
 
       recognition.onend = () => {
         if (!isActive) return;
 
-        // On mobile devices (Android / iOS):
-        // Conclude dictation cleanly on utterance finish to prevent OS bleep loops and hardware dead-zones.
-        if (isMobile) {
-          isActive = false;
-          if (silenceTimer) clearTimeout(silenceTimer);
-          if (restartTimer) clearTimeout(restartTimer);
-          if (recognition) {
-            try { recognition.abort(); } catch {}
-            recognition = null;
-          }
-          if (hadSpeech) {
-            onStatusChange('✨ Captured! (Tap to append, or use keyboard 🎙️ for continuous)');
-          } else {
-            onStatusChange('');
-          }
-          setTimeout(() => onStatusChange(''), 4500);
-          if (onEnd) onEnd();
-          return;
-        }
-
         const timeSinceSpeech = Date.now() - lastSpeechTime;
 
-        // On desktop: If user has been silent for full silenceTimeout (e.g. 20s), finish cleanly
+        // If user has been silent for full silenceTimeout (e.g. 25s), finish cleanly
         if (timeSinceSpeech >= silenceTimeout) {
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
           if (restartTimer) clearTimeout(restartTimer);
+          if (recognition) {
+            recognition.onstart = null;
+            recognition.onresult = null;
+            recognition.onerror = null;
+            recognition.onend = null;
+            try { recognition.abort(); } catch {}
+            recognition = null;
+          }
           if (hadSpeech) {
             onStatusChange('✨ Voice input captured!');
           } else {
@@ -729,18 +724,15 @@ export const startVoiceDictation = ({
           return;
         }
 
-        // On desktop: Keep listening across pauses with smooth 50ms restart
-        scheduleRestart(50);
+        // Keep listening across pauses with a smooth restart
+        scheduleRestart(80);
       };
 
       recognition.start();
     } catch (e) {
       console.warn('Failed to start speech recognition, retrying:', e);
-      if (isActive && !isMobile) {
+      if (isActive) {
         scheduleRestart(150);
-      } else if (isMobile) {
-        isActive = false;
-        if (onEnd) onEnd();
       }
     }
   };
@@ -753,6 +745,10 @@ export const startVoiceDictation = ({
       if (silenceTimer) clearTimeout(silenceTimer);
       if (restartTimer) clearTimeout(restartTimer);
       if (recognition) {
+        recognition.onstart = null;
+        recognition.onresult = null;
+        recognition.onerror = null;
+        recognition.onend = null;
         try { recognition.abort(); } catch {}
         try { recognition.stop(); } catch {}
         recognition = null;

@@ -308,10 +308,10 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     jest.useRealTimers();
   });
 
-  test('startVoiceDictation on mobile concludes cleanly onend without bleep loops or dropped words', () => {
-    const originalUserAgent = navigator.userAgent;
+  test('startVoiceDictation keeps listening continuously and does not shut down prematurely after 4s pause', () => {
+    jest.useFakeTimers();
 
-    // Simulate Android device
+    const originalUserAgent = navigator.userAgent;
     Object.defineProperty(navigator, 'userAgent', {
       value: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
       configurable: true
@@ -322,7 +322,7 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
 
     class MockSpeechRecognition {
       constructor() {
-        this.continuous = false;
+        this.continuous = true;
         this.interimResults = true;
         this.start = startMock;
         this.stop = jest.fn();
@@ -341,13 +341,14 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
       initialText: '',
       onTranscript,
       onStatusChange,
-      onEnd
+      onEnd,
+      silenceTimeout: 25000
     });
 
     expect(rec).not.toBeNull();
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    // Simulate transcript received
+    // Simulate transcript received for first 4 seconds of talking
     instance.onresult({
       results: [
         [{ transcript: 'Pick up laundry' }]
@@ -355,21 +356,33 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     });
     expect(onTranscript).toHaveBeenCalledWith('Pick up laundry', false);
 
-    // Android/iOS speech engine finishes sentence on natural pause
+    // Browser speech engine concludes an utterance on pause (~4s)
     instance.onend();
 
-    // On mobile, does NOT schedule restart loop (eliminating bleep loops and dead-zones)
-    expect(startMock).toHaveBeenCalledTimes(1);
+    // Does NOT shut down! Instead, restarts listening smoothly
+    expect(onEnd).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(100);
+    expect(startMock).toHaveBeenCalledTimes(2);
+
+    // User continues speaking their note
+    instance.onresult({
+      results: [
+        [{ transcript: 'and call the plumber' }]
+      ]
+    });
+    expect(onTranscript).toHaveBeenCalledWith('Pick up laundry and call the plumber', false);
+
+    // Explicit stop by user
+    rec.stop();
     expect(onEnd).toHaveBeenCalledTimes(1);
-    expect(onStatusChange).toHaveBeenCalledWith('✨ Captured! (Tap to append, or use keyboard 🎙️ for continuous)');
 
     delete window.SpeechRecognition;
-
-    // Restore userAgent
     Object.defineProperty(navigator, 'userAgent', {
       value: originalUserAgent,
       configurable: true
     });
+    jest.useRealTimers();
   });
 });
 
