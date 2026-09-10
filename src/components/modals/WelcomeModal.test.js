@@ -19,7 +19,7 @@ describe('WelcomeModal', () => {
 
         expect(screen.getByText('Welcome to 123 To Do')).toBeInTheDocument();
         expect(screen.getByText('Start Using 123 To Do ➔')).toBeInTheDocument();
-        expect(screen.getByText(/100% Free App • Works Offline/i)).toBeInTheDocument();
+        expect(screen.getByText(/Free App • Works Offline/i)).toBeInTheDocument();
     });
 
     test('calls onAccept when start button is clicked', () => {

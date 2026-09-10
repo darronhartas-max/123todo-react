@@ -133,7 +133,7 @@ const WelcomeModal = ({
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: '14px' }}>
                     <div style={styles.badge}>
-                        <Zap size={13} /> 100% Free App • Works Offline
+                        <Zap size={13} /> Free App • Works Offline
                     </div>
                     <h2 id="welcome-modal-title" style={{ margin: '0 0 6px 0', color: 'var(--text-color)', fontSize: '1.45rem', fontWeight: '700' }}>
                         Welcome to 123 To Do
@@ -317,7 +317,7 @@ const WelcomeModal = ({
                         Start Using 123 To Do ➔
                     </button>
                     <div style={{ marginTop: '10px', textAlign: 'center', fontSize: '0.78rem', color: 'var(--muted-text)' }}>
-                        Free forever • No credit card or account required
+                        Free to use • No credit card or account required
                     </div>
                 </div>
             </div>

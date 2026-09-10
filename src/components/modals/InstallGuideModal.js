@@ -154,7 +154,7 @@ const InstallGuideModal = ({ isOpen, onClose, onNativeInstall, canNativeInstall 
                                 Install 123 To Do as an App
                             </h3>
                             <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', marginTop: '2px' }}>
-                                No App Store required • Installs in seconds • 100% Free
+                                No App Store required • Installs in seconds • Free to Use
                             </div>
                         </div>
                     </div>
