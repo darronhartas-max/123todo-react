@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, ChevronDown, GripVertical } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
@@ -860,8 +860,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     background: 'var(--item-bg)',
                     boxSizing: 'border-box'
                 }}>
-                    <div style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px', color: 'var(--muted-text)' }}>
-                        📅 Date & Recurrence Scheduling
+                    <div style={{ fontSize: '0.9rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px', color: 'var(--muted-text)' }}>
+                        Date & Recurrence
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '6px', alignItems: 'flex-end', marginBottom: '10px', width: '100%', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>
@@ -890,21 +890,25 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             style={{
                                 flex: 1,
                                 minWidth: 0,
-                                padding: '6px 4px',
+                                padding: '6px 8px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
-                                borderRadius: '4px',
+                                borderRadius: '6px',
                                 cursor: 'pointer',
                                 fontSize: '0.82rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
                                 whiteSpace: 'nowrap',
-                                textAlign: 'center',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
                                 boxSizing: 'border-box'
                             }}
-                            title="Schedule for tomorrow"
+                            title="Schedule for tomorrow (Next Day)"
                         >
-                            📅 Next Day
+                            <FastForward size={13} style={{ flexShrink: 0 }} />
+                            <span>Day</span>
                         </button>
                         <button
                             type="button"
@@ -912,21 +916,25 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             style={{
                                 flex: 1,
                                 minWidth: 0,
-                                padding: '6px 4px',
+                                padding: '6px 8px',
                                 background: 'var(--accent-bg)',
                                 border: '1px solid var(--accent-color)',
-                                borderRadius: '4px',
+                                borderRadius: '6px',
                                 cursor: 'pointer',
                                 fontSize: '0.82rem',
                                 color: 'var(--accent-color)',
                                 fontWeight: '600',
                                 whiteSpace: 'nowrap',
-                                textAlign: 'center',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
                                 boxSizing: 'border-box'
                             }}
-                            title="Schedule for 7 days from today"
+                            title="Schedule for 7 days from today (Next Week)"
                         >
-                            📅 Next Week
+                            <FastForward size={13} style={{ flexShrink: 0 }} />
+                            <span>Week</span>
                         </button>
                         {scheduledDate && (
                             <button

@@ -31,8 +31,8 @@ test('renders Next Day and Next Week buttons when schedule is toggled open', () 
   const scheduleToggle = screen.getByRole('button', { name: /schedule/i });
   fireEvent.click(scheduleToggle);
 
-  expect(screen.getByText(/next day/i)).toBeInTheDocument();
-  expect(screen.getByText(/next week/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /day/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /week/i })).toBeInTheDocument();
   expect(screen.getByLabelText(/start\/scheduled date/i)).toBeInTheDocument();
 });
 

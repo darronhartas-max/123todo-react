@@ -3,7 +3,7 @@ import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
@@ -1078,21 +1078,25 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 style={{
                                     flex: 1,
                                     minWidth: 0,
-                                    padding: '6px 4px',
+                                    padding: '6px 8px',
                                     background: 'var(--accent-bg)',
                                     border: '1px solid var(--accent-color)',
-                                    borderRadius: '4px',
+                                    borderRadius: '6px',
                                     cursor: 'pointer',
                                     fontSize: '0.82rem',
                                     color: 'var(--accent-color)',
                                     fontWeight: '600',
                                     whiteSpace: 'nowrap',
-                                    textAlign: 'center',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '5px',
                                     boxSizing: 'border-box'
                                 }}
-                                title="Schedule for tomorrow"
+                                title="Schedule for tomorrow (Next Day)"
                             >
-                                📅 Next Day
+                                <FastForward size={13} style={{ flexShrink: 0 }} />
+                                <span>Day</span>
                             </button>
                             <button
                                 type="button"
@@ -1100,21 +1104,25 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 style={{
                                     flex: 1,
                                     minWidth: 0,
-                                    padding: '6px 4px',
+                                    padding: '6px 8px',
                                     background: 'var(--accent-bg)',
                                     border: '1px solid var(--accent-color)',
-                                    borderRadius: '4px',
+                                    borderRadius: '6px',
                                     cursor: 'pointer',
                                     fontSize: '0.82rem',
                                     color: 'var(--accent-color)',
                                     fontWeight: '600',
                                     whiteSpace: 'nowrap',
-                                    textAlign: 'center',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '5px',
                                     boxSizing: 'border-box'
                                 }}
-                                title="Schedule for 7 days from today"
+                                title="Schedule for 7 days from today (Next Week)"
                             >
-                                📅 Next Week
+                                <FastForward size={13} style={{ flexShrink: 0 }} />
+                                <span>Week</span>
                             </button>
                             {scheduledDate && (
                                 <button

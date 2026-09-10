@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
@@ -753,13 +753,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 cursor: 'pointer',
                                 fontSize: '0.78rem',
                                 fontWeight: '600',
-                                padding: '3px 7px',
+                                padding: '4px 7px',
                                 borderRadius: '4px',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
                             }}
-                            title="Defer task to tomorrow"
+                            title="Defer task to tomorrow (Next Day)"
                         >
-                            📅 Next Day
+                            <FastForward size={12} style={{ flexShrink: 0 }} />
+                            <span>Day</span>
                         </button>
                         <button
                             type="button"
@@ -774,13 +778,17 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 cursor: 'pointer',
                                 fontSize: '0.78rem',
                                 fontWeight: '600',
-                                padding: '3px 7px',
+                                padding: '4px 7px',
                                 borderRadius: '4px',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
                             }}
-                            title="Defer task for 7 days"
+                            title="Defer task for 7 days (Next Week)"
                         >
-                            📅 Next Week
+                            <FastForward size={12} style={{ flexShrink: 0 }} />
+                            <span>Week</span>
                         </button>
                         <button
                             onClick={() => setShowQuickSchedule(false)}

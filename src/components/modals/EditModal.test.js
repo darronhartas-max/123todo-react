@@ -115,8 +115,8 @@ describe('EditModal', () => {
     const scheduleToggle = screen.getByRole('button', { name: /Schedule/i });
     fireEvent.click(scheduleToggle);
 
-    // Click Next Day button
-    const nextDayButton = screen.getByRole('button', { name: /Next Day/i });
+    // Click Day (Next Day) button
+    const nextDayButton = screen.getByRole('button', { name: /Day/i });
     expect(nextDayButton).toBeInTheDocument();
     fireEvent.click(nextDayButton);
 
@@ -177,8 +177,8 @@ describe('EditModal', () => {
     const scheduleToggle = screen.getByRole('button', { name: /Schedule/i });
     fireEvent.click(scheduleToggle);
 
-    // Next Week button should be present on the same line
-    const nextWeekButton = screen.getByRole('button', { name: /Next Week/i });
+    // Week (Next Week) button should be present on the same line
+    const nextWeekButton = screen.getByRole('button', { name: /Week/i });
     expect(nextWeekButton).toBeInTheDocument();
     fireEvent.click(nextWeekButton);
 
