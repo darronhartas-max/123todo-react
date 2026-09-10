@@ -117,7 +117,7 @@ describe('NoteCard', () => {
     }));
   });
 
-  test('displays evidentiary timestamp at the bottom and copies proof to clipboard when clicked', async () => {
+  test('displays evidentiary timestamp in view mode without copy button, and shows copy button in edit mode', async () => {
     const originalClipboard = navigator.clipboard;
     const writeTextMock = jest.fn().mockResolvedValue();
     Object.assign(navigator, {
@@ -140,10 +140,18 @@ describe('NoteCard', () => {
       />
     );
 
-    // Evidentiary timestamp should be present at the bottom
+    // Evidentiary timestamp should be present in listing view mode
     expect(screen.getByText(/10 Sep 2026/i)).toBeInTheDocument();
 
-    // Copy evidence button should be present
+    // In listing view mode, copy evidence button should NOT be present
+    expect(screen.queryByTitle(/Copy evidentiary timestamp/i)).not.toBeInTheDocument();
+
+    // Enter edit mode via the Edit button
+    const editBtn = screen.getByRole('button', { name: /Edit Note/i });
+    expect(editBtn).toBeInTheDocument();
+    fireEvent.click(editBtn);
+
+    // In edit mode, copy evidence button SHOULD be present
     const copyButton = screen.getByTitle(/Copy evidentiary timestamp/i);
     expect(copyButton).toBeInTheDocument();
 
@@ -157,6 +165,23 @@ describe('NoteCard', () => {
 
     // Restore clipboard
     Object.assign(navigator, { clipboard: originalClipboard });
+  });
+
+  test('renders explicit Edit button in view mode that opens edit mode when clicked', () => {
+    render(
+      <NoteCard
+        note={sampleNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    const editBtn = screen.getByRole('button', { name: /Edit Note/i });
+    expect(editBtn).toBeInTheDocument();
+
+    fireEvent.click(editBtn);
+
+    expect(screen.getByPlaceholderText('Note Title...')).toBeInTheDocument();
   });
 
   test('hides note details field in edit mode and omits placeholder in view mode when note has no associated notes', () => {
@@ -324,24 +349,32 @@ describe('NoteCard', () => {
     jest.useRealTimers();
   });
 
-  test('allows converting note to prioritized task from bottom Priority popover', () => {
+  test('allows converting and adjusting note priority, taking on priority color and label', () => {
     const onConvertMock = jest.fn();
+
+    const noteWithP2 = {
+      ...sampleNote,
+      priority: 2
+    };
 
     render(
       <NoteCard
-        note={sampleNote}
+        note={noteWithP2}
         projects={sampleProjects}
         onUpdateNote={jest.fn()}
         onConvertNoteToTask={onConvertMock}
       />
     );
 
-    // Click Priority button in bottom toolbar
-    const priorityBtn = screen.getByRole('button', { name: /Priority/i });
+    // Priority button in bottom toolbar should display P2 label and Should Do
+    const priorityBtn = screen.getByRole('button', { name: /Adjust Priority/i });
     expect(priorityBtn).toBeInTheDocument();
+    expect(priorityBtn).toHaveTextContent(/P2/i);
+    expect(priorityBtn).toHaveTextContent(/Should Do/i);
+
     fireEvent.click(priorityBtn);
 
-    // Popover options P1, P2, P3 should appear
+    // Popover options P1, P2, P3, P4 should appear
     const p1Option = screen.getByText(/P1 \(Must do\)/i);
     expect(p1Option).toBeInTheDocument();
 

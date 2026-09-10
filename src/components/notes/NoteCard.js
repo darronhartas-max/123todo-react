@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, Mic, ChevronDown, 
   Flag, Check, Clock, Camera, Copy,
-  Square, CheckSquare, ListChecks
+  Square, CheckSquare, ListChecks, Edit2
 } from 'lucide-react';
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -116,6 +116,10 @@ const NoteCard = ({
   const hasAssociatedNote = Boolean((note.notes && note.notes.trim().length > 0) || (notesText && notesText.trim().length > 0));
 
   const currentProject = projects.find(p => p.id === note.projectId) || { id: 'general', name: 'Unassigned Inbox', color: '#6b7280' };
+  const currentPriorityConfig = (note.priority && PRIORITIES[note.priority]) ? PRIORITIES[note.priority] : null;
+  const priorityColor = currentPriorityConfig ? currentPriorityConfig.color : '#2563eb';
+  const priorityBg = currentPriorityConfig ? `${currentPriorityConfig.color}18` : 'rgba(37, 99, 235, 0.1)';
+  const priorityBorder = currentPriorityConfig ? `1px solid ${currentPriorityConfig.color}40` : '1px solid rgba(37, 99, 235, 0.2)';
 
   const handleAddSubtask = () => {
     if (!newSubtaskText.trim()) return;
@@ -376,80 +380,71 @@ const NoteCard = ({
             {/* Project Picker Dropdown */}
             <AnimatePresence>
               {showProjectPicker && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 5 }}
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    marginTop: '6px',
-                    backgroundColor: 'var(--card-bg, #ffffff)',
-                    border: '1px solid var(--border-color, #e5e7eb)',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                    zIndex: 100,
-                    minWidth: '180px',
-                    padding: '6px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px'
-                  }}
-                >
-                  <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', padding: '6px 8px' }}>
-                    Assign to Project:
-                  </div>
-                  {projects.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        onAssignProject(note.id, p.id);
-                        setShowProjectPicker(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: p.id === note.projectId ? 'rgba(37, 99, 235, 0.1)' : 'transparent',
-                        color: 'var(--text-color, #1f2937)',
-                        fontSize: '13px',
-                        fontWeight: p.id === note.projectId ? '700' : '500',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        width: '100%'
-                      }}
-                    >
-                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: p.color || '#6b7280' }} />
-                      <span style={{ flex: 1 }}>{p.name}</span>
-                      {p.id === note.projectId && <Check size={14} color="#2563eb" />}
-                    </button>
-                  ))}
-                </motion.div>
+                <>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowProjectPicker(false);
+                    }}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99, background: 'transparent' }}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      marginTop: '6px',
+                      backgroundColor: 'var(--card-bg, #ffffff)',
+                      border: '1px solid var(--border-color, #e5e7eb)',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                      zIndex: 100,
+                      minWidth: '180px',
+                      padding: '6px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}
+                  >
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', padding: '6px 8px' }}>
+                      Assign to Project:
+                    </div>
+                    {projects.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          onAssignProject(note.id, p.id);
+                          setShowProjectPicker(false);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 10px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: p.id === note.projectId ? 'rgba(37, 99, 235, 0.1)' : 'transparent',
+                          color: 'var(--text-color, #1f2937)',
+                          fontSize: '13px',
+                          fontWeight: p.id === note.projectId ? '700' : '500',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          width: '100%'
+                        }}
+                      >
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: p.color || '#6b7280' }} />
+                        <span style={{ flex: 1 }}>{p.name}</span>
+                        {p.id === note.projectId && <Check size={14} color="#2563eb" />}
+                      </button>
+                    ))}
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>
-
-          {/* Priority indicator if it has priority */}
-          {note.priority && note.priority < 4 && (
-            <span style={{
-              fontSize: '11px',
-              fontWeight: '700',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              backgroundColor: `${PRIORITIES[note.priority]?.color}20`,
-              color: PRIORITIES[note.priority]?.color,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-              <Flag size={11} fill={PRIORITIES[note.priority]?.color} color={PRIORITIES[note.priority]?.color} />
-              <span>P{note.priority} {PRIORITIES[note.priority]?.label}</span>
-            </span>
-          )}
 
           {/* Photo indicator badge */}
           {note.photos && note.photos.length > 0 && (
@@ -854,6 +849,64 @@ const NoteCard = ({
               </div>
               <ActionableEntitiesBar text={newSubtaskText} compact />
             </div>
+
+            {/* Evidentiary Timestamp with Copy Button (available in Edit Mode) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }}>
+              <div 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--item-bg, #f3f4f6)',
+                  border: '1px solid var(--border-color, #e5e7eb)',
+                  fontSize: '11px',
+                  color: 'var(--text-secondary, #6b7280)',
+                  fontFamily: 'monospace, sans-serif'
+                }}
+                title="Timestamp evidence: Created date & time of this note/task"
+              >
+                <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+                <span>
+                  {createdFormatted}
+                  {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyEvidence}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    border: 'none',
+                    background: copiedEvidence ? '#10b981' : 'rgba(37, 99, 235, 0.1)',
+                    color: copiedEvidence ? '#ffffff' : '#2563eb',
+                    borderRadius: '5px',
+                    padding: '2px 6px',
+                    fontSize: '10px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    marginLeft: '4px'
+                  }}
+                  title="Copy evidentiary timestamp & note to clipboard"
+                >
+                  {copiedEvidence ? (
+                    <>
+                      <Check size={10} strokeWidth={3} />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={10} />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
               <button
                 type="button"
@@ -1018,149 +1071,174 @@ const NoteCard = ({
         </div>
       )}
 
-      {/* Bottom Action Bar & Evidentiary Timestamp */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        gap: '10px',
-        paddingTop: '10px',
-        borderTop: '1px solid var(--border-color, #f3f4f6)',
-        flexWrap: 'wrap'
-      }}>
-        {/* Left: Evidentiary Timestamp Display with 1-Tap Copy Proof */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          <div 
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 10px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--item-bg, #f3f4f6)',
-              border: '1px solid var(--border-color, #e5e7eb)',
-              fontSize: '11px',
-              color: 'var(--text-secondary, #6b7280)',
-              fontFamily: 'monospace, sans-serif'
-            }}
-            title="Timestamp evidence: Created date & time of this note/task"
-          >
-            <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
-            <span>
-              {createdFormatted}
-              {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopyEvidence}
+      {/* Bottom Action Bar (View Mode): Evidentiary Timestamp on Left, Edit & Priority on Right */}
+      {!isEditing && (
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          gap: '10px',
+          paddingTop: '10px',
+          borderTop: '1px solid var(--border-color, #f3f4f6)',
+          flexWrap: 'wrap'
+        }}>
+          {/* Left: Evidentiary Timestamp Display without copy button in listing view */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <div 
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '3px',
-                border: 'none',
-                background: copiedEvidence ? '#10b981' : 'rgba(37, 99, 235, 0.1)',
-                color: copiedEvidence ? '#ffffff' : '#2563eb',
-                borderRadius: '5px',
-                padding: '2px 6px',
-                fontSize: '10px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                marginLeft: '4px'
+                gap: '6px',
+                padding: '4px 10px',
+                borderRadius: '8px',
+                backgroundColor: 'var(--item-bg, #f3f4f6)',
+                border: '1px solid var(--border-color, #e5e7eb)',
+                fontSize: '11px',
+                color: 'var(--text-secondary, #6b7280)',
+                fontFamily: 'monospace, sans-serif'
               }}
-              title="Copy evidentiary timestamp & note to clipboard"
+              title="Timestamp evidence: Created date & time of this note/task"
             >
-              {copiedEvidence ? (
-                <>
-                  <Check size={10} strokeWidth={3} />
-                  <span>Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={10} />
-                  <span>Copy</span>
-                </>
-              )}
-            </button>
+              <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+              <span>
+                {createdFormatted}
+                {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Right: Action Group: Make Task (Priority) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {/* Turn into Task Popover */}
-          <div style={{ position: 'relative' }}>
+          {/* Right: Action Group: Edit Button & Priority Dropdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Edit Button */}
             <button
-              onClick={() => setShowPriorityPicker(!showPriorityPicker)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '5px',
                 padding: '6px 12px',
                 borderRadius: '10px',
-                border: 'none',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                color: '#2563eb',
+                border: '1px solid var(--border-color, #d1d5db)',
+                backgroundColor: 'var(--card-bg, #ffffff)',
+                color: 'var(--text-color, #374151)',
                 fontSize: '13px',
                 fontWeight: '700',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
+              title="Edit Note"
+              aria-label="Edit Note"
             >
-              <Flag size={13} fill="#2563eb" color="#2563eb" />
-              <span>Priority</span>
-              <ChevronDown size={12} />
+              <Edit2 size={13} color="var(--text-color, #374151)" />
+              <span>Edit</span>
             </button>
 
-            {showPriorityPicker && (
-              <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                right: 0,
-                marginBottom: '6px',
-                backgroundColor: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--border-color, #e5e7eb)',
-                borderRadius: '12px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                zIndex: 100,
-                minWidth: '160px',
-                padding: '6px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px'
-              }}>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', padding: '4px 8px' }}>
-                  Assign Task Priority:
-                </div>
-                {[1, 2, 3].map(p => (
-                  <button
-                    key={p}
-                    onClick={() => {
-                      onConvertNoteToTask(note.id, p);
+            {/* Priority Popover */}
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPriorityPicker(!showPriorityPicker);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  border: priorityBorder,
+                  backgroundColor: priorityBg,
+                  color: priorityColor,
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Adjust Priority"
+                aria-label="Adjust Priority"
+              >
+                <Flag size={13} fill={priorityColor} color={priorityColor} />
+                <span>{currentPriorityConfig ? `P${note.priority} (${currentPriorityConfig.label})` : 'Priority'}</span>
+                <ChevronDown size={12} color={priorityColor} />
+              </button>
+
+              {showPriorityPicker && (
+                <>
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowPriorityPicker(false);
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: `${PRIORITIES[p].color}15`,
-                      color: PRIORITIES[p].color,
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      textAlign: 'left'
-                    }}
-                  >
-                    <Flag size={13} fill={PRIORITIES[p].color} color={PRIORITIES[p].color} />
-                    <span>P{p} ({PRIORITIES[p].label})</span>
-                  </button>
-                ))}
-              </div>
-            )}
+                    }} 
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99, background: 'transparent' }} 
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    right: 0,
+                    marginBottom: '6px',
+                    backgroundColor: 'var(--card-bg, #ffffff)',
+                    border: '1px solid var(--border-color, #e5e7eb)',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                    zIndex: 100,
+                    minWidth: '180px',
+                    padding: '6px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px'
+                  }}>
+                    <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', padding: '4px 8px' }}>
+                      Assign Priority:
+                    </div>
+                    {[1, 2, 3, 4].map(p => {
+                      const pConfig = PRIORITIES[p];
+                      const isSelected = note.priority === p;
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onConvertNoteToTask(note.id, p);
+                            setShowPriorityPicker(false);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '8px',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            border: isSelected ? `1px solid ${pConfig.color}60` : '1px solid transparent',
+                            backgroundColor: isSelected ? `${pConfig.color}20` : `${pConfig.color}0c`,
+                            color: pConfig.color,
+                            fontSize: '13px',
+                            fontWeight: isSelected ? '800' : '600',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            width: '100%'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Flag size={13} fill={pConfig.color} color={pConfig.color} />
+                            <span>P{p} ({pConfig.label})</span>
+                          </div>
+                          {isSelected && <Check size={14} color={pConfig.color} strokeWidth={2.5} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 };
