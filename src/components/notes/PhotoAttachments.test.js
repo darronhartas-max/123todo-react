@@ -88,4 +88,31 @@ describe('PhotoAttachments Component', () => {
     // Copy photo timestamp button should be present
     expect(screen.getByTitle(/Copy photo evidentiary timestamp/i)).toBeInTheDocument();
   });
+
+  test('formats long numerical filenames into concise, relevant titles in lightbox', () => {
+    const photoWithLongNumberName = [
+      {
+        id: 'img_long_num',
+        name: '1741624385920384729.jpg',
+        dataUrl: 'data:image/jpeg;base64,mockdata',
+        thumbnail: 'data:image/jpeg;base64,mockthumb',
+        size: 180000,
+        timestamp: new Date(2026, 8, 10, 15, 45, 0).getTime()
+      }
+    ];
+
+    render(<PhotoAttachments photos={photoWithLongNumberName} readOnly={false} />);
+
+    const images = screen.getAllByRole('img');
+    fireEvent.click(images[0]);
+
+    // Should display human-friendly formatted title instead of raw long numbers
+    expect(screen.getByText('Photo • 10 Sep, 15:45')).toBeInTheDocument();
+    expect(screen.queryByText('1741624385920384729.jpg')).not.toBeInTheDocument();
+
+    // Share and close buttons are still cleanly available
+    expect(screen.getByRole('button', { name: /Save to Photos \/ Share/i })).toBeInTheDocument();
+    expect(screen.getByTitle('Close (Esc)')).toBeInTheDocument();
+  });
 });
+

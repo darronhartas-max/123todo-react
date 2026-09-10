@@ -196,3 +196,87 @@ export const formatFileSize = (bytes) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 };
+
+/**
+ * Checks if a photo filename is a generic camera/device timestamp or machine string.
+ * e.g. "1741624385920.jpg", "IMG_20260910_173122.jpg", "123todo-photo-1741624385920.webp",
+ * "PXL_20260910_173122123.jpg", "image.png", "photo.webp", UUIDs, etc.
+ */
+export const isMachineGeneratedName = (name) => {
+  if (!name || typeof name !== 'string') return true;
+  const trimmed = name.trim();
+  const baseName = trimmed.replace(/\.[a-zA-Z0-9]+$/, '');
+
+  // Pure digits or epoch timestamp (e.g. 1741624385920)
+  if (/^\d{8,}$/.test(baseName)) return true;
+
+  // Device camera prefixes (IMG_12345, PXL_2026..., DSC_123, Screenshot_...)
+  if (/^(img|pxl|dsc|screenshot|capture)[_-]?\d+/i.test(baseName)) return true;
+
+  // Generic app default names
+  if (/^123todo-photo/i.test(baseName)) return true;
+  if (/^(photo|image|picture)[_-]?\d*$/i.test(baseName)) return true;
+  if (/^fullsizerender$/i.test(baseName)) return true;
+
+  // UUID strings
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}/i.test(baseName)) return true;
+
+  return false;
+};
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * Formats a photo name into a short, meaningful, human-friendly title.
+ * Transforms ugly device strings (e.g. "1741624385920.jpg") into "Photo • 10 Sep, 17:31".
+ */
+export const formatPhotoDisplayName = (rawName, timestamp) => {
+  const ts = timestamp || Date.now();
+
+  if (isMachineGeneratedName(rawName)) {
+    const d = new Date(ts);
+    if (!isNaN(d.getTime())) {
+      const day = d.getDate();
+      const month = MONTH_NAMES[d.getMonth()] || '';
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `Photo • ${day} ${month}, ${hours}:${mins}`;
+    }
+    return 'Photo';
+  }
+
+  // Custom user name: truncate if excessively long to prevent UI overflow
+  const trimmed = rawName.trim();
+  if (trimmed.length > 24) {
+    const extMatch = trimmed.match(/\.[a-zA-Z0-9]+$/);
+    const ext = extMatch ? extMatch[0].replace(/^\./, '') : '';
+    const base = extMatch ? trimmed.slice(0, -extMatch[0].length) : trimmed;
+    return ext ? `${base.slice(0, 18)}...${ext}` : `${base.slice(0, 21)}...`;
+  }
+  return trimmed;
+};
+
+/**
+ * Generates a clean, short, relevant file name when saving or sharing a photo.
+ * e.g. "Photo-10Sep-1731.jpg" instead of "123todo-photo-1741624385920.webp".
+ */
+export const getPhotoExportFileName = (photo, fallbackExt = 'jpg') => {
+  if (!photo) return `Photo.${fallbackExt}`;
+  const ext = (fallbackExt || 'jpg').replace(/^\./, '');
+  const rawName = photo.name || '';
+
+  if (!isMachineGeneratedName(rawName)) {
+    return rawName.includes('.') ? rawName : `${rawName}.${ext}`;
+  }
+
+  const ts = photo.timestamp || Date.now();
+  const d = new Date(ts);
+  if (!isNaN(d.getTime())) {
+    const day = d.getDate();
+    const month = MONTH_NAMES[d.getMonth()] || '';
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `Photo-${day}${month}-${hours}${mins}.${ext}`;
+  }
+  return `Photo.${ext}`;
+};
