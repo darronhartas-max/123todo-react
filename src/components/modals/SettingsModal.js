@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
@@ -270,10 +270,11 @@ const SettingsModal = ({
     onNativeInstall,
     onOpenInstallGuide,
     emailClientPreference,
-    setEmailClientPreference
+    setEmailClientPreference,
+    initialTab = 'appearance'
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
-    const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'appearance'
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [projectName, setProjectName] = useState('');
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -415,9 +416,9 @@ const SettingsModal = ({
             background: 'var(--surface-color)',
             borderRadius: '16px',
             width: '90%',
-            maxWidth: '680px',
-            height: '80vh',
-            maxHeight: '650px',
+            maxWidth: '720px',
+            height: '82vh',
+            maxHeight: '680px',
             display: 'flex',
             flexDirection: 'column',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
@@ -447,14 +448,14 @@ const SettingsModal = ({
             flexDirection: window.innerWidth < 600 ? 'column' : 'row'
         },
         sidebar: {
-            width: window.innerWidth < 600 ? '100%' : '150px',
+            width: window.innerWidth < 600 ? '100%' : '165px',
             borderRight: window.innerWidth < 600 ? 'none' : '1px solid var(--border-color)',
             borderBottom: window.innerWidth < 600 ? '1px solid var(--border-color)' : 'none',
             background: 'var(--bg-color)',
             display: 'flex',
             flexDirection: window.innerWidth < 600 ? 'row' : 'column',
             padding: window.innerWidth < 600 ? '8px' : '12px 6px',
-            gap: '6px',
+            gap: '4px',
             flexShrink: 0,
             overflowX: window.innerWidth < 600 ? 'auto' : 'hidden',
             overflowY: window.innerWidth < 600 ? 'hidden' : 'auto',
@@ -463,15 +464,15 @@ const SettingsModal = ({
         tabBtn: (isActive) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: window.innerWidth < 600 ? '6px 12px' : '7px 10px',
+            gap: '8px',
+            padding: window.innerWidth < 600 ? '6px 12px' : '8px 12px',
             borderRadius: window.innerWidth < 600 ? '16px' : '8px',
             background: isActive ? 'var(--surface-color)' : 'transparent',
             color: isActive ? 'var(--accent-color)' : 'var(--muted-text)',
             border: isActive ? '1px solid var(--border-color)' : '1px solid transparent',
             cursor: 'pointer',
             fontWeight: isActive ? '700' : '500',
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             whiteSpace: 'nowrap',
             flexShrink: 0,
             justifyContent: window.innerWidth < 600 ? 'center' : 'flex-start',
@@ -702,18 +703,25 @@ const SettingsModal = ({
                 <div style={styles.body}>
                     <div style={styles.sidebar}>
                         <button
-                            style={styles.tabBtn(activeTab === 'projects')}
-                            onClick={() => setActiveTab('projects')}
-                        >
-                            <FolderOpen size={18} />
-                            Projects
-                        </button>
-                        <button
                             style={styles.tabBtn(activeTab === 'appearance')}
                             onClick={() => setActiveTab('appearance')}
                         >
                             <Sliders size={18} />
                             Appearance
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'tasks')}
+                            onClick={() => setActiveTab('tasks')}
+                        >
+                            <ListChecks size={18} />
+                            Tasks
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'projects')}
+                            onClick={() => setActiveTab('projects')}
+                        >
+                            <FolderOpen size={18} />
+                            Projects
                         </button>
                         <button
                             style={styles.tabBtn(activeTab === 'swipe')}
@@ -723,13 +731,6 @@ const SettingsModal = ({
                             Swipe
                         </button>
                         <button
-                            style={styles.tabBtn(activeTab === 'shortcuts')}
-                            onClick={() => setActiveTab('shortcuts')}
-                        >
-                            <Keyboard size={18} />
-                            Shortcuts
-                        </button>
-                        <button
                             style={styles.tabBtn(activeTab === 'sync')}
                             onClick={() => setActiveTab('sync')}
                         >
@@ -737,11 +738,25 @@ const SettingsModal = ({
                             Cloud Sync
                         </button>
                         <button
-                            style={styles.tabBtn(activeTab === 'install')}
-                            onClick={() => setActiveTab('install')}
+                            style={styles.tabBtn(activeTab === 'voice')}
+                            onClick={() => setActiveTab('voice')}
                         >
-                            <Download size={18} />
-                            Install App
+                            <Mic size={18} />
+                            Voice
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'shortcuts')}
+                            onClick={() => setActiveTab('shortcuts')}
+                        >
+                            <Keyboard size={18} />
+                            Shortcuts
+                        </button>
+                        <button
+                            style={styles.tabBtn(activeTab === 'about' || activeTab === 'install')}
+                            onClick={() => setActiveTab('about')}
+                        >
+                            <Info size={18} />
+                            App & Updates
                         </button>
                     </div>
 
@@ -1096,63 +1111,39 @@ const SettingsModal = ({
                                     </div>
                                 </div>
 
-                                 {/* Bold Font Option */}
-                                 <div style={styles.settingRow}>
-                                     <div style={styles.settingLabel}>
-                                         <span>Bold Text Typography</span>
-                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Increase font weight across tasks, menus, and notes for enhanced high contrast readability
-                                         </span>
-                                     </div>
-                                     <label style={{
-                                         display: 'flex',
-                                         alignItems: 'center',
-                                         gap: '8px',
-                                         cursor: 'pointer',
-                                         fontWeight: '600',
-                                         color: 'var(--text-color)',
-                                         fontSize: '0.95rem'
-                                     }}>
-                                         <input
-                                             type="checkbox"
-                                             checked={isBoldFont}
-                                             onChange={(e) => setIsBoldFont && setIsBoldFont(e.target.checked)}
-                                             style={{
-                                                 width: '18px',
-                                                 height: '18px',
-                                                 accentColor: 'var(--accent-color)',
-                                                 cursor: 'pointer'
-                                             }}
-                                         />
-                                         <span>Enable Bold Text</span>
-                                     </label>
-                                 </div>
+                                {/* Bold Font Option */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Bold Text Typography</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Increase font weight across tasks, menus, and notes for enhanced high contrast readability
+                                        </span>
+                                    </div>
+                                    <label style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: '600',
+                                        color: 'var(--text-color)',
+                                        fontSize: '0.95rem'
+                                    }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isBoldFont}
+                                            onChange={(e) => setIsBoldFont && setIsBoldFont(e.target.checked)}
+                                            style={{
+                                                width: '18px',
+                                                height: '18px',
+                                                accentColor: 'var(--accent-color)',
+                                                cursor: 'pointer'
+                                            }}
+                                        />
+                                        <span>Enable Bold Text</span>
+                                    </label>
+                                </div>
 
-                                 {/* Tasks List View Mode */}
-                                 <div style={styles.settingRow}>
-                                     <div style={styles.settingLabel}>
-                                         <span>Tasks List View Mode</span>
-                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Choose between compact 2-line preview or full-length task titles in list views
-                                         </span>
-                                     </div>
-                                     <div style={styles.segmentContainer}>
-                                         <button
-                                             style={styles.segmentBtn(taskViewMode === 'compact')}
-                                             onClick={() => setTaskViewMode && setTaskViewMode('compact')}
-                                         >
-                                             Compact (2 Lines)
-                                         </button>
-                                         <button
-                                             style={styles.segmentBtn(taskViewMode === 'full')}
-                                             onClick={() => setTaskViewMode && setTaskViewMode('full')}
-                                         >
-                                             Full-Length
-                                         </button>
-                                     </div>
-                                 </div>
-
-                                 {/* Layout Width Constraint */}
+                                {/* Layout Width Constraint */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>Desktop Layout Width</div>
                                     <div style={styles.segmentContainer}>
@@ -1196,315 +1187,171 @@ const SettingsModal = ({
                                         </div>
                                     </div>
                                 )}
-                                 {/* Date Format Order Preference */}
-                                 <div style={styles.settingRow}>
-                                     <div style={styles.settingLabel}>
-                                         <span>Date Format Order</span>
-                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Choose UK, US, or ISO date order display
-                                         </span>
-                                     </div>
-                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '8px', marginTop: '6px' }}>
-                                         {DATE_FORMAT_OPTIONS.map(fmt => {
-                                             const isSelected = dateFormat === fmt.id;
-                                             return (
-                                                 <div
-                                                     key={fmt.id}
-                                                     onClick={() => setDateFormat && setDateFormat(fmt.id)}
-                                                     style={{
-                                                         padding: '10px 12px',
-                                                         borderRadius: '8px',
-                                                         border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
-                                                         background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                                         cursor: 'pointer',
-                                                         display: 'flex',
-                                                         flexDirection: 'column',
-                                                         gap: '2px',
-                                                         transition: 'all 0.15s ease'
-                                                     }}
-                                                 >
-                                                     <div style={{
-                                                         fontSize: '0.85rem',
-                                                         fontWeight: isSelected ? '700' : '600',
-                                                         color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
-                                                     }}>
-                                                         {fmt.label}
-                                                     </div>
-                                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'monospace' }}>
-                                                         {fmt.example}
-                                                     </div>
-                                                 </div>
-                                             );
-                                         })}
-                                     </div>
-                                 </div>
+                            </div>
+                        )}
 
-                                 {/* Task Description Character Limit */}
-                                 <div style={styles.settingRow}>
-                                     <div style={styles.settingLabel}>
-                                         <span>Task Description Character Limit</span>
-                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Set limit for task descriptions (250 chars default encourages concise tasks)
-                                         </span>
-                                     </div>
-                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px', marginTop: '6px' }}>
-                                         {[
-                                             { id: '250', label: '250 Characters (Default)', desc: 'Encourages concise task details' },
-                                             { id: 'unlimited', label: 'Unlimited', desc: 'No length restriction' }
-                                         ].map(opt => {
-                                             const isSelected = (taskLengthLimit || '250') === opt.id;
-                                             return (
-                                                 <div
-                                                     key={opt.id}
-                                                     onClick={() => setTaskLengthLimit && setTaskLengthLimit(opt.id)}
-                                                     style={{
-                                                         padding: '10px 12px',
-                                                         borderRadius: '8px',
-                                                         border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
-                                                         background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                                         cursor: 'pointer',
-                                                         display: 'flex',
-                                                         flexDirection: 'column',
-                                                         gap: '2px',
-                                                         transition: 'all 0.15s ease'
-                                                     }}
-                                                 >
-                                                     <div style={{
-                                                         fontSize: '0.85rem',
-                                                         fontWeight: isSelected ? '700' : '600',
-                                                         color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
-                                                     }}>
-                                                         {opt.label}
-                                                     </div>
-                                                     <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>
-                                                         {opt.desc}
-                                                     </div>
-                                                 </div>
-                                             );
-                                         })}
-                                     </div>
-                                 </div>
+                        {activeTab === 'tasks' && (
+                            <div>
+                                <div style={styles.sectionTitle}>Tasks & Workflow</div>
 
-                                  {/* Preferred Email Service */}
-                                  <div style={styles.settingRow}>
-                                      <div style={styles.settingLabel}>
-                                          <span>Preferred Email Service</span>
-                                          <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                              Choose which email app or web service opens when clicking email links
-                                          </span>
-                                      </div>
-                                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
-                                          {EMAIL_CLIENT_OPTIONS.map(opt => {
-                                              const currentPref = emailClientPreference || localEmailPref;
-                                              const isSelected = currentPref === opt.id;
-                                              return (
-                                                  <div
-                                                      key={opt.id}
-                                                      onClick={() => {
-                                                          setLocalEmailPref(opt.id);
-                                                          saveEmailClientPreference(opt.id);
-                                                          if (setEmailClientPreference) setEmailClientPreference(opt.id);
-                                                      }}
-                                                      style={{
-                                                          padding: '10px 12px',
-                                                          borderRadius: '8px',
-                                                          border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
-                                                          background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                                          cursor: 'pointer',
-                                                          display: 'flex',
-                                                          flexDirection: 'column',
-                                                          gap: '2px',
-                                                          transition: 'all 0.15s ease'
-                                                      }}
-                                                  >
-                                                      <div style={{
-                                                          fontSize: '0.85rem',
-                                                          fontWeight: isSelected ? '700' : '600',
-                                                          color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
-                                                      }}>
-                                                          {opt.name}
-                                                      </div>
-                                                      <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
-                                                          {opt.badge} • {opt.description}
-                                                      </div>
-                                                  </div>
-                                              );
-                                          })}
-                                      </div>
-                                  </div>
-
-                                 {/* Voice Input & Voice Notes */}
-                                 <div style={styles.settingRow}>
-                                     <div style={styles.settingLabel}>
-                                         <span>🎙️ Voice Input & Dictation Guide</span>
-                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                             Speak tasks and notes naturally. 123 ToDo optimizes dictation specifically for your device so you never lose spoken words.
-                                         </span>
-                                     </div>
-                                     <div style={{
-                                         background: 'var(--bg-color)',
-                                         padding: '12px 14px',
-                                         borderRadius: '10px',
-                                         border: '1px solid var(--border-color)',
-                                         marginTop: '6px',
-                                         fontSize: '0.84rem',
-                                         lineHeight: '1.5'
-                                     }}>
-                                         <div style={{ fontWeight: '700', marginBottom: '6px', color: 'var(--accent-color)' }}>
-                                             How Voice Dictation Works:
-                                         </div>
-                                         <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)' }}>
-                                             <li><strong>💻 Desktop Dictation (Mac / PC)</strong>: Hands-free continuous dictation across thinking pauses. Speaks directly into titles or notes with live spoken punctuation (<em>"comma"</em>, <em>"full stop"</em>) and editing commands (<em>"delete last 2 words"</em>, <em>"spell out..."</em>).</li>
-                                             <li><strong>📱 Mobile Quick-Capture (Phones / Tablets)</strong>: Tap the in-app Voice button to dictate a quick thought or task. When you finish speaking, it captures cleanly without repetitive system bleep loops or dropped words. Tap again anytime to append more.</li>
-                                             <li><strong>⚡ Continuous Long-Form Dictation on Mobile</strong>: For uninterrupted, multi-minute continuous dictation on your phone without pauses cutting off, tap into the text area and press the <strong>🎙️ microphone icon on your keyboard</strong> (Gboard on Android, or Apple Dictation on iPhone). It provides hardware-accelerated continuous voice capture with zero interruptions!</li>
-                                             <li><strong>🚀 Spoken Auto-Submit</strong>: Say <em>"add task"</em> or <em>"save note"</em> at the end of speech to instantly save hands-free.</li>
-                                         </ul>
-                                     </div>
-                                 </div>
-
-                                {/* App Version & Manual Update Check */}
+                                {/* Tasks List View Mode */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
-                                        <span>App Version & Updates</span>
-                                        <span 
-                                            style={{ fontSize: '0.9rem', color: 'var(--muted-text)', fontWeight: '600' }}
-                                            title={`123 ToDo v${APP_VERSION}`}
-                                        >
-                                            v{APP_VERSION}
+                                        <span>Tasks List View Mode</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Choose between compact 2-line preview or full-length task titles in list views
                                         </span>
                                     </div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        background: 'var(--bg-color)',
-                                        padding: '12px 16px',
-                                        borderRadius: '10px',
-                                        border: '1px solid var(--border-color)',
-                                        gap: '12px'
-                                    }}>
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-color)' }}>
-                                            {updateCheckStatus === 'checking' && (
-                                                <span style={{ color: 'var(--accent-color)', fontWeight: '600' }}>Checking for updates...</span>
-                                            )}
-                                            {updateCheckStatus === 'up-to-date' && (
-                                                <span style={{ color: '#10b981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <Check size={16} /> 123 To Do is up to date (v{APP_VERSION})
-                                                </span>
-                                            )}
-                                            {updateCheckStatus === 'update-available' && (
-                                                <span style={{ color: '#10b981', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <Check size={16} /> New version ready! Click 'Update Now' banner above to pull & reload.
-                                                </span>
-                                            )}
-                                            {updateCheckStatus === 'idle' && (
-                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available. (Shift+click to test)</span>
-                                            )}
-                                        </div>
+                                    <div style={styles.segmentContainer}>
                                         <button
-                                            onClick={handleManualCheckForUpdates}
-                                            disabled={updateCheckStatus === 'checking'}
-                                            style={{
-                                                padding: '6px 12px',
-                                                borderRadius: '6px',
-                                                border: '1px solid var(--border-color)',
-                                                background: 'var(--surface-color)',
-                                                color: 'var(--accent-color)',
-                                                fontWeight: '600',
-                                                fontSize: '0.85rem',
-                                                cursor: updateCheckStatus === 'checking' ? 'default' : 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '6px',
-                                                whiteSpace: 'nowrap',
-                                                transition: 'all 0.2s ease',
-                                                opacity: updateCheckStatus === 'checking' ? 0.6 : 1
-                                            }}
+                                            style={styles.segmentBtn(taskViewMode === 'compact')}
+                                            onClick={() => setTaskViewMode && setTaskViewMode('compact')}
                                         >
-                                            <RefreshCw size={14} style={{ animation: updateCheckStatus === 'checking' ? 'spin 1s linear infinite' : 'none' }} />
-                                            {updateCheckStatus === 'checking' ? 'Checking...' : 'Check for Updates'}
+                                            Compact (2 Lines)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(taskViewMode === 'full')}
+                                            onClick={() => setTaskViewMode && setTaskViewMode('full')}
+                                        >
+                                            Full-Length
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* App Mode & Installation (PWA) Row */}
+                                {/* Date Format Order Preference */}
                                 <div style={styles.settingRow}>
                                     <div style={styles.settingLabel}>
-                                        <span>📲 App Mode & Installation (PWA)</span>
+                                        <span>Date Format Order</span>
                                         <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                            {isStandalone 
-                                                ? 'Currently running as an installed standalone app with full-screen focus and offline storage.' 
-                                                : 'Currently running in your web browser. Installing 123 To Do gives you 1-tap home screen access and 100% offline support.'}
+                                            Choose UK, US, or ISO date order display
                                         </span>
                                     </div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        background: 'var(--bg-color)',
-                                        padding: '12px 16px',
-                                        borderRadius: '10px',
-                                        border: '1px solid var(--border-color)',
-                                        gap: '12px',
-                                        flexWrap: 'wrap'
-                                    }}>
-                                        <div style={{ fontSize: '0.88rem', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            {isStandalone ? (
-                                                <span style={{ color: '#10b981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                    <CheckCircle2 size={16} /> Installed App (Standalone)
-                                                </span>
-                                            ) : (
-                                                <span style={{ color: 'var(--accent-color)', fontWeight: '600' }}>
-                                                    Web Browser Mode
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                            {canNativeInstall && !isStandalone && (
-                                                <button
-                                                    onClick={onNativeInstall}
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {DATE_FORMAT_OPTIONS.map(fmt => {
+                                            const isSelected = dateFormat === fmt.id;
+                                            return (
+                                                <div
+                                                    key={fmt.id}
+                                                    onClick={() => setDateFormat && setDateFormat(fmt.id)}
                                                     style={{
-                                                        padding: '6px 14px',
-                                                        borderRadius: '6px',
-                                                        border: 'none',
-                                                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                                        color: '#ffffff',
-                                                        fontWeight: '700',
-                                                        fontSize: '0.85rem',
+                                                        padding: '10px 12px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                        background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
                                                         cursor: 'pointer',
                                                         display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px'
+                                                        flexDirection: 'column',
+                                                        gap: '2px',
+                                                        transition: 'all 0.15s ease'
                                                     }}
                                                 >
-                                                    <Download size={14} /> Install Now
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => {
-                                                    if (onOpenInstallGuide) {
-                                                        onOpenInstallGuide();
-                                                    } else {
-                                                        setActiveTab('install');
-                                                    }
-                                                }}
-                                                style={{
-                                                    padding: '6px 12px',
-                                                    borderRadius: '6px',
-                                                    border: '1px solid var(--border-color)',
-                                                    background: 'var(--surface-color)',
-                                                    color: 'var(--accent-color)',
-                                                    fontWeight: '600',
-                                                    fontSize: '0.85rem',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '6px'
-                                                }}
-                                            >
-                                                How to Install Instructions
-                                            </button>
-                                        </div>
+                                                    <div style={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: isSelected ? '700' : '600',
+                                                        color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                    }}>
+                                                        {fmt.label}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'monospace' }}>
+                                                        {fmt.example}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Task Description Character Limit */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Task Description Character Limit</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Set limit for task descriptions (250 chars default encourages concise tasks)
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {[
+                                            { id: '250', label: '250 Characters (Default)', desc: 'Encourages concise task details' },
+                                            { id: 'unlimited', label: 'Unlimited', desc: 'No length restriction' }
+                                        ].map(opt => {
+                                            const isSelected = (taskLengthLimit || '250') === opt.id;
+                                            return (
+                                                <div
+                                                    key={opt.id}
+                                                    onClick={() => setTaskLengthLimit && setTaskLengthLimit(opt.id)}
+                                                    style={{
+                                                        padding: '10px 12px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                        background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: '2px',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: isSelected ? '700' : '600',
+                                                        color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                    }}>
+                                                        {opt.label}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)' }}>
+                                                        {opt.desc}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Preferred Email Service */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Preferred Email Service</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Choose which email app or web service opens when clicking email links
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                                        {EMAIL_CLIENT_OPTIONS.map(opt => {
+                                            const currentPref = emailClientPreference || localEmailPref;
+                                            const isSelected = currentPref === opt.id;
+                                            return (
+                                                <div
+                                                    key={opt.id}
+                                                    onClick={() => {
+                                                        setLocalEmailPref(opt.id);
+                                                        saveEmailClientPreference(opt.id);
+                                                        if (setEmailClientPreference) setEmailClientPreference(opt.id);
+                                                    }}
+                                                    style={{
+                                                        padding: '10px 12px',
+                                                        borderRadius: '8px',
+                                                        border: `1.5px solid ${isSelected ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                                        background: isSelected ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: '2px',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: isSelected ? '700' : '600',
+                                                        color: isSelected ? 'var(--accent-color)' : 'var(--text-color)'
+                                                    }}>
+                                                        {opt.name}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.78rem', color: 'var(--muted-text)' }}>
+                                                        {opt.badge} • {opt.description}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
@@ -1652,23 +1499,32 @@ const SettingsModal = ({
                             </div>
                         )}
 
-                        {activeTab === 'shortcuts' && (
+                        {activeTab === 'voice' && (
                             <div>
-                                <div style={styles.sectionTitle}>Keyboard Shortcuts</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '24px' }}>
-                                    {SHORTCUTS_LIST.map((s, idx) => (
-                                        <div key={idx} style={styles.shortcutItem}>
-                                            <span style={{ color: 'var(--text-color)', fontWeight: '500' }}>{s.desc}</span>
-                                            <div style={{ display: 'flex', gap: '6px' }}>
-                                                {s.keys.map(k => (
-                                                    <kbd key={k} style={styles.kbdBadge}>{k}</kbd>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div style={styles.sectionTitle}>
+                                    <Mic size={20} /> Voice Input & Dictation Guide
                                 </div>
 
-                                <div style={styles.sectionTitle}>🎙️ Voice-to-Text & Spoken Commands Guide</div>
+                                <div style={{
+                                    background: 'var(--bg-color)',
+                                    padding: '14px 16px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--border-color)',
+                                    marginBottom: '20px',
+                                    fontSize: '0.88rem',
+                                    lineHeight: '1.55'
+                                }}>
+                                    <div style={{ fontWeight: '700', marginBottom: '8px', color: 'var(--accent-color)' }}>
+                                        Optimized Device Dictation:
+                                    </div>
+                                    <ul style={{ margin: 0, paddingLeft: '18px', color: 'var(--text-color)' }}>
+                                        <li style={{ marginBottom: '6px' }}><strong>💻 Desktop Dictation (Mac / PC)</strong>: Hands-free continuous dictation across thinking pauses. Speaks directly into titles or notes with live spoken punctuation (<em>"comma"</em>, <em>"full stop"</em>) and editing commands (<em>"delete last 2 words"</em>, <em>"spell out..."</em>).</li>
+                                        <li style={{ marginBottom: '6px' }}><strong>📱 Mobile Quick-Capture (Phones / Tablets)</strong>: Tap the in-app Voice button to dictate a quick thought or task. When you finish speaking, it captures cleanly without repetitive system bleep loops or dropped words. Tap again anytime to append more.</li>
+                                        <li style={{ marginBottom: '6px' }}><strong>⚡ Continuous Long-Form Dictation on Mobile</strong>: For uninterrupted, multi-minute continuous dictation on your phone without pauses cutting off, tap into the text area and press the <strong>🎙️ microphone icon on your keyboard</strong> (Gboard on Android, or Apple Dictation on iPhone). It provides hardware-accelerated continuous voice capture with zero interruptions!</li>
+                                        <li><strong>🚀 Spoken Auto-Submit</strong>: Say <em>"add task"</em> or <em>"save note"</em> at the end of speech to instantly save hands-free.</li>
+                                    </ul>
+                                </div>
+
                                 <div style={{
                                     background: 'var(--bg-color)',
                                     border: '1px solid var(--border-color)',
@@ -1676,10 +1532,6 @@ const SettingsModal = ({
                                     padding: '16px',
                                     lineHeight: '1.5'
                                 }}>
-                                    <p style={{ margin: '0 0 14px 0', fontSize: '0.88rem', color: 'var(--muted-text)' }}>
-                                        Click the <strong>Voice Task</strong> or <strong>Voice Notes</strong> microphone button to dictate tasks naturally. Speak punctuation marks, perform live edits, or automatically submit tasks hands-free!
-                                    </p>
-
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
                                         ✍️ Spoken Punctuation:
                                     </div>
@@ -1761,6 +1613,26 @@ const SettingsModal = ({
                             </div>
                         )}
 
+                        {activeTab === 'shortcuts' && (
+                            <div>
+                                <div style={styles.sectionTitle}>
+                                    <Keyboard size={20} /> Keyboard Shortcuts
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    {SHORTCUTS_LIST.map((s, idx) => (
+                                        <div key={idx} style={styles.shortcutItem}>
+                                            <span style={{ color: 'var(--text-color)', fontWeight: '500' }}>{s.desc}</span>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                                {s.keys.map(k => (
+                                                    <kbd key={k} style={styles.kbdBadge}>{k}</kbd>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {activeTab === 'sync' && (
                             <div>
                                 <div style={styles.sectionTitle}>Cloud Sync & Backup Options</div>
@@ -1835,10 +1707,87 @@ const SettingsModal = ({
                             </div>
                         )}
 
-                        {activeTab === 'install' && (
+                        {(activeTab === 'about' || activeTab === 'install') && (
                             <div>
                                 <div style={styles.sectionTitle}>
-                                    <Download size={20} /> Install App & PWA Guide
+                                    <Info size={20} /> App Version & Updates
+                                </div>
+
+                                {/* App Version & Manual Update Check */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    background: 'var(--bg-color)',
+                                    padding: '14px 18px',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--border-color)',
+                                    marginBottom: '20px',
+                                    gap: '12px',
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                            <span style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-color)' }}>
+                                                123 To Do
+                                            </span>
+                                            <span style={{
+                                                background: 'var(--accent-color)',
+                                                color: '#ffffff',
+                                                padding: '2px 8px',
+                                                borderRadius: '12px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '700'
+                                            }}>
+                                                v{APP_VERSION}
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-color)' }}>
+                                            {updateCheckStatus === 'checking' && (
+                                                <span style={{ color: 'var(--accent-color)', fontWeight: '600' }}>Checking for updates...</span>
+                                            )}
+                                            {updateCheckStatus === 'up-to-date' && (
+                                                <span style={{ color: '#10b981', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Check size={16} /> 123 To Do is up to date (v{APP_VERSION})
+                                                </span>
+                                            )}
+                                            {updateCheckStatus === 'update-available' && (
+                                                <span style={{ color: '#10b981', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Check size={16} /> New version ready! Click 'Update Now' banner above to pull & reload.
+                                                </span>
+                                            )}
+                                            {updateCheckStatus === 'idle' && (
+                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available. (Shift+click to test)</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleManualCheckForUpdates}
+                                        disabled={updateCheckStatus === 'checking'}
+                                        style={{
+                                            padding: '8px 14px',
+                                            borderRadius: '8px',
+                                            border: '1px solid var(--border-color)',
+                                            background: 'var(--surface-color)',
+                                            color: 'var(--accent-color)',
+                                            fontWeight: '600',
+                                            fontSize: '0.88rem',
+                                            cursor: updateCheckStatus === 'checking' ? 'default' : 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            whiteSpace: 'nowrap',
+                                            transition: 'all 0.2s ease',
+                                            opacity: updateCheckStatus === 'checking' ? 0.6 : 1
+                                        }}
+                                    >
+                                        <RefreshCw size={15} style={{ animation: updateCheckStatus === 'checking' ? 'spin 1s linear infinite' : 'none' }} />
+                                        {updateCheckStatus === 'checking' ? 'Checking...' : 'Check for Updates'}
+                                    </button>
+                                </div>
+
+                                <div style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Download size={18} /> App Installation & PWA Mode
                                 </div>
 
                                 {/* Status Card */}

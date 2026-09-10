@@ -110,9 +110,15 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.10';
+export const APP_VERSION = '3.6.11';
 
 export const RELEASE_CHANGELOG = {
+  '3.6.11': [
+    { title: '⚙️ Reorganized Settings Hub:', desc: 'Restructured Settings into 8 intuitive, priority-ordered tabs (Appearance, Tasks, Projects, Swipe, Cloud Sync, Voice, Shortcuts, App & Updates) for lightning-fast configuration.' },
+    { title: '📋 Dedicated Tasks & Workflow Preferences:', desc: 'Grouped list view modes (compact vs full-length), date formats, character limits, and preferred email clients into a dedicated Tasks settings panel.' },
+    { title: '🎙️ Dedicated Voice Dictation Guide:', desc: 'Created an uncluttered, standalone reference for speech-to-text, device-tailored voice features, punctuation, and editing commands.' },
+    { title: '🚀 Consolidated App & Updates Center:', desc: 'Unified the version checker, 1-click PWA installer, and platform installation guides into an all-in-one App & Updates section.' }
+  ],
   '3.6.10': [
     { title: '⏩ Sleek Professional Schedule Controls:', desc: 'Replaced calendar icons and full text with streamlined FastForward quick-schedule buttons (Day & Week), providing cleaner visual hierarchy and extra breathing room in Add and Edit task panels.' },
     { title: '🔗 Unified Actionable Entity Detection:', desc: 'Consolidated detected phone numbers, email addresses, and URLs into a single, clean actionable item panel beneath tasks in Edit and Add modes.' },
