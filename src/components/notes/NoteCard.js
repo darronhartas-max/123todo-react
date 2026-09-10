@@ -70,6 +70,8 @@ const NoteCard = ({
     setSubtasks(note.subtasks || []);
   }, [note.text, note.notes, note.subtasks]);
 
+  const hasAssociatedNote = Boolean((note.notes && note.notes.trim().length > 0) || (notesText && notesText.trim().length > 0));
+
   const currentProject = projects.find(p => p.id === note.projectId) || { id: 'general', name: 'Unassigned Inbox', color: '#6b7280' };
 
   const handleAddSubtask = () => {
@@ -470,6 +472,12 @@ const NoteCard = ({
               ref={titleTextareaRef}
               value={titleText}
               onChange={(e) => setTitleText(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSaveEdits();
+                }
+              }}
               placeholder="Note Title..."
               rows={2}
               spellCheck="true"
@@ -492,29 +500,39 @@ const NoteCard = ({
               autoFocus
             />
             <ActionableEntitiesBar text={titleText} />
-            <textarea
-              ref={noteTextareaRef}
-              value={notesText}
-              onChange={(e) => setNotesText(e.target.value)}
-              placeholder="Write note details or dictation..."
-              rows={3}
-              spellCheck="true"
-              autoCorrect="on"
-              autoCapitalize="sentences"
-              style={{
-                fontSize: '16px',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                border: '1px solid var(--border-color, #d1d5db)',
-                backgroundColor: 'var(--item-bg, #f9fafb)',
-                color: 'var(--text-color, #111827)',
-                outline: 'none',
-                width: '100%',
-                resize: 'none',
-                lineHeight: 1.5
-              }}
-            />
-            <ActionableEntitiesBar text={notesText} />
+            {hasAssociatedNote && (
+              <>
+                <textarea
+                  ref={noteTextareaRef}
+                  value={notesText}
+                  onChange={(e) => setNotesText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveEdits();
+                    }
+                  }}
+                  placeholder="Write note details or dictation..."
+                  rows={3}
+                  spellCheck="true"
+                  autoCorrect="on"
+                  autoCapitalize="sentences"
+                  style={{
+                    fontSize: '16px',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color, #d1d5db)',
+                    backgroundColor: 'var(--item-bg, #f9fafb)',
+                    color: 'var(--text-color, #111827)',
+                    outline: 'none',
+                    width: '100%',
+                    resize: 'none',
+                    lineHeight: 1.5
+                  }}
+                />
+                <ActionableEntitiesBar text={notesText} />
+              </>
+            )}
             <PhotoAttachments
               photos={note.photos || []}
               onChange={(newPhotos) => onUpdateNote(note.id, { photos: newPhotos })}
@@ -707,7 +725,7 @@ const NoteCard = ({
               {renderActionableText(note.text)}
             </h3>
 
-            {note.notes ? (
+            {note.notes && note.notes.trim().length > 0 ? (
               <p
                 style={{ 
                   fontSize: `${Math.max(notesFontSize - 2, 12)}px`, 
@@ -722,11 +740,7 @@ const NoteCard = ({
               >
                 {renderActionableText(note.notes)}
               </p>
-            ) : (
-              <p style={{ fontSize: `${Math.max(notesFontSize - 4, 12)}px`, color: 'var(--text-secondary, #9ca3af)', italic: 'true', margin: 0 }}>
-                Tap to add details or record voice...
-              </p>
-            )}
+            ) : null}
 
             {note.photos && note.photos.length > 0 && (
               <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '8px' }}>

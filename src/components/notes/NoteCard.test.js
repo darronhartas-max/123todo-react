@@ -158,4 +158,62 @@ describe('NoteCard', () => {
     // Restore clipboard
     Object.assign(navigator, { clipboard: originalClipboard });
   });
+
+  test('hides note details field in edit mode and omits placeholder in view mode when note has no associated notes', () => {
+    const noteWithoutNotes = {
+      id: 102,
+      text: 'Simple quick note without details',
+      notes: '',
+      projectId: 'general',
+      subtasks: []
+    };
+
+    const { rerender } = render(
+      <NoteCard
+        note={noteWithoutNotes}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // In view mode: title text is visible, but placeholder "Tap to add details..." is NOT shown
+    expect(screen.getByText('Simple quick note without details')).toBeInTheDocument();
+    expect(screen.queryByText(/Tap to add details or record voice/i)).not.toBeInTheDocument();
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText('Simple quick note without details'));
+
+    // In edit mode: Title textarea is visible, but notes textarea is hidden
+    expect(screen.getByPlaceholderText('Note Title...')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Write note details or dictation...')).not.toBeInTheDocument();
+  });
+
+  test('displays note details in both view mode and edit mode when note has associated notes', () => {
+    const noteWithNotes = {
+      id: 103,
+      text: 'Note with extra information',
+      notes: 'Detailed specifications for client approval',
+      projectId: 'general',
+      subtasks: []
+    };
+
+    render(
+      <NoteCard
+        note={noteWithNotes}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // In view mode: both title and note details are visible
+    expect(screen.getByText('Note with extra information')).toBeInTheDocument();
+    expect(screen.getByText('Detailed specifications for client approval')).toBeInTheDocument();
+
+    // Enter edit mode
+    fireEvent.click(screen.getByText('Detailed specifications for client approval'));
+
+    // In edit mode: both textareas are visible
+    expect(screen.getByPlaceholderText('Note Title...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Write note details or dictation...')).toBeInTheDocument();
+  });
 });
