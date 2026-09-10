@@ -330,8 +330,6 @@ const NoteCard = ({
     }
   };
 
-  const formattedDate = note.updatedAt ? new Date(note.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-
   return (
     <motion.div
       layout
@@ -465,14 +463,8 @@ const NoteCard = ({
           )}
         </div>
 
-        {/* Right side: formatted time & Archive Checkbox in exact same style as Task mode */}
+        {/* Right side: Archive Checkbox in exact same style as Task mode */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, marginLeft: 'auto' }}>
-          {formattedDate && (
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary, #9ca3af)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Clock size={12} /> {formattedDate}
-            </span>
-          )}
-
           {/* Archive Checkbox - Same style as Task mode */}
           <motion.button
             onClick={handleComplete}
@@ -1107,36 +1099,8 @@ const NoteCard = ({
             </div>
           </div>
 
-          {/* Right: Action Group: Edit Button & Priority Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {/* Edit Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEditing(true);
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '6px 12px',
-                borderRadius: '10px',
-                border: '1px solid var(--border-color, #d1d5db)',
-                backgroundColor: 'var(--card-bg, #ffffff)',
-                color: 'var(--text-color, #374151)',
-                fontSize: '13px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-              title="Edit Note"
-              aria-label="Edit Note"
-            >
-              <Edit2 size={13} color="var(--text-color, #374151)" />
-              <span>Edit</span>
-            </button>
-
+          {/* Right: Action Group: Priority Dropdown & Edit Note Button on bottom right */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
             {/* Priority Popover */}
             <div style={{ position: 'relative' }}>
               <button
@@ -1236,6 +1200,34 @@ const NoteCard = ({
                 </>
               )}
             </div>
+
+            {/* Edit Note Button on bottom right */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 14px',
+                borderRadius: '10px',
+                border: '1.5px solid #2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                color: '#2563eb',
+                fontSize: '13px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Edit Note"
+              aria-label="Edit Note"
+            >
+              <Edit2 size={13} color="#2563eb" />
+              <span>Edit Note</span>
+            </button>
           </div>
         </div>
       )}

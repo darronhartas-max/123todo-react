@@ -113,20 +113,49 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return combineBaseAndRemainingSpeech(base, remainingRaw);
   }
 
-  // 3. Base contains speech completely (speech is a sub-phrase or duplicate sentence of base)
-  if (baseCleanStr.includes(speechCleanStr)) {
+  // 3. Base starts with Speech (speech is an interim prefix of base from restart)
+  if (baseCleanStr.startsWith(speechCleanStr)) {
     return base;
   }
 
-  // 4. Suffix of base matches Prefix of speech (standard overlap at boundary)
+  // 4. Speech is an exact isolated replay of a complete earlier sentence without any new words
+  const baseSentencesClean = base.split(/(?<=[.?!])\s+/).filter(Boolean).map(s => {
+    return s.split(/\s+/).map(cleanWord).filter(Boolean).join(' ');
+  });
+  if (baseSentencesClean.includes(speechCleanStr)) {
+    return base;
+  }
+
+  // 5. Suffix of base matches Prefix of speech (standard overlap at boundary)
+  const baseEndsWithSentenceTerminator = /[.?!]\s*$/.test(base);
   let maxOverlap = 0;
   const maxCheck = Math.min(baseCleanList.length, speechCleanList.length);
+
+  // Pre-calculate valid sentence suffixes if base ends with sentence punctuation
+  let validSentenceSuffixes = null;
+  if (baseEndsWithSentenceTerminator) {
+    const baseSentences = base.split(/(?<=[.?!])\s+/).filter(Boolean);
+    const cleanSentences = baseSentences
+      .map(s => s.split(/\s+/).map(cleanWord).filter(Boolean).join(' '))
+      .filter(Boolean);
+    validSentenceSuffixes = new Set();
+    for (let i = 0; i < cleanSentences.length; i++) {
+      validSentenceSuffixes.add(cleanSentences.slice(i).join(' '));
+    }
+  }
 
   for (let len = 1; len <= maxCheck; len++) {
     const baseSuffix = baseCleanList.slice(baseCleanList.length - len).join(' ');
     const speechPrefix = speechCleanList.slice(0, len).join(' ');
     if (baseSuffix === speechPrefix) {
-      maxOverlap = len;
+      if (baseEndsWithSentenceTerminator) {
+        // Only allow overlap across a sentence boundary if baseSuffix starts at a sentence boundary
+        if (validSentenceSuffixes && validSentenceSuffixes.has(baseSuffix)) {
+          maxOverlap = len;
+        }
+      } else {
+        maxOverlap = len;
+      }
     }
   }
 
@@ -135,36 +164,7 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return combineBaseAndRemainingSpeech(base, remainingRaw);
   }
 
-  // 5. Advanced: Check if speech shares a sub-segment overlap with base ending near the end of base
-  for (let len = speechCleanList.length; len >= 1; len--) {
-    const speechPrefix = speechCleanList.slice(0, len).join(' ');
-    const pos = baseCleanStr.lastIndexOf(speechPrefix);
-    if (pos !== -1) {
-      if (pos + speechPrefix.length >= baseCleanStr.length - 10 || pos + speechPrefix.length === baseCleanStr.length) {
-        const remainingRaw = sliceSpeechRawAfterCleanCount(len);
-        return combineBaseAndRemainingSpeech(base, remainingRaw);
-      }
-    }
-  }
-
-  // 6. Sentence-Level Deduplication: Check if speech contains sentences already in base
-  const speechSentences = speech.split(/(?<=[.?!])\s+/).filter(Boolean);
-  const filteredSpeechSentences = speechSentences.filter(s => {
-    const sClean = s.split(/\s+/).map(cleanWord).filter(Boolean).join(' ');
-    if (!sClean) return false;
-    return !baseCleanStr.includes(sClean);
-  });
-
-  if (filteredSpeechSentences.length < speechSentences.length) {
-    if (filteredSpeechSentences.length === 0) {
-      return base;
-    }
-    const deduplicatedSpeech = filteredSpeechSentences.join(' ');
-    const separator = base.endsWith(' ') ? '' : ' ';
-    return `${base}${separator}${deduplicatedSpeech}`;
-  }
-
-  // 7. Fallback standard concatenation with clean spacing
+  // 6. Fallback standard concatenation with clean spacing
   const separator = base.endsWith(' ') ? '' : ' ';
   return `${base}${separator}${speech}`;
 };
@@ -572,7 +572,7 @@ export const startVoiceDictation = ({
     }, silenceTimeout);
   };
 
-  const scheduleRestart = (delay = 80) => {
+  const scheduleRestart = (delay = 20) => {
     if (!isActive) return;
     if (restartTimer) clearTimeout(restartTimer);
     restartTimer = setTimeout(() => {
@@ -592,7 +592,7 @@ export const startVoiceDictation = ({
                 console.error('Recognition restart attempt 2 failed:', e);
               }
             }
-          }, 200);
+          }, 60);
         }
       }
     }, delay);
@@ -626,8 +626,8 @@ export const startVoiceDictation = ({
       recognition.onresult = (event) => {
         if (!isActive) return;
 
-        let cleanFinal = '';
-        let cleanInterim = '';
+        let sessionFinal = '';
+        let sessionInterim = '';
 
         for (let i = 0; i < event.results.length; ++i) {
           const res = event.results[i];
@@ -641,13 +641,15 @@ export const startVoiceDictation = ({
           resetSilenceTimer();
 
           if (res.isFinal) {
-            cleanFinal = mergeBaseAndTranscript(cleanFinal, formattedChunk);
+            sessionFinal = sessionFinal ? `${sessionFinal} ${formattedChunk}` : formattedChunk;
           } else {
-            cleanInterim = mergeBaseAndTranscript(cleanInterim, formattedChunk);
+            sessionInterim = sessionInterim ? `${sessionInterim} ${formattedChunk}` : formattedChunk;
           }
         }
 
-        let currentSpeech = mergeBaseAndTranscript(cleanFinal, cleanInterim);
+        let currentSpeech = sessionFinal
+          ? (sessionInterim ? `${sessionFinal} ${sessionInterim}` : sessionFinal)
+          : sessionInterim;
         let combined = mergeBaseAndTranscript(currentSessionBaseText, currentSpeech);
 
         const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
@@ -724,8 +726,13 @@ export const startVoiceDictation = ({
           return;
         }
 
-        // Keep listening across pauses with a smooth restart
-        scheduleRestart(80);
+        // Keep listening across pauses with immediate resumption
+        currentSessionBaseText = lastEmittedText;
+        try {
+          recognition.start();
+        } catch (e) {
+          scheduleRestart(20);
+        }
       };
 
       recognition.start();

@@ -63,6 +63,15 @@ describe('voiceUtils - mergeBaseAndTranscript', () => {
     expect(mergeBaseAndTranscript('Buy milk.', '.')).toBe('Buy milk.');
     expect(mergeBaseAndTranscript('Is task done', '?')).toBe('Is task done?');
   });
+
+  test('does not drop words when sentences share phrases or start with same words', () => {
+    expect(mergeBaseAndTranscript('Inspect the radiator in bedroom one.', 'Inspect the radiator in bedroom two.'))
+      .toBe('Inspect the radiator in bedroom one. Inspect the radiator in bedroom two.');
+    expect(mergeBaseAndTranscript('Check the roof and walls.', 'Check the windows.'))
+      .toBe('Check the roof and walls. Check the windows.');
+    expect(mergeBaseAndTranscript('Call John on his mobile.', 'His mobile is not answering.'))
+      .toBe('Call John on his mobile. His mobile is not answering.');
+  });
 });
 
 describe('voiceUtils - processVoiceCommands', () => {
