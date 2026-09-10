@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 export const PRIORITIES = {
   1: { label: 'Must Do', color: '#dc2626', dotColor: '#dc2626' },
   2: { label: 'Should Do', color: '#f59e0b', dotColor: '#f59e0b' },
@@ -124,9 +126,34 @@ export const DEFAULT_TASK_VIEW_MODE = 'compact';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
-export const APP_VERSION = '3.6.12';
+export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.6.20': [
+    { title: '🎯 Task-Style Archive Checkbox in Notes Mode:', desc: 'Moved the archive checkbox to the top-right header on each note card with smooth square-to-check animation and 300ms completion delay, identical to Task mode.' },
+    { title: '🎨 Cohesive Notes Mode Iconography:', desc: 'Aligned priority flag icons, subtask checklist icons, and circular 32px header action buttons across Notes mode for visual consistency.' }
+  ],
+  '3.6.19': [
+    { title: '⏱️ Configurable Notes Auto-Save Delay:', desc: 'Balanced 1-minute (60s) real-world default delay for on-site measuring and quoting, with customizable tiers (30s, 1m, 2m, 5m, or manual) in Settings > Tasks & Workflow.' }
+  ],
+  '3.6.18': [
+    { title: '⚡ Redesigned Fast Notes Mode:', desc: 'Prominent Save button at the top right alongside Talk button, single note field with "Add New Note..." placeholder, photo attachments at the note-taking stage, and discard protection.' }
+  ],
+  '3.6.17': [
+    { title: '📲 Streamlined PWA Experience:', desc: 'Intelligent frequency for install prompts based on active app usage without disruptive footer links.' }
+  ],
+  '3.6.16': [
+    { title: '📝 Simplified Notes Editing:', desc: 'Dynamically hides empty note details fields during quick note editing, reserving full view for notes that contain text.' }
+  ],
+  '3.6.15': [
+    { title: '🛡️ Brand & Copy Modernization:', desc: 'Refined app wording and terms to support ongoing feature enhancements.' }
+  ],
+  '3.6.14': [
+    { title: '📸 Human-Friendly Photo Names & Zero-Bleed Lightbox:', desc: 'Transformed long machine-generated photo filenames into clean, human-friendly titles and eliminated action bar bleed in the photo Lightbox.' }
+  ],
+  '3.6.13': [
+    { title: '👋 Streamlined Welcome Modal:', desc: 'App-first onboarding with clean collapsible accordion drawers for how to install, features, and privacy without overwhelming walls of text.' }
+  ],
   '3.6.12': [
     { title: '⚡ Fast Notes Mode & Top Save Buttons:', desc: 'Redesigned Notes mode for lightning-fast capture. Added prominent, large Save Note buttons right at the top of both Quick Add and Note Edit cards, alongside Cmd+Enter keyboard shortcut support.' },
     { title: '📅 Bottom Evidentiary Timestamps & 1-Tap Copy:', desc: 'Added full date and time timestamps at the bottom of all note and task cards with a 1-tap Copy Evidence button for official job logs, client proof, and invoices.' },

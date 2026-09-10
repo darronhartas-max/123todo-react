@@ -109,17 +109,26 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                     The application has successfully updated to the latest version in the background.
                 </p>
 
-                <div style={styles.badgeContainer}>
-                    <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '4px', fontWeight: '600' }}>PREVIOUS</div>
-                        <div style={styles.versionBadge}>v{oldVersion}</div>
+                {oldVersion && oldVersion !== newVersion ? (
+                    <div style={styles.badgeContainer}>
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '4px', fontWeight: '600' }}>PREVIOUS</div>
+                            <div style={styles.versionBadge}>v{oldVersion}</div>
+                        </div>
+                        <div style={styles.arrow}>→</div>
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '4px', fontWeight: '600' }}>CURRENT</div>
+                            <div style={styles.newBadge}>v{newVersion}</div>
+                        </div>
                     </div>
-                    <div style={styles.arrow}>→</div>
-                    <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '4px', fontWeight: '600' }}>CURRENT</div>
-                        <div style={styles.newBadge}>v{newVersion}</div>
+                ) : (
+                    <div style={{ ...styles.badgeContainer, justifyContent: 'center' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginBottom: '4px', fontWeight: '600' }}>CURRENT VERSION</div>
+                            <div style={styles.newBadge}>v{newVersion}</div>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {(() => {
                     const highlights = RELEASE_CHANGELOG[newVersion] || RELEASE_CHANGELOG[APP_VERSION] || [

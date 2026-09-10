@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import App from './App';
 
 test('renders app logo', () => {
@@ -49,6 +49,24 @@ test('defaults to 11pt font size on desktop when no localStorage setting exists'
   render(<App />);
 
   expect(document.documentElement.style.fontSize).toBe('11pt');
+});
+
+test('displays UpdatedModal when previous version in localStorage is older than APP_VERSION', () => {
+  localStorage.setItem('123Todo_Last_Seen_Version', '3.6.12');
+
+  render(<App />);
+
+  expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
+  expect(screen.getByText('v3.6.12')).toBeInTheDocument();
+  expect(screen.getAllByText('v3.6.20').length).toBeGreaterThanOrEqual(1);
+
+  // Closing modal sets last seen version to current version
+  const goBtn = screen.getByRole('button', { name: /Awesome, Let's Go!/i });
+  act(() => {
+    goBtn.click();
+  });
+
+  expect(localStorage.getItem('123Todo_Last_Seen_Version')).toBe('3.6.20');
 });
 
 
