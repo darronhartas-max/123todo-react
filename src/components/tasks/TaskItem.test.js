@@ -121,6 +121,69 @@ test('successfully completes a task even after vertical touch scroll interaction
   expect(onCompleteMock).toHaveBeenCalledWith(105);
 });
 
+test('does NOT trigger swipe action during diagonal or vertical list scrolling', () => {
+  const onSwipeActionMock = jest.fn();
+  const task = {
+    id: 1051,
+    text: 'Task during diagonal scroll',
+    priority: 1,
+    projectId: 'general'
+  };
+
+  render(
+    <TaskItem
+      task={task}
+      onSwipeAction={onSwipeActionMock}
+      swipeSettings={{ enabled: true, swipeRight: 'complete', swipeLeft: 'delete' }}
+    />
+  );
+
+  const listItem = screen.getByRole('listitem');
+
+  // Simulate diagonal scrolling motion with early vertical movement (e.g., thumb flick down and right)
+  fireEvent.touchStart(listItem, { touches: [{ clientX: 100, clientY: 100 }] });
+  fireEvent.touchMove(listItem, { touches: [{ clientX: 120, clientY: 118 }] });
+  fireEvent.touchMove(listItem, { touches: [{ clientX: 180, clientY: 180 }] });
+  fireEvent.touchEnd(listItem);
+
+  // Should NOT have triggered any swipe action because vertical scrolling intent dominated
+  expect(onSwipeActionMock).not.toHaveBeenCalled();
+});
+
+test('triggers swipe action only on intentional horizontal swipe exceeding 95px threshold', () => {
+  const onSwipeActionMock = jest.fn();
+  const task = {
+    id: 1052,
+    text: 'Task with intentional swipe',
+    priority: 1,
+    projectId: 'general'
+  };
+
+  const { rerender } = render(
+    <TaskItem
+      task={task}
+      onSwipeAction={onSwipeActionMock}
+      swipeSettings={{ enabled: true, swipeRight: 'complete', swipeLeft: 'delete' }}
+    />
+  );
+
+  const listItem = screen.getByRole('listitem');
+
+  // 1. Short swipe (50px right, below 95px threshold) -> should not trigger
+  fireEvent.touchStart(listItem, { touches: [{ clientX: 100, clientY: 100 }] });
+  fireEvent.touchMove(listItem, { touches: [{ clientX: 150, clientY: 101 }] });
+  fireEvent.touchEnd(listItem);
+
+  expect(onSwipeActionMock).not.toHaveBeenCalled();
+
+  // 2. Deliberate long swipe (120px right, exceeding 95px threshold) -> triggers complete
+  fireEvent.touchStart(listItem, { touches: [{ clientX: 100, clientY: 100 }] });
+  fireEvent.touchMove(listItem, { touches: [{ clientX: 220, clientY: 101 }] });
+  fireEvent.touchEnd(listItem);
+
+  expect(onSwipeActionMock).toHaveBeenCalledWith(task, 'complete');
+});
+
 test('successfully completes and archives a task with multiple photo attachments', () => {
   const onCompleteMock = jest.fn();
   const taskWithPhotos = {

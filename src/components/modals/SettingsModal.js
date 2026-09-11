@@ -28,13 +28,13 @@ const SwipeDemoCard = ({ swipeSettings }) => {
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
 
-    const THRESHOLD = 65;
+    const THRESHOLD = 95;
 
     const applyDamping = (diffX) => {
         const absX = Math.abs(diffX);
         if (absX <= THRESHOLD) return diffX;
         const over = absX - THRESHOLD;
-        return Math.sign(diffX) * (THRESHOLD + over * 0.55);
+        return Math.sign(diffX) * (THRESHOLD + over * 0.45);
     };
 
     const rightSwipeAction = swipeSettings?.enabled && swipeSettings?.swipeRight ? SWIPE_ACTIONS[swipeSettings.swipeRight] : null;
@@ -60,11 +60,16 @@ const SwipeDemoCard = ({ swipeSettings }) => {
         const touch = e.touches ? e.touches[0] : e;
         const diffX = touch.clientX - touchStartRef.current.x;
         const diffY = touch.clientY - touchStartRef.current.y;
+        const absX = Math.abs(diffX);
+        const absY = Math.abs(diffY);
 
         if (!isSwipingRef.current) {
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 8) {
+            if (absY > 7 && (absY * 1.15 >= absX || absY > 12)) {
+                return;
+            }
+            if (absX >= 16 && absX > absY * 2.0) {
                 isSwipingRef.current = true;
-            } else if (Math.abs(diffY) > 8) {
+            } else {
                 return;
             }
         }
@@ -72,7 +77,7 @@ const SwipeDemoCard = ({ swipeSettings }) => {
         if (isSwipingRef.current) {
             if (e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
-            const clampedOffset = Math.max(-240, Math.min(240, rawOffset));
+            const clampedOffset = Math.max(-260, Math.min(260, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };

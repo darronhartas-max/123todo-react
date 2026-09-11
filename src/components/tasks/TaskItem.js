@@ -32,13 +32,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const wasSwipingRef = React.useRef(false);
     const isScrollingVerticalRef = React.useRef(false);
 
-    const THRESHOLD = 65;
+    const THRESHOLD = 95;
 
     const applyDamping = (diffX) => {
         const absX = Math.abs(diffX);
         if (absX <= THRESHOLD) return diffX;
         const over = absX - THRESHOLD;
-        const dampedOver = over * 0.55;
+        const dampedOver = over * 0.45;
         return Math.sign(diffX) * (THRESHOLD + dampedOver);
     };
 
@@ -54,20 +54,25 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (!swipeSettings?.enabled || isArchived || isScrollingVerticalRef.current) return;
         const diffX = clientX - touchStartRef.current.x;
         const diffY = clientY - touchStartRef.current.y;
+        const absX = Math.abs(diffX);
+        const absY = Math.abs(diffY);
 
         // If swiping has not started yet, determine user intent (horizontal swipe vs vertical page scroll)
         if (!isSwipingRef.current) {
-            // Vertical scroll intent: vertical movement clearly dominates early on
-            if (Math.abs(diffY) > 16 && Math.abs(diffY) > Math.abs(diffX) * 1.3) {
+            // Immediate vertical scroll intent: any noticeable vertical movement locks into vertical scroll
+            if (absY > 7 && (absY * 1.15 >= absX || absY > 12)) {
                 isScrollingVerticalRef.current = true;
                 setSwipeOffset(0);
                 return;
             }
 
-            // Horizontal swipe intent: engage as soon as horizontal distance is > 8px and exceeds vertical
-            if (Math.abs(diffX) > 8 && Math.abs(diffX) >= Math.abs(diffY)) {
+            // Horizontal swipe intent: engage ONLY when horizontal movement is deliberate (>= 16px) and clearly exceeds vertical movement by 2x
+            if (absX >= 16 && absX > absY * 2.0) {
                 isSwipingRef.current = true;
                 wasSwipingRef.current = true;
+            } else {
+                // Not enough horizontal intent yet, do not intercept or prevent native scroll
+                return;
             }
         }
 
@@ -75,7 +80,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         if (isSwipingRef.current) {
             if (e && e.cancelable) e.preventDefault();
             const rawOffset = applyDamping(diffX);
-            const clampedOffset = Math.max(-240, Math.min(240, rawOffset));
+            const clampedOffset = Math.max(-260, Math.min(260, rawOffset));
             setSwipeOffset(clampedOffset);
         }
     };
