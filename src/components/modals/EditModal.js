@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate } from '../../utils/dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
@@ -11,6 +11,8 @@ import { ActionableEntitiesBar } from '../../utils/textUtils';
 const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task, photos: task.photos || [] });
+    const createdTs = task?.createdAt || task?.id;
+    const createdFormatted = formatEvidentiaryTimestamp(createdTs);
     
     // Voice, Dropdowns & Expanded Editor State
     const [listeningTarget, setListeningTarget] = useState(null); // 'title' | 'notes' | null
@@ -1259,11 +1261,17 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     paddingTop: '12px',
                     borderTop: '1px solid var(--border-color)'
                 }}>
-                    <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'var(--muted-text)', flexWrap: 'wrap' }}>
+                        {createdFormatted && (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }} title="Initial creation date and time">
+                                <Clock size={13} style={{ opacity: 0.75, flexShrink: 0 }} />
+                                <span>Created: <strong>{createdFormatted}</strong></span>
+                            </span>
+                        )}
                         {!isUnlimited && (
-                            <div style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                {`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
-                            </div>
+                            <span style={{ opacity: 0.85 }}>
+                                {createdFormatted ? '• ' : ''}{`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
+                            </span>
                         )}
                     </div>
 
