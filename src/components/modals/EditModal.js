@@ -770,8 +770,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '4px',
-                                        padding: '3px 8px',
+                                        padding: '3px 9px',
                                         borderRadius: '8px',
                                         border: '1px solid var(--border-color)',
                                         background: 'var(--surface-color)',
@@ -781,29 +780,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         fontWeight: '600'
                                     }}
                                 >
-                                    <Clock size={12} color="var(--accent-color)" />
                                     <span>+ Timestamp</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setExpandedOverlayField('notes')}
-                                    title="Open Full Screen Focus Editor for Notes"
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        padding: '3px 8px',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--border-color)',
-                                        background: 'var(--surface-color)',
-                                        color: 'var(--text-color)',
-                                        cursor: 'pointer',
-                                        fontSize: '0.8rem',
-                                        fontWeight: '600'
-                                    }}
-                                >
-                                    <Maximize2 size={12} />
-                                    <span>Expand</span>
                                 </button>
                                 <button
                                     type="button"
@@ -872,6 +849,31 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             photos={editingTask.photos || []}
                             onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
                             readOnly={false}
+                            showCounter={false}
+                            rightAction={
+                                <button
+                                    type="button"
+                                    onClick={() => setExpandedOverlayField('notes')}
+                                    title="Open Full Screen Focus Editor for Notes"
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        padding: '4px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid var(--border-color)',
+                                        background: 'var(--bg-color)',
+                                        color: 'var(--text-color)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600',
+                                        transition: 'all 0.15s ease'
+                                    }}
+                                >
+                                    <Maximize2 size={13} style={{ color: 'var(--accent-color)' }} />
+                                    <span>Expand</span>
+                                </button>
+                            }
                         />
                     </div>
                 )}
@@ -1447,7 +1449,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: '4px',
                                                 padding: '4px 10px',
                                                 borderRadius: '12px',
                                                 border: '1px solid var(--border-color)',
@@ -1458,7 +1459,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 fontWeight: '600'
                                             }}
                                         >
-                                            <Clock size={13} color="var(--accent-color)" />
                                             <span>+ Timestamp</span>
                                         </button>
                                     )}

@@ -267,6 +267,33 @@ describe('EditModal', () => {
         expect(screen.getByRole('link', { name: /Call 07123456789/i })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /Email boss@example.com/i })).toBeInTheDocument();
     });
+
+    test('renders timestamp button and places expand button at the bottom right in place of photos counter', () => {
+        render(
+            <EditModal
+                task={sampleTaskWithNotes}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Verify + Timestamp button is present
+        const timestampBtn = screen.getByRole('button', { name: /\+ Timestamp/i });
+        expect(timestampBtn).toBeInTheDocument();
+
+        // Verify Expand button for notes is present
+        const expandBtn = screen.getByTitle('Open Full Screen Focus Editor for Notes');
+        expect(expandBtn).toBeInTheDocument();
+
+        // Photos counter text is replaced by rightAction and not rendered in notes section
+        expect(screen.queryByText(/Photos: 0\//i)).not.toBeInTheDocument();
+
+        // Clicking timestamp button appends a timestamp tag to notes
+        fireEvent.click(timestampBtn);
+        const notesTextarea = screen.getByPlaceholderText('Add notes or extra details...');
+        expect(notesTextarea.value).toMatch(/\[\d{1,2} [A-Za-z]{3} \d{4}, \d{2}:\d{2}\]/);
+    });
 });
 
 

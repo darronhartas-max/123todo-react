@@ -16,7 +16,9 @@ const PhotoAttachments = ({
   onChange,
   readOnly = false,
   maxPhotos = MAX_PHOTOS_PER_NOTE,
-  containerStyle = {}
+  containerStyle = {},
+  showCounter = true,
+  rightAction = null
 }) => {
   const [activeLightboxPhoto, setActiveLightboxPhoto] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -339,17 +341,24 @@ const PhotoAttachments = ({
             </button>
           </div>
 
-          <div style={{
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            color: isFull ? '#f59e0b' : 'var(--muted-text)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            <span>Photos: {currentCount}/{maxPhotos}</span>
-            {isProcessing && <span style={{ color: 'var(--accent-color)' }}>• Compressing...</span>}
-          </div>
+          {rightAction ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {isProcessing && <span style={{ fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: '600' }}>• Compressing...</span>}
+              {rightAction}
+            </div>
+          ) : showCounter ? (
+            <div style={{
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              color: isFull ? '#f59e0b' : 'var(--muted-text)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <span>Photos: {currentCount}/{maxPhotos}</span>
+              {isProcessing && <span style={{ color: 'var(--accent-color)' }}>• Compressing...</span>}
+            </div>
+          ) : null}
         </div>
       )}
 
