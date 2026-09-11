@@ -672,7 +672,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 ) : (
                                     <>
                                         <Mic size={13} color="var(--accent-color)" />
-                                        <span>Voice Task</span>
+                                        <span>Talk</span>
                                     </>
                                 )}
                             </button>
@@ -816,7 +816,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     ) : (
                                         <>
                                             <Mic size={13} color="var(--accent-color)" />
-                                            <span>Voice Notes</span>
+                                            <span>Talk</span>
                                         </>
                                     )}
                                 </button>
@@ -1495,7 +1495,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         ) : (
                                             <>
                                                 <Mic size={14} color="var(--accent-color)" />
-                                                <span>Voice Dictation</span>
+                                                <span>Talk</span>
                                             </>
                                         )}
                                     </button>

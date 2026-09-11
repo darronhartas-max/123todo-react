@@ -65,7 +65,7 @@ test('displays full list of projects when project dropdown is opened', () => {
   expect(screen.getByText('Fitness & Health')).toBeInTheDocument();
 });
 
-test('renders Voice Task button and activates listening indicator on click', () => {
+test('renders Talk button and activates listening indicator on click', () => {
   const { fireEvent } = require('@testing-library/react');
   // Mock SpeechRecognition in window
   class MockSpeechRecognition {
@@ -86,7 +86,7 @@ test('renders Voice Task button and activates listening indicator on click', () 
     />
   );
 
-  const voiceBtn = screen.getByRole('button', { name: /voice task/i });
+  const voiceBtn = screen.getByRole('button', { name: /talk/i });
   expect(voiceBtn).toBeInTheDocument();
   fireEvent.click(voiceBtn);
 

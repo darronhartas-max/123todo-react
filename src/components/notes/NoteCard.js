@@ -602,7 +602,7 @@ const NoteCard = ({
                   ) : (
                     <>
                       <Mic size={15} color="#2563eb" />
-                      <span>🎙️ Dictate at End</span>
+                      <span>Talk</span>
                     </>
                   )}
                 </button>

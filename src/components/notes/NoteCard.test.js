@@ -67,7 +67,7 @@ describe('NoteCard', () => {
     expect(emailChip).toHaveAttribute('href', 'mailto:quote@plumbing.co.uk');
   });
 
-  test('displays note text in multi-line textarea and shows prominent Dictate at End button in edit mode', () => {
+  test('displays note text in multi-line textarea and shows prominent Talk button in edit mode', () => {
     render(
       <NoteCard
         note={sampleNote}
@@ -84,8 +84,8 @@ describe('NoteCard', () => {
     expect(titleTextarea).toBeInTheDocument();
     expect(titleTextarea.tagName).toBe('TEXTAREA');
 
-    // Prominent "Dictate at End" button should be easily located in edit mode
-    const dictateBtn = screen.getByRole('button', { name: /Dictate at End/i });
+    // Prominent "Talk" button should be easily located in edit mode
+    const dictateBtn = screen.getByRole('button', { name: /Talk/i });
     expect(dictateBtn).toBeInTheDocument();
   });
 

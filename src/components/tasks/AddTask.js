@@ -489,7 +489,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         ) : (
                             <>
                                 <Mic size={14} color="var(--accent-color)" />
-                                <span>Voice Task</span>
+                                <span>Talk</span>
                             </>
                         )}
                     </button>
@@ -614,7 +614,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             ) : (
                                 <>
                                     <Mic size={12} color="var(--accent-color)" />
-                                    <span>Voice Notes</span>
+                                    <span>Talk</span>
                                 </>
                             )}
                         </button>
