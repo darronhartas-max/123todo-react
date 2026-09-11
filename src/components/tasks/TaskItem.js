@@ -5,6 +5,7 @@ import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
+import { reorderList } from '../../utils/reorderUtils';
 
 const ACTION_ICONS = {
     CheckSquare,
@@ -22,7 +23,80 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const [showNotesExpanded, setShowNotesExpanded] = useState(false);
     const [showSubtasksExpanded, setShowSubtasksExpanded] = useState(false);
     const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
-    const [dragOverSubtaskIndex, setDragOverSubtaskIndex] = useState(null);
+    const [dragOverSubtaskInfo, setDragOverSubtaskInfo] = useState(null);
+    const touchSubtaskRef = React.useRef(null);
+    const touchCleanupsRef = React.useRef(null);
+
+    React.useEffect(() => {
+        return () => {
+            if (touchCleanupsRef.current) {
+                touchCleanupsRef.current();
+                touchCleanupsRef.current = null;
+            }
+        };
+    }, []);
+
+    const handleSubtaskTouchStart = (e, index) => {
+        e.stopPropagation();
+        if (!e.touches || e.touches.length !== 1) return;
+
+        touchSubtaskRef.current = {
+            startIndex: index,
+            lastOverIndex: index,
+            lastPosition: 'before'
+        };
+        setDraggedSubtaskIndex(index);
+        if (typeof window !== 'undefined' && window.navigator?.vibrate) {
+            try { window.navigator.vibrate(12); } catch (err) {}
+        }
+
+        const onTouchMove = (moveEvent) => {
+            if (!touchSubtaskRef.current) return;
+            if (moveEvent.cancelable) moveEvent.preventDefault();
+            const currentTouch = moveEvent.touches[0];
+            if (!currentTouch) return;
+
+            const targetEl = document.elementFromPoint(currentTouch.clientX, currentTouch.clientY);
+            const targetLi = targetEl ? targetEl.closest('[data-subtask-index]') : null;
+            if (targetLi) {
+                const targetIdx = parseInt(targetLi.getAttribute('data-subtask-index'), 10);
+                if (!isNaN(targetIdx)) {
+                    const rect = targetLi.getBoundingClientRect();
+                    const pos = currentTouch.clientY < (rect.top + rect.height / 2) ? 'before' : 'after';
+                    touchSubtaskRef.current.lastOverIndex = targetIdx;
+                    touchSubtaskRef.current.lastPosition = pos;
+                    setDragOverSubtaskInfo({ index: targetIdx, position: pos });
+                }
+            }
+        };
+
+        const onTouchEnd = () => {
+            removeListeners();
+            const active = touchSubtaskRef.current;
+            if (active && active.startIndex !== null && active.lastOverIndex !== null) {
+                const reordered = reorderList(task.subtasks || [], active.startIndex, active.lastOverIndex, active.lastPosition);
+                if (onUpdate) onUpdate(task.id, { subtasks: reordered });
+                if (typeof window !== 'undefined' && window.navigator?.vibrate) {
+                    try { window.navigator.vibrate(10); } catch (err) {}
+                }
+            }
+            touchSubtaskRef.current = null;
+            setDraggedSubtaskIndex(null);
+            setDragOverSubtaskInfo(null);
+        };
+
+        const removeListeners = () => {
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('touchcancel', onTouchEnd);
+            touchCleanupsRef.current = null;
+        };
+        touchCleanupsRef.current = removeListeners;
+
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('touchend', onTouchEnd);
+        window.addEventListener('touchcancel', onTouchEnd);
+    };
     const archiveTimeoutRef = React.useRef(null);
 
     // Swipe Gesture State & Visual Damping
@@ -857,70 +931,130 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             <ul style={{ listStyle: 'none', padding: 0, margin: '6px 0 0 0' }}>
                                 {(task.subtasks || []).map((st, index) => {
                                     const isDraggingThis = draggedSubtaskIndex === index;
-                                    const isOverThis = dragOverSubtaskIndex === index;
+                                    const isTargetThis = dragOverSubtaskInfo?.index === index;
+                                    const targetPosition = dragOverSubtaskInfo?.position;
+
+                                    const showTopIndicator = isTargetThis && targetPosition === 'before' && (
+                                        draggedSubtaskIndex !== index && draggedSubtaskIndex !== index - 1
+                                    );
+                                    const showBottomIndicator = isTargetThis && targetPosition === 'after' && (
+                                        draggedSubtaskIndex !== index && draggedSubtaskIndex !== index + 1
+                                    );
+
                                     return (
                                         <li
                                             key={st.id}
+                                            data-subtask-index={index}
                                             draggable={true}
                                             onDragStart={(e) => {
-                                                e.dataTransfer.setData('text/plain', index.toString());
+                                                e.dataTransfer.setData('text/plain', String(index));
+                                                e.dataTransfer.effectAllowed = 'move';
                                                 setDraggedSubtaskIndex(index);
                                             }}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
-                                                e.dataTransfer.dropEffect = 'move';
-                                                if (dragOverSubtaskIndex !== index) {
-                                                    setDragOverSubtaskIndex(index);
+                                                e.stopPropagation();
+                                                if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                const pos = e.clientY < (rect.top + rect.height / 2) ? 'before' : 'after';
+                                                if (!dragOverSubtaskInfo || dragOverSubtaskInfo.index !== index || dragOverSubtaskInfo.position !== pos) {
+                                                    setDragOverSubtaskInfo({ index, position: pos });
+                                                }
+                                            }}
+                                            onDragLeave={(e) => {
+                                                if (!e.currentTarget.contains(e.relatedTarget)) {
+                                                    setDragOverSubtaskInfo(prev => prev?.index === index ? null : prev);
                                                 }
                                             }}
                                             onDragEnd={() => {
                                                 setDraggedSubtaskIndex(null);
-                                                setDragOverSubtaskIndex(null);
+                                                setDragOverSubtaskInfo(null);
                                             }}
                                             onDrop={(e) => {
                                                 e.preventDefault();
+                                                e.stopPropagation();
                                                 const fromIndex = draggedSubtaskIndex ?? parseInt(e.dataTransfer.getData('text/plain'), 10);
-                                                const toIndex = index;
-                                                if (fromIndex === undefined || fromIndex === null || isNaN(fromIndex) || fromIndex === toIndex) {
-                                                    setDraggedSubtaskIndex(null);
-                                                    setDragOverSubtaskIndex(null);
-                                                    return;
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                const pos = dragOverSubtaskInfo?.position || (e.clientY < (rect.top + rect.height / 2) ? 'before' : 'after');
+                                                if (typeof fromIndex === 'number' && !isNaN(fromIndex)) {
+                                                    const reordered = reorderList(task.subtasks || [], fromIndex, index, pos);
+                                                    onUpdate && onUpdate(task.id, { subtasks: reordered });
                                                 }
-                                                const reordered = [...(task.subtasks || [])];
-                                                const [moved] = reordered.splice(fromIndex, 1);
-                                                reordered.splice(toIndex, 0, moved);
-                                                onUpdate && onUpdate(task.id, { subtasks: reordered });
                                                 setDraggedSubtaskIndex(null);
-                                                setDragOverSubtaskIndex(null);
+                                                setDragOverSubtaskInfo(null);
                                             }}
                                             onClick={(e) => e.stopPropagation()}
                                             style={{
+                                                position: 'relative',
                                                 display: 'flex',
                                                 alignItems: 'flex-start',
                                                 gap: '6px',
-                                                padding: '3px 0',
+                                                padding: '3px 2px',
                                                 borderBottom: '1px dashed var(--border-color)',
-                                                borderTop: isOverThis && draggedSubtaskIndex !== index ? '2px solid var(--accent-color)' : '2px solid transparent',
-                                                opacity: isDraggingThis ? 0.4 : 1,
-                                                transition: 'border-color 0.15s ease, opacity 0.15s ease'
+                                                opacity: isDraggingThis ? 0.35 : 1,
+                                                background: isDraggingThis ? 'var(--accent-bg, rgba(59, 130, 246, 0.05))' : 'transparent',
+                                                borderRadius: '4px',
+                                                transition: 'opacity 0.15s ease, background 0.15s ease'
                                             }}
                                         >
+                                            {/* Blue accent insertion drop line indicator, matching main task list */}
+                                            {(showTopIndicator || showBottomIndicator) && (
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: showTopIndicator ? '-2px' : 'auto',
+                                                        bottom: showBottomIndicator ? '-2px' : 'auto',
+                                                        left: '0px',
+                                                        right: '0px',
+                                                        height: '3px',
+                                                        background: 'var(--accent-color)',
+                                                        borderRadius: '1.5px',
+                                                        boxShadow: '0 0 8px var(--accent-color)',
+                                                        zIndex: 100,
+                                                        pointerEvents: 'none',
+                                                        display: 'flex',
+                                                        alignItems: 'center'
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            width: '6px',
+                                                            height: '6px',
+                                                            borderRadius: '50%',
+                                                            background: 'var(--accent-color)',
+                                                            marginLeft: '-3px',
+                                                            boxShadow: '0 0 5px var(--accent-color)'
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
                                             <div
+                                                className="subtask-drag-handle"
+                                                onTouchStart={(e) => handleSubtaskTouchStart(e, index)}
                                                 style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    cursor: 'grab',
-                                                    padding: '3px 0',
-                                                    color: 'var(--muted-text)',
-                                                    opacity: 0.6,
-                                                    flexShrink: 0
+                                                    justifyContent: 'center',
+                                                    cursor: isDraggingThis ? 'grabbing' : 'grab',
+                                                    padding: '4px 3px',
+                                                    margin: '-2px 0 0 -2px',
+                                                    color: isDraggingThis ? 'var(--accent-color)' : 'var(--muted-text)',
+                                                    opacity: isDraggingThis ? 1 : 0.65,
+                                                    flexShrink: 0,
+                                                    touchAction: 'none',
+                                                    userSelect: 'none',
+                                                    WebkitUserSelect: 'none',
+                                                    borderRadius: '4px'
                                                 }}
-                                                title="Drag to rearrange subtask"
+                                                title="Drag to rearrange subtask (or use Alt+Up / Alt+Down)"
+                                                aria-label="Drag to rearrange subtask"
                                             >
                                                 <GripVertical size={14} />
                                             </div>
                                             <input
                                                 type="checkbox"
+                                                draggable={false}
+                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                 checked={st.completed}
                                                 onChange={() => {
                                                     const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
@@ -937,6 +1071,20 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                                 }}
                                                 value={st.text}
                                                 rows={1}
+                                                draggable={false}
+                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                onKeyDown={(e) => {
+                                                    if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                                                        e.preventDefault();
+                                                        if (e.key === 'ArrowUp' && index > 0) {
+                                                            const reordered = reorderList(task.subtasks || [], index, index - 1, 'before');
+                                                            onUpdate && onUpdate(task.id, { subtasks: reordered });
+                                                        } else if (e.key === 'ArrowDown' && index < (task.subtasks || []).length - 1) {
+                                                            const reordered = reorderList(task.subtasks || [], index, index + 1, 'after');
+                                                            onUpdate && onUpdate(task.id, { subtasks: reordered });
+                                                        }
+                                                    }
+                                                }}
                                                 onChange={(e) => {
                                                     const updatedText = e.target.value;
                                                     const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, text: updatedText } : s);

@@ -294,6 +294,104 @@ describe('EditModal', () => {
         const notesTextarea = screen.getByPlaceholderText('Add notes or extra details...');
         expect(notesTextarea.value).toMatch(/\[\d{1,2} [A-Za-z]{3} \d{4}, \d{2}:\d{2}\]/);
     });
+
+    test('reorders subtasks using drag and drop events', () => {
+        const onSaveMock = jest.fn();
+        const taskWithMultipleSubtasks = {
+            ...sampleTaskWithNotes,
+            subtasks: [
+                { id: 101, text: 'Subtask 1', completed: false },
+                { id: 102, text: 'Subtask 2', completed: false },
+                { id: 103, text: 'Subtask 3', completed: false }
+            ]
+        };
+
+        const { container } = render(
+            <EditModal
+                task={taskWithMultipleSubtasks}
+                onSave={onSaveMock}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        const subtaskItems = container.querySelectorAll('li[data-subtask-index]');
+        expect(subtaskItems).toHaveLength(3);
+
+        // Drag subtask 0 over subtask 2 with position 'after'
+        fireEvent.dragStart(subtaskItems[0], {
+            dataTransfer: { setData: jest.fn(), effectAllowed: 'move' }
+        });
+
+        // Mock bounding rect on subtask 2 to simulate dropping in the bottom half ('after')
+        subtaskItems[2].getBoundingClientRect = () => ({
+            top: 100,
+            bottom: 140,
+            height: 40,
+            left: 0,
+            right: 200,
+            width: 200
+        });
+
+        fireEvent.dragOver(subtaskItems[2], {
+            clientY: 130, // bottom half (> 120)
+            dataTransfer: { dropEffect: 'move' }
+        });
+
+        fireEvent.drop(subtaskItems[2], {
+            clientY: 130,
+            dataTransfer: { getData: () => '0' }
+        });
+
+        // Save and verify subtasks order: [Subtask 2, Subtask 3, Subtask 1]
+        fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+        expect(onSaveMock).toHaveBeenCalledWith(
+            1,
+            expect.objectContaining({
+                subtasks: [
+                    expect.objectContaining({ text: 'Subtask 2' }),
+                    expect.objectContaining({ text: 'Subtask 3' }),
+                    expect.objectContaining({ text: 'Subtask 1' })
+                ]
+            })
+        );
+    });
+
+    test('reorders subtasks using keyboard Alt+Down shortcut', () => {
+        const onSaveMock = jest.fn();
+        const taskWithMultipleSubtasks = {
+            ...sampleTaskWithNotes,
+            subtasks: [
+                { id: 101, text: 'Alpha Subtask', completed: false },
+                { id: 102, text: 'Beta Subtask', completed: false }
+            ]
+        };
+
+        render(
+            <EditModal
+                task={taskWithMultipleSubtasks}
+                onSave={onSaveMock}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        const firstSubtaskTextarea = screen.getByDisplayValue('Alpha Subtask');
+        // Press Alt+ArrowDown on Alpha Subtask
+        fireEvent.keyDown(firstSubtaskTextarea, { key: 'ArrowDown', altKey: true });
+
+        // Save and verify Alpha Subtask is now second
+        fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+        expect(onSaveMock).toHaveBeenCalledWith(
+            1,
+            expect.objectContaining({
+                subtasks: [
+                    expect.objectContaining({ text: 'Beta Subtask' }),
+                    expect.objectContaining({ text: 'Alpha Subtask' })
+                ]
+            })
+        );
+    });
 });
 
 
