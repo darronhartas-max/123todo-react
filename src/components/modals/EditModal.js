@@ -129,6 +129,47 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [recurrenceInterval, setRecurrenceInterval] = useState(task.recurrence?.interval || 'days');
     const [recurrenceDaysOfWeek, setRecurrenceDaysOfWeek] = useState(task.recurrence?.daysOfWeek || []);
 
+    const handleInsertTimestamp = (targetField = 'notes') => {
+        const d = new Date();
+        const day = d.getDate();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames[d.getMonth()];
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const timestampTag = `[${day} ${month} ${year}, ${hours}:${minutes}] `;
+
+        setEditingTask(prev => {
+            const currentVal = prev[targetField] || '';
+            let newVal = '';
+            if (!currentVal.trim()) {
+                newVal = timestampTag;
+            } else {
+                const separator = currentVal.endsWith('\n\n') ? '' : (currentVal.endsWith('\n') ? '\n' : '\n\n');
+                newVal = `${currentVal}${separator}${timestampTag}`;
+            }
+            return {
+                ...prev,
+                [targetField]: newVal
+            };
+        });
+
+        if (targetField === 'notes') {
+            setShowNotes(true);
+        }
+
+        setTimeout(() => {
+            const el = expandedOverlayField
+                ? focusTextareaRef.current
+                : (targetField === 'notes' ? notesRef.current : titleRef.current);
+            if (el) {
+                el.focus();
+                el.setSelectionRange(el.value.length, el.value.length);
+                el.scrollTop = el.scrollHeight;
+            }
+        }, 50);
+    };
+
     const handleInput = (e) => {
         e.target.style.height = 'auto';
         e.target.style.height = e.target.scrollHeight + 'px';
@@ -722,6 +763,27 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => handleInsertTimestamp('notes')}
+                                    title="Insert current date & time stamp into notes"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        padding: '3px 8px',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--border-color)',
+                                        background: 'var(--surface-color)',
+                                        color: 'var(--text-color)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    <Clock size={12} color="var(--accent-color)" />
+                                    <span>+ Timestamp</span>
+                                </button>
                                 <button
                                     type="button"
                                     onClick={() => setExpandedOverlayField('notes')}
@@ -1377,6 +1439,29 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </div>
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {expandedOverlayField === 'notes' && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleInsertTimestamp('notes')}
+                                            title="Insert current date & time stamp into notes"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                padding: '4px 10px',
+                                                borderRadius: '12px',
+                                                border: '1px solid var(--border-color)',
+                                                background: 'var(--item-bg)',
+                                                color: 'var(--text-color)',
+                                                cursor: 'pointer',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '600'
+                                            }}
+                                        >
+                                            <Clock size={13} color="var(--accent-color)" />
+                                            <span>+ Timestamp</span>
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         onClick={() => toggleVoiceInput(expandedOverlayField)}

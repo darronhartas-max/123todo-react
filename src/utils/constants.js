@@ -129,6 +129,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.0': [
+    { title: '🕒 1-Click Timestamped Notes & Updates:', desc: 'Added a 1-click + Timestamp button in the task notes editor (and full-screen focus overlay). Automatically appends the current date & time so you can maintain progressive activity logs, phone call updates, and running client journals without clunky multi-note bloat.' },
+    { title: '📅 Visible Creation Timestamps in Task Edit:', desc: 'Displays the exact evidentiary date and time when the task or note was originally created at the bottom of the edit modal, matching evidentiary logs in Notes mode.' },
+    { title: '📐 Harmonized Top Bar Spacing & Compact Footer:', desc: 'Standardized top bar button spacing to a uniform 12px grid with 32px circular touch targets, and streamlined the footer by removing redundant import/export buttons to maximize vertical task viewing space.' }
+  ],
   '3.6.21': [
     { title: '🎙️ Continuous Voice Dictation & Pause Resilience:', desc: 'Resolved premature 4-second dictation cutoffs. Enabled true continuous recognition across Mac and mobile devices with seamless auto-restart across natural thinking pauses, keeping the mic active until you tap to finish.' }
   ],
