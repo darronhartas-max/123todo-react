@@ -1,14 +1,14 @@
 import React from 'react';
 import { APP_VERSION } from '../../utils/constants';
 
-const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, isOffline, version = APP_VERSION, onCheckForUpdates, updateCheckStatus, onInstallClick, isStandalone = false }) => {
+const Footer = ({ onSyncClick, syncStatus, isAuthed, isOffline, version = APP_VERSION, onInstallClick, isStandalone = false }) => {
     const styles = {
         footer: {
             flexShrink: 0,
-            padding: '24px 20px 18px 20px',
+            padding: '16px 16px 14px 16px',
             background: 'var(--footer-bg)',
             textAlign: 'center',
-            fontSize: '1.1rem',
+            fontSize: '1rem',
             borderTop: '1px solid var(--border-color)',
             color: 'var(--muted-text)'
         },
@@ -17,10 +17,9 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
             border: '1px solid var(--border-color)',
             color: 'var(--text-color)',
             cursor: 'pointer',
-            fontSize: '1rem',
-            margin: '0 6px',
+            fontSize: '0.95rem',
             fontWeight: '700',
-            padding: '8px 16px',
+            padding: '7px 16px',
             borderRadius: '6px',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
@@ -45,7 +44,7 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
 
     return (
         <footer style={styles.footer}>
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                 <button onClick={onSyncClick} style={getSyncButtonStyle()} title={syncStatus === 'syncing' ? "Syncing in background..." : (isAuthed ? "Cloud Sync Active" : "Click to setup sync")}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                         {(!isOffline && navigator.onLine) && (
@@ -65,8 +64,6 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
                         <span>{getSyncStatusText()}</span>
                     </div>
                 </button>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                 {!isStandalone && onInstallClick && (
                     <button
                         onClick={onInstallClick}
@@ -81,18 +78,14 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
                         📲 Install App
                     </button>
                 )}
-                <button onClick={onExport} style={styles.footerButton}>Export</button>
-                <button onClick={onImportClick} style={styles.footerButton}>Import</button>
             </div>
 
-            <br />
-
             <div style={{
-                fontSize: '0.9rem',
-                margin: '8px 0',
+                fontSize: '0.88rem',
+                margin: '6px 0',
                 opacity: 0.9
             }}>
-                <div style={{ marginBottom: '4px' }}>
+                <div style={{ marginBottom: '3px' }}>
                     Copyright © Unforgettable Management Ltd {new Date().getFullYear()}
                 </div>
                 <div style={{ fontWeight: '600', color: 'var(--text-color)' }}>
@@ -100,7 +93,7 @@ const Footer = ({ onExport, onImportClick, onSyncClick, syncStatus, isAuthed, is
                 </div>
             </div>
 
-            <div style={{ marginTop: '8px', fontSize: '0.95rem', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ marginTop: '6px', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
                 <a href="https://www.123todo.com/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>
                     Terms of Service
                 </a>

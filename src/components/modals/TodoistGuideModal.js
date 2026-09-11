@@ -217,7 +217,7 @@ const TodoistGuideModal = ({ isOpen, onClose, onStartImport }) => {
                         <span style={styles.stepTitle}>Drop Files into 123 To Do</span>
                     </div>
                     <div style={styles.stepBody}>
-                        Click <strong>Import</strong> in the 123 To Do footer ➔ Select <strong>Import from Other Apps</strong> ➔ Drop your exported CSV or JSON files into the wizard.
+                        Go to <strong>Settings ⚙️</strong> in the header ➔ Select <strong>Import / Export Data</strong> ➔ Choose <strong>Import from Other Apps</strong> ➔ Drop your exported CSV or JSON files into the wizard.
                     </div>
                 </div>
 

@@ -263,7 +263,7 @@ const NotesView = ({
   return (
     <div className="notes-container">
       {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact single-row order) */}
-      <div className="notes-header-bar" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px', width: '100%', paddingBottom: '4px' }}>
+      <div className="notes-header-bar" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '12px', width: '100%', paddingBottom: '4px' }}>
         {/* 1. Search Toggle Icon Button (identical circular style as Task mode) */}
         <button
           onClick={() => setShowSearch(!showSearch)}

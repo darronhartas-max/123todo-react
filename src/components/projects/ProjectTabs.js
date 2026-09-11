@@ -45,12 +45,14 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            gap: '8px',
+            gap: '12px',
             minWidth: 0,
             boxSizing: 'border-box'
         },
         actionBtn: {
-            padding: '6px',
+            width: '32px',
+            height: '32px',
+            padding: 0,
             borderRadius: '50%',
             background: 'var(--bg-color)',
             border: '1.5px solid var(--border-color)',
@@ -134,7 +136,7 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
         rightActionsWrapper: {
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '12px',
             flexShrink: 0,
             marginLeft: 'auto'
         }
@@ -268,11 +270,12 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                                 border: 'none',
                                 color: '#dc2626',
                                 cursor: 'pointer',
-                                padding: '4px',
+                                padding: 0,
+                                width: '32px',
+                                height: '32px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                marginLeft: '6px',
                                 flexShrink: 0,
                                 transition: 'transform 0.2s ease'
                             }}
