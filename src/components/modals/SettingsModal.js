@@ -1571,7 +1571,7 @@ const SettingsModal = ({
                                         <li style={{ marginBottom: '6px' }}><strong>💻 Desktop Dictation (Mac / PC)</strong>: Hands-free continuous dictation across thinking pauses. Speaks directly into titles or notes with live spoken punctuation (<em>"comma"</em>, <em>"full stop"</em>) and editing commands (<em>"delete last 2 words"</em>, <em>"spell out..."</em>).</li>
                                         <li style={{ marginBottom: '6px' }}><strong>📱 Mobile Quick-Capture (Phones / Tablets)</strong>: Tap the in-app Voice button to dictate a quick thought or task. When you finish speaking, it captures cleanly without repetitive system bleep loops or dropped words. Tap again anytime to append more.</li>
                                         <li style={{ marginBottom: '6px' }}><strong>⚡ Continuous Long-Form Dictation on Mobile</strong>: For uninterrupted, multi-minute continuous dictation on your phone without pauses cutting off, tap into the text area and press the <strong>🎙️ microphone icon on your keyboard</strong> (Gboard on Android, or Apple Dictation on iPhone). It provides hardware-accelerated continuous voice capture with zero interruptions!</li>
-                                        <li><strong>🚀 Spoken Auto-Submit</strong>: Say <em>"add task"</em> or <em>"save note"</em> at the end of speech to instantly save hands-free.</li>
+                                        <li><strong>Spoken Auto-Submit</strong>: Say <em>"add task"</em> or <em>"save note"</em> at the end of speech to instantly save hands-free.</li>
                                     </ul>
                                 </div>
 
@@ -1649,7 +1649,7 @@ const SettingsModal = ({
                                     </div>
 
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '8px' }}>
-                                        🚀 Auto-Submit Command:
+                                        Auto-Submit Command:
                                     </div>
                                     <div style={styles.voiceGuideRow}>
                                         <div><kbd style={styles.kbdBadge}>"add task"</kbd> or <kbd style={styles.kbdBadge}>"submit task"</kbd></div>

@@ -90,7 +90,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                 }));
                 if (isSubmitCommand && updatedText.trim().length > 0) {
                     stopVoice();
-                    setVoiceStatus('🚀 Auto-saving task...');
+                    setVoiceStatus('Auto-saving task...');
                     setTimeout(() => {
                         handleSave();
                         setVoiceStatus('');

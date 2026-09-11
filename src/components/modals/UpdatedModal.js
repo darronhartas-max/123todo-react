@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Rocket } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
 import { RELEASE_CHANGELOG, APP_VERSION } from '../../utils/constants';
 
@@ -98,7 +98,7 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                 style={styles.updatedModal}
             >
                 <div style={styles.iconCircle}>
-                    <Rocket size={28} />
+                    <Check size={28} />
                 </div>
                 
                 <h2 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', fontWeight: '800', letterSpacing: '-0.3px' }}>

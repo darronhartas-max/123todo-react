@@ -116,7 +116,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
                 if (isSubmitCommand) {
                     stopVoice();
-                    setVoiceStatus('🚀 Auto-submitting task...');
+                    setVoiceStatus('Auto-submitting task...');
                     setTimeout(() => {
                         if (targetField === 'title') {
                             if (updatedText.trim().length > 0) handleSubmit(updatedText);

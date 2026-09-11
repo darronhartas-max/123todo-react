@@ -166,7 +166,7 @@ export const RELEASE_CHANGELOG = {
     { title: '⚙️ Reorganized Settings Hub:', desc: 'Restructured Settings into 8 intuitive, priority-ordered tabs (Appearance, Tasks, Projects, Swipe, Cloud Sync, Voice, Shortcuts, App & Updates) for lightning-fast configuration.' },
     { title: '📋 Dedicated Tasks & Workflow Preferences:', desc: 'Grouped list view modes (compact vs full-length), date formats, character limits, and preferred email clients into a dedicated Tasks settings panel.' },
     { title: '🎙️ Dedicated Voice Dictation Guide:', desc: 'Created an uncluttered, standalone reference for speech-to-text, device-tailored voice features, punctuation, and editing commands.' },
-    { title: '🚀 Consolidated App & Updates Center:', desc: 'Unified the version checker, 1-click PWA installer, and platform installation guides into an all-in-one App & Updates section.' }
+    { title: '📦 Consolidated App & Updates Center:', desc: 'Unified the version checker, 1-click PWA installer, and platform installation guides into an all-in-one App & Updates section.' }
   ],
   '3.6.10': [
     { title: '⏩ Sleek Professional Schedule Controls:', desc: 'Replaced calendar icons and full text with streamlined FastForward quick-schedule buttons (Day & Week), providing cleaner visual hierarchy and extra breathing room in Add and Edit task panels.' },
@@ -252,7 +252,7 @@ export const RELEASE_CHANGELOG = {
     { title: '🔒 Dual-Engine Encrypted Cloud Sync & Documentation Update:', desc: 'Expanded sync documentation covering 123ToDo Zero-Knowledge Cloud Sync (Cloudflare D1 E2EE) alongside Google Drive AppData Sync, and published switching & migration guides.' }
   ],
   '3.3.0': [
-    { title: '🚀 Multi-Competitor Migration Wizard & 1-Click Import from Other Apps:', desc: 'Introduced a unified "Import from Other Apps" wizard supporting seamless data migration from Todoist, TickTick, Google Keep, Google Tasks, and Microsoft To Do with zero text truncation and multi-file drag-and-drop support.' }
+    { title: '🔄 Multi-Competitor Migration Wizard & 1-Click Import from Other Apps:', desc: 'Introduced a unified "Import from Other Apps" wizard supporting seamless data migration from Todoist, TickTick, Google Keep, Google Tasks, and Microsoft To Do with zero text truncation and multi-file drag-and-drop support.' }
   ],
   '3.2.0': [
     { title: '🌐 Multi-Platform Social Sharing & Native Graphic Image Share:', desc: 'Added social share links for Reddit, Telegram, Threads, Bluesky, and Pinterest alongside X, WhatsApp, Facebook, LinkedIn, and Email, enabled native device image file sharing via Web Share API, and deployed a custom 1200x630 123 ToDo preview card.' }
@@ -336,7 +336,7 @@ export const RELEASE_CHANGELOG = {
     { title: '📝 Task Text Editing & Todoist Import Fix:', desc: 'Fixed character limit blocking when editing imported or long tasks, ensuring full text editing freedom without browser input locks.' }
   ],
   '2.6.0': [
-    { title: '🚀 123 ToDo v2.6.0 Milestone Release:', desc: 'Major release featuring refined compact task layouts, 440px redesigned Edit/Note Modal, 1-click Next Week scheduling, drag-and-drop & completion persistence fixes, default Muted theme, full-height Projects menu, and glassmorphic update notifications.' }
+    { title: '✨ 123 ToDo v2.6.0 Milestone Release:', desc: 'Major release featuring refined compact task layouts, 440px redesigned Edit/Note Modal, 1-click Next Week scheduling, drag-and-drop & completion persistence fixes, default Muted theme, full-height Projects menu, and glassmorphic update notifications.' }
   ],
   '2.5.32': [
     { title: '📁 Full-Height Projects Dropdown:', desc: 'Expanded the main Projects dropdown popup to display all projects down to the last item without forced scrollbars.' }
@@ -385,7 +385,7 @@ export const RELEASE_CHANGELOG = {
     { title: '⚡ Deployment Trigger Optimization:', desc: 'Optimized GitHub Actions automated deployment workflow trigger for seamless VPS deployments.' }
   ],
   '2.5.18': [
-    { title: '🚀 VPS Deployment Automation Fix:', desc: 'Refreshed deployment trigger sequence to guarantee clean VPS container builds.' }
+    { title: '⚙️ VPS Deployment Automation Fix:', desc: 'Refreshed deployment trigger sequence to guarantee clean VPS container builds.' }
   ],
   '2.5.17': [
     { title: '🛡️ 100% Privacy-Preserving Telemetry:', desc: 'Zero cookies used, no IP addresses or personal data logged, fully GDPR/CCPA compliant out of the box.' }
