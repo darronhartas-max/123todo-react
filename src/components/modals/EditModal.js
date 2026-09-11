@@ -1119,7 +1119,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     gap: '5px',
                                     boxSizing: 'border-box'
                                 }}
-                                title="Schedule for 7 days from today (Next Week)"
+                                title="Schedule for Monday of next week"
                             >
                                 <FastForward size={13} style={{ flexShrink: 0 }} />
                                 <span>Week</span>

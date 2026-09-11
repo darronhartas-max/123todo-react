@@ -790,7 +790,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 alignItems: 'center',
                                 gap: '4px'
                             }}
-                            title="Defer task for 7 days (Next Week)"
+                            title="Defer task to Monday of next week"
                         >
                             <FastForward size={12} style={{ flexShrink: 0 }} />
                             <span>Week</span>

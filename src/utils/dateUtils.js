@@ -23,11 +23,15 @@ export const getTomorrowDateString = () => {
 };
 
 /**
- * Returns next week's date (7 days from today) in local YYYY-MM-DD format.
+ * Returns the date of the Monday of the following week in local YYYY-MM-DD format.
+ * (If today is Monday, returns next Monday (+7 days); on any other day returns upcoming Monday).
+ * @param {Date} [fromDate=new Date()] - Optional base date (defaults to current date)
  */
-export const getNextWeekDateString = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 7);
+export const getNextWeekDateString = (fromDate = new Date()) => {
+    const d = new Date(fromDate);
+    const day = d.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+    const daysUntilNextMonday = ((1 - day + 7) % 7) || 7;
+    d.setDate(d.getDate() + daysUntilNextMonday);
     return formatDateString(d);
 };
 
