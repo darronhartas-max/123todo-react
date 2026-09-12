@@ -1,4 +1,4 @@
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatEvidentiaryTimestamp } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
     test('getTomorrowDateString calculates exactly 1 day from today', () => {
@@ -44,5 +44,19 @@ describe('dateUtils - scheduling helpers', () => {
         expect(formatEvidentiaryTimestamp(null)).toBe('');
         expect(formatEvidentiaryTimestamp(undefined)).toBe('');
         expect(formatEvidentiaryTimestamp('invalid-date')).toBe('');
+        expect(formatEvidentiaryTimestamp(1)).toBe(''); // sequential counter ID, not an epoch timestamp
+        expect(formatEvidentiaryTimestamp(42)).toBe('');
+        expect(formatEvidentiaryTimestamp(new Date('1970-01-01').getTime())).toBe('');
+    });
+
+    test('isValidEvidentiaryTimestamp accurately validates truthful modern timestamps', () => {
+        expect(isValidEvidentiaryTimestamp(null)).toBe(false);
+        expect(isValidEvidentiaryTimestamp(undefined)).toBe(false);
+        expect(isValidEvidentiaryTimestamp(1)).toBe(false); // sequential counter ID
+        expect(isValidEvidentiaryTimestamp('42')).toBe(false);
+        expect(isValidEvidentiaryTimestamp(new Date('1970-01-01').getTime())).toBe(false);
+        expect(isValidEvidentiaryTimestamp(new Date('2019-12-31').getTime())).toBe(false);
+        expect(isValidEvidentiaryTimestamp(new Date('2026-09-12').getTime())).toBe(true);
+        expect(isValidEvidentiaryTimestamp('2026-09-12T10:00:00.000Z')).toBe(true);
     });
 });

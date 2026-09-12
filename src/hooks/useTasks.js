@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
-import { calculateNextRecurrenceDate, getTodayDateString } from '../utils/dateUtils';
+import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp } from '../utils/dateUtils';
 import { savePhotos } from '../utils/photoStorage';
 
 // Lightweight serializer for LocalStorage: keeps metadata and compact thumbnails in LocalStorage,
@@ -147,6 +147,12 @@ export const useTasks = () => {
                     const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
                     if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
                     if (item.color) item.color = migrateProjectColor(item.color);
+                    if (item.createdAt && !isValidEvidentiaryTimestamp(item.createdAt)) {
+                        delete item.createdAt;
+                    }
+                    if (item.completedAt && !isValidEvidentiaryTimestamp(item.completedAt)) {
+                        delete item.completedAt;
+                    }
                     return item;
                 });
             }
@@ -159,6 +165,12 @@ export const useTasks = () => {
                     const item = { ...t, projectId: t.projectId || t.categoryId || 'general' };
                     if (item.projectColor) item.projectColor = migrateProjectColor(item.projectColor);
                     if (item.color) item.color = migrateProjectColor(item.color);
+                    if (item.createdAt && !isValidEvidentiaryTimestamp(item.createdAt)) {
+                        delete item.createdAt;
+                    }
+                    if (item.completedAt && !isValidEvidentiaryTimestamp(item.completedAt)) {
+                        delete item.completedAt;
+                    }
                     return item;
                 });
             }
@@ -287,7 +299,7 @@ export const useTasks = () => {
             isRecurring: extraFields.isRecurring || false,
             recurrence: extraFields.recurrence || null,
             completedAt: null,
-            createdAt: extraFields.createdAt || now,
+            createdAt: (extraFields.createdAt && isValidEvidentiaryTimestamp(extraFields.createdAt)) ? extraFields.createdAt : now,
             updatedAt: now
         };
 

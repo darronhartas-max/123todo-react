@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.10** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.11** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.10 (Current)
+### v3.7.11 (Current)
+
+- **Truthful & Evidentiary Timestamps Integrity**: Audited timestamp handling across tasks, notes, and archives. Removed legacy fallbacks to sequential numeric IDs that caused false or ancient dates (e.g., 1970). Tasks and notes created prior to timestamp tracking strictly omit timestamp badges unless a genuine creation date was recorded. Added rigorous date validation (`isValidEvidentiaryTimestamp`) ensuring only truthful, modern timestamps are formatted and displayed.
+
+### v3.7.10
 
 - **Unified Expanded Edit Card Across Views**: Clicking any task in Lite view now directly launches the exact same full Pro Task Edit Card (`EditModal`) as in Pro view, ensuring 100% feature and visual parity for task editing (voice dictation mic, priority buttons, project selector, due date & time picker, recurrence settings, subtask checklist with reordering, notes, and photo attachments).
 - **Harmonized In-Card Expansion**: Tapping the chevron button in Lite view expands the task inline using the exact standard Pro card layout (project name badge, full description, schedule badge, subtasks, and quick schedule button) with zero divergent styling.

@@ -392,6 +392,51 @@ describe('EditModal', () => {
             })
         );
     });
+
+    test('does not include a timestamp if task was created prior to feature implementation without createdAt', () => {
+        const legacyTask = {
+            id: 42,
+            text: 'Legacy task created before timestamp feature',
+            priority: 1,
+            projectId: 'general'
+            // no createdAt
+        };
+
+        render(
+            <EditModal
+                task={legacyTask}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Must NOT render any fake or 1970 timestamp
+        expect(screen.queryByText(/Created:/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/1970/i)).not.toBeInTheDocument();
+    });
+
+    test('displays truthful creation timestamp when valid createdAt is present', () => {
+        const timestampedTask = {
+            id: 43,
+            text: 'Task with genuine timestamp',
+            priority: 1,
+            projectId: 'general',
+            createdAt: new Date(2026, 8, 12, 14, 30, 0).getTime()
+        };
+
+        render(
+            <EditModal
+                task={timestampedTask}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        expect(screen.getByText(/Created:/i)).toBeInTheDocument();
+        expect(screen.getByText(/12 Sep 2026, 14:30:00/i)).toBeInTheDocument();
+    });
 });
 
 

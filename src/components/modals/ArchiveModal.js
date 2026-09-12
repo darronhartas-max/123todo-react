@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Archive, Search, X, Trash2, Calendar, Repeat, Filter, ArrowUpDown, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
-import { formatDisplayDate } from '../../utils/dateUtils';
+import { formatDisplayDate, isValidEvidentiaryTimestamp } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';
 
 const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpdate, onClose, dateFormat = 'UK', taskViewMode = 'compact' }) => {
@@ -572,7 +572,7 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                     );
 
                                     // Format completion timestamp
-                                    const completedDateStr = task.completedAt 
+                                    const completedDateStr = task.completedAt && isValidEvidentiaryTimestamp(task.completedAt)
                                         ? formatDisplayDate(new Date(task.completedAt).toISOString().split('T')[0], dateFormat)
                                         : null;
 

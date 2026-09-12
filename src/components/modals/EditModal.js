@@ -12,7 +12,7 @@ import { reorderList } from '../../utils/reorderUtils';
 const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task, photos: task.photos || [] });
-    const createdTs = task?.createdAt || task?.id;
+    const createdTs = task?.createdAt;
     const createdFormatted = formatEvidentiaryTimestamp(createdTs);
     
     // Voice, Dropdowns & Expanded Editor State

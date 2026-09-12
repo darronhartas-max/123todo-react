@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.11
+
+- **🔒 Truthful & Evidentiary Timestamps Integrity:** Audited timestamp handling across tasks, notes, and archives. Removed legacy fallback to IDs to eliminate false or ancient timestamps (e.g. 1970). Tasks and notes created prior to timestamp tracking strictly omit timestamp badges unless a genuine creation date was recorded. Added strict validation ensuring only truthful, modern timestamps are formatted and displayed.
+
 ### v3.7.10
 
 - **🎯 Unified Expanded Edit Card Across Views:** Clicking any task in Lite view now directly launches the exact same full Pro Task Edit Card as Pro view, providing identical editing capabilities, voice dictation, priority selectors, subtasks checklist, notes editor, and date scheduling across both modes. Tapping the expand chevron reveals the full in-card Pro layout.

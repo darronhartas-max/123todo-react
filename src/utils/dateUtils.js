@@ -167,14 +167,32 @@ export const adjustStartDateForWeekdays = (dateStr, daysOfWeek) => {
 };
 
 /**
+ * Checks if a timestamp is valid, accurate, and truthful (modern date >= 2020 and <= 2100).
+ * Rejects small sequential IDs (e.g. 1, 2, 42) and empty/ancient dates.
+ * @param {number|string|Date} timestamp
+ * @returns {boolean}
+ */
+export const isValidEvidentiaryTimestamp = (timestamp) => {
+    if (!timestamp) return false;
+    const num = Number(timestamp);
+    // Disallow small sequential counter IDs (e.g. 1, 2, 42) or timestamps before year 2020 (1577836800000 ms)
+    if (!isNaN(num) && num < 1577836800000) return false;
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return false;
+    const year = d.getFullYear();
+    if (year < 2020 || year > 2100) return false;
+    return true;
+};
+
+/**
  * Formats a timestamp into an evidentiary proof string (e.g., "10 Sep 2026, 17:15:32").
+ * Returns an empty string if the timestamp is not genuine or prior to feature implementation.
  * @param {number|string|Date} timestamp - Milliseconds timestamp or Date
- * @returns {string} Formatted evidentiary date & time
+ * @returns {string} Formatted evidentiary date & time, or '' if not valid/truthful
  */
 export const formatEvidentiaryTimestamp = (timestamp) => {
-    if (!timestamp) return '';
+    if (!isValidEvidentiaryTimestamp(timestamp)) return '';
     const d = new Date(timestamp);
-    if (isNaN(d.getTime())) return '';
     
     const day = d.getDate();
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

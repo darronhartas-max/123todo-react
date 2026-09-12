@@ -131,6 +131,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.11': [
+    { title: '🔒 Truthful & Evidentiary Timestamps Integrity:', desc: 'Audited timestamp handling across tasks, notes, and archives. Removed legacy fallback to IDs to eliminate false or ancient timestamps (e.g. 1970). Tasks and notes created prior to timestamp tracking strictly omit timestamp badges unless a genuine creation date was recorded. Added strict validation ensuring only truthful, modern timestamps are formatted and displayed.' }
+  ],
   '3.7.10': [
     { title: '🎯 Unified Expanded Edit Card Across Views:', desc: 'Clicking any task in Lite view now directly launches the exact same full Pro Task Edit Card as Pro view, providing identical editing capabilities, voice dictation, priority selectors, subtasks checklist, notes editor, and date scheduling across both modes. Tapping the expand chevron reveals the full in-card Pro layout.' }
   ],

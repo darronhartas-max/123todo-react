@@ -308,15 +308,18 @@ const NoteCard = ({
     setIsEditing(false);
   };
 
-  const createdTs = note.createdAt || note.id;
+  const createdTs = note.createdAt;
   const createdFormatted = formatEvidentiaryTimestamp(createdTs);
-  const updatedFormatted = note.updatedAt && (note.updatedAt - createdTs > 60000)
+  const updatedFormatted = note.updatedAt && createdTs && (Number(note.updatedAt) - Number(createdTs) > 60000)
     ? formatEvidentiaryTimestamp(note.updatedAt)
     : null;
 
   const handleCopyEvidence = (e) => {
     if (e) e.stopPropagation();
-    let textToCopy = `123 ToDo Entry Log | Created: ${createdFormatted}`;
+    let textToCopy = '123 ToDo Entry Log';
+    if (createdFormatted) {
+      textToCopy += ` | Created: ${createdFormatted}`;
+    }
     if (updatedFormatted) {
       textToCopy += ` | Edited: ${updatedFormatted}`;
     }
@@ -931,61 +934,63 @@ const NoteCard = ({
             </div>
 
             {/* Evidentiary Timestamp with Copy Button (available in Edit Mode) */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }}>
-              <div 
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 10px',
-                  borderRadius: '8px',
-                  backgroundColor: 'var(--item-bg, #f3f4f6)',
-                  border: '1px solid var(--border-color, #e5e7eb)',
-                  fontSize: '11px',
-                  color: 'var(--text-secondary, #6b7280)',
-                  fontFamily: 'monospace, sans-serif'
-                }}
-                title="Timestamp evidence: Created date & time of this note/task"
-              >
-                <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
-                <span>
-                  {createdFormatted}
-                  {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyEvidence}
+            {createdFormatted && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }}>
+                <div 
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '3px',
-                    border: 'none',
-                    background: copiedEvidence ? '#10b981' : 'rgba(37, 99, 235, 0.1)',
-                    color: copiedEvidence ? '#ffffff' : '#2563eb',
-                    borderRadius: '5px',
-                    padding: '2px 6px',
-                    fontSize: '10px',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    marginLeft: '4px'
+                    gap: '6px',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--item-bg, #f3f4f6)',
+                    border: '1px solid var(--border-color, #e5e7eb)',
+                    fontSize: '11px',
+                    color: 'var(--text-secondary, #6b7280)',
+                    fontFamily: 'monospace, sans-serif'
                   }}
-                  title="Copy evidentiary timestamp & note to clipboard"
+                  title="Timestamp evidence: Created date & time of this note/task"
                 >
-                  {copiedEvidence ? (
-                    <>
-                      <Check size={10} strokeWidth={3} />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={10} />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
+                  <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+                  <span>
+                    {createdFormatted}
+                    {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyEvidence}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      border: 'none',
+                      background: copiedEvidence ? '#10b981' : 'rgba(37, 99, 235, 0.1)',
+                      color: copiedEvidence ? '#ffffff' : '#2563eb',
+                      borderRadius: '5px',
+                      padding: '2px 6px',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      marginLeft: '4px'
+                    }}
+                    title="Copy evidentiary timestamp & note to clipboard"
+                  >
+                    {copiedEvidence ? (
+                      <>
+                        <Check size={10} strokeWidth={3} />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={10} />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
               <button
@@ -1163,29 +1168,31 @@ const NoteCard = ({
           flexWrap: 'wrap'
         }}>
           {/* Left: Evidentiary Timestamp Display without copy button in listing view */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <div 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 10px',
-                borderRadius: '8px',
-                backgroundColor: 'var(--item-bg, #f3f4f6)',
-                border: '1px solid var(--border-color, #e5e7eb)',
-                fontSize: '11px',
-                color: 'var(--text-secondary, #6b7280)',
-                fontFamily: 'monospace, sans-serif'
-              }}
-              title="Timestamp evidence: Created date & time of this note/task"
-            >
-              <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
-              <span>
-                {createdFormatted}
-                {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
-              </span>
+          {createdFormatted && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <div 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--item-bg, #f3f4f6)',
+                  border: '1px solid var(--border-color, #e5e7eb)',
+                  fontSize: '11px',
+                  color: 'var(--text-secondary, #6b7280)',
+                  fontFamily: 'monospace, sans-serif'
+                }}
+                title="Timestamp evidence: Created date & time of this note/task"
+              >
+                <Clock size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+                <span>
+                  {createdFormatted}
+                  {updatedFormatted && ` (Edit: ${updatedFormatted.split(',')[1] || updatedFormatted})`}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Right: Action Group: Priority Dropdown & Edit Note Button on bottom right */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>

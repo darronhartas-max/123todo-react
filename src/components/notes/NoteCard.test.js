@@ -167,6 +167,37 @@ describe('NoteCard', () => {
     Object.assign(navigator, { clipboard: originalClipboard });
   });
 
+  test('does not include an evidentiary timestamp if note was created prior to feature implementation without createdAt', () => {
+    const legacyNote = {
+      id: 50,
+      text: 'Legacy note before timestamp feature',
+      notes: 'Some content',
+      projectId: 'general',
+      subtasks: []
+      // no createdAt
+    };
+
+    render(
+      <NoteCard
+        note={legacyNote}
+        projects={sampleProjects}
+        onUpdateNote={jest.fn()}
+      />
+    );
+
+    // Evidentiary timestamp badge must NOT be present in listing view
+    expect(screen.queryByTitle(/Timestamp evidence/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/1970/i)).not.toBeInTheDocument();
+
+    // Enter edit mode
+    const editBtn = screen.getByRole('button', { name: /Edit Note/i });
+    fireEvent.click(editBtn);
+
+    // In edit mode, timestamp evidence badge and copy button must NOT be present
+    expect(screen.queryByTitle(/Timestamp evidence/i)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/Copy evidentiary timestamp/i)).not.toBeInTheDocument();
+  });
+
   test('renders explicit Edit button in view mode that opens edit mode when clicked', () => {
     render(
       <NoteCard
