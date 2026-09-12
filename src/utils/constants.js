@@ -129,6 +129,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.1': [
+    { title: '🔄 Silent Background Updates:', desc: 'App updates now install automatically and silently in the background without intrusive update bars or interruption to your work.' },
+    { title: '⚙️ Compact Settings Sync & Version History:', desc: 'Moved the sync status indicator into Settings with a clean, compact design, and added a Latest Update Info modal in App & Updates to view recent release highlights.' }
+  ],
   '3.7.0': [
     { title: '🕒 1-Click Timestamped Notes & Updates:', desc: 'Added a 1-click + Timestamp button in the task notes editor (and full-screen focus overlay). Automatically appends the current date & time so you can maintain progressive activity logs, phone call updates, and running client journals without clunky multi-note bloat.' },
     { title: '📅 Visible Creation Timestamps in Task Edit:', desc: 'Displays the exact evidentiary date and time when the task or note was originally created at the bottom of the edit modal, matching evidentiary logs in Notes mode.' },

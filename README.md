@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.6.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -130,23 +130,40 @@ Both the **App** (`123todo-react` ➔ `app.123todo.com`) and the **Marketing Web
 
 ### Commit & Deployment Verification Rules:
 
-1. **Lint & Prettier Compliance**: Ensure zero linter errors or Prettier violations before pushing.
-2. **Push to Origin**:
+1. **Mandatory Minor Version Bump Before Every Commit**:
+   > [!IMPORTANT]
+   > **Every time an update is made to the app and it is committed and pushed, a minor version bump MUST be performed first.**
+   > - **Minor Version Bump Increment**: Increments at the very end of the version number (e.g. `v3.6.11` ➔ `v3.6.12`, `v3.7.0` ➔ `v3.7.1`).
+   > - **Major Version Bumps**: Any major version bumps (major digit or middle digit increments) will be specifically notified and requested by the project owner. Never perform major or middle-digit bumps without explicit user instruction.
+
+2. **Lint & Prettier Compliance**: Ensure zero linter errors or Prettier violations before pushing.
+3. **Build & Test Verification**: Run `npm test -- --watchAll=false` and `npm run build` locally to verify 100% tests pass and the production bundle compiles with zero warnings.
+4. **Push to Origin**:
    - App: `darronhartas-max/123todo-react`
    - Website: `darronhartas-max/123todo-website`
-3. **Automated CI Verification**: Check deployment status via GitHub REST API:
+5. **Automated CI Verification**: Check deployment status via GitHub REST API:
    ```bash
    curl -s "https://api.github.com/repos/darronhartas-max/123todo-react/actions/runs?per_page=1"
    curl -s "https://api.github.com/repos/darronhartas-max/123todo-website/actions/runs?per_page=1"
    ```
    Confirm `status: "completed"` and `conclusion: "success"`.
 
-### Version Bumping Protocol:
+### Version Bumping Protocol (MUST-DO BEFORE EVERY COMMIT):
 
-When releasing a new version:
+Whenever preparing an update to the application:
 
-1. Update `APP_VERSION` across `src/utils/constants.js`, `package.json`, `package-lock.json`, and `README.md`.
-2. Add the release highlights to `RELEASE_CHANGELOG` in `src/utils/constants.js` to ensure the dynamic in-app "What's New" modal updates accurately.
+1. **Increment Version**:
+   Increment the version number at the end using `npm version <new_version> --no-git-tag-version` or by editing `package.json` and `package-lock.json` (e.g. `3.7.0` ➔ `3.7.1`).
+2. **Update Release Changelog**:
+   Add release highlights to `RELEASE_CHANGELOG` in `src/utils/constants.js` matching the new version key. This feeds the dynamic in-app "Latest Update Info" modal (`UpdatedModal.js`).
+3. **Update Documentation**:
+   Update the version header badge and the Recent Release Highlights section in `README.md`.
+4. **Build Bundle**:
+   Run `npm run build`. The build script automatically syncs `package.json` version into `public/version.json` and verifies compilation.
+5. **Run Tests**:
+   Run `npm test -- --watchAll=false` to ensure all test suites pass with zero regressions.
+6. **Commit & Push**:
+   Commit the changes with a concise commit message. The local post-commit hook automatically pushes to `origin/main`, triggering the CI/CD deployment pipeline.
 
 ---
 
@@ -161,7 +178,19 @@ When releasing a new version:
 
 ## 🔄 Recent Release Highlights
 
-### v3.6.0 (Current)
+### v3.7.1 (Current)
+
+- **Silent Background App Updates**: New versions now install and activate automatically and silently in the background without intrusive update bars or requiring user button clicks.
+- **Clean Footer & Compact Settings Sync**: Moved the prominent sync button from the footer into a compact status button in Settings, keeping the footer minimal while retaining clear versioning (`v{version}`).
+- **In-App Version Update History Modal**: Added a "Latest Update Info" button under Settings > App Version & Updates allowing users to view recent release notes on demand.
+
+### v3.7.0
+
+- **1-Click Timestamped Notes**: Quick "+ Timestamp" button in task notes editor and focus modal to append current date & time.
+- **Visible Task Creation Timestamps**: Bottom evidentiary creation timestamp displayed in Task Edit Modal.
+- **Standardized Top Bar Spacing**: Harmonized icon touch targets and spacing.
+
+### v3.6.0
 
 - **Photo Attachments in Notes & Tasks**: Attach up to 3 photos or screenshots per note on mobile and desktop. Features instant camera capture (`capture="environment"`), file browser, drag-and-drop, direct clipboard pasting (`Cmd+V` / `Ctrl+V`), high-efficiency client-side WebP compression (max 2048px for sharp document legibility), IndexedDB caching, and a full-screen Lightbox viewer with zoom & download.
 - **Drag-and-Drop Task Reordering Stabilization**: Resolved pointer event tracking and immediate local state settling, eliminating task snapback issues.
