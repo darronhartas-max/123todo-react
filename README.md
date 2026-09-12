@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.8** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.9** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.8 (Current)
+### v3.7.9 (Current)
+
+- **Enhanced Pro Details & Seamless Card Toggle in Lite Mode**: Clicking any task card or chevron in Lite mode now toggles expansion seamlessly. Expanded cards feature a complete Pro header (priority badge with color indicator, project badge, scheduled/due date with recurrence status, defer count, and photo badge), full unclamped description, interactive subtasks checklist with check-off, formatted notes, and direct access to launch the full Pro Edit Modal via title click or Edit Details button.
+- **Mobile Touch Interaction Stabilization**: Streamlined touch handlers on the Lite expand/collapse toggle button, ensuring immediate and reliable tap responsiveness across iOS Safari and Android Chrome.
+
+### v3.7.8
 
 - **Complete Pro Details in Lite View**: In Tasks mode Lite view, clicking any task expands it in-place to display all Pro details: project color tag, unclamped task title, scheduled date & recurrence tags, full subtasks checklist with checkboxes, full multi-line notes, attached photos gallery, and quick action buttons (`Edit Details`, `Schedule / Defer`, `Collapse`).
 - **Minimalist Lite Toolbar**: Hid the achievements badge button from the action bar in Lite mode, preserving a distraction-free toolbar.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SWIPE_ACTIONS } from '../../utils/constants';
+import { SWIPE_ACTIONS, PRIORITIES } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
@@ -607,9 +607,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         return;
                     }
                     if (isLite) {
-                        if (!isLiteExpanded) {
-                            setIsLiteExpanded(true);
-                        }
+                        setIsLiteExpanded(prev => !prev);
                         return;
                     }
                     if (!isArchived && onEdit) onEdit(task);
@@ -692,18 +690,114 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 ) : (
                     <>
-                        {projectName && (
+                        {isLite && isLiteExpanded ? (
                             <div style={{
-                                color: projectColor || 'var(--accent-color)',
-                                fontWeight: '700',
-                                fontSize: '0.78rem',
-                                display: 'inline-flex',
+                                display: 'flex',
                                 alignItems: 'center',
-                                gap: '4px',
-                                marginBottom: '2px'
+                                gap: '6px',
+                                flexWrap: 'wrap',
+                                marginBottom: '4px'
                             }}>
-                                ● {projectName}
+                                {/* Priority Pill */}
+                                {(() => {
+                                    const prio = PRIORITIES[task.priority] || PRIORITIES[1];
+                                    return (
+                                        <span style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            padding: '1px 6px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.72rem',
+                                            fontWeight: '700',
+                                            backgroundColor: `${prio.color}15`,
+                                            color: prio.color,
+                                            border: `1px solid ${prio.color}35`
+                                        }}>
+                                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: prio.color }} />
+                                            {prio.label} (P{task.priority || 1})
+                                        </span>
+                                    );
+                                })()}
+
+                                {/* Project Pill */}
+                                <span style={{
+                                    color: projectColor || 'var(--accent-color)',
+                                    fontWeight: '700',
+                                    fontSize: '0.78rem',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}>
+                                    ● {projectName || 'General'}
+                                </span>
+
+                                {/* Scheduled Date Pill */}
+                                {task.scheduledDate ? (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '700',
+                                        backgroundColor: task.isRecurring ? 'rgba(16, 185, 129, 0.12)' : 'rgba(37, 99, 235, 0.12)',
+                                        color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
+                                        border: task.isRecurring ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(37, 99, 235, 0.3)'
+                                    }}>
+                                        {task.isRecurring ? <Repeat size={11} /> : <Calendar size={11} />}
+                                        {formatDisplayDate(task.scheduledDate, dateFormat)}
+                                        {task.isRecurring && task.recurrence && ` (${getRecurrenceText(task.recurrence)})`}
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '600',
+                                        color: 'var(--muted-text)',
+                                        backgroundColor: 'var(--item-bg, rgba(0,0,0,0.04))',
+                                        border: '1px solid var(--border-color)'
+                                    }}>
+                                        <Calendar size={11} opacity={0.6} /> No date
+                                    </span>
+                                )}
+
+                                {task.deferCount > 0 && (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        padding: '1px 6px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '700',
+                                        backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                        color: '#ef4444',
+                                        border: '1px solid rgba(239, 68, 68, 0.3)'
+                                    }}>
+                                        ⚠️ Deferred {task.deferCount}x
+                                    </span>
+                                )}
                             </div>
+                        ) : (
+                            projectName && (
+                                <div style={{
+                                    color: projectColor || 'var(--accent-color)',
+                                    fontWeight: '700',
+                                    fontSize: '0.78rem',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    marginBottom: '2px'
+                                }}>
+                                    ● {projectName}
+                                </div>
+                            )
                         )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
                             <span 
@@ -781,7 +875,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         })()}
 
                         {/* Scheduled / Recurrence details */}
-                        {effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
+                        {!isLite && effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -1363,19 +1457,13 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     e.stopPropagation();
                                     setIsLiteExpanded(prev => !prev);
                                 }}
-                                onTouchStart={(e) => e.stopPropagation()}
-                                onTouchMove={(e) => e.stopPropagation()}
-                                onTouchEnd={(e) => e.stopPropagation()}
-                                onPointerDown={(e) => e.stopPropagation()}
-                                onPointerMove={(e) => e.stopPropagation()}
-                                onPointerUp={(e) => e.stopPropagation()}
                                 style={{
                                     ...styles.actionBtn,
                                     width: '28px',
                                     height: '28px',
                                     minWidth: '28px',
                                     color: 'var(--muted-text)',
-                                    opacity: 0.75,
+                                    opacity: 0.85,
                                     marginRight: '4px',
                                     background: isLiteExpanded ? 'var(--accent-bg)' : 'transparent',
                                     borderRadius: '4px'

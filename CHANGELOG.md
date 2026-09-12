@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.9
+
+- **✨ Enhanced Pro Details & Seamless Toggle in Lite Mode:** In Tasks mode Lite view, clicking any task card or expand button now seamlessly expands it to reveal complete Pro details (priority badge with color indicator, project badge, scheduled/due date with recurrence, full description, interactive subtasks checklist, notes, and photos). Clicking anywhere on an expanded task toggles collapse back to 2 lines, while clicking the title or Edit Details directly launches the full Pro Edit Modal.
+
 ### v3.7.8
 
 - **🔍 Full Pro Details in Lite View & Footer Achievements Badge:** In Tasks mode Lite view, clicking any task now expands it to reveal complete Pro details (project tag, full unclamped text, schedule and recurrence, subtasks checklist, full notes, and photo attachments). Cleaned the Lite toolbar by hiding the achievements badge, and added the achievements badge next to the version number in the footer for instant access in both Pro and Lite modes.
