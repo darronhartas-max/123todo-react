@@ -229,7 +229,7 @@ const SocialShare = () => {
                 }
             `}</style>
             <span style={{ fontSize: isMobile ? '0.8rem' : '0.9rem', marginRight: isMobile ? '0' : '8px' }}>
-                Found this useful? Pass it on — it's free! 😊
+                Share this App and keep it FREE!
             </span>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {/* Main 5 Platforms */}
