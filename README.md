@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.6** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.7** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,15 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.6 (Current)
+### v3.7.7 (Current)
+
+- **Header Logo Restored**: Restored the top header logo to its original full size (240px) with clean spacing.
+- **Toolbar Pro/Lite Switcher**: Moved the Pro / Lite toggle pill to the secondary toolbar directly between the Projects selector and Achievements badge in both Tasks and Notes modes.
+- **Clean 2-Line Lite View**: In Lite mode, task and note cards display up to 2 lines of description only, eliminating secondary badge clutter while retaining the archive/completion checkbox.
+- **1-Click Card Expansion**: Clicking any task or note card smoothly reveals all Pro-level controls, subtasks, scheduling, and metadata in place.
+- **Clean Notes Timeline by Default**: Notes mode starts with existing notes front and center, collapsing the quick-add editor into a clean `+ Add New Note` button.
+
+### v3.7.6
 
 - **Dual View Modes (⚡ Pro / 🍃 Lite)**: Introduced interface view profile toggle accessible in both the top header and Settings modal, empowering users to switch between a clean minimalist mode and a feature-rich power workspace.
 - **Minimalist 2-Line Lite Mode**: Clean 2-line layout across both Tasks and Voice Notes modes. New users start in Lite mode by default with the Must Do list front and center and secondary priorities (Should Do, Could Do, On Hold) collapsed into clean summary headers.

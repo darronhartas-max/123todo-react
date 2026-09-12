@@ -1011,6 +1011,7 @@ const TodoApp = () => {
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
               viewProfile={viewProfile}
+              onSwitchProfile={setViewProfile}
             />
           ) : (
             <>
@@ -1040,6 +1041,8 @@ const TodoApp = () => {
                 onOpenSettings={() => setShowSettings(true)}
                 onToggleAdd={() => setShowAddSection(!showAddSection)}
                 isAddOpen={showAddSection}
+                viewProfile={viewProfile}
+                onSwitchProfile={setViewProfile}
               />
 
               {projectToDelete && (

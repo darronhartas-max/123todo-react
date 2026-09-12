@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, Mic, ChevronDown, ChevronUp, FileText,
+  Folder, Mic, ChevronDown, ChevronUp,
   Flag, Check, Clock, Camera, Copy,
   Square, CheckSquare, ListChecks, Edit2
 } from 'lucide-react';
@@ -359,153 +359,80 @@ const NoteCard = ({
       }}
     >
       {isLite && !isLiteExpanded && !isEditing ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
-          {/* Line 1: Title and Expand / Complete Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-            <div style={{ 
-              fontWeight: '700', 
-              fontSize: '15px', 
-              color: 'var(--text-color, #111827)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              flex: 1
-            }}>
-              {renderActionableText(note.text || (note.notes ? note.notes.split('\n')[0] : 'Untitled Note'))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsLiteExpanded(true);
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--muted-text, #9ca3af)',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderRadius: '4px'
-                }}
-                title="Expand note details"
-                aria-label="Expand note details"
-              >
-                <ChevronDown size={16} />
-              </button>
-              <motion.button
-                onClick={handleComplete}
-                onTouchStart={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
-                style={{
-                  background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '30px',
-                  height: '30px',
-                  minWidth: '30px',
-                  touchAction: 'manipulation',
-                  color: isChecked ? '#10b981' : 'var(--muted-text, #9ca3af)',
-                  padding: '2px'
-                }}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
-                title={isChecked ? "Cancel completion" : "Complete / Archive Note"}
-                aria-label={isChecked ? "Cancel completion" : "Complete / Archive Note"}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  {isChecked ? (
-                    <motion.div key="check" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}>
-                      <CheckSquare size={17} strokeWidth={2.5} />
-                    </motion.div>
-                  ) : (
-                    <motion.div key="square" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                      <Square size={17} opacity={0.65} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.button>
-            </div>
-          </div>
-
-          {/* Line 2: Compact Metadata summary */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '11px',
-            color: 'var(--text-secondary, #6b7280)',
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%' }}>
+          <div style={{ 
+            fontWeight: '600', 
+            fontSize: '15px', 
+            color: 'var(--text-color, #111827)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis'
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+            lineHeight: '1.35',
+            flex: 1
           }}>
-            {currentProject && (
-              <span style={{
-                color: currentProject.color || '#4b5563',
-                fontWeight: '700',
-                display: 'inline-flex',
+            {renderActionableText(note.text || (note.notes ? note.notes.trim() : 'Untitled Note'))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsLiteExpanded(true);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--muted-text, #9ca3af)',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '3px'
-              }}>
-                ● {currentProject.name}
-              </span>
-            )}
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontFamily: 'monospace, sans-serif' }}>
-              <Clock size={11} /> {createdFormatted}
-            </span>
-            {subtasks.length > 0 && (
-              <span style={{
-                color: subtasks.filter(s => s.completed).length === subtasks.length ? '#10b981' : 'inherit',
-                fontWeight: '600',
-                display: 'inline-flex',
+                borderRadius: '4px'
+              }}
+              title="Expand note details"
+              aria-label="Expand note details"
+            >
+              <ChevronDown size={16} />
+            </button>
+            <motion.button
+              onClick={handleComplete}
+              onTouchStart={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              style={{
+                background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '3px'
-              }}>
-                <ListChecks size={11} /> {subtasks.filter(s => s.completed).length}/{subtasks.length}
-              </span>
-            )}
-            {note.photos && note.photos.length > 0 && (
-              <span style={{
-                color: '#0284c7',
-                fontWeight: '600',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px'
-              }}>
-                <Camera size={11} /> {note.photos.length}
-              </span>
-            )}
-            {note.notes && (
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                <FileText size={11} style={{ flexShrink: 0 }} />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {note.notes.trim().split('\n')[0].trim()}
-                </span>
-              </span>
-            )}
-            {note.priority && (
-              <span style={{
-                color: priorityColor,
-                fontWeight: '700',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '2px'
-              }}>
-                <Flag size={10} fill={priorityColor} /> P{note.priority}
-              </span>
-            )}
+                justifyContent: 'center',
+                width: '30px',
+                height: '30px',
+                minWidth: '30px',
+                touchAction: 'manipulation',
+                color: isChecked ? '#10b981' : 'var(--muted-text, #9ca3af)',
+                padding: '2px'
+              }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+              title={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+              aria-label={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isChecked ? (
+                  <motion.div key="check" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}>
+                    <CheckSquare size={17} strokeWidth={2.5} />
+                  </motion.div>
+                ) : (
+                  <motion.div key="square" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <Square size={17} opacity={0.65} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
       ) : (

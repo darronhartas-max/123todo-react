@@ -21,7 +21,7 @@ describe('NotesView', () => {
     { id: 'proj1', name: 'Work', color: '#2563eb' }
   ];
 
-  test('renders Save button on left and Talk button on top right with correct placeholder', () => {
+  test('renders closed note form by default showing existing notes and Add New Note button', () => {
     render(
       <NotesView
         tasks={sampleTasks}
@@ -29,6 +29,26 @@ describe('NotesView', () => {
         onAddNote={jest.fn()}
       />
     );
+
+    expect(screen.getByRole('button', { name: /Add New Note/i })).toBeInTheDocument();
+    expect(screen.getByText('First existing note')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Add New Note...')).not.toBeInTheDocument();
+
+    // Clicking Add New Note opens the form
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
+    expect(screen.getByPlaceholderText('Add New Note...')).toBeInTheDocument();
+  });
+
+  test('renders Save button on left and Talk button on top right with correct placeholder when opened', () => {
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        onAddNote={jest.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
 
     // Save button should say "Save" (not "Save Note")
     const saveButton = screen.getByRole('button', { name: /^Save$/i });
@@ -56,6 +76,8 @@ describe('NotesView', () => {
       />
     );
 
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
+
     const textarea = screen.getByPlaceholderText('Add New Note...');
     fireEvent.change(textarea, { target: { value: 'Urgent site inspection notes' } });
 
@@ -68,9 +90,6 @@ describe('NotesView', () => {
       'general',
       expect.objectContaining({ photos: [] })
     );
-
-    // Textarea is reset
-    expect(textarea.value).toBe('');
   });
 
   test('auto-saves draft after default 60 seconds (1 min) of idle time without premature interruption', () => {
@@ -82,6 +101,8 @@ describe('NotesView', () => {
         onAddNote={onAddNoteMock}
       />
     );
+
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
 
     const textarea = screen.getByPlaceholderText('Add New Note...');
     fireEvent.change(textarea, { target: { value: 'Site note estimating electrical wiring' } });
@@ -121,6 +142,8 @@ describe('NotesView', () => {
       />
     );
 
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
+
     const textarea = screen.getByPlaceholderText('Add New Note...');
     fireEvent.change(textarea, { target: { value: 'Quick notes 30s test' } });
 
@@ -151,6 +174,8 @@ describe('NotesView', () => {
       />
     );
 
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
+
     const textarea = screen.getByPlaceholderText('Add New Note...');
     fireEvent.change(textarea, { target: { value: 'Manual only note' } });
 
@@ -169,6 +194,8 @@ describe('NotesView', () => {
         onAddNote={onAddNoteMock}
       />
     );
+
+    fireEvent.click(screen.getByRole('button', { name: /Add New Note/i }));
 
     const textarea = screen.getByPlaceholderText('Add New Note...');
     fireEvent.change(textarea, { target: { value: 'Note before locking phone' } });

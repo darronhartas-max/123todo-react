@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, ListChecks, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
@@ -668,98 +668,26 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 {isLite && !isLiteExpanded ? (
-                    <>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                            <span 
-                                style={{
-                                    ...styles.taskText,
-                                    fontSize: '0.92rem',
-                                    fontWeight: '500',
-                                    lineHeight: '1.3'
-                                }}
-                            >
-                                {renderActionableText(task.text)}
-                            </span>
-                        </div>
-                        {(task.scheduledDate || projectName || task.notes || (task.photos && task.photos.length > 0) || subtasksCount > 0 || task.deferCount > 0) && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                fontSize: '0.72rem',
-                                color: 'var(--muted-text)',
-                                marginTop: '3px',
+                    <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, width: '100%' }}>
+                        <span 
+                            style={{
+                                ...styles.taskText,
+                                fontSize: '0.92rem',
+                                fontWeight: '500',
+                                lineHeight: '1.35',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                whiteSpace: 'nowrap',
                                 textOverflow: 'ellipsis',
-                                lineHeight: '1.2'
-                            }}>
-                                {projectName && (
-                                    <span style={{
-                                        color: projectColor || 'var(--accent-color)',
-                                        fontWeight: '600',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px'
-                                    }}>
-                                        ● {projectName}
-                                    </span>
-                                )}
-                                {task.scheduledDate && !isArchived && (
-                                    <span style={{
-                                        color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
-                                        fontWeight: '600',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px'
-                                    }}>
-                                        <Calendar size={11} /> {formatDisplayDate(task.scheduledDate, dateFormat)}
-                                    </span>
-                                )}
-                                {subtasksCount > 0 && (
-                                    <span style={{
-                                        color: completedCount === subtasksCount ? '#10b981' : 'var(--muted-text)',
-                                        fontWeight: '600',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px'
-                                    }}>
-                                        <ListChecks size={11} /> {completedCount}/{subtasksCount}
-                                    </span>
-                                )}
-                                {task.photos && task.photos.length > 0 && (
-                                    <span style={{
-                                        color: '#0284c7',
-                                        fontWeight: '600',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px'
-                                    }}>
-                                        <Camera size={11} /> {task.photos.length}
-                                    </span>
-                                )}
-                                {task.notes && (
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
-                                    }}>
-                                        <FileText size={11} style={{ flexShrink: 0 }} />
-                                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {task.notes.trim().split('\n')[0].trim()}
-                                        </span>
-                                    </span>
-                                )}
-                                {task.deferCount > 0 && !isArchived && (
-                                    <span style={{ color: '#ef4444', fontWeight: '600' }}>
-                                        ⚠️ {task.deferCount}x
-                                    </span>
-                                )}
-                            </div>
-                        )}
-                    </>
+                                wordBreak: 'break-word',
+                                whiteSpace: 'normal'
+                            }}
+                            title={task.text}
+                        >
+                            {renderActionableText(task.text)}
+                        </span>
+                    </div>
                 ) : (
                     <>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>

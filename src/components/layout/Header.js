@@ -1,7 +1,7 @@
 import React from 'react';
-import { CheckSquare, Mic, Download, Zap, Feather } from 'lucide-react';
+import { CheckSquare, Mic, Download } from 'lucide-react';
 
-const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall, viewProfile = 'lite', onSwitchProfile = () => {} }) => {
+const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall }) => {
     const styles = {
         header: {
             display: 'flex',
@@ -41,33 +41,6 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
             boxShadow: active ? '0 2px 6px rgba(37,99,235,0.3)' : 'none'
-        }),
-        profileToggleContainer: {
-            display: 'inline-flex',
-            alignItems: 'center',
-            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.06))',
-            borderRadius: '24px',
-            padding: '2px',
-            border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
-            margin: 0,
-            flexShrink: 0,
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
-        },
-        profileButton: (active) => ({
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '5px 9px',
-            borderRadius: '18px',
-            border: 'none',
-            backgroundColor: active ? 'var(--accent-color, #6366f1)' : 'transparent',
-            color: active ? '#ffffff' : 'var(--text-color, #4b5563)',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap',
-            boxShadow: active ? '0 2px 6px rgba(99,102,241,0.25)' : 'none'
         })
     };
 
@@ -85,7 +58,7 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                         src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                         alt="123 ToDo logo"
                         style={{
-                            width: '190px',
+                            width: '240px',
                             maxWidth: '100%',
                             height: 'auto',
                             cursor: 'pointer',
@@ -121,26 +94,6 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                             <span>Install</span>
                         </button>
                     )}
-
-                    {/* Pro / Lite View Profile Toggle Pill */}
-                    <div style={styles.profileToggleContainer}>
-                        <button
-                            style={styles.profileButton(viewProfile === 'pro')}
-                            onClick={() => onSwitchProfile('pro')}
-                            title="Pro Mode: Full view, drag handles, and advanced controls"
-                        >
-                            <Zap size={13} />
-                            <span>Pro</span>
-                        </button>
-                        <button
-                            style={styles.profileButton(viewProfile === 'lite')}
-                            onClick={() => onSwitchProfile('lite')}
-                            title="Lite Mode: Simple 2-line view with click-to-reveal details"
-                        >
-                            <Feather size={13} />
-                            <span>Lite</span>
-                        </button>
-                    </div>
 
                     {/* Dual Skin Mode Switcher Toggle Pill */}
                     <div style={styles.modeToggleContainer}>

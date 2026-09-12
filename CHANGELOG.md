@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.7
+
+- **🍃 Streamlined Lite Mode & Layout Harmonization:** Restored the full-size header logo and moved the Pro/Lite toggle to the action toolbar between the Projects dropdown and Achievements badge. In Lite mode, tasks and notes now display up to 2 lines of description only with zero metadata clutter, retaining the archive checkbox. Clicking any card expands it with full Pro-level details. Notes mode now starts with a clean notes timeline and an Add New Note button.
+
 ### v3.7.6
 
 - **🍃 Dual Interface Profiles (Pro / Lite):** Introduced a persistent Pro / Lite view toggle for both Tasks and Notes modes. In Lite mode (default for new users), Tasks present a distraction-free 2-line view with Must Do front and center, and Notes display in a clean 2-line timeline with 1-click progressive disclosure to expand full details.

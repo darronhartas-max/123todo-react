@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Settings, Trophy, Check
+  Folder, Search, X, Settings, Trophy, Check, Zap, Feather, PlusCircle, MinusCircle
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -27,8 +27,10 @@ const NotesView = ({
   onOpenAchievements,
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
-  viewProfile = 'lite'
+  viewProfile = 'lite',
+  onSwitchProfile
 }) => {
+  const [showAddNote, setShowAddNote] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
   const [newPhotos, setNewPhotos] = useState([]);
@@ -161,6 +163,7 @@ const NotesView = ({
     onAddNote(title, '', targetProjectId || 'general', { photos: photosToSave });
     setNewNotes('');
     setNewPhotos([]);
+    setShowAddNote(false);
 
     try {
       localStorage.removeItem('123Todo_Draft_Note');
@@ -316,6 +319,70 @@ const NotesView = ({
           })}
         </select>
 
+        {/* Pro / Lite View Profile Toggle Pill */}
+        {onSwitchProfile && (
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.06))',
+            borderRadius: '20px',
+            padding: '2px',
+            border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
+            margin: 0,
+            flexShrink: 0,
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+          }}>
+            <button
+              type="button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '4px 8px',
+                borderRadius: '16px',
+                border: 'none',
+                backgroundColor: viewProfile === 'pro' ? 'var(--accent-color, #6366f1)' : 'transparent',
+                color: viewProfile === 'pro' ? '#ffffff' : 'var(--text-color, #4b5563)',
+                fontWeight: '700',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                boxShadow: viewProfile === 'pro' ? '0 2px 6px rgba(99,102,241,0.25)' : 'none'
+              }}
+              onClick={() => onSwitchProfile('pro')}
+              title="Pro Mode: Full view, drag handles, and advanced controls"
+            >
+              <Zap size={12} />
+              <span>Pro</span>
+            </button>
+            <button
+              type="button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '4px 8px',
+                borderRadius: '16px',
+                border: 'none',
+                backgroundColor: viewProfile === 'lite' ? 'var(--accent-color, #6366f1)' : 'transparent',
+                color: viewProfile === 'lite' ? '#ffffff' : 'var(--text-color, #4b5563)',
+                fontWeight: '700',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                boxShadow: viewProfile === 'lite' ? '0 2px 6px rgba(99,102,241,0.25)' : 'none'
+              }}
+              onClick={() => onSwitchProfile('lite')}
+              title="Lite Mode: Simple view with click-to-reveal details"
+            >
+              <Feather size={12} />
+              <span>Lite</span>
+            </button>
+          </div>
+        )}
+
         {/* 3. Achievements Badge Button (identical circular style as Task mode) */}
         {onOpenAchievements && (
           <button
@@ -364,6 +431,30 @@ const NotesView = ({
             <Settings size={18} />
           </button>
         )}
+
+        {/* 5. Add Note + / - toggle button */}
+        <button
+          type="button"
+          onClick={() => setShowAddNote(!showAddNote)}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#dc2626',
+            cursor: 'pointer',
+            padding: 0,
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            transition: 'transform 0.2s ease'
+          }}
+          aria-label={showAddNote ? "Close add note" : "Open add note"}
+          title={showAddNote ? "Close add note form" : "Add new note"}
+        >
+          {showAddNote ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+        </button>
       </div>
 
       {/* Expanding Search Bar (collapses back on X click) */}
@@ -379,10 +470,38 @@ const NotesView = ({
         />
       )}
 
-      {/* Quick Add Note Card (Single note field with top-action header) */}
-      <div className="quick-add-note-card">
-        {/* Prominent Top Action Toolbar: Project Selector on Left, Talk + Large Save Note Button on Right */}
-        <div className="quick-add-top-bar" style={{
+      {/* Quick Add Note Card or Add Button */}
+      {!showAddNote ? (
+        <button
+          type="button"
+          onClick={() => setShowAddNote(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: '1.5px dashed var(--border-color, #d1d5db)',
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            color: 'var(--accent-color, #2563eb)',
+            fontSize: '15px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            boxSizing: 'border-box'
+          }}
+          title="Add a new note"
+        >
+          <PlusCircle size={18} />
+          <span>Add New Note</span>
+        </button>
+      ) : (
+        <div className="quick-add-note-card">
+          {/* Prominent Top Action Toolbar: Project Selector on Left, Talk + Large Save Note Button on Right */}
+          <div className="quick-add-top-bar" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -418,7 +537,37 @@ const NotesView = ({
           </div>
 
           {/* Primary Quick-Action Buttons at Top: Save on Left, Talk at Top Right with reasonable space */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            {/* Cancel Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowAddNote(false);
+                setNewNotes('');
+                setNewPhotos([]);
+              }}
+              style={{
+                padding: '9px 12px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-color, #d1d5db)',
+                backgroundColor: 'transparent',
+                color: 'var(--text-secondary, #6b7280)',
+                fontWeight: '600',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.15s ease',
+                minHeight: '42px',
+                boxSizing: 'border-box'
+              }}
+              title="Cancel"
+            >
+              <X size={16} />
+              <span>Cancel</span>
+            </button>
+
             {/* Large Prominent Save Button to the left of Talk */}
             <button
               type="button"
@@ -548,6 +697,7 @@ const NotesView = ({
           )}
         </div>
       </div>
+      )}
 
       {/* Notes Stream Grid */}
       {filteredNotes.length === 0 ? (
