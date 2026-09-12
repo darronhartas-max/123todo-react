@@ -99,4 +99,18 @@ describe('UpdatedModal', () => {
     // 5 version sections displayed
     expect(screen.getAllByText(/✨ What's New in v/i).length).toBe(5);
   });
+
+  test('renders external link to full release changelog', () => {
+    render(
+      <UpdatedModal
+        newVersion={APP_VERSION}
+        onClose={jest.fn()}
+      />
+    );
+
+    const link = screen.getByRole('link', { name: /View Full Release Changelog/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://www.123todo.com/changelog');
+    expect(link).toHaveAttribute('target', '_blank');
+  });
 });

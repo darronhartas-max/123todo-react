@@ -129,6 +129,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.4': [
+    { title: '📜 Public Web Changelog & Master Version History:', desc: 'Added direct access to the complete, unbroken release changelog from v1.0.0 to present on 123todo.com and in-repo CHANGELOG.md.' }
+  ],
   '3.7.3': [
     { title: '🔝 Top-Level Version Info Modal & Close Button:', desc: 'Elevated the Latest Update Info modal to always display on top of Settings with dedicated Close buttons (top-right X and bottom button), and expanded release history to display the last 5 versions.' }
   ],

@@ -269,6 +269,25 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                         Awesome, Let's Go!
                     </button>
                 </div>
+
+                <div style={{ marginTop: '14px', textAlign: 'center' }}>
+                    <a
+                        href="https://www.123todo.com/changelog"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            color: 'var(--accent-color)',
+                            fontSize: '0.88rem',
+                            fontWeight: '600',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}
+                    >
+                        View Full Release Changelog (v1.0 to present) ↗
+                    </a>
+                </div>
             </motion.div>
         </div>
     );
