@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.10
+
+- **🎯 Unified Expanded Edit Card Across Views:** Clicking any task in Lite view now directly launches the exact same full Pro Task Edit Card as Pro view, providing identical editing capabilities, voice dictation, priority selectors, subtasks checklist, notes editor, and date scheduling across both modes. Tapping the expand chevron reveals the full in-card Pro layout.
+
 ### v3.7.9
 
 - **✨ Enhanced Pro Details & Seamless Toggle in Lite Mode:** In Tasks mode Lite view, clicking any task card or expand button now seamlessly expands it to reveal complete Pro details (priority badge with color indicator, project badge, scheduled/due date with recurrence, full description, interactive subtasks checklist, notes, and photos). Clicking anywhere on an expanded task toggles collapse back to 2 lines, while clicking the title or Edit Details directly launches the full Pro Edit Modal.

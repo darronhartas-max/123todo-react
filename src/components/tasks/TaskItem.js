@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SWIPE_ACTIONS, PRIORITIES } from '../../utils/constants';
+import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
@@ -606,10 +606,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         e.preventDefault();
                         return;
                     }
-                    if (isLite) {
-                        setIsLiteExpanded(prev => !prev);
-                        return;
-                    }
                     if (!isArchived && onEdit) onEdit(task);
                 }}
                 onMouseEnter={() => !isArchived && setIsHovered(true)}
@@ -690,126 +686,24 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 ) : (
                     <>
-                        {isLite && isLiteExpanded ? (
+                        {projectName && (
                             <div style={{
-                                display: 'flex',
+                                color: projectColor || 'var(--accent-color)',
+                                fontWeight: '700',
+                                fontSize: '0.78rem',
+                                display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '6px',
-                                flexWrap: 'wrap',
-                                marginBottom: '4px'
+                                gap: '4px',
+                                marginBottom: '2px'
                             }}>
-                                {/* Priority Pill */}
-                                {(() => {
-                                    const prio = PRIORITIES[task.priority] || PRIORITIES[1];
-                                    return (
-                                        <span style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '4px',
-                                            padding: '1px 6px',
-                                            borderRadius: '4px',
-                                            fontSize: '0.72rem',
-                                            fontWeight: '700',
-                                            backgroundColor: `${prio.color}15`,
-                                            color: prio.color,
-                                            border: `1px solid ${prio.color}35`
-                                        }}>
-                                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: prio.color }} />
-                                            {prio.label} (P{task.priority || 1})
-                                        </span>
-                                    );
-                                })()}
-
-                                {/* Project Pill */}
-                                <span style={{
-                                    color: projectColor || 'var(--accent-color)',
-                                    fontWeight: '700',
-                                    fontSize: '0.78rem',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}>
-                                    ● {projectName || 'General'}
-                                </span>
-
-                                {/* Scheduled Date Pill */}
-                                {task.scheduledDate ? (
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        padding: '1px 6px',
-                                        borderRadius: '4px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700',
-                                        backgroundColor: task.isRecurring ? 'rgba(16, 185, 129, 0.12)' : 'rgba(37, 99, 235, 0.12)',
-                                        color: task.isRecurring ? '#10b981' : 'var(--accent-color)',
-                                        border: task.isRecurring ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(37, 99, 235, 0.3)'
-                                    }}>
-                                        {task.isRecurring ? <Repeat size={11} /> : <Calendar size={11} />}
-                                        {formatDisplayDate(task.scheduledDate, dateFormat)}
-                                        {task.isRecurring && task.recurrence && ` (${getRecurrenceText(task.recurrence)})`}
-                                    </span>
-                                ) : (
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        padding: '1px 6px',
-                                        borderRadius: '4px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '600',
-                                        color: 'var(--muted-text)',
-                                        backgroundColor: 'var(--item-bg, rgba(0,0,0,0.04))',
-                                        border: '1px solid var(--border-color)'
-                                    }}>
-                                        <Calendar size={11} opacity={0.6} /> No date
-                                    </span>
-                                )}
-
-                                {task.deferCount > 0 && (
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        padding: '1px 6px',
-                                        borderRadius: '4px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700',
-                                        backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                                        color: '#ef4444',
-                                        border: '1px solid rgba(239, 68, 68, 0.3)'
-                                    }}>
-                                        ⚠️ Deferred {task.deferCount}x
-                                    </span>
-                                )}
+                                ● {projectName}
                             </div>
-                        ) : (
-                            projectName && (
-                                <div style={{
-                                    color: projectColor || 'var(--accent-color)',
-                                    fontWeight: '700',
-                                    fontSize: '0.78rem',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                    marginBottom: '2px'
-                                }}>
-                                    ● {projectName}
-                                </div>
-                            )
                         )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
                             <span 
-                                className={taskViewMode === 'compact' && !(isLite && isLiteExpanded) ? 'task-text-compact' : ''}
-                                style={{
-                                    ...styles.taskText,
-                                    fontSize: (isLite && isLiteExpanded) ? '1rem' : styles.taskText?.fontSize,
-                                    fontWeight: (isLite && isLiteExpanded) ? '600' : styles.taskText?.fontWeight,
-                                    whiteSpace: (isLite && isLiteExpanded) ? 'normal' : undefined,
-                                    wordBreak: (isLite && isLiteExpanded) ? 'break-word' : undefined
-                                }}
-                                title={taskViewMode === 'compact' && !(isLite && isLiteExpanded) ? task.text : undefined}
+                                className={taskViewMode === 'compact' ? 'task-text-compact' : ''}
+                                style={styles.taskText}
+                                title={taskViewMode === 'compact' ? task.text : undefined}
                             >
                                 {renderActionableText(task.text)}
                             </span>
@@ -844,7 +738,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
                         {/* Compact Note Preview: first line only in smaller font, space-efficient */}
                         {(() => {
-                            if (isLite && isLiteExpanded) return null;
                             const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
                             if (!firstNoteLine) return null;
                             return (
@@ -875,7 +768,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         })()}
 
                         {/* Scheduled / Recurrence details */}
-                        {!isLite && effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
+                        {effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -1285,33 +1178,31 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
                 {effectiveShowFull && (task.notes || (task.photos && task.photos.length > 0)) && (
                     <div style={{ marginTop: '6px', width: '100%' }}>
-                        {!(isLite && isLiteExpanded) && (
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setShowNotesExpanded(!showNotesExpanded); }}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                    padding: '2px 8px',
-                                    borderRadius: '10px',
-                                    border: '1px solid var(--border-color)',
-                                    background: showNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                    color: showNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.7rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {(() => {
-                                    const hasPhotos = task.photos && task.photos.length > 0;
-                                    if (hasPhotos) {
-                                        return showNotesExpanded ? '▾ Hide Photos' : '▸ Show Photos';
-                                    }
-                                    return showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes';
-                                })()}
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowNotesExpanded(!showNotesExpanded); }}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                border: '1px solid var(--border-color)',
+                                background: showNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                color: showNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                cursor: 'pointer',
+                                fontSize: '0.7rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {(() => {
+                                const hasPhotos = task.photos && task.photos.length > 0;
+                                if (hasPhotos) {
+                                    return showNotesExpanded ? '▾ Hide Photos' : '▸ Show Photos';
+                                }
+                                return showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes';
+                            })()}
+                        </button>
                         <AnimatePresence>
                             {(showNotesExpanded || (isLite && isLiteExpanded)) && (
                                 <motion.div
@@ -1322,7 +1213,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     style={{
                                         fontSize: '0.92rem',
                                         color: 'var(--muted-text)',
-                                        marginTop: (isLite && isLiteExpanded) ? '2px' : '6px',
+                                        marginTop: '6px',
                                         padding: '8px 12px',
                                         background: 'rgba(0,0,0,0.03)',
                                         borderRadius: '6px',
@@ -1345,86 +1236,6 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
-                )}
-
-                {isLite && isLiteExpanded && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        marginTop: '10px',
-                        paddingTop: '8px',
-                        borderTop: '1px dashed var(--border-color)',
-                        flexWrap: 'wrap'
-                    }}>
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isArchived && onEdit) onEdit(task);
-                            }}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--surface-color)',
-                                color: 'var(--text-color)',
-                                fontSize: '0.75rem',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Edit2 size={12} /> Edit Details
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickSchedule(!showQuickSchedule);
-                            }}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--surface-color)',
-                                color: 'var(--text-color)',
-                                fontSize: '0.75rem',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Calendar size={12} /> Schedule / Defer
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsLiteExpanded(false);
-                            }}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                border: 'none',
-                                background: 'transparent',
-                                color: 'var(--muted-text)',
-                                fontSize: '0.75rem',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                marginLeft: 'auto'
-                            }}
-                        >
-                            <ChevronUp size={12} /> Collapse
-                        </button>
                     </div>
                 )}
                     </>
@@ -1476,7 +1287,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 {isLiteExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </motion.button>
                         )}
-                        {!isLite && task.scheduledDate && (
+                        {(!isLite || isLiteExpanded) && task.scheduledDate && (
                             <motion.button
                                 onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
                                 onTouchStart={(e) => e.stopPropagation()}

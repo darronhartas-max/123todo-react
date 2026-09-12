@@ -240,7 +240,7 @@ test('applies compact 2-line clamp class and title tooltip by default, but displ
   expect(textElement).not.toHaveAttribute('title');
 });
 
-test('renders clean 2-line layout in Lite mode and expands on click with action toolbar', () => {
+test('renders clean 2-line layout in Lite mode and expands on chevron click to reveal full pro view', () => {
   const task = {
     id: 108,
     text: 'Review invoice from contractor',
@@ -254,25 +254,31 @@ test('renders clean 2-line layout in Lite mode and expands on click with action 
 
   // Should display task title
   expect(screen.getByText('Review invoice from contractor')).toBeInTheDocument();
+  // In unexpanded Lite mode, project name is not visible
+  expect(screen.queryByText('● Work')).not.toBeInTheDocument();
 
   // In unexpanded Lite mode, ChevronDown expander should be visible
   const expandBtn = screen.getByRole('button', { name: /Expand task details/i });
   expect(expandBtn).toBeInTheDocument();
 
-  // Clicking expand button expands the task
+  // Clicking expand button expands the task to full pro layout
   fireEvent.click(expandBtn);
 
-  // Expanded toolbar should now show Edit Details and Collapse buttons
-  expect(screen.getByText('Edit Details')).toBeInTheDocument();
-  const collapseBtn = screen.getByText('Collapse');
+  // Pro details should now be visible
+  expect(screen.getByText('● Work')).toBeInTheDocument();
+  expect(screen.getByText('15/09/2026')).toBeInTheDocument();
+  expect(screen.getAllByText(/Payment due on Friday/).length).toBeGreaterThanOrEqual(1);
+
+  // Collapse chevron should now be visible
+  const collapseBtn = screen.getByRole('button', { name: /Collapse task details/i });
   expect(collapseBtn).toBeInTheDocument();
 
   // Clicking collapse folds it back up
   fireEvent.click(collapseBtn);
-  expect(screen.queryByText('Edit Details')).not.toBeInTheDocument();
+  expect(screen.queryByText('● Work')).not.toBeInTheDocument();
 });
 
-test('in Lite mode, clicking a task expands it to reveal full pro details (priority, project, date, full notes, subtasks) and clicking again toggles collapse', () => {
+test('in Lite mode, clicking a task calls onEdit to open the expanded edit card identically to Pro view', () => {
   const onEditMock = jest.fn();
   const task = {
     id: 109,
@@ -289,36 +295,16 @@ test('in Lite mode, clicking a task expands it to reveal full pro details (prior
 
   render(<TaskItem task={task} onEdit={onEditMock} viewProfile="lite" projectName="HVAC Project" projectColor="#3b82f6" />);
 
-  // Initially unexpanded: notes, project tag, priority pill, and subtasks are not visible
+  // Initially unexpanded: clean 2-line title
   expect(screen.getByText('Install heat pump unit')).toBeInTheDocument();
-  expect(screen.queryByText('● HVAC Project')).not.toBeInTheDocument();
-  expect(screen.queryByText(/Must Do \(P1\)/)).not.toBeInTheDocument();
-  expect(screen.queryByText(/Confirm electrical breaker size/)).not.toBeInTheDocument();
 
-  // Clicking the task row expands it
+  // Clicking the task row calls onEdit with the task object (opening the exact same EditModal as Pro view)
   const listItem = screen.getByRole('listitem');
   fireEvent.click(listItem);
 
-  // Now reveals full pro details!
-  expect(screen.getByText(/Must Do \(P1\)/)).toBeInTheDocument();
-  expect(screen.getByText('● HVAC Project')).toBeInTheDocument();
-  expect(screen.getByText('20/09/2026')).toBeInTheDocument();
-  expect(screen.getByText(/Confirm electrical breaker size/)).toBeInTheDocument();
-  expect(screen.getByText('Check electrical breaker')).toBeInTheDocument();
-  expect(screen.getByText('Mount outdoor condenser')).toBeInTheDocument();
-  const editDetailsBtn = screen.getByText('Edit Details');
-  expect(editDetailsBtn).toBeInTheDocument();
-  expect(screen.getByText('Schedule / Defer')).toBeInTheDocument();
-  expect(screen.getByText('Collapse')).toBeInTheDocument();
-
-  // Clicking Edit Details calls onEdit
-  fireEvent.click(editDetailsBtn);
+  expect(onEditMock).toHaveBeenCalledTimes(1);
   expect(onEditMock).toHaveBeenCalledWith(task);
-
-  // Clicking the task row again toggles collapse
-  fireEvent.click(listItem);
-  expect(screen.queryByText(/Must Do \(P1\)/)).not.toBeInTheDocument();
-  expect(screen.queryByText('● HVAC Project')).not.toBeInTheDocument();
 });
+
 
 
