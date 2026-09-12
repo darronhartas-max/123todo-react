@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.6
+
+- **🍃 Dual Interface Profiles (Pro / Lite):** Introduced a persistent Pro / Lite view toggle for both Tasks and Notes modes. In Lite mode (default for new users), Tasks present a distraction-free 2-line view with Must Do front and center, and Notes display in a clean 2-line timeline with 1-click progressive disclosure to expand full details.
+
 ### v3.7.5
 
 - **🔄 Automated Master Changelog Sync:** Integrated automatic synchronization between in-app release notes, repository CHANGELOG.md, and the public marketing website changelog during the build process.

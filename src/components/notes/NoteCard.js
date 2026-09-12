@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, Mic, ChevronDown, 
+  Folder, Mic, ChevronDown, ChevronUp, FileText,
   Flag, Check, Clock, Camera, Copy,
   Square, CheckSquare, ListChecks, Edit2
 } from 'lucide-react';
@@ -22,9 +22,12 @@ const NoteCard = ({
   isSelected,
   onToggleSelect,
   notesFontSize = 18,
-  notesAutosaveDelay = '60s'
+  notesAutosaveDelay = '60s',
+  viewProfile = 'pro'
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isLiteExpanded, setIsLiteExpanded] = useState(false);
+  const isLite = viewProfile === 'lite';
   const [titleText, setTitleText] = useState(note.text || '');
   const [notesText, setNotesText] = useState(note.notes || '');
   const [subtasks, setSubtasks] = useState(note.subtasks || []);
@@ -338,19 +341,177 @@ const NoteCard = ({
       exit={{ opacity: 0, scale: 0.95 }}
       style={{
         backgroundColor: 'var(--card-bg, #ffffff)',
-        borderRadius: '16px',
-        padding: '20px',
-        boxShadow: isSelected ? '0 0 0 2px #2563eb, 0 8px 24px rgba(37, 99, 235, 0.15)' : '0 4px 16px rgba(0,0,0,0.06)',
+        borderRadius: isLite && !isLiteExpanded && !isEditing ? '10px' : '16px',
+        padding: isLite && !isLiteExpanded && !isEditing ? '10px 14px' : '20px',
+        boxShadow: isSelected ? '0 0 0 2px #2563eb, 0 8px 24px rgba(37, 99, 235, 0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
         border: '1px solid var(--border-color, #e5e7eb)',
         position: 'relative',
         transition: 'all 0.2s ease',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px'
+        gap: isLite && !isLiteExpanded && !isEditing ? '4px' : '12px',
+        cursor: isLite && !isLiteExpanded && !isEditing ? 'pointer' : 'default'
+      }}
+      onClick={() => {
+        if (isLite && !isLiteExpanded && !isEditing) {
+          setIsLiteExpanded(true);
+        }
       }}
     >
-      {/* Top Header Row: Project Badge & Timestamp */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+      {isLite && !isLiteExpanded && !isEditing ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+          {/* Line 1: Title and Expand / Complete Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+            <div style={{ 
+              fontWeight: '700', 
+              fontSize: '15px', 
+              color: 'var(--text-color, #111827)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flex: 1
+            }}>
+              {renderActionableText(note.text || (note.notes ? note.notes.split('\n')[0] : 'Untitled Note'))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLiteExpanded(true);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--muted-text, #9ca3af)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderRadius: '4px'
+                }}
+                title="Expand note details"
+                aria-label="Expand note details"
+              >
+                <ChevronDown size={16} />
+              </button>
+              <motion.button
+                onClick={handleComplete}
+                onTouchStart={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                style={{
+                  background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '30px',
+                  height: '30px',
+                  minWidth: '30px',
+                  touchAction: 'manipulation',
+                  color: isChecked ? '#10b981' : 'var(--muted-text, #9ca3af)',
+                  padding: '2px'
+                }}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+                title={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+                aria-label={isChecked ? "Cancel completion" : "Complete / Archive Note"}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {isChecked ? (
+                    <motion.div key="check" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}>
+                      <CheckSquare size={17} strokeWidth={2.5} />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="square" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      <Square size={17} opacity={0.65} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </div>
+          </div>
+
+          {/* Line 2: Compact Metadata summary */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '11px',
+            color: 'var(--text-secondary, #6b7280)',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis'
+          }}>
+            {currentProject && (
+              <span style={{
+                color: currentProject.color || '#4b5563',
+                fontWeight: '700',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}>
+                ● {currentProject.name}
+              </span>
+            )}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontFamily: 'monospace, sans-serif' }}>
+              <Clock size={11} /> {createdFormatted}
+            </span>
+            {subtasks.length > 0 && (
+              <span style={{
+                color: subtasks.filter(s => s.completed).length === subtasks.length ? '#10b981' : 'inherit',
+                fontWeight: '600',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}>
+                <ListChecks size={11} /> {subtasks.filter(s => s.completed).length}/{subtasks.length}
+              </span>
+            )}
+            {note.photos && note.photos.length > 0 && (
+              <span style={{
+                color: '#0284c7',
+                fontWeight: '600',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}>
+                <Camera size={11} /> {note.photos.length}
+              </span>
+            )}
+            {note.notes && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                <FileText size={11} style={{ flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {note.notes.trim().split('\n')[0].trim()}
+                </span>
+              </span>
+            )}
+            {note.priority && (
+              <span style={{
+                color: priorityColor,
+                fontWeight: '700',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px'
+              }}>
+                <Flag size={10} fill={priorityColor} /> P{note.priority}
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Top Header Row: Project Badge & Timestamp */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Project Tag Pill */}
           <div style={{ position: 'relative' }}>
@@ -1228,9 +1389,39 @@ const NoteCard = ({
               <Edit2 size={13} color="#2563eb" />
               <span>Edit Note</span>
             </button>
+            {isLite && isLiteExpanded && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLiteExpanded(false);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-color, #e5e7eb)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary, #6b7280)',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Collapse Note"
+                aria-label="Collapse Note"
+              >
+                <ChevronUp size={13} />
+                <span>Collapse</span>
+              </button>
+            )}
           </div>
         </div>
       )}
+    </>
+  )}
     </motion.div>
   );
 };

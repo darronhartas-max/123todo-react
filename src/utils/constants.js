@@ -38,7 +38,8 @@ export const STORAGE_KEYS = {
   NOTES_FONT_SIZE: '123TodoNotesFontSize',
   TASK_VIEW_MODE: '123TodoTaskViewMode',
   EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference',
-  NOTES_AUTOSAVE_DELAY: '123TodoNotesAutosaveDelay'
+  NOTES_AUTOSAVE_DELAY: '123TodoNotesAutosaveDelay',
+  VIEW_PROFILE: '123Todo_ViewProfile'
 };
 
 export const NOTES_AUTOSAVE_OPTIONS = [
@@ -123,12 +124,16 @@ export const MAX_TASK_LENGTH = 250;
 export const DEFAULT_TASK_LENGTH_LIMIT = '250';
 export const DEFAULT_LIGHT_MODE_TONE = 'muted';
 export const DEFAULT_TASK_VIEW_MODE = 'compact';
+export const DEFAULT_VIEW_PROFILE = 'lite';
 // Notes length is intentionally unlimited to support full Todoist migration and rich task descriptions.
 export const BACKUP_REMINDER_DAYS = 7;
 export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.6': [
+    { title: '🍃 Dual Interface Profiles (Pro / Lite):', desc: 'Introduced a persistent Pro / Lite view toggle for both Tasks and Notes modes. In Lite mode (default for new users), Tasks present a distraction-free 2-line view with Must Do front and center, and Notes display in a clean 2-line timeline with 1-click progressive disclosure to expand full details.' }
+  ],
   '3.7.5': [
     { title: '🔄 Automated Master Changelog Sync:', desc: 'Integrated automatic synchronization between in-app release notes, repository CHANGELOG.md, and the public marketing website changelog during the build process.' }
   ],

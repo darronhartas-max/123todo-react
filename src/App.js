@@ -37,7 +37,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
@@ -367,6 +367,9 @@ const TodoApp = () => {
   const [taskViewMode, setTaskViewModeState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.TASK_VIEW_MODE) || DEFAULT_TASK_VIEW_MODE;
   });
+  const [viewProfile, setViewProfileState] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.VIEW_PROFILE) || DEFAULT_VIEW_PROFILE;
+  });
   const [notesAutosaveDelay, setNotesAutosaveDelayState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.NOTES_AUTOSAVE_DELAY) || DEFAULT_NOTES_AUTOSAVE_DELAY;
   });
@@ -436,8 +439,25 @@ const TodoApp = () => {
       console.error('Failed to save task view mode preference:', e);
     }
   };
+  const setViewProfile = (val) => {
+    setViewProfileState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.VIEW_PROFILE, val);
+    } catch (e) {
+      console.error('Failed to save view profile preference:', e);
+    }
+  };
 
   // Apply visual styling settings to root element
+  useEffect(() => {
+    if (viewProfile === 'lite') {
+      document.documentElement.classList.add('app-view-lite');
+      document.documentElement.classList.remove('app-view-pro');
+    } else {
+      document.documentElement.classList.add('app-view-pro');
+      document.documentElement.classList.remove('app-view-lite');
+    }
+  }, [viewProfile]);
   useEffect(() => {
     if (taskViewMode === 'compact') {
       document.documentElement.classList.add('task-view-compact');
@@ -935,6 +955,8 @@ const TodoApp = () => {
           onSwitchMode={handleSwitchMode}
           isStandalone={isStandalone}
           onOpenInstall={handleInstallClick}
+          viewProfile={viewProfile}
+          onSwitchProfile={setViewProfile}
         />
 
         <AddTask
@@ -988,6 +1010,7 @@ const TodoApp = () => {
               onOpenAchievements={() => setShowAchievements(true)}
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
+              viewProfile={viewProfile}
             />
           ) : (
             <>
@@ -1051,6 +1074,7 @@ const TodoApp = () => {
                       onSwipeAction={handleSwipeAction}
                       dateFormat={dateFormat}
                       taskViewMode={taskViewMode}
+                      viewProfile={viewProfile}
                     />
                   ))
                 ) : (
@@ -1073,6 +1097,7 @@ const TodoApp = () => {
                       onSwipeAction={handleSwipeAction}
                       dateFormat={dateFormat}
                       taskViewMode={taskViewMode}
+                      viewProfile={viewProfile}
                     />
                   ))
                 )}
@@ -1111,6 +1136,7 @@ const TodoApp = () => {
                               dateFormat={dateFormat}
                               showFullDetails={true}
                               taskViewMode={taskViewMode}
+                              viewProfile={viewProfile}
                             />
                           );
                         })}
@@ -1149,6 +1175,7 @@ const TodoApp = () => {
                           dateFormat={dateFormat}
                           showFullDetails={true}
                           taskViewMode={taskViewMode}
+                          viewProfile={viewProfile}
                         />
                       );
                     })}
@@ -1362,6 +1389,8 @@ const TodoApp = () => {
         onSwitchMode={handleSwitchMode}
         taskViewMode={taskViewMode}
         setTaskViewMode={setTaskViewMode}
+        viewProfile={viewProfile}
+        setViewProfile={setViewProfile}
         isStandalone={isStandalone}
         canNativeInstall={canNativeInstall}
         onNativeInstall={handleInstallClick}

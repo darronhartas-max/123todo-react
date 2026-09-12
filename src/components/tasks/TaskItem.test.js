@@ -240,3 +240,35 @@ test('applies compact 2-line clamp class and title tooltip by default, but displ
   expect(textElement).not.toHaveAttribute('title');
 });
 
+test('renders clean 2-line layout in Lite mode and expands on click with action toolbar', () => {
+  const task = {
+    id: 108,
+    text: 'Review invoice from contractor',
+    notes: 'Payment due on Friday\nAccount details attached',
+    priority: 1,
+    projectId: 'general',
+    scheduledDate: '2026-09-15'
+  };
+
+  render(<TaskItem task={task} viewProfile="lite" projectName="Work" />);
+
+  // Should display task title
+  expect(screen.getByText('Review invoice from contractor')).toBeInTheDocument();
+
+  // In unexpanded Lite mode, ChevronDown expander should be visible
+  const expandBtn = screen.getByRole('button', { name: /Expand task details/i });
+  expect(expandBtn).toBeInTheDocument();
+
+  // Clicking expand button expands the task
+  fireEvent.click(expandBtn);
+
+  // Expanded toolbar should now show Edit Details and Collapse buttons
+  expect(screen.getByText('Edit Details')).toBeInTheDocument();
+  const collapseBtn = screen.getByText('Collapse');
+  expect(collapseBtn).toBeInTheDocument();
+
+  // Clicking collapse folds it back up
+  fireEvent.click(collapseBtn);
+  expect(screen.queryByText('Edit Details')).not.toBeInTheDocument();
+});
+

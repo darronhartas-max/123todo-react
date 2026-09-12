@@ -381,5 +381,40 @@ describe('NoteCard', () => {
     fireEvent.click(p1Option);
     expect(onConvertMock).toHaveBeenCalledWith(sampleNote.id, 1);
   });
+
+  test('renders 2-line condensed view in Lite mode and expands on click with Collapse button', () => {
+    const liteNote = {
+      id: 99,
+      text: 'Order safety goggles for workshop',
+      notes: 'Need 5 pairs of ANSI certified goggles',
+      projectId: 'general',
+      priority: 2,
+      createdAt: '2026-09-12T10:00:00.000Z'
+    };
+
+    render(
+      <NoteCard
+        note={liteNote}
+        projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+        viewProfile="lite"
+      />
+    );
+
+    // Title should be visible
+    expect(screen.getByText('Order safety goggles for workshop')).toBeInTheDocument();
+
+    // In unexpanded Lite mode, ChevronDown expander should be visible
+    const expandBtn = screen.getByRole('button', { name: /Expand note details/i });
+    expect(expandBtn).toBeInTheDocument();
+
+    // Clicking expand reveals the full card and Collapse button
+    fireEvent.click(expandBtn);
+    const collapseBtn = screen.getByRole('button', { name: /Collapse Note/i });
+    expect(collapseBtn).toBeInTheDocument();
+
+    // Clicking collapse returns to 2-line view
+    fireEvent.click(collapseBtn);
+    expect(screen.queryByRole('button', { name: /Collapse Note/i })).not.toBeInTheDocument();
+  });
 });
 

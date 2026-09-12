@@ -20,12 +20,16 @@ const PrioritySection = ({
     swipeSettings,
     onSwipeAction,
     dateFormat,
-    taskViewMode = 'compact'
+    taskViewMode = 'compact',
+    viewProfile = 'lite'
 }) => {
     const config = PRIORITIES[priority];
     const sectionTasks = tasks.filter(t => t.priority === priority);
 
     const [isCollapsed, setIsCollapsed] = useState(() => {
+        if (viewProfile === 'lite' && priority !== 1) {
+            return true;
+        }
         try {
             const stored = localStorage.getItem('123Todo_Collapsed_Priorities');
             if (stored) {
@@ -35,6 +39,26 @@ const PrioritySection = ({
         } catch (e) {}
         return false;
     });
+
+    React.useEffect(() => {
+        if (viewProfile === 'lite') {
+            if (priority !== 1) {
+                setIsCollapsed(true);
+            } else {
+                setIsCollapsed(false);
+            }
+        } else {
+            try {
+                const stored = localStorage.getItem('123Todo_Collapsed_Priorities');
+                if (stored) {
+                    const list = JSON.parse(stored);
+                    setIsCollapsed(Array.isArray(list) && list.includes(priority));
+                    return;
+                }
+            } catch (e) {}
+            setIsCollapsed(false);
+        }
+    }, [viewProfile, priority]);
 
     const toggleCollapse = (e) => {
         if (e) e.stopPropagation();
@@ -164,6 +188,7 @@ const PrioritySection = ({
                                             key={task.id}
                                             task={task}
                                             projectColor={project?.color}
+                                            projectName={project?.name}
                                             onComplete={onComplete}
                                             onEdit={onEdit}
                                             onUpdate={onUpdate}
@@ -171,6 +196,7 @@ const PrioritySection = ({
                                             onSwipeAction={onSwipeAction}
                                             dateFormat={dateFormat}
                                             taskViewMode={taskViewMode}
+                                            viewProfile={viewProfile}
                                             isDragging={draggedId === task.id}
                                             isDragOver={dragOverId === task.id}
                                             dragHandlers={{

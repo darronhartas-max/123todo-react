@@ -272,6 +272,8 @@ const SettingsModal = ({
     onSwitchMode = () => {},
     taskViewMode = 'compact',
     setTaskViewMode,
+    viewProfile = 'lite',
+    setViewProfile,
     isStandalone = false,
     canNativeInstall = false,
     onNativeInstall,
@@ -1066,6 +1068,32 @@ const SettingsModal = ({
                                             onClick={() => onSwitchMode('notes')}
                                         >
                                             🎙️ Voice Notes
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Interface View Profile */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Interface Profile</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            {viewProfile === 'lite' 
+                                                ? 'Lite: Clean 2-line minimalist view with progressive disclosure on tap' 
+                                                : 'Pro: Full feature set with instant access to toolbars, subtasks, and notes'}
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(viewProfile === 'lite')}
+                                            onClick={() => setViewProfile && setViewProfile('lite')}
+                                        >
+                                            🍃 Lite (Simple)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(viewProfile === 'pro')}
+                                            onClick={() => setViewProfile && setViewProfile('pro')}
+                                        >
+                                            ⚡ Pro (Full Power)
                                         </button>
                                     </div>
                                 </div>

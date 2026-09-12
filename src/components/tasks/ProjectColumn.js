@@ -20,7 +20,8 @@ const ProjectColumn = ({
     swipeSettings,
     onSwipeAction,
     dateFormat,
-    taskViewMode = 'compact'
+    taskViewMode = 'compact',
+    viewProfile = 'lite'
 }) => {
     const projectTasks = tasks.filter(t => 
         (t.projectId || 'general').toLowerCase() === project.id.toLowerCase() ||
@@ -190,6 +191,7 @@ const ProjectColumn = ({
                                             key={task.id}
                                             task={task}
                                             projectColor={proj?.color}
+                                            projectName={proj?.name}
                                             onComplete={onComplete}
                                             onEdit={onEdit}
                                             onUpdate={onUpdate}
@@ -197,6 +199,7 @@ const ProjectColumn = ({
                                             onSwipeAction={onSwipeAction}
                                             dateFormat={dateFormat}
                                             taskViewMode={taskViewMode}
+                                            viewProfile={viewProfile}
                                             isDragging={draggedId === task.id}
                                             isDragOver={dragOverId === task.id}
                                             dragHandlers={{

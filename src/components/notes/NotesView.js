@@ -26,7 +26,8 @@ const NotesView = ({
   onOpenSettings,
   onOpenAchievements,
   notesFontSize = 18,
-  notesAutosaveDelay = '60s'
+  notesAutosaveDelay = '60s',
+  viewProfile = 'lite'
 }) => {
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
@@ -579,6 +580,7 @@ const NotesView = ({
               onToggleSelect={handleToggleSelectNote}
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
+              viewProfile={viewProfile}
             />
           ))}
         </div>

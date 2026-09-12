@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.5** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.6** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,14 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.5 (Current)
+### v3.7.6 (Current)
+
+- **Dual View Modes (⚡ Pro / 🍃 Lite)**: Introduced interface view profile toggle accessible in both the top header and Settings modal, empowering users to switch between a clean minimalist mode and a feature-rich power workspace.
+- **Minimalist 2-Line Lite Mode**: Clean 2-line layout across both Tasks and Voice Notes modes. New users start in Lite mode by default with the Must Do list front and center and secondary priorities (Should Do, Could Do, On Hold) collapsed into clean summary headers.
+- **Progressive In-Place Disclosure**: 1-tap in-place expansion for tasks and notes revealing full details (subtasks, notes, photo attachments, scheduling, priority picker, and edit tools) with an instant collapse button.
+- **Cross-Session View Memory**: Automatically remembers and persists your chosen view profile across sessions.
+
+### v3.7.5
 
 - **Automated Master Changelog Synchronization**: Added automated build hook (`scripts/sync-changelog.js`) that automatically syncs in-app release notes from `constants.js` to `CHANGELOG.md` and the marketing website `123todo-website/src/data/changelog.json`, guaranteeing the public changelog at `123todo.com/changelog` updates with zero manual duplication.
 
