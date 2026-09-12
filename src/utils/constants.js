@@ -129,6 +129,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.5': [
+    { title: '🔄 Automated Master Changelog Sync:', desc: 'Integrated automatic synchronization between in-app release notes, repository CHANGELOG.md, and the public marketing website changelog during the build process.' }
+  ],
   '3.7.4': [
     { title: '📜 Public Web Changelog & Master Version History:', desc: 'Added direct access to the complete, unbroken release changelog from v1.0.0 to present on 123todo.com and in-repo CHANGELOG.md.' }
   ],

@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.4** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.5** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.4 (Current)
+### v3.7.5 (Current)
+
+- **Automated Master Changelog Synchronization**: Added automated build hook (`scripts/sync-changelog.js`) that automatically syncs in-app release notes from `constants.js` to `CHANGELOG.md` and the marketing website `123todo-website/src/data/changelog.json`, guaranteeing the public changelog at `123todo.com/changelog` updates with zero manual duplication.
+
+### v3.7.4
 
 - **Comprehensive Release History & Public Web Changelog**: Compiled complete release history from v1.0.0 to present into in-repo `CHANGELOG.md` and added direct navigation link to `123todo.com/changelog` from the in-app update modal.
 

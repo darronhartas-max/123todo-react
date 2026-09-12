@@ -23,8 +23,8 @@
    - In `src/utils/constants.js`, add the new version key and entry to `RELEASE_CHANGELOG` summarizing what changed. This directly feeds the in-app "Latest Update Info" modal (`UpdatedModal.js`).
 3. **Update Documentation**:
    - In `README.md`, update the version badge header (e.g. `Version **3.7.1**`) and add release notes under `## 🔄 Recent Release Highlights`.
-4. **Build Bundle**:
-   - Run `npm run build`. The build script automatically syncs the new version from `package.json` into `public/version.json` and confirms zero build warnings.
+4. **Build Bundle & Auto-Sync Master Changelog**:
+   - Run `npm run build`. The build script automatically executes `node scripts/sync-changelog.js` (which syncs the new release from `RELEASE_CHANGELOG` into both `CHANGELOG.md` and the sibling marketing website `123todo-website/src/data/changelog.json`), updates `public/version.json`, and confirms zero build warnings.
 5. **Run Tests**:
    - Run `npm test -- --watchAll=false` and confirm all test suites pass.
 6. **Commit Changes**:
@@ -32,6 +32,13 @@
    - Note: The local `.git/hooks/post-commit` hook automatically pushes the commit to `origin/<branch>`.
 7. **Verify CI/CD Deployment**:
    - Verify that the GitHub Actions build on `darronhartas-max/123todo-react` finishes with `status: "completed"` and `conclusion: "success"`.
+8. **Deploy Public Website Changelog**:
+   - In `../123todo-website`, run `npm run check && npm run build` to verify formatting and compilation.
+   - Stage and commit the updated `src/data/changelog.json`:
+     ```bash
+     git add src/data/changelog.json && git commit -m "chore: sync changelog to v<new_version>" && git push origin main
+     ```
+   - Verify the GitHub Actions deployment on `darronhartas-max/123todo-website` finishes with `status: "completed"` and `conclusion: "success"`, publishing the updated changelog live to `https://www.123todo.com/changelog`.
 
 ---
 
