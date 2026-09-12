@@ -18,14 +18,34 @@ export function register(config) {
             return;
         }
 
-        // Auto reload when a new service worker takes control
+        // Auto reload silently when a new service worker takes control
         let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-                refreshing = true;
-                window.location.reload();
+        const reloadSilently = () => {
+            if (refreshing) return;
+            // Defer if user is currently typing in an input/textarea to preserve active typing
+            const isEditing = document.activeElement && (
+                document.activeElement.tagName === 'INPUT' ||
+                document.activeElement.tagName === 'TEXTAREA' ||
+                document.activeElement.isContentEditable
+            );
+            if (isEditing) {
+                const performDeferredReload = () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                };
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') performDeferredReload();
+                }, { once: true });
+                document.activeElement.addEventListener('blur', performDeferredReload, { once: true });
+                return;
             }
-        });
+            refreshing = true;
+            window.location.reload();
+        };
+
+        navigator.serviceWorker.addEventListener('controllerchange', reloadSilently);
 
         window.addEventListener('load', () => {
             const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
@@ -55,11 +75,10 @@ function registerValidSW(swUrl, config) {
     navigator.serviceWorker
         .register(swUrl)
         .then((registration) => {
-            // Immediate check if a Service Worker is ALREADY waiting to activate
+            // Immediate check if a Service Worker is ALREADY waiting to activate: activate silently
             if (registration.waiting && navigator.serviceWorker.controller) {
-                console.log('Service Worker is already waiting to activate.');
-                const event = new CustomEvent('swUpdateAvailable', { detail: registration });
-                window.dispatchEvent(event);
+                console.log('Service Worker is waiting to activate - activating silently in background.');
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
             }
 
             // Force update check on registration
@@ -73,15 +92,11 @@ function registerValidSW(swUrl, config) {
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // New content found! Notify UI so user can choose when to update
-                            console.log('New content available, notify user to update...');
-
+                            // New content found! Silently activate in background without user intervention
+                            console.log('New app version installed - activating silently in background...');
+                            installingWorker.postMessage({ type: 'SKIP_WAITING' });
                             if (config && config.onUpdate) {
                                 config.onUpdate(registration);
-                            } else {
-                                // Dispatch custom event so App.js can display update banner
-                                const event = new CustomEvent('swUpdateAvailable', { detail: registration });
-                                window.dispatchEvent(event);
                             }
                         } else {
                             if (config && config.onSuccess) {
@@ -163,8 +178,7 @@ export async function checkForUpdates(forceSimulate = false) {
                 await registration.update();
 
                 if (registration.waiting && navigator.serviceWorker.controller) {
-                    const event = new CustomEvent('swUpdateAvailable', { detail: registration });
-                    window.dispatchEvent(event);
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
                     return { success: true, updated: true, registration, remoteVersion };
                 }
 
@@ -172,8 +186,7 @@ export async function checkForUpdates(forceSimulate = false) {
                     return new Promise((resolve) => {
                         registration.installing.onstatechange = function() {
                             if (this.state === 'installed' && navigator.serviceWorker.controller) {
-                                const event = new CustomEvent('swUpdateAvailable', { detail: registration });
-                                window.dispatchEvent(event);
+                                registration.installing.postMessage({ type: 'SKIP_WAITING' });
                                 resolve({ success: true, updated: true, registration, remoteVersion });
                             }
                         };
@@ -181,10 +194,8 @@ export async function checkForUpdates(forceSimulate = false) {
                     });
                 }
 
-                // If remote version exists and is newer than APP_VERSION, notify UI that an update is available!
+                // If remote version exists and is newer than APP_VERSION, attempt update
                 if (remoteVersion && remoteVersion !== APP_VERSION) {
-                    const event = new CustomEvent('swUpdateAvailable', { detail: registration });
-                    window.dispatchEvent(event);
                     return { success: true, updated: true, registration, remoteVersion };
                 }
 
@@ -193,8 +204,6 @@ export async function checkForUpdates(forceSimulate = false) {
         }
 
         if (remoteVersion && remoteVersion !== APP_VERSION) {
-            const event = new CustomEvent('swUpdateAvailable', { detail: null });
-            window.dispatchEvent(event);
             return { success: true, updated: true, remoteVersion };
         }
     } catch (error) {

@@ -52,4 +52,19 @@ describe('UpdatedModal', () => {
 
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
+
+  test('displays info of the last few versions updated', () => {
+    render(
+      <UpdatedModal
+        newVersion={APP_VERSION}
+        onClose={jest.fn()}
+      />
+    );
+
+    expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
+    expect(screen.getByText(`✨ What's New in v${APP_VERSION}:`)).toBeInTheDocument();
+    expect(screen.getByText('Latest')).toBeInTheDocument();
+    // At least 2 version sections displayed
+    expect(screen.getAllByText(/✨ What's New in v/i).length).toBeGreaterThanOrEqual(2);
+  });
 });

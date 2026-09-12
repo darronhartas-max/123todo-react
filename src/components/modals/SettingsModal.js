@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
@@ -278,11 +278,43 @@ const SettingsModal = ({
     onOpenInstallGuide,
     emailClientPreference,
     setEmailClientPreference,
-    initialTab = 'appearance'
+    initialTab = 'appearance',
+    isAuthed = false,
+    syncStatus = 'idle',
+    isOffline = false,
+    onOpenLatestUpdates
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
     const [projectName, setProjectName] = useState('');
+
+    const getCompactSyncStatusText = () => {
+        if (isOffline || !navigator.onLine) return 'Offline';
+        if (syncStatus === 'error') return 'Sync Error';
+        if (isAuthed) return 'Synced';
+        return 'Sync';
+    };
+
+    const getCompactSyncButtonStyle = () => {
+        const base = {
+            border: '1px solid var(--border-color)',
+            cursor: 'pointer',
+            fontSize: '0.76rem',
+            fontWeight: '700',
+            padding: '3px 8px',
+            borderRadius: '12px',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+        };
+        if (isOffline || !navigator.onLine) return { ...base, background: 'rgba(245, 158, 11, 0.12)', color: '#d97706', borderColor: 'rgba(245, 158, 11, 0.3)' };
+        if (syncStatus === 'error') return { ...base, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' };
+        if (isAuthed) return { ...base, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)' };
+        return { ...base, background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.25)' };
+    };
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
 
@@ -701,7 +733,32 @@ const SettingsModal = ({
                 onClick={e => e.stopPropagation()}
             >
                 <div style={styles.header}>
-                    <div style={styles.title}>Settings</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={styles.title}>Settings</div>
+                        {onOpenSyncModal && (
+                            <button
+                                onClick={onOpenSyncModal}
+                                style={getCompactSyncButtonStyle()}
+                                title={syncStatus === 'syncing' ? "Syncing in background..." : (isAuthed ? "Cloud Sync Active - Click to configure" : "Click to setup sync")}
+                            >
+                                {(!isOffline && navigator.onLine) && (
+                                    <span
+                                        style={{
+                                            width: '6px',
+                                            height: '6px',
+                                            borderRadius: '50%',
+                                            background: isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444',
+                                            boxShadow: `0 0 5px ${isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444'}`,
+                                            display: 'inline-block',
+                                            flexShrink: 0,
+                                            animation: syncStatus === 'syncing' ? 'pulseDot 1.2s infinite ease-in-out' : 'none'
+                                        }}
+                                    />
+                                )}
+                                <span>{getCompactSyncStatusText()}</span>
+                            </button>
+                        )}
+                    </div>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--muted-text)', cursor: 'pointer', display: 'flex' }}>
                         <X size={22} />
                     </button>
@@ -1685,7 +1742,30 @@ const SettingsModal = ({
 
                         {activeTab === 'sync' && (
                             <div>
-                                <div style={styles.sectionTitle}>Cloud Sync & Backup Options</div>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                                    <div style={styles.sectionTitle}>Cloud Sync & Backup Options</div>
+                                    <button
+                                        onClick={onOpenSyncModal}
+                                        style={getCompactSyncButtonStyle()}
+                                        title={syncStatus === 'syncing' ? "Syncing in background..." : (isAuthed ? "Cloud Sync Active - Click to configure" : "Click to setup sync")}
+                                    >
+                                        {(!isOffline && navigator.onLine) && (
+                                            <span
+                                                style={{
+                                                    width: '6px',
+                                                    height: '6px',
+                                                    borderRadius: '50%',
+                                                    background: isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444',
+                                                    boxShadow: `0 0 4px ${isAuthed ? (syncStatus === 'error' ? '#ef4444' : '#10b981') : '#ef4444'}`,
+                                                    display: 'inline-block',
+                                                    flexShrink: 0,
+                                                    animation: syncStatus === 'syncing' ? 'pulseDot 1.2s infinite ease-in-out' : 'none'
+                                                }}
+                                            />
+                                        )}
+                                        <span>{getCompactSyncStatusText()}</span>
+                                    </button>
+                                </div>
                                 <div style={{ fontSize: '0.86rem', color: 'var(--muted-text)', marginBottom: '16px', lineHeight: '1.4' }}>
                                     Choose your preferred cross-platform sync engine to keep your tasks seamlessly updated across mobile, laptop, and desktop devices.
                                 </div>
@@ -1803,37 +1883,63 @@ const SettingsModal = ({
                                             )}
                                             {updateCheckStatus === 'update-available' && (
                                                 <span style={{ color: '#10b981', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <Check size={16} /> New version ready! Click 'Update Now' banner above to pull & reload.
+                                                    <Check size={16} /> New version updating in background...
                                                 </span>
                                             )}
                                             {updateCheckStatus === 'idle' && (
-                                                <span style={{ color: 'var(--muted-text)' }}>Check if a newer version is available. (Shift+click to test)</span>
+                                                <span style={{ color: 'var(--muted-text)' }}>Updates install automatically in the background</span>
                                             )}
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={handleManualCheckForUpdates}
-                                        disabled={updateCheckStatus === 'checking'}
-                                        style={{
-                                            padding: '8px 14px',
-                                            borderRadius: '8px',
-                                            border: '1px solid var(--border-color)',
-                                            background: 'var(--surface-color)',
-                                            color: 'var(--accent-color)',
-                                            fontWeight: '600',
-                                            fontSize: '0.88rem',
-                                            cursor: updateCheckStatus === 'checking' ? 'default' : 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            whiteSpace: 'nowrap',
-                                            transition: 'all 0.2s ease',
-                                            opacity: updateCheckStatus === 'checking' ? 0.6 : 1
-                                        }}
-                                    >
-                                        <RefreshCw size={15} style={{ animation: updateCheckStatus === 'checking' ? 'spin 1s linear infinite' : 'none' }} />
-                                        {updateCheckStatus === 'checking' ? 'Checking...' : 'Check for Updates'}
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        {onOpenLatestUpdates && (
+                                            <button
+                                                onClick={onOpenLatestUpdates}
+                                                style={{
+                                                    padding: '8px 14px',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid var(--accent-color)',
+                                                    background: 'var(--accent-bg, rgba(99, 102, 241, 0.1))',
+                                                    color: 'var(--accent-color)',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.88rem',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    whiteSpace: 'nowrap',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                                title="View what's new in recent releases"
+                                            >
+                                                <Sparkles size={15} />
+                                                Latest Update Info
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={handleManualCheckForUpdates}
+                                            disabled={updateCheckStatus === 'checking'}
+                                            style={{
+                                                padding: '8px 14px',
+                                                borderRadius: '8px',
+                                                border: '1px solid var(--border-color)',
+                                                background: 'var(--surface-color)',
+                                                color: 'var(--accent-color)',
+                                                fontWeight: '600',
+                                                fontSize: '0.88rem',
+                                                cursor: updateCheckStatus === 'checking' ? 'default' : 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                whiteSpace: 'nowrap',
+                                                transition: 'all 0.2s ease',
+                                                opacity: updateCheckStatus === 'checking' ? 0.6 : 1
+                                            }}
+                                        >
+                                            <RefreshCw size={15} style={{ animation: updateCheckStatus === 'checking' ? 'spin 1s linear infinite' : 'none' }} />
+                                            {updateCheckStatus === 'checking' ? 'Checking...' : 'Check for Updates'}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>

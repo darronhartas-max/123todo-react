@@ -57,8 +57,12 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
 
     useEffect(() => {
         const handleUpdate = (event) => {
-            setSwRegistration(event.detail);
-            setShowUpdateReady(true);
+            const reg = event.detail;
+            setSwRegistration(reg);
+            if (reg && reg.waiting) {
+                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            setShowUpdateReady(false);
         };
         window.addEventListener('swUpdateAvailable', handleUpdate);
 

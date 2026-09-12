@@ -131,34 +131,61 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                 )}
 
                 {(() => {
-                    const highlights = RELEASE_CHANGELOG[newVersion] || RELEASE_CHANGELOG[APP_VERSION] || [
-                        { title: '🔄 Manual Update Check:', desc: 'Check for updates anytime under Settings ➔ Appearance.' },
-                        { title: '🖐️ Drag & Drop Projects:', desc: 'Reorder your projects by dragging grip handles in Settings.' },
-                        { title: '🔔 Sync Alert Popup:', desc: 'Automatic prompt if Google Drive session disconnects so you can re-auth in 1 tap.' },
-                        { title: '📐 Compact Layout:', desc: 'Optimized project selector dropdown and trimmed header/footer margins.' }
-                    ];
+                    const entries = Object.entries(RELEASE_CHANGELOG);
+                    const targetVer = newVersion || APP_VERSION;
+                    let startIndex = entries.findIndex(([ver]) => ver === targetVer);
+                    if (startIndex === -1) startIndex = 0;
+                    const recentVersions = entries.slice(startIndex, startIndex + 3);
+
+                    if (recentVersions.length === 0) {
+                        recentVersions.push([targetVer, [
+                            { title: '🔄 Silent Background Updates:', desc: 'App updates automatically in the background without user intervention.' },
+                            { title: '🕒 Evidentiary Timestamps:', desc: '1-click timestamped notes and visible creation timestamps in task edit modal.' },
+                            { title: '📐 Compact Footer & Settings Sync Button:', desc: 'Streamlined footer layout with integrated sync status button in Settings.' }
+                        ]]);
+                    }
 
                     return (
-                        <div style={{
-                            background: 'var(--bg-color)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '12px',
-                            padding: '14px 16px',
-                            margin: '16px 0',
-                            fontSize: '0.9rem',
-                            textAlign: 'left',
-                            color: 'var(--text-color)'
-                        }}>
-                            <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '8px', color: 'var(--accent-color)' }}>
-                                ✨ What's New in v{newVersion}:
-                            </div>
-                            <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.4' }}>
-                                {highlights.map((item, idx) => (
-                                    <li key={idx}>
-                                        <strong>{item.title}</strong> {item.desc}
-                                    </li>
-                                ))}
-                            </ul>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', margin: '16px 0' }}>
+                            {recentVersions.map(([ver, highlights], vIdx) => (
+                                <div key={ver} style={{
+                                    background: 'var(--bg-color)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '12px',
+                                    padding: '14px 16px',
+                                    fontSize: '0.9rem',
+                                    textAlign: 'left',
+                                    color: 'var(--text-color)'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                                        <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--accent-color)' }}>
+                                            ✨ What's New in v{ver}:
+                                        </div>
+                                        {ver === (newVersion || APP_VERSION) && (
+                                            <span style={{
+                                                fontSize: '0.72rem',
+                                                fontWeight: '700',
+                                                color: '#10b981',
+                                                background: 'rgba(16, 185, 129, 0.1)',
+                                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                padding: '2px 8px',
+                                                borderRadius: '10px',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px'
+                                            }}>
+                                                Latest
+                                            </span>
+                                        )}
+                                    </div>
+                                    <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.4' }}>
+                                        {highlights.map((item, idx) => (
+                                            <li key={idx}>
+                                                <strong>{item.title}</strong> {item.desc}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
                         </div>
                     );
                 })()}

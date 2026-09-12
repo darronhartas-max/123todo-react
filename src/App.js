@@ -32,7 +32,7 @@ import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
 import InstallGuideModal from './components/modals/InstallGuideModal';
 import EmailClientModal from './components/modals/EmailClientModal';
 import NotesView from './components/notes/NotesView';
-import { InstallPrompt, BackupReminder, UpdateReadyPrompt, SyncOfflinePrompt } from './components/layout/NotificationBar';
+import { InstallPrompt, BackupReminder, SyncOfflinePrompt } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
@@ -80,8 +80,7 @@ const TodoApp = () => {
 
   const {
     showWelcome, showInstallPrompt, showInstallModal, showBackupReminder, showCongrats,
-    showUpdateReady, swRegistration,
-    setShowCongrats, setShowUpdateReady, checkMilestones, dismissWelcome, dismissInstallPrompt,
+    setShowCongrats, checkMilestones, dismissWelcome, dismissInstallPrompt,
     recordAppUsageAction,
     dismissBackupReminder, recordBackup, checkForUpdates,
     isStandalone, canNativeInstall, triggerNativeInstall
@@ -182,7 +181,7 @@ const TodoApp = () => {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
-  const [prevVersionStr, setPrevVersionStr] = useState('');
+  const [prevVersionStr] = useState(() => localStorage.getItem('123Todo_Previous_Version') || '');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showInstallGuideModal, setShowInstallGuideModal] = useState(false);
   const [emailModalState, setEmailModalState] = useState({
@@ -218,17 +217,10 @@ const TodoApp = () => {
     }
   };
 
-  // Check if app has been updated to a newer version and show What's New modal
+  // Record latest seen version silently for background updates
   useEffect(() => {
-    const lastSeen = localStorage.getItem('123Todo_Last_Seen_Version') || localStorage.getItem('123Todo_Previous_Version');
-    const legacyShowModal = localStorage.getItem('123Todo_Show_Updated_Modal') === 'true';
-
-    if ((lastSeen && lastSeen !== APP_VERSION) || legacyShowModal) {
-      setPrevVersionStr(lastSeen && lastSeen !== APP_VERSION ? lastSeen : (lastSeen || '2.4.15'));
-      setShowUpdatedModal(true);
-    } else if (!lastSeen) {
-      localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
-    }
+    localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
+    localStorage.removeItem('123Todo_Show_Updated_Modal');
   }, []);
 
   // Initialise first-use timestamp for smart share modal
@@ -856,7 +848,6 @@ const TodoApp = () => {
       const res = await checkForUpdates(forceSimulate);
       if (res && res.updated) {
         setUpdateCheckStatus('update-available');
-        setShowUpdateReady(true);
       } else {
         setUpdateCheckStatus('up-to-date');
         setTimeout(() => setUpdateCheckStatus('idle'), 4500);
@@ -864,30 +855,6 @@ const TodoApp = () => {
     } catch (err) {
       console.error('Update check failed:', err);
       setUpdateCheckStatus('idle');
-    }
-  };
-
-  const handleApplyUpdate = () => {
-    localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
-    localStorage.setItem('123Todo_Previous_Version', APP_VERSION);
-    localStorage.setItem('123Todo_Show_Updated_Modal', 'true');
-
-    if (swRegistration && swRegistration.waiting) {
-      // Set up listener for Service Worker takeover to trigger page reload
-      const onControllerChange = () => {
-        window.location.reload();
-      };
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-      }
-      swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      
-      // Fallback: reload anyway in 1.5 seconds in case controllerchange doesn't fire
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } else {
-      window.location.reload();
     }
   };
 
@@ -996,13 +963,6 @@ const TodoApp = () => {
 
           {showInstallPrompt && (
             <InstallPrompt onInstall={handleInstallClick} onDismiss={dismissInstallPrompt} />
-          )}
-
-          {showUpdateReady && (
-            <UpdateReadyPrompt
-              onUpdate={handleApplyUpdate}
-              onDismiss={() => setShowUpdateReady(false)}
-            />
           )}
 
           {showBackupReminder && (
@@ -1212,14 +1172,6 @@ const TodoApp = () => {
     </div>
 
         <Footer
-          onExport={handleExport}
-          onImportClick={() => setShowImportSelection(true)}
-          onSyncClick={() => setShowSyncModal(true)}
-          syncStatus={syncStatus}
-          isAuthed={isAuthed}
-          isOffline={isOffline}
-          onCheckForUpdates={handleManualCheckForUpdates}
-          updateCheckStatus={updateCheckStatus}
           isStandalone={isStandalone}
           onInstallClick={handleInstallClick}
         />
@@ -1428,6 +1380,10 @@ const TodoApp = () => {
         onOpenInstallGuide={() => setShowInstallGuideModal(true)}
         emailClientPreference={emailClientPreference}
         setEmailClientPreference={setEmailClientPreference}
+        isAuthed={isAuthed}
+        syncStatus={syncStatus}
+        isOffline={isOffline}
+        onOpenLatestUpdates={() => setShowUpdatedModal(true)}
       />
 
       <EmailClientModal

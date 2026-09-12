@@ -52,22 +52,38 @@ test('defaults to 11pt font size on desktop when no localStorage setting exists'
   expect(document.documentElement.style.fontSize).toBe('11pt');
 });
 
-test('displays UpdatedModal when previous version in localStorage is older than APP_VERSION', () => {
-  localStorage.setItem('123Todo_Last_Seen_Version', '3.6.12');
-
+test('displays UpdatedModal with recent versions when clicking Latest Update Info in Settings', () => {
   render(<App />);
 
-  expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
-  expect(screen.getByText('v3.6.12')).toBeInTheDocument();
-  expect(screen.getAllByText(`v${APP_VERSION}`).length).toBeGreaterThanOrEqual(1);
+  // Open settings
+  const settingsBtn = screen.getByTitle('Settings');
+  act(() => {
+    settingsBtn.click();
+  });
 
-  // Closing modal sets last seen version to current version
+  // Navigate to App & Updates tab
+  const appTab = screen.getByRole('button', { name: /App & Updates/i });
+  act(() => {
+    appTab.click();
+  });
+
+  // Click Latest Update Info button
+  const updateInfoBtn = screen.getByRole('button', { name: /Latest Update Info/i });
+  act(() => {
+    updateInfoBtn.click();
+  });
+
+  expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
+  expect(screen.getAllByText(new RegExp(`v${APP_VERSION}`)).length).toBeGreaterThanOrEqual(1);
+  expect(screen.getAllByText(/✨ What's New in v/i).length).toBeGreaterThanOrEqual(2);
+
+  // Closing modal
   const goBtn = screen.getByRole('button', { name: /Awesome, Let's Go!/i });
   act(() => {
     goBtn.click();
   });
 
-  expect(localStorage.getItem('123Todo_Last_Seen_Version')).toBe(APP_VERSION);
+  expect(screen.queryByText('123 To Do Updated!')).not.toBeInTheDocument();
 });
 
 
