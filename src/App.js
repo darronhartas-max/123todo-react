@@ -1218,18 +1218,6 @@ const TodoApp = () => {
         />
       )}
 
-      {showUpdatedModal && (
-        <UpdatedModal
-          oldVersion={prevVersionStr}
-          newVersion={APP_VERSION}
-          onClose={() => {
-            localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
-            localStorage.removeItem('123Todo_Show_Updated_Modal');
-            localStorage.removeItem('123Todo_Previous_Version');
-            setShowUpdatedModal(false);
-          }}
-        />
-      )}
 
       {showExportModal && (
         <ExportModal
@@ -1418,6 +1406,19 @@ const TodoApp = () => {
         archived={archived}
         projects={availableProjects}
       />
+
+      {showUpdatedModal && (
+        <UpdatedModal
+          oldVersion={prevVersionStr}
+          newVersion={APP_VERSION}
+          onClose={() => {
+            localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
+            localStorage.removeItem('123Todo_Show_Updated_Modal');
+            localStorage.removeItem('123Todo_Previous_Version');
+            setShowUpdatedModal(false);
+          }}
+        />
+      )}
 
       <AnimatePresence>
         {showArchiveToast && (

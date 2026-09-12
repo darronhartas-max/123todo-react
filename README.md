@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.2** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.3** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.2 (Current)
+### v3.7.3 (Current)
+
+- **Elevated Version Info Modal & Close Controls**: Ensured the "Latest Update Info" modal displays in front of Settings with elevated stacking priority (`zIndex: 2500`), added dedicated close buttons (top-right X and bottom Close button), and expanded release notes to display the last 5 versions.
+
+### v3.7.2
 
 - **Social Share Call-to-Action**: Updated the lowest footer social sharing section with a clearer and more direct call-to-action: *"Share this App and keep it FREE!"*.
 

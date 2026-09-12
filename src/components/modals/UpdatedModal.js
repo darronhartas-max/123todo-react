@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
 import { RELEASE_CHANGELOG, APP_VERSION } from '../../utils/constants';
 
@@ -13,12 +13,28 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
             borderRadius: '16px',
             maxWidth: '90%',
             width: '460px',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
             textAlign: 'center',
             maxHeight: '85vh',
             overflowY: 'auto',
             border: '1px solid var(--border-color)',
             position: 'relative'
+        },
+        closeBtn: {
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'var(--surface-color)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--muted-text)',
+            cursor: 'pointer',
+            padding: '7px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            zIndex: 10
         },
         badgeContainer: {
             display: 'flex',
@@ -68,13 +84,30 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
             margin: '0 auto 16px auto',
             boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
         },
-        button: {
+        buttonContainer: {
+            display: 'flex',
+            gap: '10px',
             marginTop: '16px',
-            width: '100%',
-            padding: '12px 24px',
+            width: '100%'
+        },
+        closeButton: {
+            flex: 1,
+            padding: '12px 18px',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            fontSize: '1rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            background: 'var(--item-bg, rgba(0,0,0,0.05))',
+            color: 'var(--text-color)',
+            transition: 'all 0.2s ease'
+        },
+        button: {
+            flex: 1.5,
+            padding: '12px 18px',
             border: 'none',
             borderRadius: '8px',
-            fontSize: '1.1rem',
+            fontSize: '1rem',
             fontWeight: '700',
             cursor: 'pointer',
             background: 'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
@@ -89,14 +122,29 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
     };
 
     return (
-        <div style={COMMON_STYLES.modalOverlay}>
+        <div
+            style={{
+                ...COMMON_STYLES.modalOverlay,
+                zIndex: 2500
+            }}
+            onClick={onClose}
+        >
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 transition={{ duration: 0.3, cubicBezier: [0.16, 1, 0.3, 1] }}
                 style={styles.updatedModal}
+                onClick={(e) => e.stopPropagation()}
             >
+                <button
+                    onClick={onClose}
+                    style={styles.closeBtn}
+                    aria-label="Close modal"
+                    title="Close"
+                >
+                    <X size={18} />
+                </button>
                 <div style={styles.iconCircle}>
                     <Check size={28} />
                 </div>
@@ -135,7 +183,7 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                     const targetVer = newVersion || APP_VERSION;
                     let startIndex = entries.findIndex(([ver]) => ver === targetVer);
                     if (startIndex === -1) startIndex = 0;
-                    const recentVersions = entries.slice(startIndex, startIndex + 3);
+                    const recentVersions = entries.slice(startIndex, startIndex + 5);
 
                     if (recentVersions.length === 0) {
                         recentVersions.push([targetVer, [
@@ -207,12 +255,20 @@ const UpdatedModal = ({ oldVersion, newVersion, onClose }) => {
                     <span>All your settings, custom projects, and tasks were safely preserved.</span>
                 </div>
 
-                <button
-                    onClick={onClose}
-                    style={styles.button}
-                >
-                    Awesome, Let's Go!
-                </button>
+                <div style={styles.buttonContainer}>
+                    <button
+                        onClick={onClose}
+                        style={styles.closeButton}
+                    >
+                        Close
+                    </button>
+                    <button
+                        onClick={onClose}
+                        style={styles.button}
+                    >
+                        Awesome, Let's Go!
+                    </button>
+                </div>
             </motion.div>
         </div>
     );

@@ -53,7 +53,39 @@ describe('UpdatedModal', () => {
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 
-  test('displays info of the last few versions updated', () => {
+  test('calls onClose when X close button is clicked', () => {
+    const onCloseMock = jest.fn();
+    render(
+      <UpdatedModal
+        newVersion={APP_VERSION}
+        onClose={onCloseMock}
+      />
+    );
+
+    const xButton = screen.getByLabelText('Close modal');
+    expect(xButton).toBeInTheDocument();
+    fireEvent.click(xButton);
+
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('calls onClose when bottom Close button is clicked', () => {
+    const onCloseMock = jest.fn();
+    render(
+      <UpdatedModal
+        newVersion={APP_VERSION}
+        onClose={onCloseMock}
+      />
+    );
+
+    const closeButton = screen.getByRole('button', { name: 'Close' });
+    expect(closeButton).toBeInTheDocument();
+    fireEvent.click(closeButton);
+
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('displays info of the last 5 versions updated', () => {
     render(
       <UpdatedModal
         newVersion={APP_VERSION}
@@ -64,7 +96,7 @@ describe('UpdatedModal', () => {
     expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
     expect(screen.getByText(`✨ What's New in v${APP_VERSION}:`)).toBeInTheDocument();
     expect(screen.getByText('Latest')).toBeInTheDocument();
-    // At least 2 version sections displayed
-    expect(screen.getAllByText(/✨ What's New in v/i).length).toBeGreaterThanOrEqual(2);
+    // 5 version sections displayed
+    expect(screen.getAllByText(/✨ What's New in v/i).length).toBe(5);
   });
 });

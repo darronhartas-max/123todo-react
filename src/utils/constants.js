@@ -129,6 +129,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.3': [
+    { title: '🔝 Top-Level Version Info Modal & Close Button:', desc: 'Elevated the Latest Update Info modal to always display on top of Settings with dedicated Close buttons (top-right X and bottom button), and expanded release history to display the last 5 versions.' }
+  ],
   '3.7.2': [
     { title: '📢 Social Share Call-to-Action:', desc: 'Updated the lowest footer social sharing section with a clearer call-to-action: "Share this App and keep it FREE!".' }
   ],
