@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.8
+
+- **🔍 Full Pro Details in Lite View & Footer Achievements Badge:** In Tasks mode Lite view, clicking any task now expands it to reveal complete Pro details (project tag, full unclamped text, schedule and recurrence, subtasks checklist, full notes, and photo attachments). Cleaned the Lite toolbar by hiding the achievements badge, and added the achievements badge next to the version number in the footer for instant access in both Pro and Lite modes.
+
 ### v3.7.7
 
 - **🍃 Streamlined Lite Mode & Layout Harmonization:** Restored the full-size header logo and moved the Pro/Lite toggle to the action toolbar between the Projects dropdown and Achievements badge. In Lite mode, tasks and notes now display up to 2 lines of description only with zero metadata clutter, retaining the archive checkbox. Clicking any card expands it with full Pro-level details. Notes mode now starts with a clean notes timeline and an Add New Note button.

@@ -299,8 +299,8 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
                         </div>
                     )}
 
-                    {/* 3. Achievements Badge icon button */}
-                    {onOpenAchievements && (
+                    {/* 3. Achievements Badge icon button (hidden in Lite mode) */}
+                    {viewProfile !== 'lite' && onOpenAchievements && (
                         <button
                             onClick={onOpenAchievements}
                             style={{

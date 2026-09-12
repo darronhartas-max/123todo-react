@@ -1204,6 +1204,7 @@ const TodoApp = () => {
         <Footer
           isStandalone={isStandalone}
           onInstallClick={handleInstallClick}
+          onOpenAchievements={() => setShowAchievements(true)}
         />
         <input
           type="file"

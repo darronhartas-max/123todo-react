@@ -272,3 +272,39 @@ test('renders clean 2-line layout in Lite mode and expands on click with action 
   expect(screen.queryByText('Edit Details')).not.toBeInTheDocument();
 });
 
+test('in Lite mode, clicking a task expands it to reveal full pro details (project, full notes, subtasks)', () => {
+  const task = {
+    id: 109,
+    text: 'Install heat pump unit',
+    notes: 'Confirm electrical breaker size and outdoor clearance',
+    priority: 1,
+    projectId: 'general',
+    scheduledDate: '2026-09-20',
+    subtasks: [
+      { id: 1, text: 'Check electrical breaker', completed: true },
+      { id: 2, text: 'Mount outdoor condenser', completed: false }
+    ]
+  };
+
+  render(<TaskItem task={task} viewProfile="lite" projectName="HVAC Project" projectColor="#3b82f6" />);
+
+  // Initially unexpanded: notes, project tag, and subtasks are not visible
+  expect(screen.getByText('Install heat pump unit')).toBeInTheDocument();
+  expect(screen.queryByText('● HVAC Project')).not.toBeInTheDocument();
+  expect(screen.queryByText(/Confirm electrical breaker size/)).not.toBeInTheDocument();
+
+  // Clicking the task row expands it
+  const listItem = screen.getByRole('listitem');
+  fireEvent.click(listItem);
+
+  // Now reveals full pro details!
+  expect(screen.getByText('● HVAC Project')).toBeInTheDocument();
+  expect(screen.getByText(/Confirm electrical breaker size/)).toBeInTheDocument();
+  expect(screen.getByText('Check electrical breaker')).toBeInTheDocument();
+  expect(screen.getByText('Mount outdoor condenser')).toBeInTheDocument();
+  expect(screen.getByText('Edit Details')).toBeInTheDocument();
+  expect(screen.getByText('Schedule / Defer')).toBeInTheDocument();
+  expect(screen.getByText('Collapse')).toBeInTheDocument();
+});
+
+

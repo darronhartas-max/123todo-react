@@ -68,12 +68,30 @@ describe('ProjectTabs Component', () => {
                 onToggleSearch={jest.fn()}
                 onOpenSettings={jest.fn()}
                 onOpenAchievements={onOpenAchievementsMock}
+                viewProfile="pro"
             />
         );
         const trophyBtn = screen.getByTitle('Productivity Achievements & Insights');
         expect(trophyBtn).toBeInTheDocument();
         fireEvent.click(trophyBtn);
         expect(onOpenAchievementsMock).toHaveBeenCalled();
+    });
+
+    test('hides Achievements trophy button in toolbar when in Lite mode', () => {
+        render(
+            <ProjectTabs
+                projects={sampleProjects}
+                tasks={sampleTasks}
+                currentProjectId="all"
+                onSelect={jest.fn()}
+                showSearch={false}
+                onToggleSearch={jest.fn()}
+                onOpenSettings={jest.fn()}
+                onOpenAchievements={jest.fn()}
+                viewProfile="lite"
+            />
+        );
+        expect(screen.queryByTitle('Productivity Achievements & Insights')).not.toBeInTheDocument();
     });
 
     test('renders correctly with very long project name and preserves action buttons', () => {

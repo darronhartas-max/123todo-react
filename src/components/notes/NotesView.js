@@ -383,8 +383,8 @@ const NotesView = ({
           </div>
         )}
 
-        {/* 3. Achievements Badge Button (identical circular style as Task mode) */}
-        {onOpenAchievements && (
+        {/* 3. Achievements Badge Button (hidden in Lite mode) */}
+        {viewProfile !== 'lite' && onOpenAchievements && (
           <button
             onClick={onOpenAchievements}
             style={{

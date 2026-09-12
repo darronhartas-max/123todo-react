@@ -607,7 +607,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         return;
                     }
                     if (isLite) {
-                        setIsLiteExpanded(prev => !prev);
+                        if (!isLiteExpanded) {
+                            setIsLiteExpanded(true);
+                        }
                         return;
                     }
                     if (!isArchived && onEdit) onEdit(task);
@@ -690,11 +692,30 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 ) : (
                     <>
+                        {projectName && (
+                            <div style={{
+                                color: projectColor || 'var(--accent-color)',
+                                fontWeight: '700',
+                                fontSize: '0.78rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                marginBottom: '2px'
+                            }}>
+                                ● {projectName}
+                            </div>
+                        )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
                             <span 
-                                className={taskViewMode === 'compact' ? 'task-text-compact' : ''}
-                                style={styles.taskText}
-                                title={taskViewMode === 'compact' ? task.text : undefined}
+                                className={taskViewMode === 'compact' && !(isLite && isLiteExpanded) ? 'task-text-compact' : ''}
+                                style={{
+                                    ...styles.taskText,
+                                    fontSize: (isLite && isLiteExpanded) ? '1rem' : styles.taskText?.fontSize,
+                                    fontWeight: (isLite && isLiteExpanded) ? '600' : styles.taskText?.fontWeight,
+                                    whiteSpace: (isLite && isLiteExpanded) ? 'normal' : undefined,
+                                    wordBreak: (isLite && isLiteExpanded) ? 'break-word' : undefined
+                                }}
+                                title={taskViewMode === 'compact' && !(isLite && isLiteExpanded) ? task.text : undefined}
                             >
                                 {renderActionableText(task.text)}
                             </span>
@@ -729,6 +750,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
                         {/* Compact Note Preview: first line only in smaller font, space-efficient */}
                         {(() => {
+                            if (isLite && isLiteExpanded) return null;
                             const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
                             if (!firstNoteLine) return null;
                             return (
@@ -936,7 +958,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     padding: 0
                                 }}
                             >
-                                📋 Steps: {completedCount}/{subtasksCount} ({showSubtasksExpanded ? '▾' : '▸'})
+                                📋 Steps: {completedCount}/{subtasksCount} ({(showSubtasksExpanded || (isLite && isLiteExpanded)) ? '▾' : '▸'})
                             </button>
                             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-color)' }}>
                                 {Math.round((completedCount / subtasksCount) * 100)}%
@@ -957,7 +979,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 transition: 'width 0.3s ease'
                             }} />
                         </div>
-                        {showSubtasksExpanded && (
+                        {(showSubtasksExpanded || (isLite && isLiteExpanded)) && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '6px 0 0 0' }}>
                                 {(task.subtasks || []).map((st, index) => {
                                     const isDraggingThis = draggedSubtaskIndex === index;
@@ -1168,34 +1190,36 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
 
                 {effectiveShowFull && (task.notes || (task.photos && task.photos.length > 0)) && (
-                    <div style={{ marginTop: '6px' }}>
-                        <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setShowNotesExpanded(!showNotesExpanded); }}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '2px 8px',
-                                borderRadius: '10px',
-                                border: '1px solid var(--border-color)',
-                                background: showNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
-                                color: showNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
-                                cursor: 'pointer',
-                                fontSize: '0.7rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            {(() => {
-                                const hasPhotos = task.photos && task.photos.length > 0;
-                                if (hasPhotos) {
-                                    return showNotesExpanded ? '▾ Hide Photos' : '▸ Show Photos';
-                                }
-                                return showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes';
-                            })()}
-                        </button>
+                    <div style={{ marginTop: '6px', width: '100%' }}>
+                        {!(isLite && isLiteExpanded) && (
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setShowNotesExpanded(!showNotesExpanded); }}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    border: '1px solid var(--border-color)',
+                                    background: showNotesExpanded ? 'var(--accent-bg)' : 'var(--item-bg)',
+                                    color: showNotesExpanded ? 'var(--accent-color)' : 'var(--muted-text)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {(() => {
+                                    const hasPhotos = task.photos && task.photos.length > 0;
+                                    if (hasPhotos) {
+                                        return showNotesExpanded ? '▾ Hide Photos' : '▸ Show Photos';
+                                    }
+                                    return showNotesExpanded ? '▾ Hide Notes' : '▸ Show Notes';
+                                })()}
+                            </button>
+                        )}
                         <AnimatePresence>
-                            {showNotesExpanded && (
+                            {(showNotesExpanded || (isLite && isLiteExpanded)) && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -1204,7 +1228,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     style={{
                                         fontSize: '0.92rem',
                                         color: 'var(--muted-text)',
-                                        marginTop: '6px',
+                                        marginTop: (isLite && isLiteExpanded) ? '2px' : '6px',
                                         padding: '8px 12px',
                                         background: 'rgba(0,0,0,0.03)',
                                         borderRadius: '6px',
@@ -1217,10 +1241,12 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 >
                                     {task.notes && <div>{renderActionableText(task.notes)}</div>}
                                     {task.photos && task.photos.length > 0 && (
-                                        <PhotoAttachments
-                                            photos={task.photos}
-                                            readOnly={true}
-                                        />
+                                        <div style={{ marginTop: task.notes ? '8px' : '0' }}>
+                                            <PhotoAttachments
+                                                photos={task.photos}
+                                                readOnly={true}
+                                            />
+                                        </div>
                                     )}
                                 </motion.div>
                             )}
