@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
@@ -19,7 +19,6 @@ const ACTION_ICONS = {
 const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, projectName, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK', taskViewMode = 'compact', viewProfile = 'pro' }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [isLiteExpanded, setIsLiteExpanded] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
     const [showNotesExpanded, setShowNotesExpanded] = useState(false);
     const [showSubtasksExpanded, setShowSubtasksExpanded] = useState(false);
@@ -308,8 +307,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const completedCount = (task.subtasks || []).filter(s => s.completed).length;
 
     const isLite = viewProfile === 'lite';
-    const effectiveShowFull = showFullDetails || (isLite && isLiteExpanded);
-    const hasExtraDetails = isLite ? isLiteExpanded : Boolean(
+    const effectiveShowFull = showFullDetails;
+    const hasExtraDetails = !isLite && Boolean(
         (showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0)) ||
         showQuickSchedule ||
         subtasksCount > 0 ||
@@ -663,7 +662,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 </button>
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                {isLite && !isLiteExpanded ? (
+                {isLite ? (
                     <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, width: '100%' }}>
                         <span 
                             style={{
@@ -945,7 +944,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     padding: 0
                                 }}
                             >
-                                📋 Steps: {completedCount}/{subtasksCount} ({(showSubtasksExpanded || (isLite && isLiteExpanded)) ? '▾' : '▸'})
+                                📋 Steps: {completedCount}/{subtasksCount} ({showSubtasksExpanded ? '▾' : '▸'})
                             </button>
                             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-color)' }}>
                                 {Math.round((completedCount / subtasksCount) * 100)}%
@@ -966,7 +965,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 transition: 'width 0.3s ease'
                             }} />
                         </div>
-                        {(showSubtasksExpanded || (isLite && isLiteExpanded)) && (
+                        {showSubtasksExpanded && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '6px 0 0 0' }}>
                                 {(task.subtasks || []).map((st, index) => {
                                     const isDraggingThis = draggedSubtaskIndex === index;
@@ -1204,7 +1203,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             })()}
                         </button>
                         <AnimatePresence>
-                            {(showNotesExpanded || (isLite && isLiteExpanded)) && (
+                            {showNotesExpanded && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -1261,33 +1260,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </button>
                 ) : (
                     <>
-                        {isLite && (
-                            <motion.button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsLiteExpanded(prev => !prev);
-                                }}
-                                style={{
-                                    ...styles.actionBtn,
-                                    width: '28px',
-                                    height: '28px',
-                                    minWidth: '28px',
-                                    color: 'var(--muted-text)',
-                                    opacity: 0.85,
-                                    marginRight: '4px',
-                                    background: isLiteExpanded ? 'var(--accent-bg)' : 'transparent',
-                                    borderRadius: '4px'
-                                }}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                title={isLiteExpanded ? "Collapse task details" : "Expand task details"}
-                                aria-label={isLiteExpanded ? "Collapse task details" : "Expand task details"}
-                            >
-                                {isLiteExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </motion.button>
-                        )}
-                        {(!isLite || isLiteExpanded) && task.scheduledDate && (
+                        {!isLite && task.scheduledDate && (
                             <motion.button
                                 onClick={(e) => { e.stopPropagation(); setShowQuickSchedule(!showQuickSchedule); }}
                                 onTouchStart={(e) => e.stopPropagation()}

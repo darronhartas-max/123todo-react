@@ -131,6 +131,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.12': [
+    { title: '🛡️ Safe & Clean Lite Tasks View:', desc: 'Removed the expand chevron icon adjacent to the archive checkbox in Lite tasks view to prevent accidental taps. Users can effortlessly view and edit complete task details and subtasks by clicking directly on the task item to open the full edit modal.' }
+  ],
   '3.7.11': [
     { title: '🔒 Truthful & Evidentiary Timestamps Integrity:', desc: 'Audited timestamp handling across tasks, notes, and archives. Removed legacy fallback to IDs to eliminate false or ancient timestamps (e.g. 1970). Tasks and notes created prior to timestamp tracking strictly omit timestamp badges unless a genuine creation date was recorded. Added strict validation ensuring only truthful, modern timestamps are formatted and displayed.' }
   ],

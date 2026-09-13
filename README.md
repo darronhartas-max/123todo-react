@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.11** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.12** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.11 (Current)
+### v3.7.12 (Current)
+
+- **Safe & Clean Lite Tasks View**: Removed the expand chevron icon situated immediately adjacent to the archive checkbox in Lite tasks view to eliminate the risk of accidental taps and completions. Users can effortlessly access and edit all task details, subtasks, notes, dates, and settings by simply tapping directly anywhere on the task item to launch the full edit modal.
+
+### v3.7.11
 
 - **Truthful & Evidentiary Timestamps Integrity**: Audited timestamp handling across tasks, notes, and archives. Removed legacy fallbacks to sequential numeric IDs that caused false or ancient dates (e.g., 1970). Tasks and notes created prior to timestamp tracking strictly omit timestamp badges unless a genuine creation date was recorded. Added rigorous date validation (`isValidEvidentiaryTimestamp`) ensuring only truthful, modern timestamps are formatted and displayed.
 

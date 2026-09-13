@@ -240,7 +240,7 @@ test('applies compact 2-line clamp class and title tooltip by default, but displ
   expect(textElement).not.toHaveAttribute('title');
 });
 
-test('renders clean 2-line layout in Lite mode and expands on chevron click to reveal full pro view', () => {
+test('renders clean 2-line layout in Lite mode without expand chevron next to archive checkbox', () => {
   const task = {
     id: 108,
     text: 'Review invoice from contractor',
@@ -254,28 +254,15 @@ test('renders clean 2-line layout in Lite mode and expands on chevron click to r
 
   // Should display task title
   expect(screen.getByText('Review invoice from contractor')).toBeInTheDocument();
-  // In unexpanded Lite mode, project name is not visible
+  // In Lite mode, project name is not visible
   expect(screen.queryByText('● Work')).not.toBeInTheDocument();
 
-  // In unexpanded Lite mode, ChevronDown expander should be visible
-  const expandBtn = screen.getByRole('button', { name: /Expand task details/i });
-  expect(expandBtn).toBeInTheDocument();
+  // In Lite mode, expand chevron button should not be rendered next to archive checkbox
+  expect(screen.queryByRole('button', { name: /Expand task details/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Collapse task details/i })).not.toBeInTheDocument();
 
-  // Clicking expand button expands the task to full pro layout
-  fireEvent.click(expandBtn);
-
-  // Pro details should now be visible
-  expect(screen.getByText('● Work')).toBeInTheDocument();
-  expect(screen.getByText('15/09/2026')).toBeInTheDocument();
-  expect(screen.getAllByText(/Payment due on Friday/).length).toBeGreaterThanOrEqual(1);
-
-  // Collapse chevron should now be visible
-  const collapseBtn = screen.getByRole('button', { name: /Collapse task details/i });
-  expect(collapseBtn).toBeInTheDocument();
-
-  // Clicking collapse folds it back up
-  fireEvent.click(collapseBtn);
-  expect(screen.queryByText('● Work')).not.toBeInTheDocument();
+  // Archive / complete checkbox button is rendered safely without adjacent expand button
+  expect(screen.getByRole('button', { name: /Complete Task/i })).toBeInTheDocument();
 });
 
 test('in Lite mode, clicking a task calls onEdit to open the expanded edit card identically to Pro view', () => {
