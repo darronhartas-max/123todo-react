@@ -131,6 +131,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.13': [
+    { title: '🛡️ Safe & Clean Lite Notes View:', desc: 'Removed the expand chevron icon adjacent to the archive checkbox in Lite notes view to eliminate accidental completions. Users can effortlessly expand and view full note details and edit mode by clicking directly on the note card or text.' }
+  ],
   '3.7.12': [
     { title: '🛡️ Safe & Clean Lite Tasks View:', desc: 'Removed the expand chevron icon adjacent to the archive checkbox in Lite tasks view to prevent accidental taps. Users can effortlessly view and edit complete task details and subtasks by clicking directly on the task item to open the full edit modal.' }
   ],

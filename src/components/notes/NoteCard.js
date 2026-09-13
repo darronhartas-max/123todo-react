@@ -379,27 +379,6 @@ const NoteCard = ({
             {renderActionableText(note.text || (note.notes ? note.notes.trim() : 'Untitled Note'))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsLiteExpanded(true);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--muted-text, #9ca3af)',
-                cursor: 'pointer',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                borderRadius: '4px'
-              }}
-              title="Expand note details"
-              aria-label="Expand note details"
-            >
-              <ChevronDown size={16} />
-            </button>
             <motion.button
               onClick={handleComplete}
               onTouchStart={(e) => e.stopPropagation()}

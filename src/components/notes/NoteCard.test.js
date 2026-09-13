@@ -432,14 +432,17 @@ describe('NoteCard', () => {
     );
 
     // Title should be visible
-    expect(screen.getByText('Order safety goggles for workshop')).toBeInTheDocument();
+    const titleEl = screen.getByText('Order safety goggles for workshop');
+    expect(titleEl).toBeInTheDocument();
 
-    // In unexpanded Lite mode, ChevronDown expander should be visible
-    const expandBtn = screen.getByRole('button', { name: /Expand note details/i });
-    expect(expandBtn).toBeInTheDocument();
+    // In Lite mode, expand chevron button should not be rendered next to archive checkbox
+    expect(screen.queryByRole('button', { name: /Expand note details/i })).not.toBeInTheDocument();
 
-    // Clicking expand reveals the full card and Collapse button
-    fireEvent.click(expandBtn);
+    // Archive / complete checkbox button remains present
+    expect(screen.getByRole('button', { name: /Complete \/ Archive Note/i })).toBeInTheDocument();
+
+    // Clicking the note card/text expands reveals the full card and Collapse button
+    fireEvent.click(titleEl);
     const collapseBtn = screen.getByRole('button', { name: /Collapse Note/i });
     expect(collapseBtn).toBeInTheDocument();
 

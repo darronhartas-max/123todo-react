@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.13
+
+- **🛡️ Safe & Clean Lite Notes View:** Removed the expand chevron icon adjacent to the archive checkbox in Lite notes view to eliminate accidental completions. Users can effortlessly expand and view full note details and edit mode by clicking directly on the note card or text.
+
 ### v3.7.12
 
 - **🛡️ Safe & Clean Lite Tasks View:** Removed the expand chevron icon adjacent to the archive checkbox in Lite tasks view to prevent accidental taps. Users can effortlessly view and edit complete task details and subtasks by clicking directly on the task item to open the full edit modal.

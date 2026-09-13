@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.12** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.13** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.12 (Current)
+### v3.7.13 (Current)
+
+- **Safe & Clean Lite Notes View**: Removed the expand chevron icon situated immediately adjacent to the archive checkbox in Notes mode Lite view to eliminate accidental taps and completions. Users can effortlessly expand full note details and edit options by simply tapping directly anywhere on the note card or description.
+
+### v3.7.12
 
 - **Safe & Clean Lite Tasks View**: Removed the expand chevron icon situated immediately adjacent to the archive checkbox in Lite tasks view to eliminate the risk of accidental taps and completions. Users can effortlessly access and edit all task details, subtasks, notes, dates, and settings by simply tapping directly anywhere on the task item to launch the full edit modal.
 
