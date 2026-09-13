@@ -380,7 +380,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         addSection: {
             position: 'relative',
             zIndex: isProjectOpen ? 120 : 60,
-            padding: isOpen ? '12px' : '0',
+            padding: isOpen ? 'clamp(8px, 2.5vw, 12px)' : '0',
             background: 'var(--surface-color)',
             maxHeight: isOpen ? 'none' : '0',
             overflow: isOpen ? 'visible' : 'hidden',
@@ -424,9 +424,9 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 {(() => {
                     const activeProject = (projects || []).find(p => p.id === projectId) || projects?.[0] || { id: 'general', name: 'General', color: '#6b7280' };
                     const maxProjectNameLength = Math.max(...(projects || []).map(p => (p?.name || '').length), 10);
-                    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 180), 320);
+                    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 140), 320);
                     return (
-                        <div style={{ position: 'relative', minWidth: `${dropdownMinWidth}px`, maxWidth: '340px' }}>
+                        <div style={{ position: 'relative', minWidth: `min(${dropdownMinWidth}px, 100%)`, maxWidth: '340px' }}>
                             <button
                                 type="button"
                                 onClick={() => setIsProjectOpen(!isProjectOpen)}

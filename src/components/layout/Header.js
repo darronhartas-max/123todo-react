@@ -9,7 +9,7 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
             justifyContent: 'space-between',
             background: 'var(--header-bg)',
             border: '1px solid var(--border-color)',
-            padding: '10px 16px',
+            padding: '10px clamp(8px, 2.5vw, 16px)',
             boxSizing: 'border-box',
             gap: '8px',
             width: '100%',
@@ -29,14 +29,14 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
         modeButton: (active) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            padding: '6px 14px',
+            gap: '4px',
+            padding: '5px clamp(8px, 2vw, 14px)',
             borderRadius: '20px',
             border: 'none',
             backgroundColor: active ? '#2563eb' : 'transparent',
             color: active ? '#ffffff' : 'var(--text-color, #4b5563)',
             fontWeight: '700',
-            fontSize: '15px',
+            fontSize: 'clamp(13px, 3.2vw, 15px)',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -58,7 +58,7 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                         src={isDark ? '/123-logo-500px-dark.png' : '/123-logo-500px-light.png'}
                         alt="123 ToDo logo"
                         style={{
-                            width: '240px',
+                            width: 'var(--header-logo-width, 240px)',
                             maxWidth: '100%',
                             height: 'auto',
                             cursor: 'pointer',

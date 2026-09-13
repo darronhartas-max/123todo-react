@@ -313,10 +313,10 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         modalContent: {
             background: 'var(--surface-color)',
             borderRadius: '16px',
-            padding: '18px 22px 20px 22px',
-            width: '95%',
+            padding: 'var(--modal-padding, 18px 22px 20px 22px)',
+            width: '96%',
             maxWidth: '580px',
-            maxHeight: '92vh',
+            maxHeight: '94vh',
             overflowY: (isProjectOpen || isPriorityOpen) ? 'visible' : 'auto',
             boxShadow: '0 24px 64px -8px rgba(0, 0, 0, 0.4)',
             color: 'var(--text-color)',

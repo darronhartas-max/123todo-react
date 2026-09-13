@@ -39,8 +39,17 @@ export const STORAGE_KEYS = {
   TASK_VIEW_MODE: '123TodoTaskViewMode',
   EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference',
   NOTES_AUTOSAVE_DELAY: '123TodoNotesAutosaveDelay',
-  VIEW_PROFILE: '123Todo_ViewProfile'
+  VIEW_PROFILE: '123Todo_ViewProfile',
+  SCREEN_SCALING_MODE: '123TodoScreenScalingMode'
 };
+
+export const SCREEN_SCALING_MODES = [
+  { id: 'auto', label: 'Auto (Recommended)', desc: 'Automatically adapts to device screen width & pixel density' },
+  { id: 'compact', label: 'Compact (Older / Smaller Phones)', desc: 'Optimized typography and tight spacing for compact screens' },
+  { id: 'standard', label: 'Standard', desc: 'Default comfortable spacing and typography across all screens' }
+];
+
+export const DEFAULT_SCREEN_SCALING_MODE = 'auto';
 
 export const NOTES_AUTOSAVE_OPTIONS = [
   { id: '30s', label: '30 Seconds', seconds: 30, desc: 'Quick on-site saving' },
@@ -131,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.14': [
+    { title: '📱 Adaptive Resolution & Compact Phone Scaling:', desc: 'Added automatic device screen resolution and viewport detection. For older and compact phones (such as iPhone SE, iPhone 5/6/7/8, Galaxy A-series, and screens ≤375px or ≤640px high), the app automatically adjusts base typography, header logo width, modal paddings, and touch targets to maintain optimal proportion and eliminate cramped layouts. Includes a manual override in Settings > Appearance (Auto, Compact, Standard).' }
+  ],
   '3.7.13': [
     { title: '🛡️ Safe & Clean Lite Notes View:', desc: 'Removed the expand chevron icon adjacent to the archive checkbox in Lite notes view to eliminate accidental completions. Users can effortlessly expand and view full note details and edit mode by clicking directly on the note card or text.' }
   ],

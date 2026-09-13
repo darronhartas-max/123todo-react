@@ -37,6 +37,7 @@ import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
+import { useDeviceResolution } from './hooks/useDeviceResolution';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
@@ -85,6 +86,13 @@ const TodoApp = () => {
     dismissBackupReminder, recordBackup, checkForUpdates,
     isStandalone, canNativeInstall, triggerNativeInstall
   } = useAppSystem(archived.length, tasks.length, isAuthed);
+
+  const {
+    isCompact,
+    isMobile,
+    screenScalingMode,
+    setScreenScalingMode
+  } = useDeviceResolution();
 
   const [showOfflinePrompt, setShowOfflinePrompt] = useState(true);
 
@@ -878,7 +886,7 @@ const TodoApp = () => {
     }
   };
 
-  const isWideLayout = window.innerWidth > 768 && layoutWidth !== '480px';
+  const isWideLayout = !isMobile && layoutWidth !== '480px';
   const visibleProjects = currentProjectId === 'all'
     ? [...DEFAULT_PROJECTS, ...projects].filter(p => p.id !== 'all')
     : [...DEFAULT_PROJECTS, ...projects].filter(p => p.id === currentProjectId);
@@ -887,7 +895,7 @@ const TodoApp = () => {
     appContainer: {
       maxWidth: layoutWidth === '480px' ? '480px' : (wideColumnView === 'projects' ? '100%' : layoutWidth),
       margin: '0 auto',
-      paddingBottom: window.innerWidth < 768 ? '120px' : '80px',
+      paddingBottom: isMobile ? (isCompact ? '100px' : '120px') : '80px',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
@@ -907,7 +915,7 @@ const TodoApp = () => {
     },
     sectionsContainer: {
       flex: 1,
-      padding: '0 12px 8px 12px',
+      padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
       display: 'flex',
       flexDirection: isWideLayout ? 'row' : 'column',
       gap: isWideLayout ? '16px' : '0px',
@@ -1405,6 +1413,8 @@ const TodoApp = () => {
         syncStatus={syncStatus}
         isOffline={isOffline}
         onOpenLatestUpdates={() => setShowUpdatedModal(true)}
+        screenScalingMode={screenScalingMode}
+        setScreenScalingMode={setScreenScalingMode}
       />
 
       <EmailClientModal

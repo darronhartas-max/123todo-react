@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.14
+
+- **📱 Adaptive Resolution & Compact Phone Scaling:** Added automatic device screen resolution and viewport detection. For older and compact phones (such as iPhone SE, iPhone 5/6/7/8, Galaxy A-series, and screens ≤375px or ≤640px high), the app automatically adjusts base typography, header logo width, modal paddings, and touch targets to maintain optimal proportion and eliminate cramped layouts. Includes a manual override in Settings > Appearance (Auto, Compact, Standard).
+
 ### v3.7.13
 
 - **🛡️ Safe & Clean Lite Notes View:** Removed the expand chevron icon adjacent to the archive checkbox in Lite notes view to eliminate accidental completions. Users can effortlessly expand and view full note details and edit mode by clicking directly on the note card or text.

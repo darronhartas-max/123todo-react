@@ -650,9 +650,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         marginLeft: '0',
                         marginRight: '8px',
                         background: 'rgba(239, 68, 68, 0.08)',
-                        width: '34px',
-                        height: '34px',
-                        minWidth: '34px',
+                        width: 'var(--task-action-btn-size, 32px)',
+                        height: 'var(--task-action-btn-size, 32px)',
+                        minWidth: 'var(--task-action-btn-size, 32px)',
                         marginTop: '2px',
                         flexShrink: 0
                     }}
@@ -1249,9 +1249,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             ...styles.actionBtn,
                             color: '#3b82f6',
                             background: 'rgba(59, 130, 246, 0.08)',
-                            width: '32px',
-                            height: '32px',
-                            minWidth: '32px',
+                            width: 'var(--task-action-btn-size, 32px)',
+                            height: 'var(--task-action-btn-size, 32px)',
+                            minWidth: 'var(--task-action-btn-size, 32px)',
                             marginTop: '0px'
                         }}
                         title="Restore Task"
@@ -1276,9 +1276,9 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     border: `1px solid ${task.isRecurring ? '#10b981' : 'var(--accent-color)'}`,
                                     marginRight: '6px',
                                     opacity: 1.0,
-                                    width: '32px',
-                                    height: '32px',
-                                    minWidth: '32px'
+                                    width: 'var(--task-action-btn-size, 32px)',
+                                    height: 'var(--task-action-btn-size, 32px)',
+                                    minWidth: 'var(--task-action-btn-size, 32px)'
                                 }}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
@@ -1313,10 +1313,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             onPointerUp={(e) => e.stopPropagation()}
                             style={{
                                 ...styles.actionBtn,
-                                minWidth: '32px',
-                                minHeight: '32px',
-                                width: '32px',
-                                height: '32px',
+                                minWidth: 'var(--task-action-btn-size, 32px)',
+                                minHeight: 'var(--task-action-btn-size, 32px)',
+                                width: 'var(--task-action-btn-size, 32px)',
+                                height: 'var(--task-action-btn-size, 32px)',
                                 touchAction: 'manipulation',
                                 color: isChecked ? '#10b981' : 'var(--muted-text)',
                                 background: isChecked ? 'rgba(16, 185, 129, 0.15)' : 'transparent'

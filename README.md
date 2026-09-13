@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.13** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.14** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.13 (Current)
+### v3.7.14 (Current)
+
+- **Adaptive Resolution & Compact Phone Scaling**: Automatic device screen resolution and viewport detection for compact and older phones (such as iPhone SE, iPhone 5/6/7/8, Galaxy A-series, and screens ≤375px wide or ≤640px high). The app automatically adapts base typography, header logo width, modal paddings, task spacing, and touch targets to eliminate cramping and prevent horizontal overflow. Includes a user preference in Settings > Appearance (Auto, Compact, Standard).
+
+### v3.7.13
 
 - **Safe & Clean Lite Notes View**: Removed the expand chevron icon situated immediately adjacent to the archive checkbox in Notes mode Lite view to eliminate accidental taps and completions. Users can effortlessly expand full note details and edit options by simply tapping directly anywhere on the note card or description.
 

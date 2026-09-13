@@ -24,9 +24,11 @@ export const COMMON_STYLES = {
         backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'flex-start',
-        paddingTop: '20px',
+        paddingTop: 'clamp(6px, 2vh, 20px)',
+        paddingBottom: 'clamp(6px, 2vh, 20px)',
         justifyContent: 'center',
-        zIndex: 1000
+        zIndex: 1000,
+        boxSizing: 'border-box'
     },
     modalContent: {
         background: '#fff',

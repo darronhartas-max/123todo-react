@@ -284,7 +284,9 @@ const SettingsModal = ({
     isAuthed = false,
     syncStatus = 'idle',
     isOffline = false,
-    onOpenLatestUpdates
+    onOpenLatestUpdates,
+    screenScalingMode = 'auto',
+    setScreenScalingMode
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -456,9 +458,9 @@ const SettingsModal = ({
         modal: {
             background: 'var(--surface-color)',
             borderRadius: '16px',
-            width: '90%',
+            width: '94%',
             maxWidth: '720px',
-            height: '82vh',
+            height: '86vh',
             maxHeight: '680px',
             display: 'flex',
             flexDirection: 'column',
@@ -467,7 +469,7 @@ const SettingsModal = ({
             overflow: 'hidden'
         },
         header: {
-            padding: '16px 24px',
+            padding: '12px clamp(12px, 3vw, 24px)',
             borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             justifyContent: 'space-between',
@@ -522,7 +524,7 @@ const SettingsModal = ({
         }),
         content: {
             flex: 1,
-            padding: '24px',
+            padding: 'clamp(14px, 3vw, 24px)',
             overflowY: 'auto',
             background: 'var(--surface-color)'
         },
@@ -1166,6 +1168,43 @@ const SettingsModal = ({
                                             onClick={() => setThemeMode('dark')}
                                         >
                                             Dark
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Screen Scaling & Device Optimization */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Screen Scaling & Device Optimization</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            {screenScalingMode === 'compact'
+                                                ? 'Compact: Scaled typography, logo & tight paddings for older or smaller phones (≤375px)'
+                                                : screenScalingMode === 'standard'
+                                                    ? 'Standard: Full comfortable spacing & typography across all displays'
+                                                    : 'Auto: Automatically adapts layout and text based on device screen resolution'}
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(screenScalingMode === 'auto')}
+                                            onClick={() => setScreenScalingMode && setScreenScalingMode('auto')}
+                                            title="Auto-detect screen resolution and apply optimal scaling"
+                                        >
+                                            📱 Auto (Recommended)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(screenScalingMode === 'compact')}
+                                            onClick={() => setScreenScalingMode && setScreenScalingMode('compact')}
+                                            title="Force compact typography and spacing for older/smaller devices"
+                                        >
+                                            🔍 Compact
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(screenScalingMode === 'standard')}
+                                            onClick={() => setScreenScalingMode && setScreenScalingMode('standard')}
+                                            title="Standard typography and spacious padding"
+                                        >
+                                            🖥️ Standard
                                         </button>
                                     </div>
                                 </div>

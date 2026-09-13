@@ -2,6 +2,33 @@
 
 html {
   font-size: 17px; /* Increases default base size to scale all text (using rem) by ~1pt */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Adaptive Typography for Compact & Older Phone Viewports */
+@media screen and (max-width: 380px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Hook-driven Tier Overrides (respects user settings in Settings > Appearance) */
+html[data-screen-tier="compact"] {
+  font-size: 15px;
+}
+
+html[data-screen-tier="compact-ultra"] {
+  font-size: 14px;
+}
+
+html[data-screen-tier="standard"] {
+  font-size: 17px;
 }
 
 :root {
@@ -17,13 +44,77 @@ html {
   --accent-bg: #f0f7ff;
   --archive-bg: #f9fafb;
   
-  /* Compact Task Spacing */
+  /* Adaptive Layout & Spacing Variables */
+  --header-logo-width: 240px;
+  --modal-padding: 18px 22px 20px 22px;
+  --task-action-btn-size: 32px;
   --task-padding: 6px 10px;
   --task-padding-top: 6px;
   --task-padding-bottom: 6px;
   --task-margin: 4px;
   --task-font-size: 1.05rem;
   --section-margin: 12px;
+}
+
+/* Declarative Media Query Scaling for Compact Screens */
+@media screen and (max-width: 380px) {
+  :root {
+    --header-logo-width: 190px;
+    --modal-padding: 14px 12px 16px 12px;
+    --task-action-btn-size: 30px;
+    --task-padding: 5px 8px;
+    --task-padding-top: 5px;
+    --task-padding-bottom: 5px;
+    --section-margin: 8px;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  :root {
+    --header-logo-width: 165px;
+    --modal-padding: 12px 10px 14px 10px;
+    --task-action-btn-size: 28px;
+    --task-padding: 4px 6px;
+    --task-padding-top: 4px;
+    --task-padding-bottom: 4px;
+    --section-margin: 6px;
+  }
+}
+
+/* Explicit hook tier overrides */
+html[data-screen-tier="compact"] {
+  --header-logo-width: 190px;
+  --modal-padding: 14px 12px 16px 12px;
+  --task-action-btn-size: 30px;
+  --task-padding: 5px 8px;
+  --task-padding-top: 5px;
+  --task-padding-bottom: 5px;
+  --section-margin: 8px;
+}
+
+html[data-screen-tier="compact-ultra"] {
+  --header-logo-width: 165px;
+  --modal-padding: 12px 10px 14px 10px;
+  --task-action-btn-size: 28px;
+  --task-padding: 4px 6px;
+  --task-padding-top: 4px;
+  --task-padding-bottom: 4px;
+  --section-margin: 6px;
+}
+
+html[data-screen-tier="standard"] {
+  --header-logo-width: 240px;
+  --modal-padding: 18px 22px 20px 22px;
+  --task-action-btn-size: 32px;
+  --task-padding: 6px 10px;
+  --task-padding-top: 6px;
+  --task-padding-bottom: 6px;
+  --section-margin: 12px;
+}
+
+/* Enhanced contrast borders for low DPR displays (< 2.0 DPR) */
+html[data-screen-density="low-dpr"] {
+  --border-color: #d1d5db;
 }
 
 /* Configurable Light Mode Tones (applied in light mode) */
