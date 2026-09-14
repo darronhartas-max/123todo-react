@@ -963,8 +963,6 @@ const TodoApp = () => {
           onSwitchMode={handleSwitchMode}
           isStandalone={isStandalone}
           onOpenInstall={handleInstallClick}
-          viewProfile={viewProfile}
-          onSwitchProfile={setViewProfile}
         />
 
         <AddTask
@@ -1050,7 +1048,6 @@ const TodoApp = () => {
                 onToggleAdd={() => setShowAddSection(!showAddSection)}
                 isAddOpen={showAddSection}
                 viewProfile={viewProfile}
-                onSwitchProfile={setViewProfile}
               />
 
               {projectToDelete && (

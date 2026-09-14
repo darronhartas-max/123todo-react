@@ -121,4 +121,23 @@ describe('ProjectTabs Component', () => {
         fireEvent.click(addBtn);
         expect(onToggleAddMock).toHaveBeenCalled();
     });
+
+    test('does not render Pro/Lite profile switch in the toolbar', () => {
+        render(
+            <ProjectTabs
+                projects={sampleProjects}
+                tasks={sampleTasks}
+                currentProjectId="all"
+                onSelect={jest.fn()}
+                showSearch={false}
+                onToggleSearch={jest.fn()}
+                onOpenSettings={jest.fn()}
+                viewProfile="pro"
+            />
+        );
+
+        expect(screen.queryByRole('button', { name: /Pro/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Lite/i })).not.toBeInTheDocument();
+    });
 });
+

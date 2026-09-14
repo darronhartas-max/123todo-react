@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.16
+
+- **✨ Streamlined Main List Toolbar:** Removed the Pro/Lite interface toggle switch from the main task list toolbar, freeing up valuable space for project names and essential action buttons on smaller mobile screens. Interface Profile selection remains fully available and configurable under Settings > Appearance.
+
 ### v3.7.15
 
 - **🔄 Restored Drag-and-Drop Task Reordering in Lite Mode:** Restored draggable handlers and reordering capability across tasks in Lite mode. Users can seamlessly click and drag tasks to reorder them within or between priority sections and project columns in both Lite and Pro interface profiles, with safeguards ensuring smooth drops without unintended edit modal triggers.

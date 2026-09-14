@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.15** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.16** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.15 (Current)
+### v3.7.16 (Current)
+
+- **Streamlined Main List Toolbar**: Removed the Pro/Lite interface toggle switch from the main task list toolbar, reclaiming significant horizontal space for the project dropdown and action controls across mobile screens. Interface Profile selection (Lite vs Pro) remains fully available and configurable under **Settings > Appearance > Interface Profile**.
+
+### v3.7.15
 
 - **Restored Drag-and-Drop Task Reordering in Lite Mode**: Re-enabled draggable handlers and task reordering in Lite mode. Users can effortlessly reorder tasks across priority tiers and project columns via drag-and-drop in both Lite and Pro interface profiles, with safeguards ensuring smooth drops without unintended edit modal triggers.
 

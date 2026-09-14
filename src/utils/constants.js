@@ -140,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.16': [
+    { title: '✨ Streamlined Main List Toolbar:', desc: 'Removed the Pro/Lite interface toggle switch from the main task list toolbar, freeing up valuable space for project names and essential action buttons on smaller mobile screens. Interface Profile selection remains fully available and configurable under Settings > Appearance.' }
+  ],
   '3.7.15': [
     { title: '🔄 Restored Drag-and-Drop Task Reordering in Lite Mode:', desc: 'Restored draggable handlers and reordering capability across tasks in Lite mode. Users can seamlessly click and drag tasks to reorder them within or between priority sections and project columns in both Lite and Pro interface profiles, with safeguards ensuring smooth drops without unintended edit modal triggers.' }
   ],
