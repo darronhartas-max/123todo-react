@@ -140,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.15': [
+    { title: '🔄 Restored Drag-and-Drop Task Reordering in Lite Mode:', desc: 'Restored draggable handlers and reordering capability across tasks in Lite mode. Users can seamlessly click and drag tasks to reorder them within or between priority sections and project columns in both Lite and Pro interface profiles, with safeguards ensuring smooth drops without unintended edit modal triggers.' }
+  ],
   '3.7.14': [
     { title: '📱 Adaptive Resolution & Compact Phone Scaling:', desc: 'Added automatic device screen resolution and viewport detection. For older and compact phones (such as iPhone SE, iPhone 5/6/7/8, Galaxy A-series, and screens ≤375px or ≤640px high), the app automatically adjusts base typography, header logo width, modal paddings, and touch targets to maintain optimal proportion and eliminate cramped layouts. Includes a manual override in Settings > Appearance (Auto, Compact, Standard).' }
   ],

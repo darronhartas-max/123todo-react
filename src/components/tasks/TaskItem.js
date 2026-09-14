@@ -104,6 +104,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     const touchStartRef = React.useRef({ x: 0, y: 0 });
     const isSwipingRef = React.useRef(false);
     const wasSwipingRef = React.useRef(false);
+    const wasDraggingRef = React.useRef(false);
     const isScrollingVerticalRef = React.useRef(false);
 
     const THRESHOLD = 95;
@@ -326,7 +327,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             borderBottom: isDragging ? '1px solid var(--accent-color)' : '1px solid var(--border-color)',
             borderLeft: projectColor ? `6px solid ${projectColor}` : (task.isSample ? '6px solid #0ea5e9' : (isDragging ? '1px solid var(--accent-color)' : 'none')),
             background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
-            cursor: isArchived ? 'default' : (isLite ? 'pointer' : 'move'),
+            cursor: isArchived ? 'default' : 'move',
             borderRadius: '6px',
             marginBottom: 'var(--task-margin, 4px)',
             transition: 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
@@ -580,15 +581,22 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     position: 'relative',
                     zIndex: 2
                 }}
-                draggable={!isArchived && !isLite}
-                {...(dragHandlers && !isLite ? {
+                draggable={!isArchived}
+                {...(dragHandlers ? {
                     ...dragHandlers,
                     onDragStart: (e) => {
                         if (isSwipingRef.current || Math.abs(swipeOffset) > 5) {
                             e.preventDefault();
                             return;
                         }
+                        wasDraggingRef.current = true;
                         if (dragHandlers.onDragStart) dragHandlers.onDragStart(e);
+                    },
+                    onDragEnd: (e) => {
+                        if (dragHandlers.onDragEnd) dragHandlers.onDragEnd(e);
+                        setTimeout(() => {
+                            wasDraggingRef.current = false;
+                        }, 150);
                     }
                 } : {})}
                 onTouchStart={handleTouchStart}
@@ -600,7 +608,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handleCancel}
                 onClick={(e) => {
-                    if (wasSwipingRef.current || isSwipingRef.current || Math.abs(swipeOffset) > 5) {
+                    if (wasDraggingRef.current || wasSwipingRef.current || isSwipingRef.current || Math.abs(swipeOffset) > 5) {
                         e.stopPropagation();
                         e.preventDefault();
                         return;

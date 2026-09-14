@@ -293,5 +293,28 @@ test('in Lite mode, clicking a task calls onEdit to open the expanded edit card 
   expect(onEditMock).toHaveBeenCalledWith(task);
 });
 
+test('in Lite mode, the task item is draggable and invokes dragHandlers for reordering', () => {
+  const onDragStartMock = jest.fn();
+  const task = {
+    id: 110,
+    text: 'Reorderable Lite task',
+    priority: 1,
+    projectId: 'general'
+  };
 
+  render(
+    <TaskItem
+      task={task}
+      viewProfile="lite"
+      dragHandlers={{
+        onDragStart: onDragStartMock
+      }}
+    />
+  );
 
+  const listItem = screen.getByRole('listitem');
+  expect(listItem).toHaveAttribute('draggable', 'true');
+
+  fireEvent.dragStart(listItem);
+  expect(onDragStartMock).toHaveBeenCalled();
+});
