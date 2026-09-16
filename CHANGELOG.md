@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.18
+
+- **🎙️ Clean Voice Dictation & Echo Prevention:** Resolved speech recognition text duplication across pauses in Notes mode. Cleaned up recognition instance recycling during natural pauses and pauses between sentences, preventing repeated words, duplicated sentences, and overlapping speech buffers.
+
 ### v3.7.17
 
 - **🔄 Drag-and-Drop Reordering for On Hold Tasks:** Added full drag-and-drop support to the On Hold tasks section. Users can now reorder tasks within the On Hold section as well as drag tasks into and out of On Hold from any priority tier or project column with responsive visual drop indicators.

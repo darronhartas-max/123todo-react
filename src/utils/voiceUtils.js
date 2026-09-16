@@ -726,13 +726,9 @@ export const startVoiceDictation = ({
           return;
         }
 
-        // Keep listening across pauses with immediate resumption
+        // Keep listening across pauses with clean instance restart
         currentSessionBaseText = lastEmittedText;
-        try {
-          recognition.start();
-        } catch (e) {
-          scheduleRestart(20);
-        }
+        scheduleRestart(20);
       };
 
       recognition.start();

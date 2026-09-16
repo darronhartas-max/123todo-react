@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.17** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.18** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.17 (Current)
+### v3.7.18 (Current)
+
+- **Clean Voice Dictation & Echo Prevention**: Resolved speech recognition text duplication across pauses in Notes mode. Cleaned up recognition instance recycling during natural pauses and pauses between sentences, preventing repeated words, duplicated sentences, and overlapping speech buffers.
+
+### v3.7.17
 
 - **Drag-and-Drop Reordering for On Hold Tasks**: Enabled complete drag-and-drop support for the On Hold tasks section. Users can seamlessly reorder tasks within the On Hold section and drag tasks across priority sections or project columns into and out of On Hold, complete with interactive dashed drop indicators.
 
