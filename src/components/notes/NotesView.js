@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Settings, Trophy, Check, PlusCircle, MinusCircle
+  Folder, Search, X, Settings, Trophy, Check, PlusCircle, MinusCircle, ChevronDown
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -8,6 +8,7 @@ import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
+import { DEFAULT_PROJECTS } from '../../utils/constants';
 
 const NotesView = ({
   tasks = [],
@@ -260,9 +261,40 @@ const NotesView = ({
     }
   };
 
-  const unassignedCount = useMemo(() => {
-    return tasks.filter(t => t.projectId === 'general').length;
+  const allProjects = useMemo(() => {
+    return [
+      DEFAULT_PROJECTS.find(p => p.id === 'all') || { id: 'all', name: 'All Notes', color: '#6b7280' },
+      { id: 'general', name: 'Unassigned Inbox', color: '#6b7280' },
+      ...projects.filter(p => p.id !== 'all' && p.id !== 'general')
+    ];
+  }, [projects]);
+
+  const activeProject = useMemo(() => {
+    return allProjects.find(p => p.id === activeProjectFilter) || allProjects[0];
+  }, [allProjects, activeProjectFilter]);
+
+  const activeColor = activeProject?.color || '#6b7280';
+
+  const getProjectNoteCount = useCallback((projectId) => {
+    if (!tasks || tasks.length === 0) return 0;
+    if (projectId === 'all') {
+      return tasks.length;
+    }
+    return tasks.filter(t => (t.projectId || 'general').toLowerCase() === projectId.toLowerCase()).length;
   }, [tasks]);
+
+  const activeCount = getProjectNoteCount(activeProject?.id);
+
+  const getProjectLabelLength = useCallback((p) => {
+    const count = getProjectNoteCount(p.id);
+    return (p?.name || '').length + String(count).length + 4;
+  }, [getProjectNoteCount]);
+
+  const maxProjectNameLength = Math.max(...allProjects.map(getProjectLabelLength), 10);
+  const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 140), 320);
+
+  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+  const [hoveredProjectOptionId, setHoveredProjectOptionId] = useState(null);
 
   return (
     <div className="notes-container">
@@ -290,34 +322,144 @@ const NotesView = ({
           {showSearch ? <X size={16} /> : <Search size={16} />}
         </button>
 
-        {/* 2. Projects Filter Dropdown */}
-        <select
-          value={activeProjectFilter}
-          onChange={(e) => onSelectProjectFilter(e.target.value)}
-          style={{
-            padding: '7px 10px',
-            borderRadius: '10px',
-            border: '1.5px solid var(--border-color, #d1d5db)',
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            color: 'var(--text-color, #111827)',
-            fontSize: '14px',
-            fontWeight: '700',
-            cursor: 'pointer',
-            outline: 'none',
-            flex: 1,
-            minWidth: 0,
-            width: '100%'
-          }}
-        >
-          <option value="all">All Notes ({tasks.length})</option>
-          <option value="general">Unassigned Inbox ({unassignedCount})</option>
-          {projects.filter(p => p.id !== 'all' && p.id !== 'general').map(p => {
-            const count = tasks.filter(t => t.projectId === p.id).length;
-            return (
-              <option key={p.id} value={p.id}>{p.name} ({count})</option>
-            );
-          })}
-        </select>
+        {/* 2. Projects Filter Dropdown (matching Task mode styling with brand colors) */}
+        <div style={{
+          position: 'relative',
+          display: 'inline-flex',
+          flexDirection: 'column',
+          flex: '0 1 auto',
+          minWidth: 0,
+          maxWidth: `${dropdownMinWidth}px`
+        }}>
+          <button
+            type="button"
+            onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              minWidth: 0,
+              padding: '4px 8px',
+              borderRadius: '6px',
+              border: `1.5px solid ${activeColor}`,
+              background: 'var(--item-bg, #ffffff)',
+              color: activeColor,
+              fontSize: '0.92rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '6px',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              textAlign: 'left',
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              lineHeight: '1.25',
+              boxSizing: 'border-box'
+            }}
+          >
+            <span style={{ 
+              flex: '1 1 auto',
+              minWidth: 0,
+              overflowWrap: 'break-word',
+              wordBreak: 'break-word',
+              whiteSpace: 'normal',
+              lineHeight: '1.25'
+            }}>
+              {activeProject?.name === 'All' ? 'All Notes' : activeProject?.name} ({activeCount})
+            </span>
+            <ChevronDown size={16} style={{ color: activeColor, flexShrink: 0, marginLeft: '4px' }} />
+          </button>
+          {isProjectDropdownOpen && (
+            <>
+              <div 
+                onClick={() => setIsProjectDropdownOpen(false)}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 99,
+                  background: 'transparent'
+                }}
+              />
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                left: 0,
+                minWidth: '100%',
+                maxWidth: 'min(320px, calc(100vw - 32px))',
+                width: 'max-content',
+                background: 'var(--surface-color, #ffffff)',
+                border: '1px solid var(--border-color, #e5e7eb)',
+                borderRadius: '6px',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                zIndex: 100,
+                maxHeight: 'calc(100vh - 120px)',
+                overflowY: 'auto',
+                padding: '4px 0',
+                boxSizing: 'border-box'
+              }}>
+                {allProjects.map(p => {
+                  const count = getProjectNoteCount(p.id);
+                  const isSelected = p.id === activeProjectFilter;
+                  const displayName = p.name === 'All' ? 'All Notes' : p.name;
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        onSelectProjectFilter(p.id);
+                        setIsProjectDropdownOpen(false);
+                      }}
+                      onMouseEnter={() => setHoveredProjectOptionId(p.id)}
+                      onMouseLeave={() => setHoveredProjectOptionId(null)}
+                      style={{
+                        padding: '6px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.95rem',
+                        fontWeight: '600',
+                        color: isSelected ? p.color : 'var(--text-color, #374151)',
+                        transition: 'all 0.15s ease',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        background: isSelected
+                          ? `${p.color}15`
+                          : (hoveredProjectOptionId === p.id ? 'var(--bg-color, rgba(0,0,0,0.04))' : 'transparent')
+                      }}
+                    >
+                      <div style={{
+                        width: '4px',
+                        height: '14px',
+                        borderRadius: '2px',
+                        backgroundColor: p.color,
+                        flexShrink: 0
+                      }} />
+                      <span style={{ flex: 1, minWidth: 0, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{displayName}</span>
+                      <span style={{
+                        fontSize: '0.78rem',
+                        fontWeight: '700',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        background: isSelected ? `${p.color}25` : 'var(--bg-color, #f3f4f6)',
+                        color: isSelected ? p.color : 'var(--muted-text, #6b7280)',
+                        border: '1px solid var(--border-color, #e5e7eb)',
+                        marginLeft: '8px',
+                        flexShrink: 0
+                      }}>
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
 
         {/* 3. Achievements Badge Button (hidden in Lite mode) */}
         {viewProfile !== 'lite' && onOpenAchievements && (

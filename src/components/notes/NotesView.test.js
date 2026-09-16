@@ -231,4 +231,32 @@ describe('NotesView', () => {
     expect(screen.queryByRole('button', { name: /^Pro$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^Lite$/i })).not.toBeInTheDocument();
   });
+
+  test('renders styled project dropdown trigger and opens dropdown with project color bands and counts', () => {
+    const onSelectProjectFilterMock = jest.fn();
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        activeProjectFilter="all"
+        onSelectProjectFilter={onSelectProjectFilterMock}
+        onAddNote={jest.fn()}
+      />
+    );
+
+    // Initial trigger button says "All Notes (1)"
+    const trigger = screen.getByText(/All Notes\s*\(1\)/i);
+    expect(trigger).toBeInTheDocument();
+
+    // Clicking trigger opens custom dropdown
+    fireEvent.click(trigger);
+
+    // Verify project options in dropdown
+    expect(screen.getByText('Unassigned Inbox')).toBeInTheDocument();
+    expect(screen.getByText('Work')).toBeInTheDocument();
+
+    // Selecting a project option calls onSelectProjectFilter
+    fireEvent.click(screen.getByText('Work'));
+    expect(onSelectProjectFilterMock).toHaveBeenCalledWith('proj1');
+  });
 });

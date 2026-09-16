@@ -140,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.20': [
+    { title: '🎨 Styled Projects Dropdown in Notes Mode:', desc: 'Upgraded the Notes view project dropdown to match the custom styled dropdown in Tasks mode, featuring vibrant project color borders, colored indicator bands, accurate note counts, and active highlighting.' }
+  ],
   '3.7.19': [
     { title: '✨ Streamlined Notes Toolbar:', desc: 'Removed the redundant Pro/Lite toggle switch from the Notes view toolbar to match Tasks mode. Interface Profile selection remains fully available and configurable under Settings > Appearance.' }
   ],
