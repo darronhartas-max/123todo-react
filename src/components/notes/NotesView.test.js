@@ -217,4 +217,18 @@ describe('NotesView', () => {
       expect.objectContaining({ photos: [] })
     );
   });
+
+  test('does not render Pro/Lite profile toggle switch in the toolbar', () => {
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        onAddNote={jest.fn()}
+        viewProfile="lite"
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: /^Pro$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Lite$/i })).not.toBeInTheDocument();
+  });
 });

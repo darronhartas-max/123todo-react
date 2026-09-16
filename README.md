@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.18** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.19** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.18 (Current)
+### v3.7.19 (Current)
+
+- **Streamlined Notes Toolbar**: Removed the redundant Pro/Lite toggle switch from the Notes view toolbar to match Tasks mode, freeing up screen space for project selection and essential actions. Interface Profile selection (Lite vs Pro) remains fully available and configurable under **Settings > Appearance > Interface Profile**.
+
+### v3.7.18
 
 - **Clean Voice Dictation & Echo Prevention**: Resolved speech recognition text duplication across pauses in Notes mode. Cleaned up recognition instance recycling during natural pauses and pauses between sentences, preventing repeated words, duplicated sentences, and overlapping speech buffers.
 

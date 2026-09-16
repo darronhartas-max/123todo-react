@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.19
+
+- **✨ Streamlined Notes Toolbar:** Removed the redundant Pro/Lite toggle switch from the Notes view toolbar to match Tasks mode. Interface Profile selection remains fully available and configurable under Settings > Appearance.
+
 ### v3.7.18
 
 - **🎙️ Clean Voice Dictation & Echo Prevention:** Resolved speech recognition text duplication across pauses in Notes mode. Cleaned up recognition instance recycling during natural pauses and pauses between sentences, preventing repeated words, duplicated sentences, and overlapping speech buffers.

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Settings, Trophy, Check, Zap, Feather, PlusCircle, MinusCircle
+  Folder, Search, X, Settings, Trophy, Check, PlusCircle, MinusCircle
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -318,70 +318,6 @@ const NotesView = ({
             );
           })}
         </select>
-
-        {/* Pro / Lite View Profile Toggle Pill */}
-        {onSwitchProfile && (
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            backgroundColor: 'var(--item-bg, rgba(0,0,0,0.06))',
-            borderRadius: '20px',
-            padding: '2px',
-            border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
-            margin: 0,
-            flexShrink: 0,
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
-          }}>
-            <button
-              type="button"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '3px',
-                padding: '4px 8px',
-                borderRadius: '16px',
-                border: 'none',
-                backgroundColor: viewProfile === 'pro' ? 'var(--accent-color, #6366f1)' : 'transparent',
-                color: viewProfile === 'pro' ? '#ffffff' : 'var(--text-color, #4b5563)',
-                fontWeight: '700',
-                fontSize: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap',
-                boxShadow: viewProfile === 'pro' ? '0 2px 6px rgba(99,102,241,0.25)' : 'none'
-              }}
-              onClick={() => onSwitchProfile('pro')}
-              title="Pro Mode: Full view, drag handles, and advanced controls"
-            >
-              <Zap size={12} />
-              <span>Pro</span>
-            </button>
-            <button
-              type="button"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '3px',
-                padding: '4px 8px',
-                borderRadius: '16px',
-                border: 'none',
-                backgroundColor: viewProfile === 'lite' ? 'var(--accent-color, #6366f1)' : 'transparent',
-                color: viewProfile === 'lite' ? '#ffffff' : 'var(--text-color, #4b5563)',
-                fontWeight: '700',
-                fontSize: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap',
-                boxShadow: viewProfile === 'lite' ? '0 2px 6px rgba(99,102,241,0.25)' : 'none'
-              }}
-              onClick={() => onSwitchProfile('lite')}
-              title="Lite Mode: Simple view with click-to-reveal details"
-            >
-              <Feather size={12} />
-              <span>Lite</span>
-            </button>
-          </div>
-        )}
 
         {/* 3. Achievements Badge Button (hidden in Lite mode) */}
         {viewProfile !== 'lite' && onOpenAchievements && (

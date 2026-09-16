@@ -140,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.19': [
+    { title: '✨ Streamlined Notes Toolbar:', desc: 'Removed the redundant Pro/Lite toggle switch from the Notes view toolbar to match Tasks mode. Interface Profile selection remains fully available and configurable under Settings > Appearance.' }
+  ],
   '3.7.18': [
     { title: '🎙️ Clean Voice Dictation & Echo Prevention:', desc: 'Resolved speech recognition text duplication across pauses in Notes mode. Cleaned up recognition instance recycling during natural pauses and pauses between sentences, preventing repeated words, duplicated sentences, and overlapping speech buffers.' }
   ],
