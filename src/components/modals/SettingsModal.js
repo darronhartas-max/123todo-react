@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
+import { useTenant } from '../../context/TenantContext';
 
 const SHORTCUTS_LIST = [
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
@@ -321,6 +322,7 @@ const SettingsModal = ({
     };
     const [selectedColor, setSelectedColor] = useState(PROJECT_COLORS[0]);
     const [showAddForm, setShowAddForm] = useState(false);
+    const { tenantConfig, isCustomTenant, resetTenant } = useTenant();
 
     const handleManualCheckForUpdates = (e) => {
         if (onCheckForUpdates) {
@@ -2008,6 +2010,50 @@ const SettingsModal = ({
                                         </button>
                                     </div>
                                 </div>
+
+                                {isCustomTenant && (
+                                    <div style={{
+                                        marginTop: '12px',
+                                        marginBottom: '18px',
+                                        padding: '12px 14px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'var(--accent-bg, rgba(99, 102, 241, 0.08))',
+                                        border: '1.5px solid var(--accent-color, #2563eb)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        flexWrap: 'wrap',
+                                        gap: '10px'
+                                    }}>
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.92rem', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <Building2 size={16} color="var(--accent-color)" /> Custom Client Edition: {tenantConfig?.brandName}
+                                            </div>
+                                            {tenantConfig?.tagline && (
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--muted-text)', marginTop: '2px' }}>
+                                                    {tenantConfig.tagline}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => resetTenant()}
+                                            style={{
+                                                padding: '6px 12px',
+                                                borderRadius: '6px',
+                                                border: '1px solid var(--border-color)',
+                                                backgroundColor: 'var(--surface-color)',
+                                                color: 'var(--text-color)',
+                                                fontSize: '0.82rem',
+                                                fontWeight: '600',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            title="Reset to standard 123 To Do"
+                                        >
+                                            Reset to Standard
+                                        </button>
+                                    </div>
+                                )}
 
                                 <div style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '12px', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Download size={18} /> App Installation & PWA Mode

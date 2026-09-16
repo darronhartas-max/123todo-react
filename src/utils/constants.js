@@ -40,7 +40,8 @@ export const STORAGE_KEYS = {
   EMAIL_CLIENT_PREFERENCE: '123TodoEmailClientPreference',
   NOTES_AUTOSAVE_DELAY: '123TodoNotesAutosaveDelay',
   VIEW_PROFILE: '123Todo_ViewProfile',
-  SCREEN_SCALING_MODE: '123TodoScreenScalingMode'
+  SCREEN_SCALING_MODE: '123TodoScreenScalingMode',
+  TENANT: '123Todo_Tenant'
 };
 
 export const SCREEN_SCALING_MODES = [
@@ -140,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.21': [
+    { title: '🏢 Commercial White-Labeling & Multi-Tenant Branding (Phase 1):', desc: 'Introduced an extensible configuration architecture allowing custom branded editions for commercial clients while preserving seamless core app updates for everyone. Supports custom partner footer branding, partner logos, client-specific support/portal links, and client feature flags with instant activation via URL (?brand=pilot) and device persistence.' }
+  ],
   '3.7.20': [
     { title: '🎨 Styled Projects Dropdown in Notes Mode:', desc: 'Upgraded the Notes view project dropdown to match the custom styled dropdown in Tasks mode, featuring vibrant project color borders, colored indicator bands, accurate note counts, and active highlighting.' }
   ],

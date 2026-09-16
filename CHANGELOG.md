@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.21
+
+- **🏢 Commercial White-Labeling & Multi-Tenant Branding (Phase 1):** Introduced an extensible configuration architecture allowing custom branded editions for commercial clients while preserving seamless core app updates for everyone. Supports custom partner footer branding, partner logos, client-specific support/portal links, and client feature flags with instant activation via URL (?brand=pilot) and device persistence.
+
 ### v3.7.20
 
 - **🎨 Styled Projects Dropdown in Notes Mode:** Upgraded the Notes view project dropdown to match the custom styled dropdown in Tasks mode, featuring vibrant project color borders, colored indicator bands, accurate note counts, and active highlighting.

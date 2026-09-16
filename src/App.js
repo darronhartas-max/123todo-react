@@ -42,6 +42,7 @@ import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, 
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
+import { TenantProvider, useTenant } from './context/TenantContext';
 
 const TodoApp = () => {
   const {
@@ -49,6 +50,8 @@ const TodoApp = () => {
     restoreTask, updateTask, reorderTasks, addProject, updateProject, deleteProject, moveProject, reorderProjects,
     importData, bulkAddTasks
   } = useTasks();
+
+  const { tenantConfig } = useTenant();
 
   const availableProjects = useMemo(() => [
     ...DEFAULT_PROJECTS.filter(p => p.id !== 'all'),
@@ -1254,7 +1257,7 @@ const TodoApp = () => {
         />
       </div>
 
-      <SocialShare />
+      {tenantConfig?.features?.socialShare !== false && <SocialShare />}
 
       {showShareModal && (
         <SharePromptModal
@@ -1604,4 +1607,10 @@ const TodoApp = () => {
   );
 };
 
-export default TodoApp;
+const App = () => (
+  <TenantProvider>
+    <TodoApp />
+  </TenantProvider>
+);
+
+export default App;

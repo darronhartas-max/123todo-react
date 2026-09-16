@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.20** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.21** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.20 (Current)
+### v3.7.21 (Current)
+
+- **Commercial White-Labeling & Multi-Tenant Branding (Phase 1)**: Introduced an extensible configuration architecture allowing custom branded editions for commercial clients while preserving seamless core app updates for everyone. Supports custom partner footer branding, partner logos, client-specific support/portal links, and client feature flags with instant activation via URL (`?brand=pilot`) and automatic device persistence.
+
+### v3.7.20
 
 - **Styled Projects Dropdown in Notes Mode**: Upgraded the Notes mode project dropdown from a plain native element to the custom styled dropdown matching Tasks mode, complete with dynamic project color borders, colored indicator bands, and formatted note counts.
 

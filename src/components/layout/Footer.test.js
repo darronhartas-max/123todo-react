@@ -25,4 +25,17 @@ describe('Footer Component', () => {
         expect(screen.getByText('v3.7.8')).toBeInTheDocument();
         expect(screen.queryByTitle('Productivity Achievements & Insights')).not.toBeInTheDocument();
     });
+
+    test('renders commercial partner badge and custom client links when custom tenant is active', () => {
+        const { TenantProvider } = require('../../context/TenantContext');
+        render(
+            <TenantProvider initialTenantId="pilot">
+                <Footer version="3.7.21" />
+            </TenantProvider>
+        );
+
+        expect(screen.getByText('Custom Edition prepared for Commercial Pilot')).toBeInTheDocument();
+        expect(screen.getByText('Client Support')).toBeInTheDocument();
+        expect(screen.getByText(/Commercial Partners/)).toBeInTheDocument();
+    });
 });

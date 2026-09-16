@@ -109,5 +109,16 @@ test('renders On Hold tasks with draggable attribute and drag support', () => {
   expect(task1).toHaveAttribute('draggable', 'true');
 });
 
+test('activates commercial client branding via URL query and renders branded footer', () => {
+  const originalLocation = window.location;
+  delete window.location;
+  window.location = new URL('https://www.123todo.com/?brand=pilot');
 
+  render(<App />);
 
+  expect(screen.getByText('Custom Edition prepared for Commercial Pilot')).toBeInTheDocument();
+  expect(screen.getByText('Client Support')).toBeInTheDocument();
+  expect(localStorage.getItem('123Todo_Tenant')).toBe('pilot');
+
+  window.location = originalLocation;
+});
