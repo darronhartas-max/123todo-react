@@ -122,3 +122,25 @@ test('activates commercial client branding via URL query and renders branded foo
 
   window.location = originalLocation;
 });
+
+test('displays scheduled tasks in chronological order with soonest due date at the top', () => {
+  const scheduledList = [
+    { id: 501, text: 'Task due next week', priority: 1, projectId: 'general', completed: false, scheduledDate: '2099-12-01' },
+    { id: 502, text: 'Task due tomorrow', priority: 1, projectId: 'general', completed: false, scheduledDate: '2099-11-01' },
+    { id: 503, text: 'Task due mid month', priority: 1, projectId: 'general', completed: false, scheduledDate: '2099-11-15' }
+  ];
+  localStorage.setItem('123TodoTasks', JSON.stringify(scheduledList));
+
+  render(<App />);
+
+  // Expand Scheduled section
+  const toggleBtn = screen.getByRole('button', { name: /Show Scheduled & Recurring \(3\)/i });
+  act(() => {
+    toggleBtn.click();
+  });
+
+  const taskItems = screen.getAllByRole('listitem');
+  expect(taskItems[0]).toHaveTextContent('Task due tomorrow');
+  expect(taskItems[1]).toHaveTextContent('Task due mid month');
+  expect(taskItems[2]).toHaveTextContent('Task due next week');
+});

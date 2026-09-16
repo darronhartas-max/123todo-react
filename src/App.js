@@ -660,7 +660,9 @@ const TodoApp = () => {
 
   const today = getTodayDateString();
   const activeTasks = tasks.filter(t => !t.scheduledDate || t.scheduledDate <= today);
-  const scheduledTasks = tasks.filter(t => t.scheduledDate && t.scheduledDate > today);
+  const scheduledTasks = tasks
+    .filter(t => t.scheduledDate && t.scheduledDate > today)
+    .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
 
   const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
   const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));
