@@ -1118,7 +1118,16 @@ const TodoApp = () => {
               </div>
 
               {onHoldTasksFiltered.length > 0 && (
-                <div style={{ ...styles.toggleSection, background: 'var(--accent-bg)' }}>
+                <div 
+                  style={{ 
+                    ...styles.toggleSection, 
+                    background: 'var(--accent-bg)',
+                    border: dragOverId === 'priority-4' ? '2px dashed #9333ea' : '1px solid var(--border-color)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onDragOver={(e) => handleDragOver(e, 'priority-4')}
+                  onDrop={(e) => handleDrop(e, 'priority-4')}
+                >
                   <button
                     onClick={() => setShowOnHold(!showOnHold)}
                     style={{ ...styles.toggleBtn, color: '#9333ea' }}
@@ -1126,7 +1135,15 @@ const TodoApp = () => {
                     {showOnHold ? 'Hide On Hold Tasks' : `Show On Hold Tasks (${onHoldTasksFiltered.length})`}
                   </button>
                   {showOnHold && (
-                    <ul style={styles.taskList}>
+                    <ul 
+                      style={{
+                        ...styles.taskList,
+                        minHeight: dragOverId === 'priority-4' ? '60px' : 'auto',
+                        padding: dragOverId === 'priority-4' ? '4px 0' : '0'
+                      }}
+                      onDragOver={(e) => handleDragOver(e, 'priority-4')}
+                      onDrop={(e) => handleDrop(e, 'priority-4')}
+                    >
                       <AnimatePresence>
                         {onHoldTasksFiltered.map(task => {
                           const proj = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
@@ -1145,6 +1162,23 @@ const TodoApp = () => {
                               showFullDetails={true}
                               taskViewMode={taskViewMode}
                               viewProfile={viewProfile}
+                              isDragging={draggedId === task.id}
+                              isDragOver={dragOverId === task.id}
+                              dragHandlers={{
+                                onDragStart: (e) => handleDragStart(e, task.id),
+                                onDragOver: (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                                  handleDragOver(e, task.id);
+                                },
+                                onDrop: (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleDrop(e, task.id);
+                                },
+                                onDragEnd: handleDragEnd
+                              }}
                             />
                           );
                         })}

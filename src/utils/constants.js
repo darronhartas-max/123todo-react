@@ -140,6 +140,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.17': [
+    { title: '🔄 Drag-and-Drop Reordering for On Hold Tasks:', desc: 'Added full drag-and-drop support to the On Hold tasks section. Users can now reorder tasks within the On Hold section as well as drag tasks into and out of On Hold from any priority tier or project column with responsive visual drop indicators.' }
+  ],
   '3.7.16': [
     { title: '✨ Streamlined Main List Toolbar:', desc: 'Removed the Pro/Lite interface toggle switch from the main task list toolbar, freeing up valuable space for project names and essential action buttons on smaller mobile screens. Interface Profile selection remains fully available and configurable under Settings > Appearance.' }
   ],

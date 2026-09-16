@@ -86,4 +86,28 @@ test('displays UpdatedModal with recent versions when clicking Latest Update Inf
   expect(screen.queryByText('123 To Do Updated!')).not.toBeInTheDocument();
 });
 
+test('renders On Hold tasks with draggable attribute and drag support', () => {
+  const tasks = [
+    { id: 401, text: 'On Hold Task 1', priority: 4, projectId: 'general', completed: false, createdDate: '2026-09-16' },
+    { id: 402, text: 'On Hold Task 2', priority: 4, projectId: 'general', completed: false, createdDate: '2026-09-16' }
+  ];
+  localStorage.setItem('123TodoTasks', JSON.stringify(tasks));
+
+  render(<App />);
+
+  // Click on "Show On Hold Tasks"
+  const toggleBtn = screen.getByRole('button', { name: /Show On Hold Tasks \(2\)/i });
+  act(() => {
+    toggleBtn.click();
+  });
+
+  expect(screen.getByText('On Hold Task 1')).toBeInTheDocument();
+  expect(screen.getByText('On Hold Task 2')).toBeInTheDocument();
+
+  // Tasks should have draggable attributes
+  const task1 = screen.getByText('On Hold Task 1').closest('li');
+  expect(task1).toHaveAttribute('draggable', 'true');
+});
+
+
 

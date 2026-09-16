@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.17
+
+- **🔄 Drag-and-Drop Reordering for On Hold Tasks:** Added full drag-and-drop support to the On Hold tasks section. Users can now reorder tasks within the On Hold section as well as drag tasks into and out of On Hold from any priority tier or project column with responsive visual drop indicators.
+
 ### v3.7.16
 
 - **✨ Streamlined Main List Toolbar:** Removed the Pro/Lite interface toggle switch from the main task list toolbar, freeing up valuable space for project names and essential action buttons on smaller mobile screens. Interface Profile selection remains fully available and configurable under Settings > Appearance.
