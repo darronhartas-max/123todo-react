@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.23
+
+- **🔝 Top Priority Placement for Scheduled Tasks Due Today:** When a scheduled task reaches its set day (or is due today), it is now automatically placed at the top of its priority list, ensuring it is immediately visible and never overlooked even in long lists.
+
 ### v3.7.22
 
 - **📅 Chronological Scheduled Tasks Sorting:** Scheduled and recurring tasks in the Scheduled section are now automatically sorted in ascending date order with tasks due the soonest displayed at the top of the list.

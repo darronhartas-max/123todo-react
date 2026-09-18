@@ -144,3 +144,26 @@ test('displays scheduled tasks in chronological order with soonest due date at t
   expect(taskItems[1]).toHaveTextContent('Task due mid month');
   expect(taskItems[2]).toHaveTextContent('Task due next week');
 });
+
+test('lists scheduled tasks appearing on their set day at the top of their priority list', () => {
+  const today = new Date().toISOString().split('T')[0];
+  const activeList = [
+    { id: 601, text: 'Existing priority 1 regular task A', priority: 1, projectId: 'general', completed: false, scheduledDate: null },
+    { id: 602, text: 'Existing priority 1 regular task B', priority: 1, projectId: 'general', completed: false, scheduledDate: null },
+    { id: 603, text: 'Scheduled task appearing today', priority: 1, projectId: 'general', completed: false, scheduledDate: today },
+    { id: 604, text: 'Existing priority 2 regular task', priority: 2, projectId: 'general', completed: false, scheduledDate: null },
+    { id: 605, text: 'Scheduled task appearing for priority 2', priority: 2, projectId: 'general', completed: false, scheduledDate: today }
+  ];
+  localStorage.setItem('123TodoTasks', JSON.stringify(activeList));
+
+  render(<App />);
+
+  // Find all task item list elements
+  const taskElements = screen.getAllByRole('listitem');
+  
+  // In Priority 1, the scheduled task appearing today must be the very first task in the section
+  expect(taskElements[0]).toHaveTextContent('Scheduled task appearing today');
+  expect(taskElements[1]).toHaveTextContent('Existing priority 1 regular task A');
+  expect(taskElements[2]).toHaveTextContent('Existing priority 1 regular task B');
+});
+

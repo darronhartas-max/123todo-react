@@ -141,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.23': [
+    { title: '🔝 Top Priority Placement for Scheduled Tasks Due Today:', desc: 'When a scheduled task reaches its set day (or is due today), it is now automatically placed at the top of its priority list, ensuring it is immediately visible and never overlooked even in long lists.' }
+  ],
   '3.7.22': [
     { title: '📅 Chronological Scheduled Tasks Sorting:', desc: 'Scheduled and recurring tasks in the Scheduled section are now automatically sorted in ascending date order with tasks due the soonest displayed at the top of the list.' }
   ],
