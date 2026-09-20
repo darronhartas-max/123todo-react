@@ -141,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.25': [
+    { title: '📝 Streamlined & Clutter-Free Notes View:', desc: 'Simplified the Notes view header by removing the achievements badge and settings cog (accessible anytime in Tasks view), neatly aligning the red new note icon on the header row next to projects, and eliminating the redundant Add New Note button below for a cleaner, distraction-free writing experience.' }
+  ],
   '3.7.24': [
     { title: '🎙️ Continuous Voice Dictation & Word Repetition Elimination:', desc: 'Resolved speech transcription word duplication and engine stutters during continuous dictation. Added intelligent multi-word and single-word deduplication, seamless interim segment boundary overlap merging, and clean pause recovery across all Talk buttons in Tasks and Notes modes.' }
   ],

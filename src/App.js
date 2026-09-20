@@ -1028,12 +1028,9 @@ const TodoApp = () => {
               onSelectProjectFilter={setCurrentProjectId}
               searchQuery={searchTerm}
               onSearchChange={setSearchTerm}
-              onOpenSettings={() => setShowSettings(true)}
-              onOpenAchievements={() => setShowAchievements(true)}
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
               viewProfile={viewProfile}
-              onSwitchProfile={setViewProfile}
             />
           ) : (
             <>

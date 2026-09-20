@@ -259,4 +259,26 @@ describe('NotesView', () => {
     fireEvent.click(screen.getByText('Work'));
     expect(onSelectProjectFilterMock).toHaveBeenCalledWith('proj1');
   });
+
+  test('renders clutter-free top bar without achievements badge or settings, and without duplicate Add New Note button below', () => {
+    render(
+      <NotesView
+        tasks={sampleTasks}
+        projects={sampleProjects}
+        onAddNote={jest.fn()}
+      />
+    );
+
+    // Achievements badge and Settings cog must NOT be in the Notes view
+    expect(screen.queryByTitle('Productivity Achievements & Insights')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Settings')).not.toBeInTheDocument();
+
+    // The red Add new note button is in the top bar
+    const addNoteBtn = screen.getByRole('button', { name: /Add new note/i });
+    expect(addNoteBtn).toBeInTheDocument();
+
+    // The duplicate "Add New Note" dashed button below is NOT rendered
+    expect(screen.queryByText('Add New Note')).not.toBeInTheDocument();
+  });
 });
+

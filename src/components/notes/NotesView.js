@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Settings, Trophy, Check, PlusCircle, MinusCircle, ChevronDown
+  Folder, Search, X, Check, PlusCircle, MinusCircle, ChevronDown
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -20,16 +20,13 @@ const NotesView = ({
   onDeleteTask,
   onAssignProject,
   onBulkAssignProject,
-  activeProjectFilter,
+  activeProjectFilter = 'all',
   onSelectProjectFilter,
-  searchQuery,
+  searchQuery = '',
   onSearchChange,
-  onOpenSettings,
-  onOpenAchievements,
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
-  viewProfile = 'lite',
-  onSwitchProfile
+  viewProfile = 'lite'
 }) => {
   const [showAddNote, setShowAddNote] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
@@ -298,7 +295,7 @@ const NotesView = ({
 
   return (
     <div className="notes-container">
-      {/* Header Bar: Search Icon, Projects Dropdown, Settings Icon (exact single-row order) */}
+      {/* Header Bar: Search Icon, Projects Dropdown, Add Note Icon (clean single-row order) */}
       <div className="notes-header-bar" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '12px', width: '100%', paddingBottom: '4px' }}>
         {/* 1. Search Toggle Icon Button (identical circular style as Task mode) */}
         <button
@@ -461,56 +458,7 @@ const NotesView = ({
           )}
         </div>
 
-        {/* 3. Achievements Badge Button (hidden in Lite mode) */}
-        {viewProfile !== 'lite' && onOpenAchievements && (
-          <button
-            onClick={onOpenAchievements}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(245, 158, 11, 0.12)',
-              border: '1.5px solid #f59e0b',
-              color: '#d97706',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease',
-              flexShrink: 0,
-              boxShadow: '0 1px 4px rgba(245, 158, 11, 0.2)'
-            }}
-            title="Productivity Achievements & Insights"
-          >
-            <Trophy size={17} />
-          </button>
-        )}
-
-        {/* 4. Settings Cog Icon Button (identical circular style as Task mode) */}
-        {onOpenSettings && (
-          <button
-            onClick={onOpenSettings}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--card-bg, #ffffff)',
-              border: '1.5px solid var(--border-color, #d1d5db)',
-              color: 'var(--text-color, #4b5563)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease',
-              flexShrink: 0
-            }}
-            title="Settings"
-          >
-            <Settings size={18} />
-          </button>
-        )}
-
-        {/* 5. Add Note + / - toggle button */}
+        {/* 3. Add Note + / - toggle button */}
         <button
           type="button"
           onClick={() => setShowAddNote(!showAddNote)}
@@ -528,7 +476,7 @@ const NotesView = ({
             flexShrink: 0,
             transition: 'transform 0.2s ease'
           }}
-          aria-label={showAddNote ? "Close add note" : "Open add note"}
+          aria-label={showAddNote ? "Close add note" : "Add new note"}
           title={showAddNote ? "Close add note form" : "Add new note"}
         >
           {showAddNote ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
@@ -548,35 +496,8 @@ const NotesView = ({
         />
       )}
 
-      {/* Quick Add Note Card or Add Button */}
-      {!showAddNote ? (
-        <button
-          type="button"
-          onClick={() => setShowAddNote(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: '12px',
-            border: '1.5px dashed var(--border-color, #d1d5db)',
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            color: 'var(--accent-color, #2563eb)',
-            fontSize: '15px',
-            fontWeight: '700',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            boxSizing: 'border-box'
-          }}
-          title="Add a new note"
-        >
-          <PlusCircle size={18} />
-          <span>Add New Note</span>
-        </button>
-      ) : (
+      {/* Quick Add Note Card */}
+      {showAddNote && (
         <div className="quick-add-note-card">
           {/* Prominent Top Action Toolbar: Project Selector on Left, Talk + Large Save Note Button on Right */}
           <div className="quick-add-top-bar" style={{
