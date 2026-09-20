@@ -141,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.24': [
+    { title: '🎙️ Continuous Voice Dictation & Word Repetition Elimination:', desc: 'Resolved speech transcription word duplication and engine stutters during continuous dictation. Added intelligent multi-word and single-word deduplication, seamless interim segment boundary overlap merging, and clean pause recovery across all Talk buttons in Tasks and Notes modes.' }
+  ],
   '3.7.23': [
     { title: '🔝 Top Priority Placement for Scheduled Tasks Due Today:', desc: 'When a scheduled task reaches its set day (or is due today), it is now automatically placed at the top of its priority list, ensuring it is immediately visible and never overlooked even in long lists.' }
   ],

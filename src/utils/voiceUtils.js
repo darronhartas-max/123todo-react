@@ -43,15 +43,115 @@ export const formatSpokenPunctuation = (text) => {
 };
 
 /**
+ * Deduplicates adjacent repeated words and repeated multi-word phrases (2-5 words) from speech.
+ * Eliminates speech recognition stutters and boundary echo (e.g. "word word" -> "word",
+ * "a word a word" -> "a word", "multiple multiple" -> "multiple", "the the" -> "the").
+ */
+export const cleanDuplicateWordsAndPhrases = (text) => {
+  if (!text || typeof text !== 'string') return text;
+
+  // Handle multi-line texts (newlines / paragraphs) independently to preserve structure
+  if (text.includes('\n')) {
+    return text
+      .split('\n')
+      .map(line => cleanDuplicateWordsAndPhrases(line))
+      .join('\n');
+  }
+
+  let cleaned = text.trim();
+  if (!cleaned) return cleaned;
+
+  const cleanWord = (w) => w.toLowerCase().replace(/[^a-z0-9]/gi, '');
+
+  // 1. Remove repeated multi-word phrases (length 5 down to 2 words) within clauses/sentences
+  // e.g. "a word a word" -> "a word", "to the shop to the shop" -> "to the shop"
+  for (let phraseLen = 5; phraseLen >= 2; phraseLen--) {
+    let changed = true;
+    let iterations = 0;
+    while (changed && iterations < 10) {
+      changed = false;
+      iterations++;
+      const words = cleaned.split(/\s+/);
+      if (words.length < phraseLen * 2) break;
+
+      for (let i = 0; i <= words.length - phraseLen * 2; i++) {
+        const firstPhraseWords = words.slice(i, i + phraseLen);
+        const secondPhraseWords = words.slice(i + phraseLen, i + phraseLen * 2);
+
+        const firstClean = firstPhraseWords.map(cleanWord).join(' ');
+        const secondClean = secondPhraseWords.map(cleanWord).join(' ');
+
+        if (firstClean && firstClean === secondClean) {
+          const firstPhraseEndsWithTerminator = /[.?!]$/.test(firstPhraseWords[firstPhraseWords.length - 1]);
+          if (!firstPhraseEndsWithTerminator) {
+            // Internal clause phrase repetition (e.g. "a word a word", "on Tuesday on Tuesday")
+            words.splice(i + phraseLen, phraseLen);
+            cleaned = words.join(' ');
+            changed = true;
+            break;
+          } else {
+            // If first phrase ends with sentence terminator, only collapse if second phrase also ends with terminator or end of line
+            const secondEndsWithTerminator = /[.?!]$/.test(secondPhraseWords[secondPhraseWords.length - 1]) || (i + phraseLen * 2 >= words.length);
+            if (secondEndsWithTerminator) {
+              words.splice(i + phraseLen, phraseLen);
+              cleaned = words.join(' ');
+              changed = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Remove consecutively repeated single words (e.g. "word word word" -> "word", "the the" -> "the", "multiple multiple" -> "multiple")
+  const words = cleaned.split(/\s+/);
+  const resultWords = [];
+  for (let i = 0; i < words.length; i++) {
+    const current = words[i];
+    const prev = resultWords.length > 0 ? resultWords[resultWords.length - 1] : null;
+
+    if (prev) {
+      const cleanCurrent = cleanWord(current);
+      const cleanPrev = cleanWord(prev);
+
+      if (cleanCurrent && cleanCurrent === cleanPrev) {
+        // Carry forward any trailing punctuation if prev did not have it
+        const currentPunc = current.replace(/^[a-z0-9]+/i, '');
+        if (currentPunc && !prev.endsWith(currentPunc)) {
+          resultWords[resultWords.length - 1] = prev + currentPunc;
+        }
+        // Skip consecutive duplicate word
+        continue;
+      }
+    }
+    resultWords.push(current);
+  }
+
+  cleaned = resultWords.join(' ');
+
+  // Fix punctuation spacing
+  cleaned = cleaned
+    .replace(/\s+([.,?!:;])/g, '$1')
+    .replace(/([.,?!:;])(?=[a-zA-Z0-9])/g, '$1 ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned;
+};
+
+/**
  * Intelligently merges baseText and speechText avoiding duplicate words, repeated sentences, or repeated prefixes.
  * Handles punctuation differences, case sensitivity, and sub-sequence overlaps.
  */
 export const mergeBaseAndTranscript = (baseText, speechText) => {
   const base = (baseText || '').trim();
-  const speech = (speechText || '').trim();
+  const rawSpeech = (speechText || '').trim();
 
-  if (!base) return speech;
-  if (!speech) return base;
+  if (!base) return cleanDuplicateWordsAndPhrases(rawSpeech);
+  if (!rawSpeech) return cleanDuplicateWordsAndPhrases(base);
+
+  const speech = cleanDuplicateWordsAndPhrases(rawSpeech);
 
   // Extract raw words and clean alphanumeric tokens for comparison
   const baseRawWords = base.split(/\s+/);
@@ -74,7 +174,7 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return `${base}${punc}`;
   }
 
-  if (baseCleanList.length === 0) return speech;
+  if (baseCleanList.length === 0) return cleanDuplicateWordsAndPhrases(speech);
 
   const baseCleanStr = baseCleanList.join(' ');
   const speechCleanStr = speechCleanList.join(' ');
@@ -104,7 +204,8 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     const remainingText = remainingSpeechWords.join(' ');
     const separator = baseStr.endsWith(' ') ? '' : ' ';
     let result = `${baseStr}${separator}${remainingText}`.trim();
-    return result.replace(/\s+/g, ' ').replace(/\s+([.,?!:;])/g, '$1');
+    result = result.replace(/\s+/g, ' ').replace(/\s+([.,?!:;])/g, '$1');
+    return cleanDuplicateWordsAndPhrases(result);
   };
 
   // 2. Speech starts with Base (base is a prefix of speech)
@@ -113,8 +214,8 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     return combineBaseAndRemainingSpeech(base, remainingRaw);
   }
 
-  // 3. Base starts with Speech (speech is an interim prefix of base from restart)
-  if (baseCleanStr.startsWith(speechCleanStr)) {
+  // 3. Base starts with Speech or Base ends with Speech (speech is an interim prefix or echo suffix of base)
+  if (baseCleanStr.startsWith(speechCleanStr) || baseCleanStr.endsWith(speechCleanStr)) {
     return base;
   }
 
@@ -149,8 +250,8 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
     const speechPrefix = speechCleanList.slice(0, len).join(' ');
     if (baseSuffix === speechPrefix) {
       if (baseEndsWithSentenceTerminator) {
-        // Only allow overlap across a sentence boundary if baseSuffix starts at a sentence boundary
-        if (validSentenceSuffixes && validSentenceSuffixes.has(baseSuffix)) {
+        // Allow overlap across sentence boundary if single-word or starting at valid sentence suffix
+        if (len === 1 || (validSentenceSuffixes && validSentenceSuffixes.has(baseSuffix))) {
           maxOverlap = len;
         }
       } else {
@@ -166,7 +267,8 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
 
   // 6. Fallback standard concatenation with clean spacing
   const separator = base.endsWith(' ') ? '' : ' ';
-  return `${base}${separator}${speech}`;
+  const combined = `${base}${separator}${speech}`;
+  return cleanDuplicateWordsAndPhrases(combined);
 };
 
 /**
@@ -641,19 +743,22 @@ export const startVoiceDictation = ({
           resetSilenceTimer();
 
           if (res.isFinal) {
-            sessionFinal = sessionFinal ? `${sessionFinal} ${formattedChunk}` : formattedChunk;
+            sessionFinal = sessionFinal ? mergeBaseAndTranscript(sessionFinal, formattedChunk) : formattedChunk;
           } else {
-            sessionInterim = sessionInterim ? `${sessionInterim} ${formattedChunk}` : formattedChunk;
+            sessionInterim = sessionInterim ? mergeBaseAndTranscript(sessionInterim, formattedChunk) : formattedChunk;
           }
         }
 
         let currentSpeech = sessionFinal
-          ? (sessionInterim ? `${sessionFinal} ${sessionInterim}` : sessionFinal)
+          ? (sessionInterim ? mergeBaseAndTranscript(sessionFinal, sessionInterim) : sessionFinal)
           : sessionInterim;
+        currentSpeech = cleanDuplicateWordsAndPhrases(currentSpeech);
+
         let combined = mergeBaseAndTranscript(currentSessionBaseText, currentSpeech);
+        combined = cleanDuplicateWordsAndPhrases(combined);
 
         const { text: processedText, isSubmitCommand } = processVoiceCommands(combined);
-        let finalText = processedText;
+        let finalText = cleanDuplicateWordsAndPhrases(processedText);
 
         if (finalText.length > 0) {
           finalText = finalText.charAt(0).toUpperCase() + finalText.slice(1);

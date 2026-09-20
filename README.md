@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.23** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.24** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.23 (Current)
+### v3.7.24 (Current)
+
+- **Continuous Voice Dictation & Word Repetition Elimination**: Resolved speech transcription word duplication and engine stutters during continuous dictation. Added intelligent multi-word and single-word deduplication, seamless interim segment boundary overlap merging, and clean pause recovery across all Talk buttons in Tasks and Notes modes.
+
+### v3.7.23
 
 - **Top Priority Placement for Scheduled Tasks Due Today**: When a scheduled task reaches its set day (or is due today), it is now automatically placed at the top of its priority list, ensuring it is immediately visible and never overlooked even in long lists.
 

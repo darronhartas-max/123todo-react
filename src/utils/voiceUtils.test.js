@@ -1,4 +1,4 @@
-import { formatSpokenPunctuation, mergeBaseAndTranscript, processVoiceCommands, isMobileDevice, startVoiceDictation, processSpellingConstructs } from './voiceUtils';
+import { formatSpokenPunctuation, mergeBaseAndTranscript, cleanDuplicateWordsAndPhrases, processVoiceCommands, isMobileDevice, startVoiceDictation, processSpellingConstructs } from './voiceUtils';
 
 describe('voiceUtils - formatSpokenPunctuation', () => {
   test('formats spoken punctuation and capitalizes sentences correctly', () => {
@@ -393,5 +393,76 @@ describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
     });
     jest.useRealTimers();
   });
+
+  test('startVoiceDictation cleans speech engine duplicate word stutters and boundary word overlaps as user speaks', () => {
+    jest.useFakeTimers();
+
+    let instance = null;
+
+    class MockSpeechRecognition {
+      constructor() {
+        this.continuous = true;
+        this.interimResults = true;
+        this.start = jest.fn();
+        this.stop = jest.fn();
+        this.abort = jest.fn();
+        instance = this;
+      }
+    }
+
+    window.SpeechRecognition = MockSpeechRecognition;
+
+    const onTranscript = jest.fn();
+    const onStatusChange = jest.fn();
+    const onEnd = jest.fn();
+
+    const rec = startVoiceDictation({
+      initialText: '',
+      onTranscript,
+      onStatusChange,
+      onEnd
+    });
+
+    // Simulate multi-chunk speech recognition event where interim contains repeated words / overlapping words
+    instance.onresult({
+      results: [
+        { 0: { transcript: 'For example' }, isFinal: true, length: 1 },
+        { 0: { transcript: 'example it repeats a word a word multiple multiple times' }, isFinal: false, length: 1 }
+      ]
+    });
+
+    expect(onTranscript).toHaveBeenCalledWith('For example it repeats a word multiple times', false);
+
+    rec.stop();
+    delete window.SpeechRecognition;
+    jest.useRealTimers();
+  });
 });
+
+describe('voiceUtils - cleanDuplicateWordsAndPhrases', () => {
+  test('removes immediately repeated single words', () => {
+    expect(cleanDuplicateWordsAndPhrases('word word')).toBe('word');
+    expect(cleanDuplicateWordsAndPhrases('word word word')).toBe('word');
+    expect(cleanDuplicateWordsAndPhrases('multiple multiple times')).toBe('multiple times');
+    expect(cleanDuplicateWordsAndPhrases('the the store')).toBe('the store');
+    expect(cleanDuplicateWordsAndPhrases('testing testing 1 2 3')).toBe('testing 1 2 3');
+    expect(cleanDuplicateWordsAndPhrases('Hello hello world')).toBe('Hello world');
+  });
+
+  test('removes repeated multi-word phrases (2-5 words)', () => {
+    expect(cleanDuplicateWordsAndPhrases('it repeats a word a word multiple times')).toBe('it repeats a word multiple times');
+    expect(cleanDuplicateWordsAndPhrases('we went to the store to the store on Friday on Friday')).toBe('we went to the store on Friday');
+    expect(cleanDuplicateWordsAndPhrases('buy organic milk buy organic milk tomorrow')).toBe('buy organic milk tomorrow');
+    expect(cleanDuplicateWordsAndPhrases('for example for example this works')).toBe('for example this works');
+  });
+
+  test('preserves punctuation and distinct sentences', () => {
+    expect(cleanDuplicateWordsAndPhrases('Buy milk, milk and eggs')).toBe('Buy milk, and eggs');
+    expect(cleanDuplicateWordsAndPhrases('Call John on his mobile. His mobile is not answering.'))
+      .toBe('Call John on his mobile. His mobile is not answering.');
+    expect(cleanDuplicateWordsAndPhrases('Line 1\nLine 2')).toBe('Line 1\nLine 2');
+    expect(cleanDuplicateWordsAndPhrases('First point bullet point bullet point')).toBe('First point bullet point');
+  });
+});
+
 
