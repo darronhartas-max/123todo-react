@@ -167,3 +167,22 @@ test('lists scheduled tasks appearing on their set day at the top of their prior
   expect(taskElements[2]).toHaveTextContent('Existing priority 1 regular task B');
 });
 
+test('allows user to reorder scheduled tasks in priority list and move other tasks above them without snapping to top', () => {
+  const today = new Date().toISOString().split('T')[0];
+  // Once a scheduled task has appeared on its due day and been reordered, its custom position is preserved
+  const activeList = [
+    { id: 601, text: 'Regular task moved to top', priority: 1, projectId: 'general', completed: false, scheduledDate: null },
+    { id: 603, text: 'Scheduled task moved down', priority: 1, projectId: 'general', completed: false, scheduledDate: today, promotedDate: today },
+    { id: 602, text: 'Regular task at bottom', priority: 1, projectId: 'general', completed: false, scheduledDate: null }
+  ];
+  localStorage.setItem('123TodoTasks', JSON.stringify(activeList));
+
+  render(<App />);
+
+  const taskElements = screen.getAllByRole('listitem');
+  expect(taskElements[0]).toHaveTextContent('Regular task moved to top');
+  expect(taskElements[1]).toHaveTextContent('Scheduled task moved down');
+  expect(taskElements[2]).toHaveTextContent('Regular task at bottom');
+});
+
+

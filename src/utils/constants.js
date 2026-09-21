@@ -141,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.26': [
+    { title: '🖐️ Drag-and-Drop Reordering for Due Scheduled Tasks:', desc: 'Scheduled tasks continue to appear at the top of their priority list when their set due date arrives, but now fully respect custom drag-and-drop reordering without snapping back to the top, allowing users to freely move them anywhere in the list or place other tasks above them.' }
+  ],
   '3.7.25': [
     { title: '📝 Streamlined & Clutter-Free Notes View:', desc: 'Simplified the Notes view header by removing the achievements badge and settings cog (accessible anytime in Tasks view), neatly aligning the red new note icon on the header row next to projects, and eliminating the redundant Add New Note button below for a cleaner, distraction-free writing experience.' }
   ],

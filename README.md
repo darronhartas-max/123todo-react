@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.25** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.26** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.25 (Current)
+### v3.7.26 (Current)
+
+- **Drag-and-Drop Reordering for Due Scheduled Tasks**: Scheduled tasks continue to appear at the top of their priority list when their set due date arrives, but now fully respect custom drag-and-drop reordering without snapping back to the top, allowing users to freely move them anywhere in the list or place other tasks above them.
+
+### v3.7.25
 
 - **Streamlined & Clutter-Free Notes View**: Simplified the Notes view header by removing the achievements badge and settings cog (accessible anytime in Tasks view), neatly aligning the red new note icon on the header row next to projects, and eliminating the redundant Add New Note button below for a cleaner, distraction-free writing experience.
 

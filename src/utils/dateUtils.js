@@ -204,3 +204,61 @@ export const formatEvidentiaryTimestamp = (timestamp) => {
     
     return `${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
 };
+
+/**
+ * Promotes scheduled tasks whose due date has arrived (scheduledDate <= today) to the top
+ * of their respective priority lists upon initial appearance, marking them with promotedDate.
+ * Once marked as promoted, they respect user drag-and-drop reordering without snapping back to top.
+ * 
+ * @param {Array} taskList - List of tasks
+ * @param {string} [todayStr] - Today's date string in YYYY-MM-DD
+ * @returns {Array} Updated task list with due scheduled tasks placed at the top of their priority sections
+ */
+export const promoteDueScheduledTasks = (taskList, todayStr = getTodayDateString()) => {
+    if (!Array.isArray(taskList) || taskList.length === 0) return taskList;
+
+    const needsPromotion = taskList.some(t => 
+        t && t.scheduledDate && t.scheduledDate <= todayStr && t.promotedDate !== t.scheduledDate
+    );
+
+    if (!needsPromotion) return taskList;
+
+    let result = [...taskList];
+
+    [1, 2, 3, 4].forEach(priority => {
+        const dueToPromote = result.filter(t => 
+            t && (t.priority === priority || (!t.priority && priority === 1)) &&
+            t.scheduledDate && t.scheduledDate <= todayStr && t.promotedDate !== t.scheduledDate
+        );
+
+        if (dueToPromote.length === 0) return;
+
+        // Sort multiple due tasks by scheduledDate (e.g. earlier due dates first)
+        dueToPromote.sort((a, b) => (a.scheduledDate || '').localeCompare(b.scheduledDate || ''));
+
+        const promotedDueTasks = dueToPromote.map(t => ({
+            ...t,
+            promotedDate: t.scheduledDate
+        }));
+
+        const dueIds = new Set(promotedDueTasks.map(t => String(t.id)));
+        const remaining = result.filter(t => !dueIds.has(String(t.id)));
+
+        const firstPriorityIndex = remaining.findIndex(t => 
+            (t.priority === priority || (!t.priority && priority === 1))
+        );
+
+        if (firstPriorityIndex !== -1) {
+            remaining.splice(firstPriorityIndex, 0, ...promotedDueTasks);
+        } else {
+            let insertIndex = remaining.findIndex(t => (t.priority || 1) > priority);
+            if (insertIndex === -1) insertIndex = remaining.length;
+            remaining.splice(insertIndex, 0, ...promotedDueTasks);
+        }
+
+        result = remaining;
+    });
+
+    return result;
+};
+

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
-import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp } from '../utils/dateUtils';
+import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from '../utils/dateUtils';
 import { savePhotos } from '../utils/photoStorage';
 
 // Lightweight serializer for LocalStorage: keeps metadata and compact thumbnails in LocalStorage,
@@ -55,6 +55,7 @@ const sanitizeTaskIds = (tasksList, archivedList, startCounter) => {
                 id,
                 projectId: task.projectId || task.categoryId || 'general',
                 scheduledDate: task.scheduledDate || null,
+                promotedDate: task.promotedDate || null,
                 deferCount: task.deferCount || 0,
                 subtasks: task.subtasks || [],
                 isRecurring: task.isRecurring || false,
@@ -202,7 +203,9 @@ export const useTasks = () => {
 
             // Sanitize loaded tasks and assign unique IDs to resolve collisions
             const sanitized = sanitizeTaskIds(loadedTasks, loadedArchived, startCounter);
-            setTasks(sanitized.tasks);
+            const today = getTodayDateString();
+            const initialTasks = promoteDueScheduledTasks(sanitized.tasks, today);
+            setTasks(initialTasks);
             setArchived(sanitized.archived);
             setCounter(sanitized.counter);
 
@@ -283,9 +286,36 @@ export const useTasks = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp, isLoaded]);
 
+    // Automatically promote due scheduled tasks when reaching their set day (or across midnight/focus)
+    useEffect(() => {
+        if (!isLoaded) return;
+        const checkPromotion = () => {
+            const today = getTodayDateString();
+            setTasks(prev => {
+                const needsPromotion = prev.some(t => 
+                    t && t.scheduledDate && t.scheduledDate <= today && t.promotedDate !== t.scheduledDate
+                );
+                if (!needsPromotion) return prev;
+                return promoteDueScheduledTasks(prev, today);
+            });
+        };
+
+        checkPromotion();
+        const interval = setInterval(checkPromotion, 60000);
+        window.addEventListener('visibilitychange', checkPromotion);
+        window.addEventListener('focus', checkPromotion);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('visibilitychange', checkPromotion);
+            window.removeEventListener('focus', checkPromotion);
+        };
+    }, [isLoaded]);
+
     const addTask = useCallback((text, priority, projectId = 'general', notes = '', extraFields = {}) => {
         const newId = counter + 1;
         const now = Date.now();
+        const today = getTodayDateString();
+        const isScheduledToday = extraFields.scheduledDate && extraFields.scheduledDate <= today;
         const newTask = {
             id: newId,
             text: text.trim(),
@@ -294,6 +324,7 @@ export const useTasks = () => {
             notes: (notes || '').trim(),
             isSample: false,
             scheduledDate: extraFields.scheduledDate || null,
+            promotedDate: isScheduledToday ? extraFields.scheduledDate : null,
             deferCount: 0,
             subtasks: extraFields.subtasks || [],
             isRecurring: extraFields.isRecurring || false,
@@ -304,7 +335,7 @@ export const useTasks = () => {
         };
 
         setCounter(newId);
-        setTasks(prev => [newTask, ...prev]);
+        setTasks(prev => promoteDueScheduledTasks([newTask, ...prev], today));
         setTimestamp(now);
     }, [counter]);
 
@@ -346,6 +377,7 @@ export const useTasks = () => {
                     const spawnedTask = {
                         ...taskToComplete,
                         scheduledDate: nextDate,
+                        promotedDate: null,
                         deferCount: 0,
                         subtasks: resetSubtasks,
                         completedAt: null,
@@ -411,20 +443,26 @@ export const useTasks = () => {
     const updateTask = useCallback((id, updates) => {
         const today = getTodayDateString();
         const now = Date.now();
-        setTasks(prev => prev.map(task => {
-            if (String(task.id) === String(id)) {
-                const finalUpdates = { ...updates };
-                const oldIsActive = !task.scheduledDate || task.scheduledDate <= today;
-                const newIsFuture = updates.scheduledDate && updates.scheduledDate > today;
-                
-                if (oldIsActive && newIsFuture) {
-                    finalUpdates.deferCount = (task.deferCount || 0) + 1;
+        setTasks(prev => {
+            const updated = prev.map(task => {
+                if (String(task.id) === String(id)) {
+                    const finalUpdates = { ...updates };
+                    const oldIsActive = !task.scheduledDate || task.scheduledDate <= today;
+                    const newIsFuture = updates.scheduledDate && updates.scheduledDate > today;
+                    
+                    if (oldIsActive && newIsFuture) {
+                        finalUpdates.deferCount = (task.deferCount || 0) + 1;
+                    }
+                    if (updates.scheduledDate && updates.scheduledDate !== task.scheduledDate) {
+                        finalUpdates.promotedDate = null;
+                    }
+                    
+                    return { ...task, ...finalUpdates, updatedAt: now, isSample: false };
                 }
-                
-                return { ...task, ...finalUpdates, updatedAt: now, isSample: false };
-            }
-            return task;
-        }));
+                return task;
+            });
+            return promoteDueScheduledTasks(updated, today);
+        });
         setTimestamp(now);
     }, []);
 
@@ -447,6 +485,9 @@ export const useTasks = () => {
                 const [movedTask] = newTasks.splice(fromIndex, 1);
                 movedTask.priority = newPriority;
                 movedTask.updatedAt = now;
+                if (movedTask.scheduledDate) {
+                    movedTask.promotedDate = movedTask.scheduledDate;
+                }
 
                 // Append at the bottom of the target priority section for natural dropping
                 let lastPriorityIdx = -1;
@@ -476,6 +517,9 @@ export const useTasks = () => {
                 const [movedTask] = newTasks.splice(fromIndex, 1);
                 movedTask.projectId = targetProjId;
                 movedTask.updatedAt = now;
+                if (movedTask.scheduledDate) {
+                    movedTask.promotedDate = movedTask.scheduledDate;
+                }
 
                 let lastProjIdx = -1;
                 for (let i = newTasks.length - 1; i >= 0; i--) {
@@ -502,6 +546,12 @@ export const useTasks = () => {
             const [movedTask] = newTasks.splice(fromIndex, 1);
             movedTask.priority = targetTask.priority;
             movedTask.updatedAt = now;
+            if (movedTask.scheduledDate) {
+                movedTask.promotedDate = movedTask.scheduledDate;
+            }
+            if (targetTask.scheduledDate) {
+                targetTask.promotedDate = targetTask.scheduledDate;
+            }
 
             const newTargetIndex = newTasks.findIndex(t => String(t.id) === targetStr);
             if (newTargetIndex === -1) {

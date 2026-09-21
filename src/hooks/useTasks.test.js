@@ -130,6 +130,36 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(moved.priority).toBe(1);
     });
 
+    test('allows moving scheduled tasks and moving other tasks above scheduled tasks via drag and drop without snapping back', () => {
+        const today = new Date().toISOString().split('T')[0];
+        const initialTasks = [
+            { id: 1, text: 'Regular Task 1', priority: 1, projectId: 'general', scheduledDate: null },
+            { id: 2, text: 'Regular Task 2', priority: 1, projectId: 'general', scheduledDate: null },
+            { id: 3, text: 'Scheduled Task Due Today', priority: 1, projectId: 'general', scheduledDate: today }
+        ];
+        localStorage.setItem('123TodoTasks', JSON.stringify(initialTasks));
+
+        const { result } = renderHook(() => useTasks());
+
+        // Upon initial load, the scheduled task should appear at the top of its priority section
+        expect(result.current.tasks.map(t => t.id)).toEqual([3, 1, 2]);
+
+        // Drag Regular Task 1 (id 1) above Scheduled Task (id 3)
+        act(() => {
+            result.current.reorderTasks(1, 3);
+        });
+
+        // The user's reordered position must be preserved!
+        expect(result.current.tasks.map(t => t.id)).toEqual([1, 3, 2]);
+
+        // Drag Scheduled Task (id 3) down onto id 2 so it drops before id 2
+        act(() => {
+            result.current.reorderTasks(2, 3);
+        });
+
+        expect(result.current.tasks.map(t => t.id)).toEqual([1, 2, 3]);
+    });
+
     test('updates task details and handles string ID mismatch gracefully', () => {
         const initialTasks = [
             { id: 1, text: 'Old Task Title', priority: 1, projectId: 'general', notes: 'Old Notes' }

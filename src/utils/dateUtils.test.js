@@ -1,4 +1,4 @@
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
     test('getTomorrowDateString calculates exactly 1 day from today', () => {
@@ -58,5 +58,45 @@ describe('dateUtils - scheduling helpers', () => {
         expect(isValidEvidentiaryTimestamp(new Date('2019-12-31').getTime())).toBe(false);
         expect(isValidEvidentiaryTimestamp(new Date('2026-09-12').getTime())).toBe(true);
         expect(isValidEvidentiaryTimestamp('2026-09-12T10:00:00.000Z')).toBe(true);
+    });
+
+    describe('promoteDueScheduledTasks', () => {
+        test('promotes due scheduled task to the top of its priority list upon first appearance', () => {
+            const today = '2026-09-21';
+            const tasks = [
+                { id: 1, text: 'Regular Task 1', priority: 1, scheduledDate: null },
+                { id: 2, text: 'Regular Task 2', priority: 1, scheduledDate: null },
+                { id: 3, text: 'Scheduled Today', priority: 1, scheduledDate: today }
+            ];
+
+            const result = promoteDueScheduledTasks(tasks, today);
+            expect(result.map(t => t.id)).toEqual([3, 1, 2]);
+            expect(result[0].promotedDate).toBe(today);
+        });
+
+        test('does not re-promote tasks that have already been marked as promoted', () => {
+            const today = '2026-09-21';
+            // Suppose user reordered task 3 below task 1
+            const tasks = [
+                { id: 1, text: 'Regular Task 1', priority: 1, scheduledDate: null },
+                { id: 3, text: 'Scheduled Today', priority: 1, scheduledDate: today, promotedDate: today },
+                { id: 2, text: 'Regular Task 2', priority: 1, scheduledDate: null }
+            ];
+
+            const result = promoteDueScheduledTasks(tasks, today);
+            // Must preserve the user's reordered array without snapping to top
+            expect(result.map(t => t.id)).toEqual([1, 3, 2]);
+        });
+
+        test('does not promote future scheduled tasks', () => {
+            const today = '2026-09-21';
+            const tasks = [
+                { id: 1, text: 'Regular Task 1', priority: 1, scheduledDate: null },
+                { id: 2, text: 'Future Task', priority: 1, scheduledDate: '2026-09-25' }
+            ];
+
+            const result = promoteDueScheduledTasks(tasks, today);
+            expect(result).toBe(tasks); // untouched reference
+        });
     });
 });
