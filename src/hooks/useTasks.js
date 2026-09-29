@@ -55,6 +55,7 @@ const sanitizeTaskIds = (tasksList, archivedList, startCounter) => {
                 id,
                 projectId: task.projectId || task.categoryId || 'general',
                 scheduledDate: task.scheduledDate || null,
+                scheduledTime: task.scheduledTime || null,
                 promotedDate: task.promotedDate || null,
                 deferCount: task.deferCount || 0,
                 subtasks: task.subtasks || [],
@@ -324,6 +325,7 @@ export const useTasks = () => {
             notes: (notes || '').trim(),
             isSample: false,
             scheduledDate: extraFields.scheduledDate || null,
+            scheduledTime: extraFields.scheduledDate ? (extraFields.scheduledTime || null) : null,
             promotedDate: isScheduledToday ? extraFields.scheduledDate : null,
             deferCount: 0,
             subtasks: extraFields.subtasks || [],
@@ -455,6 +457,9 @@ export const useTasks = () => {
                     }
                     if (updates.scheduledDate && updates.scheduledDate !== task.scheduledDate) {
                         finalUpdates.promotedDate = null;
+                    }
+                    if (updates.scheduledDate === null && updates.scheduledTime === undefined) {
+                        finalUpdates.scheduledTime = null;
                     }
                     
                     return { ...task, ...finalUpdates, updatedAt: now, isSample: false };

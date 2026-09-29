@@ -192,6 +192,44 @@ describe('EditModal', () => {
     );
   });
 
+  test('allows setting and clearing scheduled time in EditModal', () => {
+    const onSaveMock = jest.fn();
+    const taskWithDate = {
+      ...sampleTaskWithNotes,
+      scheduledDate: '2026-10-15',
+      scheduledTime: null
+    };
+
+    render(
+      <EditModal
+        task={taskWithDate}
+        onSave={onSaveMock}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    // Schedule section is already open because task has scheduledDate
+    const addTimeBtn = screen.getByRole('button', { name: /\+ add time \(optional\)/i });
+    expect(addTimeBtn).toBeInTheDocument();
+    fireEvent.click(addTimeBtn);
+
+    // Enter a time
+    const timeInput = screen.getByLabelText(/time:/i);
+    expect(timeInput).toBeInTheDocument();
+    fireEvent.change(timeInput, { target: { value: '09:45' } });
+
+    // Save
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+    expect(onSaveMock).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        scheduledDate: '2026-10-15',
+        scheduledTime: '09:45'
+      })
+    );
+  });
+
   test('displays all project options when opening project dropdown in edit modal', () => {
     const manyProjects = [
       { id: 'general', name: 'General', color: '#6b7280' },

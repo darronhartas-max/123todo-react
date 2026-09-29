@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.27
+
+- **⏰ Optional Time for Scheduled Tasks:** Added an optional scheduled time alongside the scheduled date. Designed to be visually minimalist and unobtrusive so it does not clutter the interface for users who only schedule by date, with a subtle "+ Add time" option, clear controls, and chronological date and time ordering.
+
 ### v3.7.26
 
 - **🖐️ Drag-and-Drop Reordering for Due Scheduled Tasks:** Scheduled tasks continue to appear at the top of their priority list when their set due date arrives, but now fully respect custom drag-and-drop reordering without snapping back to the top, allowing users to freely move them anywhere in the list or place other tasks above them.

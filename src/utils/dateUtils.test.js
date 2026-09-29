@@ -1,4 +1,4 @@
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatDisplayTime, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
     test('getTomorrowDateString calculates exactly 1 day from today', () => {
@@ -88,15 +88,44 @@ describe('dateUtils - scheduling helpers', () => {
             expect(result.map(t => t.id)).toEqual([1, 3, 2]);
         });
 
-        test('does not promote future scheduled tasks', () => {
+        test('orders multiple due tasks on same date with timed tasks first chronologically', () => {
             const today = '2026-09-21';
             const tasks = [
                 { id: 1, text: 'Regular Task 1', priority: 1, scheduledDate: null },
-                { id: 2, text: 'Future Task', priority: 1, scheduledDate: '2026-09-25' }
+                { id: 2, text: 'All-Day Scheduled Today', priority: 1, scheduledDate: today, scheduledTime: null },
+                { id: 3, text: 'Afternoon Task', priority: 1, scheduledDate: today, scheduledTime: '14:30' },
+                { id: 4, text: 'Morning Task', priority: 1, scheduledDate: today, scheduledTime: '09:00' }
             ];
 
             const result = promoteDueScheduledTasks(tasks, today);
-            expect(result).toBe(tasks); // untouched reference
+            // Morning (09:00), then Afternoon (14:30), then All-Day (no time), then regular task
+            expect(result.map(t => t.id)).toEqual([4, 3, 2, 1]);
+        });
+    });
+
+    describe('formatDisplayTime', () => {
+        test('formats 24-hour style for UK, ISO, and UK_TEXT', () => {
+            expect(formatDisplayTime('14:30', 'UK')).toBe('14:30');
+            expect(formatDisplayTime('09:05', 'UK')).toBe('09:05');
+            expect(formatDisplayTime('00:00', 'ISO')).toBe('00:00');
+            expect(formatDisplayTime('23:59', 'UK_TEXT')).toBe('23:59');
+            expect(formatDisplayTime('12:00', 'UK')).toBe('12:00');
+        });
+
+        test('formats 12-hour style with AM/PM for US and US_TEXT', () => {
+            expect(formatDisplayTime('14:30', 'US')).toBe('2:30 PM');
+            expect(formatDisplayTime('09:05', 'US')).toBe('9:05 AM');
+            expect(formatDisplayTime('00:00', 'US')).toBe('12:00 AM');
+            expect(formatDisplayTime('12:00', 'US')).toBe('12:00 PM');
+            expect(formatDisplayTime('23:59', 'US_TEXT')).toBe('11:59 PM');
+            expect(formatDisplayTime('00:30', 'US_TEXT')).toBe('12:30 AM');
+        });
+
+        test('handles invalid or empty inputs gracefully', () => {
+            expect(formatDisplayTime('')).toBe('');
+            expect(formatDisplayTime(null)).toBe('');
+            expect(formatDisplayTime(undefined)).toBe('');
+            expect(formatDisplayTime('invalid')).toBe('invalid');
         });
     });
 });

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
 import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -199,6 +199,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     // Scheduling and recurrence states
     const [showSchedule, setShowSchedule] = useState(!!task.scheduledDate);
     const [scheduledDate, setScheduledDate] = useState(task.scheduledDate || null);
+    const [scheduledTime, setScheduledTime] = useState(task.scheduledTime || null);
+    const [showTimeInput, setShowTimeInput] = useState(!!task.scheduledTime);
     const [isRecurring, setIsRecurring] = useState(task.isRecurring || false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState(task.recurrence?.frequency || 1);
     const [recurrenceInterval, setRecurrenceInterval] = useState(task.recurrence?.interval || 'days');
@@ -274,6 +276,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             notes: editingTask.notes,
             photos: editingTask.photos || [],
             scheduledDate: finalScheduledDate,
+            scheduledTime: finalScheduledDate ? scheduledTime : null,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
             recurrence
@@ -809,7 +812,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         style={toggleButtonStyle(showSchedule)}
                     >
                         {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>{scheduledDate ? formatDisplayDate(scheduledDate, dateFormat) : 'Schedule'}</span>
+                        <span>{scheduledDate
+                            ? `${formatDisplayDate(scheduledDate, dateFormat)}${scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
+                            : 'Schedule'}</span>
                     </button>
                 </div>
 
@@ -1341,7 +1346,12 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             {scheduledDate && (
                                 <button
                                     type="button"
-                                    onClick={() => { setScheduledDate(null); setIsRecurring(false); }}
+                                    onClick={() => {
+                                        setScheduledDate(null);
+                                        setScheduledTime(null);
+                                        setShowTimeInput(false);
+                                        setIsRecurring(false);
+                                    }}
                                     style={{
                                         padding: '6px 8px',
                                         background: 'transparent',
@@ -1360,6 +1370,89 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                             )}
                         </div>
+
+                        {/* Minimalist Time Input */}
+                        {!showTimeInput && !scheduledTime ? (
+                            <div style={{ marginBottom: '6px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowTimeInput(true);
+                                        if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '2px 0',
+                                        color: 'var(--muted-text)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.78rem',
+                                        fontWeight: '500',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px'
+                                    }}
+                                >
+                                    <Clock size={12} />
+                                    <span>+ Add time (optional)</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                marginBottom: '8px',
+                                flexWrap: 'nowrap'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
+                                    <Clock size={13} />
+                                    <label htmlFor="edit-scheduled-time">Time:</label>
+                                </div>
+                                <input
+                                    id="edit-scheduled-time"
+                                    type="time"
+                                    value={scheduledTime || ''}
+                                    onChange={(e) => {
+                                        setScheduledTime(e.target.value || null);
+                                        if (!scheduledDate && e.target.value) {
+                                            setScheduledDate(getTodayDateString());
+                                        }
+                                    }}
+                                    style={{
+                                        padding: '4px 6px',
+                                        fontSize: '0.82rem',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '4px',
+                                        background: 'var(--bg-color)',
+                                        color: 'var(--text-color)',
+                                        outline: 'none',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setScheduledTime(null);
+                                        setShowTimeInput(false);
+                                    }}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: 'var(--muted-text)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.78rem',
+                                        padding: '4px 6px',
+                                        borderRadius: '4px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center'
+                                    }}
+                                    title="Remove time"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        )}
 
                         <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}>

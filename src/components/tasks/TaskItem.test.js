@@ -318,3 +318,35 @@ test('in Lite mode, the task item is draggable and invokes dragHandlers for reor
   fireEvent.dragStart(listItem);
   expect(onDragStartMock).toHaveBeenCalled();
 });
+
+test('displays scheduled date and scheduled time with separator in task badge', () => {
+  const task = {
+    id: 111,
+    text: 'Client consultation meeting',
+    priority: 1,
+    projectId: 'general',
+    scheduledDate: '2026-10-05',
+    scheduledTime: '15:30'
+  };
+
+  render(<TaskItem task={task} showFullDetails={true} dateFormat="UK" />);
+
+  // Should display 05/10/2026 • 15:30
+  expect(screen.getByText(/05\/10\/2026\s*•\s*15:30/)).toBeInTheDocument();
+});
+
+test('displays scheduled date and scheduled time in 12-hour format when dateFormat is US', () => {
+  const task = {
+    id: 112,
+    text: 'Doctor appointment',
+    priority: 1,
+    projectId: 'general',
+    scheduledDate: '2026-10-05',
+    scheduledTime: '15:30'
+  };
+
+  render(<TaskItem task={task} showFullDetails={true} dateFormat="US" />);
+
+  // Should display 10/05/2026 • 3:30 PM
+  expect(screen.getByText(/10\/05\/2026\s*•\s*3:30 PM/)).toBeInTheDocument();
+});

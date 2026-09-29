@@ -94,6 +94,28 @@ export const formatDisplayDate = (dateVal, formatStyle = 'UK') => {
 };
 
 /**
+ * Formats an HH:MM time string (24-hour format from <input type="time">) according to user preference.
+ * @param {string} timeStr - "HH:MM"
+ * @param {string} [formatStyle='UK'] - 'UK' | 'US' | 'ISO' | 'UK_TEXT' | 'US_TEXT'
+ * @returns {string} Formatted display time string (e.g. "14:30" or "2:30 PM")
+ */
+export const formatDisplayTime = (timeStr, formatStyle = 'UK') => {
+    if (!timeStr || typeof timeStr !== 'string') return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    const hours = parseInt(parts[0], 10);
+    const minutes = parts[1].padStart(2, '0');
+    if (isNaN(hours)) return timeStr;
+
+    if (formatStyle === 'US' || formatStyle === 'US_TEXT') {
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${minutes} ${period}`;
+    }
+    return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
+
+/**
  * Calculates the next recurrence date based on the current scheduled date and the recurrence rules.
  * @param {string} currentDateStr - YYYY-MM-DD format
  * @param {Object} recurrence - { frequency, interval, daysOfWeek }
@@ -233,8 +255,17 @@ export const promoteDueScheduledTasks = (taskList, todayStr = getTodayDateString
 
         if (dueToPromote.length === 0) return;
 
-        // Sort multiple due tasks by scheduledDate (e.g. earlier due dates first)
-        dueToPromote.sort((a, b) => (a.scheduledDate || '').localeCompare(b.scheduledDate || ''));
+        // Sort multiple due tasks by scheduledDate and scheduledTime (e.g. earlier due dates & times first)
+        dueToPromote.sort((a, b) => {
+            const dateComp = (a.scheduledDate || '').localeCompare(b.scheduledDate || '');
+            if (dateComp !== 0) return dateComp;
+            if (a.scheduledTime && b.scheduledTime) {
+                return a.scheduledTime.localeCompare(b.scheduledTime);
+            }
+            if (a.scheduledTime && !b.scheduledTime) return -1;
+            if (!a.scheduledTime && b.scheduledTime) return 1;
+            return 0;
+        });
 
         const promotedDueTasks = dueToPromote.map(t => ({
             ...t,

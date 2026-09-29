@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.26** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.27** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.26 (Current)
+### v3.7.27 (Current)
+
+- **Optional Time for Scheduled Tasks**: Added an optional scheduled time alongside the scheduled date in both Add Task and Edit Task modals. Visually minimalist and unobtrusive so it does not clutter the interface for users who only schedule by date, featuring progressive disclosure via "+ Add time", fast clear controls, and chronological date and time ordering.
+
+### v3.7.26
 
 - **Drag-and-Drop Reordering for Due Scheduled Tasks**: Scheduled tasks continue to appear at the top of their priority list when their set due date arrives, but now fully respect custom drag-and-drop reordering without snapping back to the top, allowing users to freely move them anywhere in the list or place other tasks above them.
 

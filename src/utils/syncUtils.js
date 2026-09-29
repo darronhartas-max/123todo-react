@@ -155,6 +155,7 @@ export const mergeSyncDatasets = (localData = {}, remoteData = {}) => {
         priority: primaryTask.priority !== undefined ? primaryTask.priority : secondaryTask.priority,
         projectId: primaryTask.projectId || primaryTask.categoryId || secondaryTask.projectId || 'general',
         scheduledDate: primaryTask.scheduledDate !== undefined ? primaryTask.scheduledDate : secondaryTask.scheduledDate,
+        scheduledTime: primaryTask.scheduledTime !== undefined ? primaryTask.scheduledTime : secondaryTask.scheduledTime,
         subtasks: primaryTask.subtasks !== undefined ? primaryTask.subtasks : secondaryTask.subtasks,
         photos: primaryTask.photos !== undefined ? primaryTask.photos : secondaryTask.photos,
         isRecurring: primaryTask.isRecurring !== undefined ? primaryTask.isRecurring : secondaryTask.isRecurring,

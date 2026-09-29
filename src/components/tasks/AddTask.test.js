@@ -96,4 +96,85 @@ test('renders Talk button and activates listening indicator on click', () => {
   delete window.SpeechRecognition;
 });
 
+test('allows adding and removing time when scheduling a task in AddTask', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const onAddMock = jest.fn();
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={onAddMock}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+    />
+  );
+
+  // Type title
+  const input = screen.getByPlaceholderText(/what needs to be done/i);
+  fireEvent.change(input, { target: { value: 'Dentist appointment' } });
+
+  // Open schedule section
+  const scheduleToggle = screen.getByRole('button', { name: /schedule/i });
+  fireEvent.click(scheduleToggle);
+
+  // Set date to tomorrow
+  const dayButton = screen.getByRole('button', { name: /day/i });
+  fireEvent.click(dayButton);
+
+  // Initially minimalist "+ Add time (optional)" is shown
+  const addTimeBtn = screen.getByRole('button', { name: /\+ add time \(optional\)/i });
+  expect(addTimeBtn).toBeInTheDocument();
+  fireEvent.click(addTimeBtn);
+
+  // Time input is now revealed
+  const timeInput = screen.getByLabelText(/time:/i);
+  expect(timeInput).toBeInTheDocument();
+  fireEvent.change(timeInput, { target: { value: '14:30' } });
+
+  // Add the task
+  const addBtn = screen.getByRole('button', { name: /^add$/i });
+  fireEvent.click(addBtn);
+
+  expect(onAddMock).toHaveBeenCalledWith(
+    'Dentist appointment',
+    1,
+    'general',
+    '',
+    expect.objectContaining({
+      scheduledDate: expect.any(String),
+      scheduledTime: '14:30'
+    })
+  );
+});
+
+test('removing scheduled time reverts back to + Add time button in AddTask', () => {
+  const { fireEvent } = require('@testing-library/react');
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+    />
+  );
+
+  // Open schedule section
+  fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+  // Click "+ Add time (optional)"
+  fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+
+  // Set time and then click Remove
+  const timeInput = screen.getByLabelText(/time:/i);
+  fireEvent.change(timeInput, { target: { value: '10:00' } });
+
+  const removeBtn = screen.getByRole('button', { name: /remove/i });
+  fireEvent.click(removeBtn);
+
+  // Reverts back to "+ Add time (optional)"
+  expect(screen.getByRole('button', { name: /\+ add time \(optional\)/i })).toBeInTheDocument();
+  expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
+});
+
 

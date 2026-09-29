@@ -615,8 +615,8 @@ const TodoApp = () => {
     }
   };
 
-  const handleAddTask = useCallback((text, priority, projectId, notes, scheduledDate, extraFields) => {
-    addTask(text, priority, projectId, notes, scheduledDate, extraFields);
+  const handleAddTask = useCallback((text, priority, projectId, notes, extraFields) => {
+    addTask(text, priority, projectId, notes, extraFields);
     recordAppUsageAction('add');
   }, [addTask, recordAppUsageAction]);
 
@@ -662,7 +662,16 @@ const TodoApp = () => {
   const activeTasks = tasks.filter(t => !t.scheduledDate || t.scheduledDate <= today);
   const scheduledTasks = tasks
     .filter(t => t.scheduledDate && t.scheduledDate > today)
-    .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
+    .sort((a, b) => {
+      const dateComp = a.scheduledDate.localeCompare(b.scheduledDate);
+      if (dateComp !== 0) return dateComp;
+      if (a.scheduledTime && b.scheduledTime) {
+        return a.scheduledTime.localeCompare(b.scheduledTime);
+      }
+      if (a.scheduledTime && !b.scheduledTime) return -1;
+      if (!a.scheduledTime && b.scheduledTime) return 1;
+      return 0;
+    });
 
   const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
   const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));

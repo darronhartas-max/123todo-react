@@ -141,6 +141,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.27': [
+    { title: '⏰ Optional Time for Scheduled Tasks:', desc: 'Added an optional scheduled time alongside the scheduled date. Designed to be visually minimalist and unobtrusive so it does not clutter the interface for users who only schedule by date, with a subtle "+ Add time" option, clear controls, and chronological date and time ordering.' }
+  ],
   '3.7.26': [
     { title: '🖐️ Drag-and-Drop Reordering for Due Scheduled Tasks:', desc: 'Scheduled tasks continue to appear at the top of their priority list when their set due date arrives, but now fully respect custom drag-and-drop reordering without snapping back to the top, allowing users to freely move them anywhere in the list or place other tasks above them.' }
   ],

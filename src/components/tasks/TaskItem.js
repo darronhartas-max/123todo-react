@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
-import { formatDisplayDate, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
+import { formatDisplayDate, formatDisplayTime, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
@@ -796,7 +796,11 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 alignItems: 'center',
                                 gap: '3px'
                             }}>
-                                {task.isRecurring ? <Repeat size={12} /> : <Calendar size={12} />} {formatDisplayDate(task.scheduledDate, dateFormat)}
+                                {task.isRecurring ? <Repeat size={12} /> : <Calendar size={12} />}
+                                <span>
+                                    {formatDisplayDate(task.scheduledDate, dateFormat)}
+                                    {task.scheduledTime ? ` • ${formatDisplayTime(task.scheduledTime, dateFormat)}` : ''}
+                                </span>
                             </span>
                         )}
                         {task.isRecurring && task.recurrence && (
