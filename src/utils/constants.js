@@ -142,6 +142,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.31': [
+    { title: '✨ Clean Priority Section Headers:', desc: 'Removed the redundant "Collapsed" text label from priority section headers in the main task list. Sections maintain clean, uncluttered visual headers with intuitive chevron toggle icons indicating collapse and expansion states.' }
+  ],
   '3.7.30': [
     { title: '⏰ Simple Clock Face Time Picker:', desc: 'Simplified the scheduling time picker to a clean, minimal interface. Clicking the time input opens the intuitive native clock face to easily pick the hour then minutes, eliminating visual clutter while preserving quick Google Calendar and Apple Calendar integration.' }
   ],

@@ -130,12 +130,7 @@ const PrioritySection = ({
                     </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.75rem', fontWeight: '600' }}>
-                    {isCollapsed && (
-                        <span style={{ fontSize: '0.72rem', color: 'var(--muted-text)' }}>
-                            Collapsed
-                        </span>
-                    )}
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--muted-text)' }}>
                     <button
                         type="button"
                         onClick={toggleCollapse}

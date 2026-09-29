@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.31
+
+- **✨ Clean Priority Section Headers:** Removed the redundant "Collapsed" text label from priority section headers in the main task list. Sections maintain clean, uncluttered visual headers with intuitive chevron toggle icons indicating collapse and expansion states.
+
 ### v3.7.30
 
 - **⏰ Simple Clock Face Time Picker:** Simplified the scheduling time picker to a clean, minimal interface. Clicking the time input opens the intuitive native clock face to easily pick the hour then minutes, eliminating visual clutter while preserving quick Google Calendar and Apple Calendar integration.
