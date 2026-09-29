@@ -475,6 +475,53 @@ describe('EditModal', () => {
         expect(screen.getByText(/Created:/i)).toBeInTheDocument();
         expect(screen.getByText(/12 Sep 2026, 14:30:00/i)).toBeInTheDocument();
     });
+
+    test('renders Google Cal and Apple Cal buttons when task has scheduled date', () => {
+        const calendarUtils = require('../../utils/calendarUtils');
+        jest.spyOn(calendarUtils, 'openGoogleCalendar').mockImplementation(() => {});
+        jest.spyOn(calendarUtils, 'downloadAppleCalendarIcs').mockImplementation(() => {});
+
+        const scheduledTask = {
+            id: 99,
+            text: 'Meeting with dentist',
+            priority: 1,
+            projectId: 'general',
+            scheduledDate: '2026-10-15',
+            scheduledTime: '10:00'
+        };
+
+        render(
+            <EditModal
+                task={scheduledTask}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        const googleBtn = screen.getByRole('button', { name: /google cal/i });
+        const appleBtn = screen.getByRole('button', { name: /apple cal/i });
+        expect(googleBtn).toBeInTheDocument();
+        expect(appleBtn).toBeInTheDocument();
+
+        fireEvent.click(googleBtn);
+        expect(calendarUtils.openGoogleCalendar).toHaveBeenCalledWith(
+            expect.objectContaining({
+                title: 'Meeting with dentist',
+                scheduledDate: '2026-10-15',
+                scheduledTime: '10:00'
+            })
+        );
+
+        fireEvent.click(appleBtn);
+        expect(calendarUtils.downloadAppleCalendarIcs).toHaveBeenCalledWith(
+            expect.objectContaining({
+                title: 'Meeting with dentist',
+                scheduledDate: '2026-10-15',
+                scheduledTime: '10:00'
+            })
+        );
+    });
 });
 
 

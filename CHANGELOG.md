@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.28
+
+- **📅 Google & Apple Calendar Integration & Automated Reminders:** Added seamless 1-click "Add to Google Calendar" and "Add to Apple Calendar" (.ics) buttons when scheduling tasks, pre-configured with reminders. Also introduced automated in-app and PWA reminders for due scheduled tasks on desktop and mobile devices, with a preference toggle in Settings.
+
 ### v3.7.27
 
 - **⏰ Optional Time for Scheduled Tasks:** Added an optional scheduled time alongside the scheduled date. Designed to be visually minimalist and unobtrusive so it does not clutter the interface for users who only schedule by date, with a subtle "+ Add time" option, clear controls, and chronological date and time ordering.

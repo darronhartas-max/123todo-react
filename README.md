@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.27** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.28** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.27 (Current)
+### v3.7.28 (Current)
+
+- **Google & Apple Calendar Integration & Automated Reminders**: Added seamless 1-click "Add to Google Calendar" and "Add to Apple Calendar" (.ics) buttons when scheduling tasks. Calendar events automatically include reminder alerts (15-minute advance alert in Apple Calendar and native Google Calendar notifications). Also introduced automated in-app and PWA reminders for due scheduled tasks on desktop and mobile devices, with a preference toggle in Settings.
+
+### v3.7.27
 
 - **Optional Time for Scheduled Tasks**: Added an optional scheduled time alongside the scheduled date in both Add Task and Edit Task modals. Visually minimalist and unobtrusive so it does not clutter the interface for users who only schedule by date, featuring progressive disclosure via "+ Add time", fast clear controls, and chronological date and time ordering.
 

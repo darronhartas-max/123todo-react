@@ -177,4 +177,42 @@ test('removing scheduled time reverts back to + Add time button in AddTask', () 
   expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
 });
 
+test('renders Google Cal and Apple Cal buttons when scheduled date is set', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const calendarUtils = require('../../utils/calendarUtils');
+  jest.spyOn(calendarUtils, 'openGoogleCalendar').mockImplementation(() => {});
+  jest.spyOn(calendarUtils, 'downloadAppleCalendarIcs').mockImplementation(() => {});
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+    />
+  );
+
+  // Open schedule section
+  fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+  // Before date is set, calendar buttons are not rendered
+  expect(screen.queryByRole('button', { name: /google cal/i })).not.toBeInTheDocument();
+
+  // Set date using +1 Day button
+  fireEvent.click(screen.getByRole('button', { name: /day/i }));
+
+  // Now buttons appear
+  const googleBtn = screen.getByRole('button', { name: /google cal/i });
+  const appleBtn = screen.getByRole('button', { name: /apple cal/i });
+  expect(googleBtn).toBeInTheDocument();
+  expect(appleBtn).toBeInTheDocument();
+
+  fireEvent.click(googleBtn);
+  expect(calendarUtils.openGoogleCalendar).toHaveBeenCalled();
+
+  fireEvent.click(appleBtn);
+  expect(calendarUtils.downloadAppleCalendarIcs).toHaveBeenCalled();
+});
+
+
 

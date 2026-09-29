@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2 } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
+import { isNotificationSupported, getNotificationPermission, requestNotificationPermission } from '../../utils/notificationUtils';
 import { useTenant } from '../../context/TenantContext';
 
 const SHORTCUTS_LIST = [
@@ -287,7 +288,9 @@ const SettingsModal = ({
     isOffline = false,
     onOpenLatestUpdates,
     screenScalingMode = 'auto',
-    setScreenScalingMode
+    setScreenScalingMode,
+    notificationsEnabled = false,
+    setNotificationsEnabled
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -1528,6 +1531,59 @@ const SettingsModal = ({
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                </div>
+
+                                {/* Automated Reminders & Notifications */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Bell size={16} style={{ color: 'var(--accent-color)' }} />
+                                            Automated Reminders & Notifications
+                                        </span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Receive native system notifications on desktop and open mobile PWA when scheduled tasks reach their set time
+                                        </span>
+                                    </div>
+                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        {!isNotificationSupported() ? (
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)' }}>
+                                                Notifications are not supported by this browser.
+                                            </span>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    const perm = await requestNotificationPermission();
+                                                    if (perm === 'granted') {
+                                                        const nextState = !notificationsEnabled;
+                                                        if (setNotificationsEnabled) setNotificationsEnabled(nextState);
+                                                    } else {
+                                                        if (setNotificationsEnabled) setNotificationsEnabled(false);
+                                                    }
+                                                }}
+                                                style={{
+                                                    ...styles.segmentBtn(notificationsEnabled && getNotificationPermission() === 'granted'),
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    padding: '8px 14px',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: '600',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                <Bell size={14} />
+                                                <span>
+                                                    {getNotificationPermission() === 'denied'
+                                                        ? 'Blocked in Browser Permissions'
+                                                        : (notificationsEnabled && getNotificationPermission() === 'granted'
+                                                            ? 'Reminders Enabled'
+                                                            : 'Enable Reminders')}
+                                                </span>
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
+import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
@@ -1201,6 +1202,73 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 title="Remove time"
                             >
                                 Remove
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Add to External Calendars */}
+                    {scheduledDate && (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            marginBottom: '10px',
+                            flexWrap: 'wrap'
+                        }}>
+                            <span style={{ fontSize: '0.78rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                Add to:
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => openGoogleCalendar({
+                                    title: text || 'Scheduled Task',
+                                    scheduledDate,
+                                    scheduledTime,
+                                    notes
+                                })}
+                                style={{
+                                    background: 'var(--item-bg)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '4px',
+                                    padding: '3px 8px',
+                                    fontSize: '0.78rem',
+                                    fontWeight: '600',
+                                    color: 'var(--text-color)',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
+                                }}
+                                title="Add to Google Calendar (with automated reminders)"
+                            >
+                                <Calendar size={12} style={{ color: '#4285f4' }} />
+                                <span>Google Cal</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => downloadAppleCalendarIcs({
+                                    title: text || 'Scheduled Task',
+                                    scheduledDate,
+                                    scheduledTime,
+                                    notes
+                                })}
+                                style={{
+                                    background: 'var(--item-bg)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '4px',
+                                    padding: '3px 8px',
+                                    fontSize: '0.78rem',
+                                    fontWeight: '600',
+                                    color: 'var(--text-color)',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
+                                }}
+                                title="Add to Apple Calendar / Download .ics (with automated 15-min reminder)"
+                            >
+                                <Calendar size={12} style={{ color: '#ea4335' }} />
+                                <span>Apple Cal</span>
                             </button>
                         </div>
                     )}

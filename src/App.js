@@ -41,6 +41,7 @@ import { useDeviceResolution } from './hooks/useDeviceResolution';
 import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
+import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 import { TenantProvider, useTenant } from './context/TenantContext';
 
@@ -458,6 +459,54 @@ const TodoApp = () => {
       console.error('Failed to save view profile preference:', e);
     }
   };
+
+  const [notificationsEnabled, setNotificationsEnabledState] = useState(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED);
+      if (val !== null) return val === 'true';
+      return isNotificationSupported() && Notification.permission === 'granted';
+    } catch {
+      return false;
+    }
+  });
+
+  const setNotificationsEnabled = (val) => {
+    setNotificationsEnabledState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, val ? 'true' : 'false');
+    } catch (e) {
+      console.error('Failed to save notifications preference:', e);
+    }
+  };
+
+  // Automated reminder checker for due scheduled tasks
+  const notifiedTasksRef = useRef(new Set());
+  useEffect(() => {
+    if (!notificationsEnabled || !isNotificationSupported() || Notification.permission !== 'granted') {
+      return;
+    }
+
+    const checkDueReminders = () => {
+      const today = getTodayDateString();
+      const d = new Date();
+      const currentHHMM = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+      tasks.forEach(t => {
+        if (!t || t.completed || !t.scheduledDate) return;
+        if (t.scheduledDate === today && t.scheduledTime === currentHHMM) {
+          const reminderKey = `${t.id}-${today}-${currentHHMM}`;
+          if (!notifiedTasksRef.current.has(reminderKey)) {
+            notifiedTasksRef.current.add(reminderKey);
+            sendTaskNotification(t);
+          }
+        }
+      });
+    };
+
+    checkDueReminders();
+    const interval = setInterval(checkDueReminders, 30000);
+    return () => clearInterval(interval);
+  }, [tasks, notificationsEnabled]);
 
   // Apply visual styling settings to root element
   useEffect(() => {
@@ -1457,6 +1506,8 @@ const TodoApp = () => {
         onOpenLatestUpdates={() => setShowUpdatedModal(true)}
         screenScalingMode={screenScalingMode}
         setScreenScalingMode={setScreenScalingMode}
+        notificationsEnabled={notificationsEnabled}
+        setNotificationsEnabled={setNotificationsEnabled}
       />
 
       <EmailClientModal
