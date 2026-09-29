@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar } from 'lucide-react';
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, TIME_PRESETS, getTimeDropdownOptions } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
@@ -1123,88 +1123,167 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         )}
                     </div>
 
-                    {/* Minimalist Time Input */}
-                    {!showTimeInput && !scheduledTime ? (
-                        <div style={{ marginBottom: '6px' }}>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowTimeInput(true);
-                                    if (!scheduledDate) setScheduledDate(getTodayDateString());
-                                }}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '2px 0',
-                                    color: 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.78rem',
-                                    fontWeight: '500',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px'
-                                }}
-                            >
-                                <Clock size={12} />
-                                <span>+ Add time (optional)</span>
-                            </button>
-                        </div>
-                    ) : (
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            marginBottom: '8px',
-                            flexWrap: 'nowrap'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
-                                <Clock size={13} />
-                                <label htmlFor="start-scheduled-time">Time:</label>
+                    {/* Minimalist Time Input with Quick Presets & Dropdown */}
+                    {(() => {
+                        const timeOptions = getTimeDropdownOptions(dateFormat);
+                        const isStandardTime = scheduledTime && timeOptions.some(o => o.value === scheduledTime);
+
+                        return !showTimeInput && !scheduledTime ? (
+                            <div style={{ marginBottom: '6px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowTimeInput(true);
+                                        if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '2px 0',
+                                        color: 'var(--muted-text)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.78rem',
+                                        fontWeight: '500',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px'
+                                    }}
+                                >
+                                    <Clock size={12} />
+                                    <span>+ Add time (optional)</span>
+                                </button>
                             </div>
-                            <input
-                                id="start-scheduled-time"
-                                type="time"
-                                value={scheduledTime || ''}
-                                onChange={(e) => {
-                                    setScheduledTime(e.target.value || null);
-                                    if (!scheduledDate && e.target.value) {
-                                        setScheduledDate(getTodayDateString());
-                                    }
-                                }}
-                                style={{
-                                    padding: '4px 6px',
-                                    fontSize: '0.82rem',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '4px',
-                                    background: 'var(--item-bg)',
-                                    color: 'var(--text-color)',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setScheduledTime(null);
-                                    setShowTimeInput(false);
-                                }}
-                                style={{
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.78rem',
-                                    padding: '4px 6px',
-                                    borderRadius: '4px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center'
-                                }}
-                                title="Remove time"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    )}
+                        ) : (
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '6px',
+                                marginBottom: '8px',
+                                padding: '6px 8px',
+                                background: 'var(--card-bg, rgba(0,0,0,0.02))',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '6px'
+                            }}>
+                                {/* 1-Tap Quick Presets */}
+                                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                                    {TIME_PRESETS.map(preset => {
+                                        const isSelected = scheduledTime === preset.time;
+                                        const displayTime = formatDisplayTime(preset.time, dateFormat);
+                                        return (
+                                            <button
+                                                key={preset.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setScheduledTime(preset.time);
+                                                    if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                                }}
+                                                style={{
+                                                    flex: '1 1 auto',
+                                                    minWidth: 0,
+                                                    padding: '4px 6px',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: isSelected ? '700' : '600',
+                                                    border: isSelected ? '1.5px solid var(--accent-color)' : '1px solid var(--border-color)',
+                                                    background: isSelected ? 'var(--accent-bg, rgba(59, 130, 246, 0.15))' : 'var(--item-bg)',
+                                                    color: isSelected ? 'var(--accent-color)' : 'var(--text-color)',
+                                                    cursor: 'pointer',
+                                                    whiteSpace: 'nowrap',
+                                                    textAlign: 'center',
+                                                    transition: 'all 0.12s ease'
+                                                }}
+                                                title={`Set time to ${displayTime} (${preset.label})`}
+                                            >
+                                                {preset.label} {displayTime}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Dropdown Selector, Exact Time Input, and Remove */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                    <select
+                                        aria-label="Common times"
+                                        value={isStandardTime ? (scheduledTime || '') : ''}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val) {
+                                                setScheduledTime(val);
+                                                if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                            }
+                                        }}
+                                        style={{
+                                            flex: 1,
+                                            minWidth: '120px',
+                                            padding: '4px 6px',
+                                            fontSize: '0.82rem',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '4px',
+                                            background: 'var(--item-bg)',
+                                            color: 'var(--text-color)',
+                                            outline: 'none',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    >
+                                        <option value="">{scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Common times...'}</option>
+                                        {timeOptions.map(opt => (
+                                            <option key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
+                                        <Clock size={13} />
+                                        <label htmlFor="start-scheduled-time">Time:</label>
+                                    </div>
+                                    <input
+                                        id="start-scheduled-time"
+                                        type="time"
+                                        value={scheduledTime || ''}
+                                        onChange={(e) => {
+                                            setScheduledTime(e.target.value || null);
+                                            if (!scheduledDate && e.target.value) {
+                                                setScheduledDate(getTodayDateString());
+                                            }
+                                        }}
+                                        style={{
+                                            padding: '3px 6px',
+                                            fontSize: '0.82rem',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '4px',
+                                            background: 'var(--item-bg)',
+                                            color: 'var(--text-color)',
+                                            outline: 'none',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setScheduledTime(null);
+                                            setShowTimeInput(false);
+                                        }}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--muted-text)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.78rem',
+                                            padding: '4px 6px',
+                                            borderRadius: '4px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center'
+                                        }}
+                                        title="Remove time"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })()}
 
                     {/* Add to External Calendars */}
                     {scheduledDate && (

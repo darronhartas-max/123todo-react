@@ -230,6 +230,42 @@ describe('EditModal', () => {
     );
   });
 
+  test('allows selecting time via quick preset buttons in EditModal', () => {
+    const onSaveMock = jest.fn();
+    const taskWithDate = {
+      ...sampleTaskWithNotes,
+      scheduledDate: '2026-10-15',
+      scheduledTime: null
+    };
+
+    render(
+      <EditModal
+        task={taskWithDate}
+        onSave={onSaveMock}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    // Click "+ Add time (optional)"
+    fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+
+    // Click Afternoon 14:00 preset
+    const aftBtn = screen.getByRole('button', { name: /afternoon 14:00/i });
+    expect(aftBtn).toBeInTheDocument();
+    fireEvent.click(aftBtn);
+
+    // Save
+    fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+    expect(onSaveMock).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        scheduledDate: '2026-10-15',
+        scheduledTime: '14:00'
+      })
+    );
+  });
+
   test('displays all project options when opening project dropdown in edit modal', () => {
     const manyProjects = [
       { id: 'general', name: 'General', color: '#6b7280' },

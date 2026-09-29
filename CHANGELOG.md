@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.29
+
+- **⚡ Fast 1-Tap Time Presets & Clean Dropdown Picker:** Upgraded the time picker to make scheduling tasks effortless on both mobile and desktop. Added 1-tap quick preset chips for Morning (09:00), Midday (12:00), Afternoon (14:00), and Evening (18:00), alongside a clean common times dropdown and exact time input, while seamlessly retaining calendar integration.
+
 ### v3.7.28
 
 - **📅 Google & Apple Calendar Integration & Automated Reminders:** Added seamless 1-click "Add to Google Calendar" and "Add to Apple Calendar" (.ics) buttons when scheduling tasks, pre-configured with reminders. Also introduced automated in-app and PWA reminders for due scheduled tasks on desktop and mobile devices, with a preference toggle in Settings.

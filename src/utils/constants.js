@@ -142,6 +142,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.29': [
+    { title: '⚡ Fast 1-Tap Time Presets & Clean Dropdown Picker:', desc: 'Upgraded the time picker to make scheduling tasks effortless on both mobile and desktop. Added 1-tap quick preset chips for Morning (09:00), Midday (12:00), Afternoon (14:00), and Evening (18:00), alongside a clean common times dropdown and exact time input, while seamlessly retaining calendar integration.' }
+  ],
   '3.7.28': [
     { title: '📅 Google & Apple Calendar Integration & Automated Reminders:', desc: 'Added seamless 1-click "Add to Google Calendar" and "Add to Apple Calendar" (.ics) buttons when scheduling tasks, pre-configured with reminders. Also introduced automated in-app and PWA reminders for due scheduled tasks on desktop and mobile devices, with a preference toggle in Settings.' }
   ],

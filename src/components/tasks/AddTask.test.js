@@ -214,5 +214,46 @@ test('renders Google Cal and Apple Cal buttons when scheduled date is set', () =
   expect(calendarUtils.downloadAppleCalendarIcs).toHaveBeenCalled();
 });
 
+test('allows setting time via quick preset buttons in AddTask', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const onAddMock = jest.fn();
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={onAddMock}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+    />
+  );
+
+  // Type title and open schedule
+  fireEvent.change(screen.getByPlaceholderText(/what needs to be done/i), { target: { value: 'Morning meeting' } });
+  fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+  // Click "+ Add time (optional)"
+  fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+
+  // Presets are visible
+  const morningBtn = screen.getByRole('button', { name: /morning 09:00/i });
+  expect(morningBtn).toBeInTheDocument();
+  fireEvent.click(morningBtn);
+
+  // Add task
+  fireEvent.click(screen.getByRole('button', { name: /^add$/i }));
+
+  expect(onAddMock).toHaveBeenCalledWith(
+    'Morning meeting',
+    1,
+    'general',
+    '',
+    expect.objectContaining({
+      scheduledDate: expect.any(String),
+      scheduledTime: '09:00'
+    })
+  );
+});
+
+
 
 

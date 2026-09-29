@@ -115,6 +115,43 @@ export const formatDisplayTime = (timeStr, formatStyle = 'UK') => {
     return `${String(hours).padStart(2, '0')}:${minutes}`;
 };
 
+export const TIME_PRESETS = [
+    { id: 'morning', time: '09:00', label: 'Morning' },
+    { id: 'midday', time: '12:00', label: 'Midday' },
+    { id: 'afternoon', time: '14:00', label: 'Afternoon' },
+    { id: 'evening', time: '18:00', label: 'Evening' },
+];
+
+/**
+ * Returns options for time dropdown selection (06:00 to 23:30 in 30-min intervals)
+ * with user format preferences applied.
+ * @param {string} [formatStyle='UK'] - 'UK' | 'US' | 'ISO' | 'UK_TEXT' | 'US_TEXT'
+ * @returns {Array<{ value: string, label: string }>}
+ */
+export const getTimeDropdownOptions = (formatStyle = 'UK') => {
+    const options = [];
+    const presetMap = {
+        '09:00': 'Morning',
+        '12:00': 'Midday',
+        '14:00': 'Afternoon',
+        '18:00': 'Evening'
+    };
+
+    for (let h = 6; h <= 23; h++) {
+        for (let m = 0; m < 60; m += 30) {
+            const timeVal = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            const formatted = formatDisplayTime(timeVal, formatStyle);
+            const tag = presetMap[timeVal] ? ` (${presetMap[timeVal]})` : '';
+            options.push({
+                value: timeVal,
+                label: `${formatted}${tag}`
+            });
+        }
+    }
+    return options;
+};
+
+
 /**
  * Calculates the next recurrence date based on the current scheduled date and the recurrence rules.
  * @param {string} currentDateStr - YYYY-MM-DD format
