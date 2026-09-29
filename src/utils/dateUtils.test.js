@@ -1,4 +1,4 @@
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatDisplayTime, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks, TIME_PRESETS, getTimeDropdownOptions } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatDisplayTime, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
     test('getTomorrowDateString calculates exactly 1 day from today', () => {
@@ -128,26 +128,6 @@ describe('dateUtils - scheduling helpers', () => {
             expect(formatDisplayTime('invalid')).toBe('invalid');
         });
     });
-
-    describe('TIME_PRESETS and getTimeDropdownOptions', () => {
-        test('contains standard Morning, Midday, Afternoon, and Evening presets', () => {
-            expect(TIME_PRESETS).toHaveLength(4);
-            expect(TIME_PRESETS.map(p => p.time)).toEqual(['09:00', '12:00', '14:00', '18:00']);
-        });
-
-        test('generates dropdown options from 06:00 to 23:30 with presets annotated', () => {
-            const ukOptions = getTimeDropdownOptions('UK');
-            expect(ukOptions.length).toBe(36); // (24 - 6) * 2 = 36
-            expect(ukOptions[0]).toEqual({ value: '06:00', label: '06:00' });
-            expect(ukOptions.find(o => o.value === '09:00')).toEqual({ value: '09:00', label: '09:00 (Morning)' });
-            expect(ukOptions.find(o => o.value === '12:00')).toEqual({ value: '12:00', label: '12:00 (Midday)' });
-            expect(ukOptions.find(o => o.value === '14:00')).toEqual({ value: '14:00', label: '14:00 (Afternoon)' });
-            expect(ukOptions.find(o => o.value === '18:00')).toEqual({ value: '18:00', label: '18:00 (Evening)' });
-
-            const usOptions = getTimeDropdownOptions('US');
-            expect(usOptions.find(o => o.value === '09:00')).toEqual({ value: '09:00', label: '9:00 AM (Morning)' });
-            expect(usOptions.find(o => o.value === '14:00')).toEqual({ value: '14:00', label: '2:00 PM (Afternoon)' });
-        });
-    });
 });
+
 

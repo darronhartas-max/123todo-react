@@ -230,7 +230,7 @@ describe('EditModal', () => {
     );
   });
 
-  test('allows selecting time via quick preset buttons in EditModal', () => {
+  test('allows setting time via time input in EditModal', () => {
     const onSaveMock = jest.fn();
     const taskWithDate = {
       ...sampleTaskWithNotes,
@@ -250,10 +250,10 @@ describe('EditModal', () => {
     // Click "+ Add time (optional)"
     fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
 
-    // Click Afternoon 14:00 preset
-    const aftBtn = screen.getByRole('button', { name: /afternoon 14:00/i });
-    expect(aftBtn).toBeInTheDocument();
-    fireEvent.click(aftBtn);
+    const timeInput = screen.getByLabelText(/time:/i);
+    expect(timeInput).toBeInTheDocument();
+    fireEvent.click(timeInput);
+    fireEvent.change(timeInput, { target: { value: '14:00' } });
 
     // Save
     fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));

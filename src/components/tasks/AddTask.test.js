@@ -214,7 +214,7 @@ test('renders Google Cal and Apple Cal buttons when scheduled date is set', () =
   expect(calendarUtils.downloadAppleCalendarIcs).toHaveBeenCalled();
 });
 
-test('allows setting time via quick preset buttons in AddTask', () => {
+test('allows setting time via time input in AddTask', () => {
   const { fireEvent } = require('@testing-library/react');
   const onAddMock = jest.fn();
 
@@ -234,10 +234,11 @@ test('allows setting time via quick preset buttons in AddTask', () => {
   // Click "+ Add time (optional)"
   fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
 
-  // Presets are visible
-  const morningBtn = screen.getByRole('button', { name: /morning 09:00/i });
-  expect(morningBtn).toBeInTheDocument();
-  fireEvent.click(morningBtn);
+  const timeInput = screen.getByLabelText(/time:/i);
+  expect(timeInput).toBeInTheDocument();
+  // Click on the input to invoke showPicker
+  fireEvent.click(timeInput);
+  fireEvent.change(timeInput, { target: { value: '09:00' } });
 
   // Add task
   fireEvent.click(screen.getByRole('button', { name: /^add$/i }));
