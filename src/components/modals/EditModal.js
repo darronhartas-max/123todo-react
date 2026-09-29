@@ -9,6 +9,7 @@ import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/v
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
+import TimePickerModal from './TimePickerModal';
 
 const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -202,6 +203,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [scheduledDate, setScheduledDate] = useState(task.scheduledDate || null);
     const [scheduledTime, setScheduledTime] = useState(task.scheduledTime || null);
     const [showTimeInput, setShowTimeInput] = useState(!!task.scheduledTime);
+    const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
     const [isRecurring, setIsRecurring] = useState(task.isRecurring || false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState(task.recurrence?.frequency || 1);
     const [recurrenceInterval, setRecurrenceInterval] = useState(task.recurrence?.interval || 'days');
@@ -1372,7 +1374,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             )}
                         </div>
 
-                        {/* Minimalist Time Input */}
+                        {/* Minimalist Time Input with Circular Clock Face */}
                         {!showTimeInput && !scheduledTime ? (
                             <div style={{ marginBottom: '6px' }}>
                                 <button
@@ -1380,6 +1382,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     onClick={() => {
                                         setShowTimeInput(true);
                                         if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                        setIsTimePickerOpen(true);
                                     }}
                                     style={{
                                         background: 'none',
@@ -1410,33 +1413,29 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     <Clock size={13} />
                                     <label htmlFor="edit-scheduled-time">Time:</label>
                                 </div>
-                                <input
+                                <button
                                     id="edit-scheduled-time"
-                                    type="time"
-                                    value={scheduledTime || ''}
-                                    onClick={(e) => {
-                                        try {
-                                            if (typeof e.target.showPicker === 'function') e.target.showPicker();
-                                        } catch (err) {}
-                                    }}
-                                    onChange={(e) => {
-                                        setScheduledTime(e.target.value || null);
-                                        if (!scheduledDate && e.target.value) {
-                                            setScheduledDate(getTodayDateString());
-                                        }
-                                    }}
+                                    type="button"
+                                    onClick={() => setIsTimePickerOpen(true)}
+                                    aria-label="Select time"
                                     style={{
-                                        padding: '4px 6px',
+                                        padding: '4px 8px',
                                         fontSize: '0.82rem',
                                         border: '1px solid var(--border-color)',
                                         borderRadius: '4px',
                                         background: 'var(--bg-color)',
-                                        color: 'var(--text-color)',
+                                        color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
+                                        fontWeight: scheduledTime ? '600' : '400',
                                         outline: 'none',
                                         boxSizing: 'border-box',
-                                        cursor: 'pointer'
+                                        cursor: 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
                                     }}
-                                />
+                                >
+                                    {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
+                                </button>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -1460,6 +1459,21 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                             </div>
                         )}
+
+                        <TimePickerModal
+                            isOpen={isTimePickerOpen}
+                            value={scheduledTime}
+                            onSave={(newTime) => {
+                                setScheduledTime(newTime);
+                                if (newTime && !scheduledDate) {
+                                    setScheduledDate(getTodayDateString());
+                                }
+                                if (!newTime) {
+                                    setShowTimeInput(false);
+                                }
+                            }}
+                            onClose={() => setIsTimePickerOpen(false)}
+                        />
 
                         {/* Add to External Calendars */}
                         {scheduledDate && (

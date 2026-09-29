@@ -7,6 +7,7 @@ import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/v
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
+import TimePickerModal from '../modals/TimePickerModal';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -115,6 +116,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [scheduledDate, setScheduledDate] = useState(null);
     const [scheduledTime, setScheduledTime] = useState(null);
     const [showTimeInput, setShowTimeInput] = useState(false);
+    const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState(1);
     const [recurrenceInterval, setRecurrenceInterval] = useState('days');
@@ -1123,7 +1125,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         )}
                     </div>
 
-                    {/* Minimalist Time Input */}
+                    {/* Minimalist Time Input with Circular Clock Face */}
                     {!showTimeInput && !scheduledTime ? (
                         <div style={{ marginBottom: '6px' }}>
                             <button
@@ -1131,6 +1133,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 onClick={() => {
                                     setShowTimeInput(true);
                                     if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                    setIsTimePickerOpen(true);
                                 }}
                                 style={{
                                     background: 'none',
@@ -1161,33 +1164,29 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 <Clock size={13} />
                                 <label htmlFor="start-scheduled-time">Time:</label>
                             </div>
-                            <input
+                            <button
                                 id="start-scheduled-time"
-                                type="time"
-                                value={scheduledTime || ''}
-                                onClick={(e) => {
-                                    try {
-                                        if (typeof e.target.showPicker === 'function') e.target.showPicker();
-                                    } catch (err) {}
-                                }}
-                                onChange={(e) => {
-                                    setScheduledTime(e.target.value || null);
-                                    if (!scheduledDate && e.target.value) {
-                                        setScheduledDate(getTodayDateString());
-                                    }
-                                }}
+                                type="button"
+                                onClick={() => setIsTimePickerOpen(true)}
+                                aria-label="Select time"
                                 style={{
-                                    padding: '4px 6px',
+                                    padding: '4px 8px',
                                     fontSize: '0.82rem',
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '4px',
                                     background: 'var(--item-bg)',
-                                    color: 'var(--text-color)',
+                                    color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
+                                    fontWeight: scheduledTime ? '600' : '400',
                                     outline: 'none',
                                     boxSizing: 'border-box',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
                                 }}
-                            />
+                            >
+                                {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -1211,6 +1210,21 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             </button>
                         </div>
                     )}
+
+                    <TimePickerModal
+                        isOpen={isTimePickerOpen}
+                        value={scheduledTime}
+                        onSave={(newTime) => {
+                            setScheduledTime(newTime);
+                            if (newTime && !scheduledDate) {
+                                setScheduledDate(getTodayDateString());
+                            }
+                            if (!newTime) {
+                                setShowTimeInput(false);
+                            }
+                        }}
+                        onClose={() => setIsTimePickerOpen(false)}
+                    />
 
                     {/* Add to External Calendars */}
                     {scheduledDate && (

@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.32
+
+- **🕒 Universal Custom Circular Clock Face Time Picker:** Introduced a unified, custom circular clock face time picker across desktop and mobile. Features an intuitive two-step interactive clock dial (hours then minutes), digital time display with direct hour/minute switching, AM/PM toggle, and dial-tap selection for a seamless, consistent experience on all platforms.
+
 ### v3.7.31
 
 - **✨ Clean Priority Section Headers:** Removed the redundant "Collapsed" text label from priority section headers in the main task list. Sections maintain clean, uncluttered visual headers with intuitive chevron toggle icons indicating collapse and expansion states.

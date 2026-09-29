@@ -214,10 +214,11 @@ describe('EditModal', () => {
     expect(addTimeBtn).toBeInTheDocument();
     fireEvent.click(addTimeBtn);
 
-    // Enter a time
-    const timeInput = screen.getByLabelText(/time:/i);
-    expect(timeInput).toBeInTheDocument();
-    fireEvent.change(timeInput, { target: { value: '09:45' } });
+    // Clock picker modal is open
+    expect(screen.getByRole('dialog', { name: /select time/i })).toBeInTheDocument();
+
+    // Click Set Time (09:00 AM)
+    fireEvent.click(screen.getByRole('button', { name: /set time/i }));
 
     // Save
     fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
@@ -225,12 +226,12 @@ describe('EditModal', () => {
       1,
       expect.objectContaining({
         scheduledDate: '2026-10-15',
-        scheduledTime: '09:45'
+        scheduledTime: '09:00'
       })
     );
   });
 
-  test('allows setting time via time input in EditModal', () => {
+  test('allows setting time via circular clock picker in EditModal', () => {
     const onSaveMock = jest.fn();
     const taskWithDate = {
       ...sampleTaskWithNotes,
@@ -250,10 +251,14 @@ describe('EditModal', () => {
     // Click "+ Add time (optional)"
     fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
 
-    const timeInput = screen.getByLabelText(/time:/i);
-    expect(timeInput).toBeInTheDocument();
-    fireEvent.click(timeInput);
-    fireEvent.change(timeInput, { target: { value: '14:00' } });
+    // Clock picker modal is open
+    expect(screen.getByRole('dialog', { name: /select time/i })).toBeInTheDocument();
+
+    // Click PM
+    fireEvent.click(screen.getByRole('button', { name: /^PM$/i }));
+
+    // Click Set Time
+    fireEvent.click(screen.getByRole('button', { name: /set time/i }));
 
     // Save
     fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
@@ -261,7 +266,7 @@ describe('EditModal', () => {
       1,
       expect.objectContaining({
         scheduledDate: '2026-10-15',
-        scheduledTime: '14:00'
+        scheduledTime: '21:00'
       })
     );
   });

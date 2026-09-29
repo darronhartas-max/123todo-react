@@ -142,6 +142,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.32': [
+    { title: '🕒 Universal Custom Circular Clock Face Time Picker:', desc: 'Introduced a unified, custom circular clock face time picker across desktop and mobile. Features an intuitive two-step interactive clock dial (hours then minutes), digital time display with direct hour/minute switching, AM/PM toggle, and dial-tap selection for a seamless, consistent experience on all platforms.' }
+  ],
   '3.7.31': [
     { title: '✨ Clean Priority Section Headers:', desc: 'Removed the redundant "Collapsed" text label from priority section headers in the main task list. Sections maintain clean, uncluttered visual headers with intuitive chevron toggle icons indicating collapse and expansion states.' }
   ],

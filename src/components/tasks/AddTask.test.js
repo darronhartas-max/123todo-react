@@ -126,10 +126,9 @@ test('allows adding and removing time when scheduling a task in AddTask', () => 
   expect(addTimeBtn).toBeInTheDocument();
   fireEvent.click(addTimeBtn);
 
-  // Time input is now revealed
-  const timeInput = screen.getByLabelText(/time:/i);
-  expect(timeInput).toBeInTheDocument();
-  fireEvent.change(timeInput, { target: { value: '14:30' } });
+  // Set time via clock picker modal
+  fireEvent.click(screen.getByRole('button', { name: /^PM$/i }));
+  fireEvent.click(screen.getByRole('button', { name: /^Set Time$/i }));
 
   // Add the task
   const addBtn = screen.getByRole('button', { name: /^add$/i });
@@ -142,7 +141,7 @@ test('allows adding and removing time when scheduling a task in AddTask', () => 
     '',
     expect.objectContaining({
       scheduledDate: expect.any(String),
-      scheduledTime: '14:30'
+      scheduledTime: '21:00'
     })
   );
 });
@@ -162,19 +161,19 @@ test('removing scheduled time reverts back to + Add time button in AddTask', () 
   // Open schedule section
   fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
 
-  // Click "+ Add time (optional)"
+  // Click "+ Add time (optional)" to open circular clock picker
   fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
 
-  // Set time and then click Remove
-  const timeInput = screen.getByLabelText(/time:/i);
-  fireEvent.change(timeInput, { target: { value: '10:00' } });
+  // In modal, click Set Time
+  fireEvent.click(screen.getByRole('button', { name: /set time/i }));
 
+  // Time is set and Remove button appears
   const removeBtn = screen.getByRole('button', { name: /remove/i });
+  expect(removeBtn).toBeInTheDocument();
   fireEvent.click(removeBtn);
 
   // Reverts back to "+ Add time (optional)"
   expect(screen.getByRole('button', { name: /\+ add time \(optional\)/i })).toBeInTheDocument();
-  expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
 });
 
 test('renders Google Cal and Apple Cal buttons when scheduled date is set', () => {
@@ -214,7 +213,7 @@ test('renders Google Cal and Apple Cal buttons when scheduled date is set', () =
   expect(calendarUtils.downloadAppleCalendarIcs).toHaveBeenCalled();
 });
 
-test('allows setting time via time input in AddTask', () => {
+test('allows setting time via circular clock picker in AddTask', () => {
   const { fireEvent } = require('@testing-library/react');
   const onAddMock = jest.fn();
 
@@ -231,14 +230,14 @@ test('allows setting time via time input in AddTask', () => {
   fireEvent.change(screen.getByPlaceholderText(/what needs to be done/i), { target: { value: 'Morning meeting' } });
   fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
 
-  // Click "+ Add time (optional)"
+  // Click "+ Add time (optional)" to open clock face modal
   fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
 
-  const timeInput = screen.getByLabelText(/time:/i);
-  expect(timeInput).toBeInTheDocument();
-  // Click on the input to invoke showPicker
-  fireEvent.click(timeInput);
-  fireEvent.change(timeInput, { target: { value: '09:00' } });
+  // Clock picker dialog is open
+  expect(screen.getByRole('dialog', { name: /select time/i })).toBeInTheDocument();
+
+  // Click Set Time (defaults to 09:00 AM)
+  fireEvent.click(screen.getByRole('button', { name: /set time/i }));
 
   // Add task
   fireEvent.click(screen.getByRole('button', { name: /^add$/i }));
