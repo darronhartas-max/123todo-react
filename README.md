@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.33** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.34** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.33 (Current)
+### v3.7.34 (Current)
+
+- **Full-Width Real-Estate for On Hold & Scheduled Tasks**: Removed the heavy grey box border, background fill, and recessed padding from the On Hold and Scheduled & Recurring task lists. Tasks now render full-width edge-to-edge seamlessly matching the primary priority sections, maximizing visible screen real-estate while maintaining clean collapsible headers with chevron indicators and drop-target responsiveness.
+
+### v3.7.33
 
 - **Chronological Time Ordering & Time Visibility Setting**: Tasks with a scheduled time now automatically appear in chronological time order with the earliest time first, allowing 123ToDo to function like a daily calendar schedule while fully preserving custom drag-and-drop manual reordering. Added a new "Scheduled Task Times" toggle in Settings (Tasks & Workflow) to easily show or hide time selectors and time badges for an even simpler, distraction-free interface.
 

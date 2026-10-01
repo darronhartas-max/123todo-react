@@ -109,6 +109,26 @@ test('renders On Hold tasks with draggable attribute and drag support', () => {
   expect(task1).toHaveAttribute('draggable', 'true');
 });
 
+test('renders On Hold and Scheduled sections without grey padding border', () => {
+  const tasks = [
+    { id: 401, text: 'On Hold Task 1', priority: 4, projectId: 'general', completed: false },
+    { id: 501, text: 'Scheduled Task 1', priority: 1, projectId: 'general', completed: false, scheduledDate: '2099-12-01' }
+  ];
+  localStorage.setItem('123TodoTasks', JSON.stringify(tasks));
+
+  render(<App />);
+
+  const onHoldBtn = screen.getByRole('button', { name: /Show On Hold Tasks \(1\)/i });
+  const onHoldContainer = onHoldBtn.parentElement;
+  expect(onHoldContainer).toHaveStyle({ background: 'transparent' });
+  expect(onHoldContainer).toHaveStyle({ border: '2px dashed transparent' });
+
+  const scheduledBtn = screen.getByRole('button', { name: /Show Scheduled & Recurring \(1\)/i });
+  const scheduledContainer = scheduledBtn.parentElement;
+  expect(scheduledContainer).toHaveStyle({ background: 'transparent' });
+  expect(scheduledContainer).toHaveStyle({ border: 'none' });
+});
+
 test('activates commercial client branding via URL query and renders branded footer', () => {
   const originalLocation = window.location;
   delete window.location;

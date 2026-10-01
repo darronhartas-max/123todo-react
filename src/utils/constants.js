@@ -145,6 +145,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.34': [
+    { title: '📐 Full-Width Real-Estate for On Hold & Scheduled Tasks:', desc: 'Removed the heavy grey box border, background fill, and recessed padding from the On Hold and Scheduled & Recurring task lists. Tasks now render full-width edge-to-edge seamlessly matching the primary priority sections, maximizing visible screen real-estate while maintaining clean collapsible headers with chevron indicators and drop-target responsiveness.' }
+  ],
   '3.7.33': [
     { title: '⏱️ Chronological Time Ordering & Time Visibility Setting:', desc: 'Tasks with a scheduled time now automatically appear in chronological time order with the earliest time first, allowing 123ToDo to function like a daily calendar schedule while fully preserving custom drag-and-drop manual reordering. Added a new "Scheduled Task Times" toggle in Settings (Tasks & Workflow) to easily show or hide time selectors and time badges for an even simpler, distraction-free interface.' }
   ],
