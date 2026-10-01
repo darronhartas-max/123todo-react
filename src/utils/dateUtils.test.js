@@ -1,4 +1,4 @@
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatDisplayTime, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from './dateUtils';
+import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, parseDateString, formatDateString, formatDisplayTime, formatEvidentiaryTimestamp, isValidEvidentiaryTimestamp, promoteDueScheduledTasks, insertTaskInTimeOrder } from './dateUtils';
 
 describe('dateUtils - scheduling helpers', () => {
     test('getTomorrowDateString calculates exactly 1 day from today', () => {
@@ -100,6 +100,67 @@ describe('dateUtils - scheduling helpers', () => {
             const result = promoteDueScheduledTasks(tasks, today);
             // Morning (09:00), then Afternoon (14:30), then All-Day (no time), then regular task
             expect(result.map(t => t.id)).toEqual([4, 3, 2, 1]);
+        });
+    });
+
+    describe('insertTaskInTimeOrder', () => {
+        const today = '2026-09-21';
+
+        test('inserts timed task chronologically earlier before later timed task', () => {
+            const list = [
+                { id: 1, text: 'Late Meeting', priority: 1, scheduledDate: today, scheduledTime: '15:00' },
+                { id: 2, text: 'Untimed Task', priority: 1, scheduledDate: null, scheduledTime: null }
+            ];
+            const newTask = { id: 3, text: 'Morning Standup', priority: 1, scheduledDate: today, scheduledTime: '09:00' };
+
+            const result = insertTaskInTimeOrder(list, newTask, today);
+            expect(result.map(t => t.id)).toEqual([3, 1, 2]);
+        });
+
+        test('inserts timed task between existing earlier and later timed tasks', () => {
+            const list = [
+                { id: 1, text: 'Breakfast', priority: 1, scheduledDate: today, scheduledTime: '08:30' },
+                { id: 2, text: 'Afternoon Review', priority: 1, scheduledDate: today, scheduledTime: '14:00' },
+                { id: 3, text: 'Untimed Task', priority: 1, scheduledDate: null, scheduledTime: null }
+            ];
+            const newTask = { id: 4, text: 'Lunch', priority: 1, scheduledDate: today, scheduledTime: '12:00' };
+
+            const result = insertTaskInTimeOrder(list, newTask, today);
+            expect(result.map(t => t.id)).toEqual([1, 4, 2, 3]);
+        });
+
+        test('inserts timed task after last timed task but before untimed tasks', () => {
+            const list = [
+                { id: 1, text: 'Morning Standup', priority: 1, scheduledDate: today, scheduledTime: '09:00' },
+                { id: 2, text: 'Untimed Task 1', priority: 1, scheduledDate: null, scheduledTime: null },
+                { id: 3, text: 'Untimed Task 2', priority: 1, scheduledDate: null, scheduledTime: null }
+            ];
+            const newTask = { id: 4, text: 'Evening Wrap-up', priority: 1, scheduledDate: today, scheduledTime: '17:30' };
+
+            const result = insertTaskInTimeOrder(list, newTask, today);
+            expect(result.map(t => t.id)).toEqual([1, 4, 2, 3]);
+        });
+
+        test('inserts untimed task after timed tasks in the same priority', () => {
+            const list = [
+                { id: 1, text: 'Morning Standup', priority: 1, scheduledDate: today, scheduledTime: '09:00' },
+                { id: 2, text: 'Afternoon Call', priority: 1, scheduledDate: today, scheduledTime: '14:00' }
+            ];
+            const newTask = { id: 3, text: 'New Untimed Task', priority: 1, scheduledDate: null, scheduledTime: null };
+
+            const result = insertTaskInTimeOrder(list, newTask, today);
+            expect(result.map(t => t.id)).toEqual([1, 2, 3]);
+        });
+
+        test('inserts untimed task at the top if no timed tasks exist in that priority', () => {
+            const list = [
+                { id: 1, text: 'Existing Task A', priority: 1, scheduledDate: null, scheduledTime: null },
+                { id: 2, text: 'Existing Task B', priority: 1, scheduledDate: null, scheduledTime: null }
+            ];
+            const newTask = { id: 3, text: 'New Task', priority: 1, scheduledDate: null, scheduledTime: null };
+
+            const result = insertTaskInTimeOrder(list, newTask, today);
+            expect(result.map(t => t.id)).toEqual([3, 1, 2]);
         });
     });
 

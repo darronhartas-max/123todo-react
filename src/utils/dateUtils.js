@@ -232,6 +232,126 @@ export const formatEvidentiaryTimestamp = (timestamp) => {
  * of their respective priority lists upon initial appearance, marking them with promotedDate.
  * Once marked as promoted, they respect user drag-and-drop reordering without snapping back to top.
  * 
+/**
+ * Inserts a task into a task list, placing timed tasks in chronological order
+ * (earliest scheduledTime first) within their priority section, while placing
+ * untimed tasks after timed tasks.
+ * 
+ * @param {Array} taskList - The current list of tasks
+ * @param {Object} taskToInsert - The task being inserted
+ * @param {string} [todayStr] - Today's date string in YYYY-MM-DD
+ * @returns {Array} A new task array with the task inserted in the proper position
+ */
+export const insertTaskInTimeOrder = (taskList, taskToInsert, todayStr = getTodayDateString()) => {
+    if (!taskList || !Array.isArray(taskList)) return [taskToInsert];
+    if (!taskToInsert) return taskList;
+
+    // Remove any existing instance of the task if present
+    const listWithoutTask = taskList.filter(t => String(t.id) !== String(taskToInsert.id));
+    const targetPriority = taskToInsert.priority || 1;
+    const isFutureScheduled = taskToInsert.scheduledDate && taskToInsert.scheduledDate > todayStr;
+
+    // If it's scheduled for a future date (not in active list yet), keep it at the front of tasks
+    if (isFutureScheduled) {
+        return [taskToInsert, ...listWithoutTask];
+    }
+
+    // Find all indices of tasks with the same priority in the list
+    const priorityIndices = [];
+    listWithoutTask.forEach((t, index) => {
+        if ((t.priority || 1) === targetPriority) {
+            priorityIndices.push(index);
+        }
+    });
+
+    // If there are no tasks with this priority yet, find insertion point based on priority order
+    if (priorityIndices.length === 0) {
+        let insertIdx = listWithoutTask.findIndex(t => (t.priority || 1) > targetPriority);
+        if (insertIdx === -1) insertIdx = listWithoutTask.length;
+        const result = [...listWithoutTask];
+        result.splice(insertIdx, 0, taskToInsert);
+        return result;
+    }
+
+    const firstPriorityIdx = priorityIndices[0];
+
+    // Helper to determine if an existing task is an active timed task
+    const isActiveTimed = (t) => !!(t && t.scheduledTime && (!t.scheduledDate || t.scheduledDate <= todayStr));
+
+    // Case 1: taskToInsert is UNTIMED
+    if (!taskToInsert.scheduledTime) {
+        // If there are timed tasks in this priority, place after the last timed task
+        let lastTimedIdx = -1;
+        for (const idx of priorityIndices) {
+            if (isActiveTimed(listWithoutTask[idx])) {
+                lastTimedIdx = idx;
+            }
+        }
+
+        const result = [...listWithoutTask];
+        if (lastTimedIdx !== -1) {
+            result.splice(lastTimedIdx + 1, 0, taskToInsert);
+        } else {
+            // No timed tasks in this priority -> place at the top of the priority section
+            result.splice(firstPriorityIdx, 0, taskToInsert);
+        }
+        return result;
+    }
+
+    // Case 2: taskToInsert HAS a scheduledTime
+    const insertTime = taskToInsert.scheduledTime;
+    let targetInsertIdx = -1;
+
+    // Look for the first timed task that has a later time (or later scheduledDate)
+    for (const idx of priorityIndices) {
+        const t = listWithoutTask[idx];
+        if (isActiveTimed(t)) {
+            // Compare dates first if both have dates
+            const dateComp = (t.scheduledDate && taskToInsert.scheduledDate)
+                ? t.scheduledDate.localeCompare(taskToInsert.scheduledDate)
+                : 0;
+            if (dateComp > 0) {
+                targetInsertIdx = idx;
+                break;
+            } else if (dateComp === 0) {
+                if (t.scheduledTime.localeCompare(insertTime) > 0) {
+                    targetInsertIdx = idx;
+                    break;
+                }
+            }
+        }
+    }
+
+    const result = [...listWithoutTask];
+
+    if (targetInsertIdx !== -1) {
+        result.splice(targetInsertIdx, 0, taskToInsert);
+    } else {
+        // Either all timed tasks are earlier, or there are no timed tasks yet
+        let lastTimedIdx = -1;
+        for (const idx of priorityIndices) {
+            if (isActiveTimed(listWithoutTask[idx])) {
+                lastTimedIdx = idx;
+            }
+        }
+
+        if (lastTimedIdx !== -1) {
+            // Insert immediately after the last timed task (and before any untimed tasks)
+            result.splice(lastTimedIdx + 1, 0, taskToInsert);
+        } else {
+            // No existing timed tasks -> place at the very top of the priority section
+            result.splice(firstPriorityIdx, 0, taskToInsert);
+        }
+    }
+
+    return result;
+};
+
+/**
+ * Promotes scheduled tasks whose due date has arrived (scheduledDate <= today) to the top
+ * of their respective priority lists upon initial appearance, marking them with promotedDate.
+ * Once marked as promoted, they respect user drag-and-drop reordering without snapping back to top.
+ * 
  * @param {Array} taskList - List of tasks
  * @param {string} [todayStr] - Today's date string in YYYY-MM-DD
  * @returns {Array} Updated task list with due scheduled tasks placed at the top of their priority sections
@@ -255,7 +375,7 @@ export const promoteDueScheduledTasks = (taskList, todayStr = getTodayDateString
 
         if (dueToPromote.length === 0) return;
 
-        // Sort multiple due tasks by scheduledDate and scheduledTime (e.g. earlier due dates & times first)
+        // Sort multiple due tasks by scheduledDate and scheduledTime (earlier due dates & times first)
         dueToPromote.sort((a, b) => {
             const dateComp = (a.scheduledDate || '').localeCompare(b.scheduledDate || '');
             if (dateComp !== 0) return dateComp;
@@ -273,23 +393,17 @@ export const promoteDueScheduledTasks = (taskList, todayStr = getTodayDateString
         }));
 
         const dueIds = new Set(promotedDueTasks.map(t => String(t.id)));
-        const remaining = result.filter(t => !dueIds.has(String(t.id)));
+        let remaining = result.filter(t => !dueIds.has(String(t.id)));
 
-        const firstPriorityIndex = remaining.findIndex(t => 
-            (t.priority === priority || (!t.priority && priority === 1))
-        );
-
-        if (firstPriorityIndex !== -1) {
-            remaining.splice(firstPriorityIndex, 0, ...promotedDueTasks);
-        } else {
-            let insertIndex = remaining.findIndex(t => (t.priority || 1) > priority);
-            if (insertIndex === -1) insertIndex = remaining.length;
-            remaining.splice(insertIndex, 0, ...promotedDueTasks);
-        }
+        // Insert each promoted task into remaining in proper time order
+        promotedDueTasks.forEach(task => {
+            remaining = insertTaskInTimeOrder(remaining, task, todayStr);
+        });
 
         result = remaining;
     });
 
     return result;
 };
+
 

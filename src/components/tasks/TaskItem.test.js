@@ -350,3 +350,21 @@ test('displays scheduled date and scheduled time in 12-hour format when dateForm
   // Should display 10/05/2026 • 3:30 PM
   expect(screen.getByText(/10\/05\/2026\s*•\s*3:30 PM/)).toBeInTheDocument();
 });
+
+test('hides scheduled time when timeSchedulingEnabled is false', () => {
+  const task = {
+    id: 113,
+    text: 'Doctor appointment',
+    priority: 1,
+    projectId: 'general',
+    scheduledDate: '2026-10-05',
+    scheduledTime: '15:30'
+  };
+
+  render(<TaskItem task={task} showFullDetails={true} dateFormat="UK" timeSchedulingEnabled={false} />);
+
+  // Should display date only without time
+  expect(screen.getByText('05/10/2026')).toBeInTheDocument();
+  expect(screen.queryByText(/15:30/)).not.toBeInTheDocument();
+});
+

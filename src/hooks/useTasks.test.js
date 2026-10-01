@@ -243,6 +243,71 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(savedArchive[0].photos[0].thumbnail).toBe('data:image/webp;base64,thumb1');
         expect(savedArchive[0].photos[0].dataUrl).toBeUndefined();
     });
+
+    test('adds timed tasks in chronological order with earliest time first', () => {
+        localStorage.setItem('123TodoTasks', JSON.stringify([]));
+        const { result } = renderHook(() => useTasks());
+
+        // Add 14:00 first, then 09:30, then 11:00
+        act(() => {
+            result.current.addTask('Afternoon Call', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '14:00' });
+        });
+        act(() => {
+            result.current.addTask('Morning Standup', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '09:30' });
+        });
+        act(() => {
+            result.current.addTask('Midday Meeting', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '11:00' });
+        });
+
+        const taskTitles = result.current.tasks.map(t => t.text);
+        expect(taskTitles).toEqual(['Morning Standup', 'Midday Meeting', 'Afternoon Call']);
+    });
+
+    test('allows manual drag and drop reordering of timed tasks and preserves the custom order', () => {
+        localStorage.setItem('123TodoTasks', JSON.stringify([]));
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.addTask('Morning Standup', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '09:00' });
+        });
+        act(() => {
+            result.current.addTask('Afternoon Call', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '15:00' });
+        });
+
+        const idMorning = result.current.tasks.find(t => t.text === 'Morning Standup').id;
+        const idAfternoon = result.current.tasks.find(t => t.text === 'Afternoon Call').id;
+
+        // User manually drags Afternoon Call above Morning Standup
+        act(() => {
+            result.current.reorderTasks(idAfternoon, idMorning);
+        });
+
+        // The user's manual reordering MUST be preserved!
+        const reorderedTitles = result.current.tasks.map(t => t.text);
+        expect(reorderedTitles).toEqual(['Afternoon Call', 'Morning Standup']);
+    });
+
+    test('updating task scheduledTime repositions active timed task in chronological order', () => {
+        localStorage.setItem('123TodoTasks', JSON.stringify([]));
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.addTask('Task A', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '09:00' });
+        });
+        act(() => {
+            result.current.addTask('Task B', 1, 'general', '', { scheduledDate: '2026-09-21', scheduledTime: '14:00' });
+        });
+
+        const taskB = result.current.tasks.find(t => t.text === 'Task B');
+
+        // Update Task B's time to 08:00 (earlier than Task A)
+        act(() => {
+            result.current.updateTask(taskB.id, { scheduledTime: '08:00' });
+        });
+
+        const updatedTitles = result.current.tasks.map(t => t.text);
+        expect(updatedTitles).toEqual(['Task B', 'Task A']);
+    });
 });
 
 

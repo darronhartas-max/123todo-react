@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2, Bell } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2, Bell, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
@@ -290,7 +290,9 @@ const SettingsModal = ({
     screenScalingMode = 'auto',
     setScreenScalingMode,
     notificationsEnabled = false,
-    setNotificationsEnabled
+    setNotificationsEnabled,
+    timeSchedulingEnabled = true,
+    setTimeSchedulingEnabled
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -1394,6 +1396,33 @@ const SettingsModal = ({
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                </div>
+
+                                {/* Scheduled Task Times */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Clock size={16} style={{ color: 'var(--accent-color)' }} />
+                                            Scheduled Task Times
+                                        </span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Show time selector when scheduling tasks and display times in list views
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(timeSchedulingEnabled !== false)}
+                                            onClick={() => setTimeSchedulingEnabled && setTimeSchedulingEnabled(true)}
+                                        >
+                                            Shown (Default)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(timeSchedulingEnabled === false)}
+                                            onClick={() => setTimeSchedulingEnabled && setTimeSchedulingEnabled(false)}
+                                        >
+                                            Hidden
+                                        </button>
                                     </div>
                                 </div>
 

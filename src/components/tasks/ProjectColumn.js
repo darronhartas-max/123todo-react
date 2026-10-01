@@ -21,7 +21,8 @@ const ProjectColumn = ({
     onSwipeAction,
     dateFormat,
     taskViewMode = 'compact',
-    viewProfile = 'lite'
+    viewProfile = 'lite',
+    timeSchedulingEnabled = true
 }) => {
     const projectTasks = tasks.filter(t => 
         (t.projectId || 'general').toLowerCase() === project.id.toLowerCase() ||
@@ -200,6 +201,7 @@ const ProjectColumn = ({
                                             dateFormat={dateFormat}
                                             taskViewMode={taskViewMode}
                                             viewProfile={viewProfile}
+                                            timeSchedulingEnabled={timeSchedulingEnabled}
                                             isDragging={draggedId === task.id}
                                             isDragOver={dragOverId === task.id}
                                             dragHandlers={{

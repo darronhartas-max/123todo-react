@@ -254,6 +254,29 @@ test('allows setting time via circular clock picker in AddTask', () => {
   );
 });
 
+test('hides time selection button when timeSchedulingEnabled is false', () => {
+  const { fireEvent } = require('@testing-library/react');
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General' }]}
+      timeSchedulingEnabled={false}
+    />
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+  // Date controls are present
+  expect(screen.getByLabelText(/start\/scheduled date/i)).toBeInTheDocument();
+
+  // Time controls must NOT be present
+  expect(screen.queryByRole('button', { name: /\+ add time/i })).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
+});
+
+
 
 
 

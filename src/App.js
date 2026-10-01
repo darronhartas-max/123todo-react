@@ -38,7 +38,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { useDeviceResolution } from './hooks/useDeviceResolution';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
@@ -476,6 +476,25 @@ const TodoApp = () => {
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, val ? 'true' : 'false');
     } catch (e) {
       console.error('Failed to save notifications preference:', e);
+    }
+  };
+
+  const [timeSchedulingEnabled, setTimeSchedulingEnabledState] = useState(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_KEYS.TIME_SCHEDULING_ENABLED);
+      if (val !== null) return JSON.parse(val);
+      return DEFAULT_TIME_SCHEDULING_ENABLED;
+    } catch {
+      return DEFAULT_TIME_SCHEDULING_ENABLED;
+    }
+  });
+
+  const setTimeSchedulingEnabled = (val) => {
+    setTimeSchedulingEnabledState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.TIME_SCHEDULING_ENABLED, JSON.stringify(val));
+    } catch (e) {
+      console.error('Failed to save time scheduling preference:', e);
     }
   };
 
@@ -1036,6 +1055,7 @@ const TodoApp = () => {
           defaultProjectId={currentProjectId}
           dateFormat={dateFormat}
           taskLengthLimit={taskLengthLimit}
+          timeSchedulingEnabled={timeSchedulingEnabled}
         />
 
         <div style={{
@@ -1143,6 +1163,7 @@ const TodoApp = () => {
                       dateFormat={dateFormat}
                       taskViewMode={taskViewMode}
                       viewProfile={viewProfile}
+                      timeSchedulingEnabled={timeSchedulingEnabled}
                     />
                   ))
                 ) : (
@@ -1166,6 +1187,7 @@ const TodoApp = () => {
                       dateFormat={dateFormat}
                       taskViewMode={taskViewMode}
                       viewProfile={viewProfile}
+                      timeSchedulingEnabled={timeSchedulingEnabled}
                     />
                   ))
                 )}
@@ -1222,6 +1244,7 @@ const TodoApp = () => {
                               showFullDetails={true}
                               taskViewMode={taskViewMode}
                               viewProfile={viewProfile}
+                              timeSchedulingEnabled={timeSchedulingEnabled}
                               isDragging={draggedId === task.id}
                               isDragOver={dragOverId === task.id}
                               dragHandlers={{
@@ -1278,6 +1301,7 @@ const TodoApp = () => {
                           showFullDetails={true}
                           taskViewMode={taskViewMode}
                           viewProfile={viewProfile}
+                          timeSchedulingEnabled={timeSchedulingEnabled}
                         />
                       );
                     })}
@@ -1345,6 +1369,7 @@ const TodoApp = () => {
           }}
           dateFormat={dateFormat}
           taskLengthLimit={taskLengthLimit}
+          timeSchedulingEnabled={timeSchedulingEnabled}
         />
       )}
 
@@ -1508,6 +1533,8 @@ const TodoApp = () => {
         setScreenScalingMode={setScreenScalingMode}
         notificationsEnabled={notificationsEnabled}
         setNotificationsEnabled={setNotificationsEnabled}
+        timeSchedulingEnabled={timeSchedulingEnabled}
+        setTimeSchedulingEnabled={setTimeSchedulingEnabled}
       />
 
       <EmailClientModal

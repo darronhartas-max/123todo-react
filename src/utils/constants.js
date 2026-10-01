@@ -42,8 +42,11 @@ export const STORAGE_KEYS = {
   VIEW_PROFILE: '123Todo_ViewProfile',
   SCREEN_SCALING_MODE: '123TodoScreenScalingMode',
   TENANT: '123Todo_Tenant',
-  NOTIFICATIONS_ENABLED: '123TodoNotificationsEnabled'
+  NOTIFICATIONS_ENABLED: '123TodoNotificationsEnabled',
+  TIME_SCHEDULING_ENABLED: '123Todo_TimeSchedulingEnabled'
 };
+
+export const DEFAULT_TIME_SCHEDULING_ENABLED = true;
 
 export const SCREEN_SCALING_MODES = [
   { id: 'auto', label: 'Auto (Recommended)', desc: 'Automatically adapts to device screen width & pixel density' },
@@ -142,6 +145,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.33': [
+    { title: '⏱️ Chronological Time Ordering & Time Visibility Setting:', desc: 'Tasks with a scheduled time now automatically appear in chronological time order with the earliest time first, allowing 123ToDo to function like a daily calendar schedule while fully preserving custom drag-and-drop manual reordering. Added a new "Scheduled Task Times" toggle in Settings (Tasks & Workflow) to easily show or hide time selectors and time badges for an even simpler, distraction-free interface.' }
+  ],
   '3.7.32': [
     { title: '🕒 Universal Custom Circular Clock Face Time Picker:', desc: 'Introduced a unified, custom circular clock face time picker across desktop and mobile. Features an intuitive two-step interactive clock dial (hours then minutes), digital time display with direct hour/minute switching, AM/PM toggle, and dial-tap selection for a seamless, consistent experience on all platforms.' }
   ],

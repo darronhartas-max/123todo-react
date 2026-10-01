@@ -9,7 +9,7 @@ import { ActionableEntitiesBar } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from '../modals/TimePickerModal';
 
-const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250' }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true }) => {
     const isUnlimited = taskLengthLimit === 'unlimited';
     const getInitialProjectId = () => {
         const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
@@ -292,7 +292,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
 
         onAdd(finalTitle, priority, finalProjectId, taskNotes.trim(), {
             scheduledDate: finalScheduledDate,
-            scheduledTime: finalScheduledDate ? scheduledTime : null,
+            scheduledTime: (finalScheduledDate && timeSchedulingEnabled) ? scheduledTime : null,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
             recurrence,
@@ -656,7 +656,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 >
                     {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
                     {scheduledDate
-                        ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}${scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
+                        ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}${timeSchedulingEnabled && scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
                         : 'Schedule'}
                 </button>
             </div>
@@ -1126,105 +1126,109 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     </div>
 
                     {/* Minimalist Time Input with Circular Clock Face */}
-                    {!showTimeInput && !scheduledTime ? (
-                        <div style={{ marginBottom: '6px' }}>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowTimeInput(true);
-                                    if (!scheduledDate) setScheduledDate(getTodayDateString());
-                                    setIsTimePickerOpen(true);
-                                }}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '2px 0',
-                                    color: 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.78rem',
-                                    fontWeight: '500',
-                                    display: 'inline-flex',
+                    {timeSchedulingEnabled && (
+                        <>
+                            {!showTimeInput && !scheduledTime ? (
+                                <div style={{ marginBottom: '6px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowTimeInput(true);
+                                            if (!scheduledDate) setScheduledDate(getTodayDateString());
+                                            setIsTimePickerOpen(true);
+                                        }}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            padding: '2px 0',
+                                            color: 'var(--muted-text)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.78rem',
+                                            fontWeight: '500',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                        }}
+                                    >
+                                        <Clock size={12} />
+                                        <span>+ Add time (optional)</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    display: 'flex',
                                     alignItems: 'center',
-                                    gap: '5px'
-                                }}
-                            >
-                                <Clock size={12} />
-                                <span>+ Add time (optional)</span>
-                            </button>
-                        </div>
-                    ) : (
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            marginBottom: '8px',
-                            flexWrap: 'nowrap'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
-                                <Clock size={13} />
-                                <label htmlFor="start-scheduled-time">Time:</label>
-                            </div>
-                            <button
-                                id="start-scheduled-time"
-                                type="button"
-                                onClick={() => setIsTimePickerOpen(true)}
-                                aria-label="Select time"
-                                style={{
-                                    padding: '4px 8px',
-                                    fontSize: '0.82rem',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '4px',
-                                    background: 'var(--item-bg)',
-                                    color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
-                                    fontWeight: scheduledTime ? '600' : '400',
-                                    outline: 'none',
-                                    boxSizing: 'border-box',
-                                    cursor: 'pointer',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}
-                            >
-                                {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setScheduledTime(null);
-                                    setShowTimeInput(false);
-                                }}
-                                style={{
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.78rem',
-                                    padding: '4px 6px',
-                                    borderRadius: '4px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center'
-                                }}
-                                title="Remove time"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    )}
+                                    gap: '6px',
+                                    marginBottom: '8px',
+                                    flexWrap: 'nowrap'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
+                                        <Clock size={13} />
+                                        <label htmlFor="start-scheduled-time">Time:</label>
+                                    </div>
+                                    <button
+                                        id="start-scheduled-time"
+                                        type="button"
+                                        onClick={() => setIsTimePickerOpen(true)}
+                                        aria-label="Select time"
+                                        style={{
+                                            padding: '4px 8px',
+                                            fontSize: '0.82rem',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '4px',
+                                            background: 'var(--item-bg)',
+                                            color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
+                                            fontWeight: scheduledTime ? '600' : '400',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}
+                                    >
+                                        {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setScheduledTime(null);
+                                            setShowTimeInput(false);
+                                        }}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--muted-text)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.78rem',
+                                            padding: '4px 6px',
+                                            borderRadius: '4px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center'
+                                        }}
+                                        title="Remove time"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            )}
 
-                    <TimePickerModal
-                        isOpen={isTimePickerOpen}
-                        value={scheduledTime}
-                        onSave={(newTime) => {
-                            setScheduledTime(newTime);
-                            if (newTime && !scheduledDate) {
-                                setScheduledDate(getTodayDateString());
-                            }
-                            if (!newTime) {
-                                setShowTimeInput(false);
-                            }
-                        }}
-                        onClose={() => setIsTimePickerOpen(false)}
-                    />
+                            <TimePickerModal
+                                isOpen={isTimePickerOpen}
+                                value={scheduledTime}
+                                onSave={(newTime) => {
+                                    setScheduledTime(newTime);
+                                    if (newTime && !scheduledDate) {
+                                        setScheduledDate(getTodayDateString());
+                                    }
+                                    if (!newTime) {
+                                        setShowTimeInput(false);
+                                    }
+                                }}
+                                onClose={() => setIsTimePickerOpen(false)}
+                            />
+                        </>
+                    )}
 
                     {/* Add to External Calendars */}
                     {scheduledDate && (
@@ -1243,7 +1247,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 onClick={() => openGoogleCalendar({
                                     title: text || 'Scheduled Task',
                                     scheduledDate,
-                                    scheduledTime,
+                                    scheduledTime: timeSchedulingEnabled ? scheduledTime : null,
                                     notes
                                 })}
                                 style={{
@@ -1269,7 +1273,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 onClick={() => downloadAppleCalendarIcs({
                                     title: text || 'Scheduled Task',
                                     scheduledDate,
-                                    scheduledTime,
+                                    scheduledTime: timeSchedulingEnabled ? scheduledTime : null,
                                     notes
                                 })}
                                 style={{

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
-import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp, promoteDueScheduledTasks } from '../utils/dateUtils';
+import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp, promoteDueScheduledTasks, insertTaskInTimeOrder } from '../utils/dateUtils';
 import { savePhotos } from '../utils/photoStorage';
 
 // Lightweight serializer for LocalStorage: keeps metadata and compact thumbnails in LocalStorage,
@@ -337,7 +337,10 @@ export const useTasks = () => {
         };
 
         setCounter(newId);
-        setTasks(prev => promoteDueScheduledTasks([newTask, ...prev], today));
+        setTasks(prev => {
+            const listWithNew = insertTaskInTimeOrder(prev, newTask, today);
+            return promoteDueScheduledTasks(listWithNew, today);
+        });
         setTimestamp(now);
     }, [counter]);
 
@@ -446,6 +449,7 @@ export const useTasks = () => {
         const today = getTodayDateString();
         const now = Date.now();
         setTasks(prev => {
+            let updatedTaskObj = null;
             const updated = prev.map(task => {
                 if (String(task.id) === String(id)) {
                     const finalUpdates = { ...updates };
@@ -462,10 +466,25 @@ export const useTasks = () => {
                         finalUpdates.scheduledTime = null;
                     }
                     
-                    return { ...task, ...finalUpdates, updatedAt: now, isSample: false };
+                    updatedTaskObj = { ...task, ...finalUpdates, updatedAt: now, isSample: false };
+                    return updatedTaskObj;
                 }
                 return task;
             });
+
+            if (updatedTaskObj) {
+                const timeChanged = updates.scheduledTime !== undefined;
+                const dateChanged = updates.scheduledDate !== undefined;
+                const priorityChanged = updates.priority !== undefined;
+                const isActive = !updatedTaskObj.scheduledDate || updatedTaskObj.scheduledDate <= today;
+
+                if ((timeChanged || dateChanged || priorityChanged) && updatedTaskObj.scheduledTime && isActive) {
+                    const withoutTask = updated.filter(t => String(t.id) !== String(id));
+                    const reordered = insertTaskInTimeOrder(withoutTask, updatedTaskObj, today);
+                    return promoteDueScheduledTasks(reordered, today);
+                }
+            }
+
             return promoteDueScheduledTasks(updated, today);
         });
         setTimestamp(now);

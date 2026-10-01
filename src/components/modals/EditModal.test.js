@@ -563,6 +563,35 @@ describe('EditModal', () => {
             })
         );
     });
+
+    test('hides time selection input when timeSchedulingEnabled is false', () => {
+        const scheduledTask = {
+            id: 202,
+            text: 'Meeting with accountant',
+            priority: 1,
+            projectId: 'general',
+            scheduledDate: '2026-10-15',
+            scheduledTime: '10:00'
+        };
+
+        render(
+            <EditModal
+                task={scheduledTask}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+                timeSchedulingEnabled={false}
+            />
+        );
+
+        // Date controls should still be visible
+        expect(document.getElementById('edit-scheduled-date')).toBeInTheDocument();
+
+        // Time controls should be hidden
+        expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /\+ add time/i })).not.toBeInTheDocument();
+    });
 });
+
 
 

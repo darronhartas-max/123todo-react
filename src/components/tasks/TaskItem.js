@@ -16,7 +16,7 @@ const ACTION_ICONS = {
     Slash
 };
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, projectName, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK', taskViewMode = 'compact', viewProfile = 'pro' }) => {
+const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, projectName, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK', taskViewMode = 'compact', viewProfile = 'pro', timeSchedulingEnabled = true }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
@@ -799,7 +799,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 {task.isRecurring ? <Repeat size={12} /> : <Calendar size={12} />}
                                 <span>
                                     {formatDisplayDate(task.scheduledDate, dateFormat)}
-                                    {task.scheduledTime ? ` • ${formatDisplayTime(task.scheduledTime, dateFormat)}` : ''}
+                                    {timeSchedulingEnabled && task.scheduledTime ? ` • ${formatDisplayTime(task.scheduledTime, dateFormat)}` : ''}
                                 </span>
                             </span>
                         )}
