@@ -14,12 +14,34 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
     const activeProject = allProjects.find(p => p.id === currentProjectId) || allProjects[0];
     const activeColor = activeProject?.color || '#6b7280';
 
+    const isCountableActiveTask = (t) => {
+        if (!t || t.completedAt || t.isCompleted || t.completed) return false;
+        const p = t.priority;
+        const isValidPriority = (
+            p === 1 || p === 2 || p === 3 || p === 4 ||
+            p === '1' || p === '2' || p === '3' || p === '4' ||
+            p === 'p1' || p === 'p2' || p === 'p3' || p === 'p4' ||
+            p === 'must' || p === 'should' || p === 'could' || p === 'on hold' ||
+            p === undefined || p === null
+        );
+        const isScheduled = Boolean(t.scheduledDate);
+        return isValidPriority || isScheduled;
+    };
+
     const getProjectTaskCount = (projectId) => {
         if (!tasks || tasks.length === 0) return 0;
+        const activeList = tasks.filter(isCountableActiveTask);
         if (projectId === 'all') {
-            return tasks.length;
+            return activeList.length;
         }
-        return tasks.filter(t => (t.projectId || 'general').toLowerCase() === projectId.toLowerCase()).length;
+        const targetProj = allProjects.find(p => p.id === projectId);
+        const targetProjName = targetProj?.name?.toLowerCase();
+        const targetProjId = (projectId || '').toLowerCase();
+
+        return activeList.filter(t => {
+            const taskProj = (t.projectId || 'general').toLowerCase();
+            return taskProj === targetProjId || (targetProjName && taskProj === targetProjName);
+        }).length;
     };
 
     const activeCount = getProjectTaskCount(activeProject?.id);

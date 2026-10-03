@@ -139,5 +139,48 @@ describe('ProjectTabs Component', () => {
         expect(screen.queryByRole('button', { name: /Pro/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Lite/i })).not.toBeInTheDocument();
     });
+
+    test('includes tasks in priorities must, should, could, on hold, and scheduled in active counts', () => {
+        const testProjects = [
+            { id: 'work', name: 'Work', color: '#10b981' },
+            { id: 'personal', name: 'Personal', color: '#f59e0b' }
+        ];
+
+        const testTasks = [
+            { id: 1, text: 'Must Do Task', priority: 1, projectId: 'work' },
+            { id: 2, text: 'Should Do Task', priority: 2, projectId: 'work' },
+            { id: 3, text: 'Could Do Task', priority: 3, projectId: 'work' },
+            { id: 4, text: 'On Hold Task', priority: 4, projectId: 'work' },
+            { id: 5, text: 'Future Scheduled Task', priority: 1, scheduledDate: '2026-12-25', projectId: 'work' },
+            { id: 6, text: 'Completed Work Task', priority: 1, completedAt: 1700000000000, projectId: 'work' },
+            { id: 7, text: 'Personal Must Task', priority: 1, projectId: 'personal' },
+            { id: 8, text: 'Personal Scheduled Task', priority: 3, scheduledDate: '2026-11-15', projectId: 'personal' }
+        ];
+
+        render(
+            <ProjectTabs
+                projects={testProjects}
+                tasks={testTasks}
+                currentProjectId="work"
+                onSelect={jest.fn()}
+                showSearch={false}
+                onToggleSearch={jest.fn()}
+                onOpenSettings={jest.fn()}
+            />
+        );
+
+        // Work trigger shows 5 active tasks (must, should, could, on hold, scheduled) - completed is excluded
+        expect(screen.getByText(/Work\s*\(5\)/i)).toBeInTheDocument();
+
+        // Open dropdown to check option counts
+        fireEvent.click(screen.getByText(/Work\s*\(5\)/i));
+
+        // All should have 7 total active tasks (5 Work + 2 Personal)
+        expect(screen.getByText('7')).toBeInTheDocument();
+        // Work should have 5
+        expect(screen.getByText('5')).toBeInTheDocument();
+        // Personal should have 2
+        expect(screen.getByText('2')).toBeInTheDocument();
+    });
 });
 

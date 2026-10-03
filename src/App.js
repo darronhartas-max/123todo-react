@@ -1115,7 +1115,7 @@ const TodoApp = () => {
 
               <ProjectTabs
                 projects={projects}
-                tasks={activeTasks}
+                tasks={tasks}
                 currentProjectId={currentProjectId}
                 onSelect={setCurrentProjectId}
                 onAdd={addProject}
