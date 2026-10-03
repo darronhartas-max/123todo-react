@@ -145,6 +145,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.36': [
+    { title: '⏱️ Concise Scheduled Time Badge at Start of Tasks:', desc: 'Tasks with an associated scheduled time now display a small, concise time badge (e.g. 09:00, 2:30 PM) right at the start of the task in the list view across both Pro and Lite views. Provides an instant daily timeline view while keeping the interface clean and space-efficient.' }
+  ],
   '3.7.35': [
     { title: '📊 Complete Active Task Counts in Projects Dropdown:', desc: 'Audited and refined the active task counts displayed in the Projects dropdown trigger and menu. Project badges now accurately reflect all active tasks across Must Do, Should Do, Could Do, On Hold, and Scheduled & Recurring tasks (including future scheduled dates).' }
   ],

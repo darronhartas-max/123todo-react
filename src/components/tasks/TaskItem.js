@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, formatDisplayTime, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
@@ -671,7 +671,32 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 {isLite ? (
-                    <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 0, width: '100%', gap: '6px' }}>
+                        {timeSchedulingEnabled && task.scheduledTime && (
+                            <span
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '700',
+                                    color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
+                                    background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+                                    border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
+                                    padding: '1px 5px',
+                                    borderRadius: '4px',
+                                    flexShrink: 0,
+                                    lineHeight: '14px',
+                                    letterSpacing: '0.2px',
+                                    marginTop: '2px',
+                                    opacity: isArchived ? 0.6 : 1
+                                }}
+                                title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
+                            >
+                                <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                                <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
+                            </span>
+                        )}
                         <span 
                             style={{
                                 ...styles.taskText,
@@ -684,7 +709,8 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 wordBreak: 'break-word',
-                                whiteSpace: 'normal'
+                                whiteSpace: 'normal',
+                                minWidth: 0
                             }}
                             title={task.text}
                         >
@@ -706,7 +732,32 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 ● {projectName}
                             </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
+                            {timeSchedulingEnabled && task.scheduledTime && (
+                                <span
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '700',
+                                        color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
+                                        background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+                                        border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
+                                        padding: '1px 5px',
+                                        borderRadius: '4px',
+                                        flexShrink: 0,
+                                        lineHeight: '14px',
+                                        letterSpacing: '0.2px',
+                                        marginTop: '2px',
+                                        opacity: isArchived ? 0.6 : 1
+                                    }}
+                                    title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
+                                >
+                                    <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                                    <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
+                                </span>
+                            )}
                             <span 
                                 className={taskViewMode === 'compact' ? 'task-text-compact' : ''}
                                 style={styles.taskText}

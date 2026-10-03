@@ -368,3 +368,52 @@ test('hides scheduled time when timeSchedulingEnabled is false', () => {
   expect(screen.queryByText(/15:30/)).not.toBeInTheDocument();
 });
 
+test('renders concise time badge at the start of the task in list view (Pro mode)', () => {
+  const task = {
+    id: 114,
+    text: 'Morning Standup Meeting',
+    priority: 1,
+    projectId: 'general',
+    scheduledTime: '09:00'
+  };
+
+  render(<TaskItem task={task} dateFormat="UK" />);
+
+  // Concise time badge at start of task
+  const timeBadge = screen.getByTitle('Scheduled time: 09:00');
+  expect(timeBadge).toBeInTheDocument();
+  expect(timeBadge).toHaveTextContent('09:00');
+});
+
+test('renders concise time badge at the start of the task in list view (Lite mode)', () => {
+  const task = {
+    id: 115,
+    text: 'Dentist Checkup',
+    priority: 2,
+    projectId: 'personal',
+    scheduledTime: '14:15'
+  };
+
+  render(<TaskItem task={task} viewProfile="lite" dateFormat="UK" />);
+
+  const timeBadge = screen.getByTitle('Scheduled time: 14:15');
+  expect(timeBadge).toBeInTheDocument();
+  expect(timeBadge).toHaveTextContent('14:15');
+});
+
+test('renders concise time badge in 12-hour format when dateFormat is US', () => {
+  const task = {
+    id: 116,
+    text: 'Afternoon Call',
+    priority: 1,
+    projectId: 'general',
+    scheduledTime: '14:30'
+  };
+
+  render(<TaskItem task={task} dateFormat="US" />);
+
+  const timeBadge = screen.getByTitle('Scheduled time: 2:30 PM');
+  expect(timeBadge).toBeInTheDocument();
+  expect(timeBadge).toHaveTextContent('2:30 PM');
+});
+
