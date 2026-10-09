@@ -1,9 +1,8 @@
 import React from 'react';
-import { Trophy } from 'lucide-react';
 import { APP_VERSION } from '../../utils/constants';
 import { useTenant } from '../../context/TenantContext';
 
-const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false, onOpenAchievements }) => {
+const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false }) => {
     const { tenantConfig, isCustomTenant } = useTenant();
 
     const styles = {
@@ -54,7 +53,6 @@ const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false, o
     ];
     const showInstall = !isStandalone && onInstallClick && footerCfg.showInstallButton !== false;
     const showVersion = footerCfg.showVersion !== false;
-    const showAchievements = onOpenAchievements && footerCfg.showAchievements !== false;
 
     return (
         <footer style={styles.footer}>
@@ -122,31 +120,6 @@ const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false, o
                         gap: '6px'
                     }}>
                         <span>v{version}</span>
-                        {showAchievements && (
-                            <button
-                                type="button"
-                                onClick={onOpenAchievements}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '22px',
-                                    height: '22px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                                    border: '1px solid #f59e0b',
-                                    color: '#d97706',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: '0 1px 3px rgba(245, 158, 11, 0.2)'
-                                }}
-                                title="Productivity Achievements & Insights"
-                                aria-label="Productivity Achievements & Insights"
-                            >
-                                <Trophy size={12} />
-                            </button>
-                        )}
                     </div>
                 )}
             </div>

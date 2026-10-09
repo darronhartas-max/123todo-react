@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.37** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.38** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.37 (Current)
+### v3.7.38 (Current)
+
+- **Streamlined Footer & Top Bar Achievements**: Removed the achievements trophy badge/link from the footer since it is already readily accessible near the top of the lists view in Tasks mode, giving the footer a cleaner, minimal presentation.
+
+### v3.7.37
 
 - **Direct In-Box Actionable Links & Clean Task View**: Removed the separate cluttered Actionable section when viewing tasks. Phone numbers, email addresses, and web links are now directly linked and interactive inside the task description and notes boxes. Clicking any link immediately calls, emails, or opens the URL without entering edit mode, while clicking anywhere else in the box or tapping the Edit/Done button smoothly transitions into the full text editor.
 
