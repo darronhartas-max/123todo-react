@@ -149,15 +149,15 @@ describe('EditModal', () => {
       />
     );
 
-    const callLink = screen.getByRole('link', { name: /Call 07123 456789/i });
+    const callLink = screen.getByRole('link', { name: /07123 456789/i });
     expect(callLink).toBeInTheDocument();
     expect(callLink).toHaveAttribute('href', 'tel:07123456789');
 
-    const emailLink = screen.getByRole('link', { name: /Email client@example.com/i });
+    const emailLink = screen.getByRole('link', { name: /client@example\.com/i });
     expect(emailLink).toBeInTheDocument();
     expect(emailLink).toHaveAttribute('href', 'mailto:client@example.com');
 
-    const webLink = screen.getByRole('link', { name: /Open 123todo.com/i });
+    const webLink = screen.getByRole('link', { name: /123todo\.com/i });
     expect(webLink).toBeInTheDocument();
     expect(webLink).toHaveAttribute('href', 'https://123todo.com');
   });
@@ -318,7 +318,7 @@ describe('EditModal', () => {
         expect(onArchiveMock).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 
-    test('renders a single consolidated actionable panel under the Tasks section', () => {
+    test('renders actionable links directly in description and notes boxes and removes separate actionable panel', () => {
         const taskWithMultipleActionables = {
             id: 3,
             text: 'Meeting notes from https://example.com and call 07123456789',
@@ -337,14 +337,14 @@ describe('EditModal', () => {
             />
         );
 
-        // There should be exactly ONE actionable bar in the entire modal
+        // There should be NO separate actionable bar in the entire modal
         const actionableBars = container.querySelectorAll('.actionable-entities-bar');
-        expect(actionableBars).toHaveLength(1);
+        expect(actionableBars).toHaveLength(0);
 
-        // It should contain all entities deduplicated (1 url, 1 phone, 1 email)
-        expect(screen.getByRole('link', { name: /Open example.com/i })).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /Call 07123456789/i })).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /Email boss@example.com/i })).toBeInTheDocument();
+        // All entities are rendered directly inside description and notes boxes
+        expect(screen.getAllByRole('link', { name: /example\.com/i }).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByRole('link', { name: /07123456789/i })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /boss@example\.com/i })).toBeInTheDocument();
     });
 
     test('renders timestamp button and places expand button at the bottom right in place of photos counter', () => {
@@ -590,6 +590,47 @@ describe('EditModal', () => {
         // Time controls should be hidden
         expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /\+ add time/i })).not.toBeInTheDocument();
+    });
+
+    test('toggles edit mode in description and notes via Edit/Done buttons or clicking inside boxes', () => {
+        const taskWithEntities = {
+            id: 203,
+            text: 'Call client on 07123456789 directly',
+            notes: 'Contact info at client@example.com',
+            priority: 1,
+            projectId: 'general',
+            subtasks: []
+        };
+
+        render(
+            <EditModal
+                task={taskWithEntities}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Initially in view mode with rendered actionable links
+        const callLink = screen.getByRole('link', { name: /07123456789/i });
+        expect(callLink).toBeInTheDocument();
+
+        // Clicking the link does NOT trigger editing
+        fireEvent.click(callLink);
+        expect(screen.getAllByRole('button', { name: /Edit/i }).length).toBeGreaterThanOrEqual(1);
+
+        // Clicking Edit button toggles into edit mode with textarea
+        const editButtons = screen.getAllByRole('button', { name: /Edit/i });
+        fireEvent.click(editButtons[0]); // Description edit button
+
+        // Description is now in edit mode, showing Done button and textarea
+        expect(screen.getByRole('button', { name: /Done/i })).toBeInTheDocument();
+        const titleTextarea = screen.getByPlaceholderText('Enter task description...');
+        expect(titleTextarea).toBeInTheDocument();
+
+        // Clicking Done button returns to view mode
+        fireEvent.click(screen.getByRole('button', { name: /Done/i }));
+        expect(screen.getByRole('link', { name: /07123456789/i })).toBeInTheDocument();
     });
 });
 

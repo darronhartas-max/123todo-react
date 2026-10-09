@@ -4,10 +4,10 @@ import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, Edit2 } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
-import { ActionableEntitiesBar } from '../../utils/textUtils';
+import { renderActionableText } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from './TimePickerModal';
 
@@ -24,6 +24,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [showNotes, setShowNotes] = useState(() => Boolean((task.notes && task.notes.trim().length > 0) || (task.photos && task.photos.length > 0)));
+    const [isEditingTitle, setIsEditingTitle] = useState(() => !(task?.text && task.text.trim().length > 0));
+    const [isEditingNotes, setIsEditingNotes] = useState(false);
 
     const titleRef = useRef(null);
     const notesRef = useRef(null);
@@ -37,7 +39,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             titleRef.current.style.height = `${targetH}px`;
             titleRef.current.scrollTop = titleRef.current.scrollHeight;
         }
-    }, [editingTask.text]);
+    }, [editingTask.text, isEditingTitle]);
 
     useEffect(() => {
         if (notesRef.current) {
@@ -46,7 +48,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             notesRef.current.style.height = `${targetH}px`;
             notesRef.current.scrollTop = notesRef.current.scrollHeight;
         }
-    }, [editingTask.notes]);
+    }, [editingTask.notes, isEditingNotes]);
 
     useEffect(() => {
         if (focusTextareaRef.current) {
@@ -82,6 +84,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
         if (targetField === 'notes') {
             setShowNotes(true);
+            setIsEditingNotes(true);
+        } else if (targetField === 'title') {
+            setIsEditingTitle(true);
         }
 
         const initialVal = targetField === 'title' ? (editingTask.text || '') : (editingTask.notes || '');
@@ -236,6 +241,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
         if (targetField === 'notes') {
             setShowNotes(true);
+            setIsEditingNotes(true);
+        } else if (targetField === 'title') {
+            setIsEditingTitle(true);
         }
 
         setTimeout(() => {
@@ -700,6 +708,34 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                             <button
                                 type="button"
+                                onClick={() => {
+                                    if (isEditingTitle) {
+                                        setIsEditingTitle(false);
+                                    } else {
+                                        setIsEditingTitle(true);
+                                        setTimeout(() => titleRef.current?.focus(), 50);
+                                    }
+                                }}
+                                title={isEditingTitle ? "Done editing description" : "Edit task description"}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '4px 9px',
+                                    borderRadius: '8px',
+                                    border: `1px solid ${isEditingTitle ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                    background: isEditingTitle ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--item-bg)',
+                                    color: isEditingTitle ? 'var(--accent-color)' : 'var(--text-color)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {isEditingTitle ? <Check size={12} /> : <Edit2 size={12} />}
+                                <span>{isEditingTitle ? 'Done' : 'Edit'}</span>
+                            </button>
+                            <button
+                                type="button"
                                 onClick={() => setExpandedOverlayField('title')}
                                 title="Open Full Screen Focus Editor for Task Title"
                                 style={{
@@ -721,7 +757,10 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             </button>
                             <button
                                 type="button"
-                                onClick={() => toggleVoiceInput('title')}
+                                onClick={() => {
+                                    setIsEditingTitle(true);
+                                    toggleVoiceInput('title');
+                                }}
                                 title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
                                 style={{
                                     display: 'flex',
@@ -760,35 +799,72 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         </div>
                     </div>
 
-                    <textarea
-                        ref={titleRef}
-                        autoFocus
-                        value={editingTask.text}
-                        onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
-                        onInput={handleInput}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = 'var(--accent-color)';
-                            e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
-                        }}
-                        onBlur={(e) => {
-                            e.target.style.borderColor = 'var(--border-color)';
-                            e.target.style.boxShadow = 'none';
-                        }}
-                        style={{
-                            ...styles.textarea,
-                            minHeight: '56px',
-                            maxHeight: '160px',
-                            fontWeight: '500',
-                            fontSize: '1.08rem'
-                        }}
-                        maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
-                    />
-                    {/* SINGLE ACTIONABLE PANEL FOR ENTIRE TASK */}
-                    <ActionableEntitiesBar texts={[
-                        editingTask.text,
-                        editingTask.notes,
-                        ...(subtasks.map(s => s.text))
-                    ]} />
+                    {!isEditingTitle ? (
+                        <div
+                            role="textbox"
+                            tabIndex={0}
+                            placeholder="Enter task description..."
+                            onClick={(e) => {
+                                if (e.target.tagName !== 'A' && !e.target.closest('a')) {
+                                    setIsEditingTitle(true);
+                                    setTimeout(() => titleRef.current?.focus(), 50);
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    setIsEditingTitle(true);
+                                    setTimeout(() => titleRef.current?.focus(), 50);
+                                }
+                            }}
+                            title="Click to edit task description"
+                            style={{
+                                ...styles.textarea,
+                                minHeight: '56px',
+                                maxHeight: '160px',
+                                fontWeight: '500',
+                                fontSize: '1.08rem',
+                                cursor: 'text',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                overflowY: 'auto',
+                                userSelect: 'text'
+                            }}
+                        >
+                            {editingTask.text && editingTask.text.trim().length > 0 ? (
+                                renderActionableText(editingTask.text)
+                            ) : (
+                                <span style={{ color: 'var(--muted-text)' }}>Enter task description...</span>
+                            )}
+                        </div>
+                    ) : (
+                        <textarea
+                            ref={titleRef}
+                            autoFocus
+                            value={editingTask.text}
+                            onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
+                            onInput={handleInput}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = 'var(--accent-color)';
+                                e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = 'var(--border-color)';
+                                e.target.style.boxShadow = 'none';
+                                if (listeningTarget !== 'title') {
+                                    setIsEditingTitle(false);
+                                }
+                            }}
+                            placeholder="Enter task description..."
+                            style={{
+                                ...styles.textarea,
+                                minHeight: '56px',
+                                maxHeight: '160px',
+                                fontWeight: '500',
+                                fontSize: '1.08rem'
+                            }}
+                            maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (editingTask.text || '').length + 500)}
+                        />
+                    )}
                 </div>
 
                 {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, and Schedule on the SAME line */}
@@ -848,7 +924,38 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                                 <button
                                     type="button"
-                                    onClick={() => handleInsertTimestamp('notes')}
+                                    onClick={() => {
+                                        if (isEditingNotes) {
+                                            setIsEditingNotes(false);
+                                        } else {
+                                            setIsEditingNotes(true);
+                                            setTimeout(() => notesRef.current?.focus(), 50);
+                                        }
+                                    }}
+                                    title={isEditingNotes ? "Done editing notes" : "Edit notes"}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        padding: '3px 9px',
+                                        borderRadius: '8px',
+                                        border: `1px solid ${isEditingNotes ? 'var(--accent-color)' : 'var(--border-color)'}`,
+                                        background: isEditingNotes ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--surface-color)',
+                                        color: isEditingNotes ? 'var(--accent-color)' : 'var(--text-color)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    {isEditingNotes ? <Check size={12} /> : <Edit2 size={12} />}
+                                    <span>{isEditingNotes ? 'Done' : 'Edit'}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsEditingNotes(true);
+                                        handleInsertTimestamp('notes');
+                                    }}
                                     title="Insert current date & time stamp into notes"
                                     style={{
                                         display: 'flex',
@@ -867,7 +974,10 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => toggleVoiceInput('notes')}
+                                    onClick={() => {
+                                        setIsEditingNotes(true);
+                                        toggleVoiceInput('notes');
+                                    }}
                                     title={listeningTarget === 'notes' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
                                     style={{
                                         display: 'flex',
@@ -905,29 +1015,73 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                             </div>
                         </div>
-                        <textarea
-                            ref={notesRef}
-                            value={editingTask.notes || ''}
-                            onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
-                            onInput={handleInput}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = 'var(--accent-color)';
-                                e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = 'var(--border-color)';
-                                e.target.style.boxShadow = 'none';
-                            }}
-                            placeholder="Add notes or extra details..."
-                            style={{
-                                ...styles.textarea,
-                                minHeight: '85px',
-                                maxHeight: '180px',
-                                fontSize: '1.05rem',
-                                background: 'var(--surface-color)',
-                                marginBottom: '8px'
-                            }}
-                        />
+                        {!isEditingNotes ? (
+                            <div
+                                role="textbox"
+                                tabIndex={0}
+                                placeholder="Add notes or extra details..."
+                                onClick={(e) => {
+                                    if (e.target.tagName !== 'A' && !e.target.closest('a')) {
+                                        setIsEditingNotes(true);
+                                        setTimeout(() => notesRef.current?.focus(), 50);
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        setIsEditingNotes(true);
+                                        setTimeout(() => notesRef.current?.focus(), 50);
+                                    }
+                                }}
+                                title="Click to edit notes"
+                                style={{
+                                    ...styles.textarea,
+                                    minHeight: '85px',
+                                    maxHeight: '180px',
+                                    fontSize: '1.05rem',
+                                    background: 'var(--surface-color)',
+                                    marginBottom: '8px',
+                                    cursor: 'text',
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-word',
+                                    overflowY: 'auto',
+                                    userSelect: 'text'
+                                }}
+                            >
+                                {editingTask.notes && editingTask.notes.trim().length > 0 ? (
+                                    renderActionableText(editingTask.notes)
+                                ) : (
+                                    <span style={{ color: 'var(--muted-text)' }}>Add notes or extra details...</span>
+                                )}
+                            </div>
+                        ) : (
+                            <textarea
+                                ref={notesRef}
+                                autoFocus
+                                value={editingTask.notes || ''}
+                                onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
+                                onInput={handleInput}
+                                onFocus={(e) => {
+                                    e.target.style.borderColor = 'var(--accent-color)';
+                                    e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                                }}
+                                onBlur={(e) => {
+                                    e.target.style.borderColor = 'var(--border-color)';
+                                    e.target.style.boxShadow = 'none';
+                                    if (listeningTarget !== 'notes') {
+                                        setIsEditingNotes(false);
+                                    }
+                                }}
+                                placeholder="Add notes or extra details..."
+                                style={{
+                                    ...styles.textarea,
+                                    minHeight: '85px',
+                                    maxHeight: '180px',
+                                    fontSize: '1.05rem',
+                                    background: 'var(--surface-color)',
+                                    marginBottom: '8px'
+                                }}
+                            />
+                        )}
                         <PhotoAttachments
                             photos={editingTask.photos || []}
                             onChange={(newPhotos) => setEditingTask(prev => ({ ...prev, photos: newPhotos }))}
@@ -1876,7 +2030,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     boxSizing: 'border-box'
                                 }}
                             />
-                            <ActionableEntitiesBar text={expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')} />
 
                             {expandedOverlayField === 'notes' && (
                                 <PhotoAttachments

@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.36** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.37** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.36 (Current)
+### v3.7.37 (Current)
+
+- **Direct In-Box Actionable Links & Clean Task View**: Removed the separate cluttered Actionable section when viewing tasks. Phone numbers, email addresses, and web links are now directly linked and interactive inside the task description and notes boxes. Clicking any link immediately calls, emails, or opens the URL without entering edit mode, while clicking anywhere else in the box or tapping the Edit/Done button smoothly transitions into the full text editor.
+
+### v3.7.36
 
 - **Concise Scheduled Time Badge at Start of Tasks**: Tasks with an associated scheduled time now display a small, concise time badge (e.g. 09:00, 2:30 PM) right at the start of the task in the list view across both Pro and Lite views. Provides an instant daily timeline view while keeping the interface clean and space-efficient.
 
