@@ -26,8 +26,11 @@ const NotesView = ({
   onSearchChange,
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
-  viewProfile = 'lite'
+  viewProfile = 'lite',
+  buttonDisplayMode = 'icons'
 }) => {
+  const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
+  const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
   const [showAddNote, setShowAddNote] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [newNotes, setNewNotes] = useState('');
@@ -545,8 +548,10 @@ const NotesView = ({
                 setNewNotes('');
                 setNewPhotos([]);
               }}
+              aria-label="Cancel"
               style={{
-                padding: '9px 12px',
+                padding: showBtnText ? '9px 12px' : '9px 12px',
+                minWidth: showBtnText ? 'auto' : '40px',
                 borderRadius: '10px',
                 border: '1px solid var(--border-color, #d1d5db)',
                 backgroundColor: 'transparent',
@@ -554,8 +559,9 @@ const NotesView = ({
                 fontWeight: '600',
                 fontSize: '14px',
                 cursor: 'pointer',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
                 transition: 'all 0.15s ease',
                 minHeight: '42px',
@@ -563,16 +569,18 @@ const NotesView = ({
               }}
               title="Cancel"
             >
-              <X size={16} />
-              <span>Cancel</span>
+              {showBtnIcons && <X size={16} />}
+              {showBtnText && <span>Cancel</span>}
             </button>
 
             {/* Large Prominent Save Button to the left of Talk */}
             <button
               type="button"
               onClick={() => handleCreateNote()}
+              aria-label="Save"
               style={{
-                padding: '9px 20px',
+                padding: showBtnText ? '9px 20px' : '9px 16px',
+                minWidth: showBtnText ? 'auto' : '44px',
                 borderRadius: '10px',
                 border: 'none',
                 backgroundColor: '#2563eb',
@@ -580,8 +588,9 @@ const NotesView = ({
                 fontWeight: '800',
                 fontSize: '15px',
                 cursor: 'pointer',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
                 boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
                 transition: 'all 0.15s ease',
@@ -590,19 +599,22 @@ const NotesView = ({
               }}
               title="Save Note / Task (Cmd+Enter)"
             >
-              <Check size={18} strokeWidth={2.6} />
-              <span>Save</span>
+              {showBtnIcons && <Check size={18} strokeWidth={2.6} />}
+              {showBtnText && <span>Save</span>}
             </button>
 
             {/* Red Tape Recorder 'Talk' / 'Stop' Button at top right */}
             <button
               type="button"
               onClick={toggleQuickAddDictation}
+              aria-label={isDictatingQuickAdd ? "Stop" : "Talk"}
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
-                padding: '9px 16px',
+                padding: showBtnText ? '9px 16px' : '9px 14px',
+                minWidth: showBtnText ? 'auto' : '44px',
                 borderRadius: '10px',
                 border: '1.5px solid #ef4444',
                 backgroundColor: isDictatingQuickAdd ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.08)',
@@ -625,7 +637,7 @@ const NotesView = ({
                 boxShadow: isDictatingQuickAdd ? '0 0 8px #ef4444' : 'none',
                 animation: isDictatingQuickAdd ? 'pulse 1.2s infinite' : 'none'
               }} />
-              <span>{isDictatingQuickAdd ? 'Stop' : 'Talk'}</span>
+              <span>{isDictatingQuickAdd ? 'Stop' : (showBtnText ? 'Talk' : '')}</span>
             </button>
           </div>
         </div>
@@ -730,6 +742,7 @@ const NotesView = ({
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
               viewProfile={viewProfile}
+              buttonDisplayMode={buttonDisplayMode}
             />
           ))}
         </div>

@@ -103,24 +103,26 @@ const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false })
             )}
 
             <div style={{
-                fontSize: '0.88rem',
-                margin: '6px 0',
-                opacity: 0.9
+                fontSize: '0.78rem',
+                margin: '4px 0',
+                opacity: 0.85,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                gap: '6px'
             }}>
-                <div style={{ marginBottom: '3px' }}>
-                    {copyrightText}
-                </div>
+                <span>{copyrightText}</span>
                 {showVersion && (
-                    <div style={{ 
-                        fontWeight: '600', 
-                        color: 'var(--text-color)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                    }}>
-                        <span>v{version}</span>
-                    </div>
+                    <>
+                        <span aria-hidden="true" style={{ opacity: 0.5 }}>·</span>
+                        <span style={{ 
+                            fontWeight: '600', 
+                            color: 'var(--text-color)'
+                        }}>
+                            v{version}
+                        </span>
+                    </>
                 )}
             </div>
 

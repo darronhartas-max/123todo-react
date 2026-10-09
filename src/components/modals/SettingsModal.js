@@ -292,7 +292,9 @@ const SettingsModal = ({
     notificationsEnabled = false,
     setNotificationsEnabled,
     timeSchedulingEnabled = true,
-    setTimeSchedulingEnabled
+    setTimeSchedulingEnabled,
+    buttonDisplayMode = 'icons',
+    setButtonDisplayMode
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -1103,6 +1105,43 @@ const SettingsModal = ({
                                             onClick={() => setViewProfile && setViewProfile('pro')}
                                         >
                                             ⚡ Pro (Full Power)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Feature Buttons & Labels: Icons (Clean), Icons & Text, Text Only */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span>Feature Buttons & Labels</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            {buttonDisplayMode === 'icons'
+                                                ? 'Icons (Clean): Shows clean icons for features and actions with comfortable spacing'
+                                                : buttonDisplayMode === 'both'
+                                                    ? 'Icons & Text: Shows both descriptive icons and text labels side-by-side'
+                                                    : 'Text Only: Shows text labels without icons'}
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(buttonDisplayMode === 'icons')}
+                                            onClick={() => setButtonDisplayMode && setButtonDisplayMode('icons')}
+                                            title="Clean mode with icons"
+                                        >
+                                            ✨ Icons (Clean)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(buttonDisplayMode === 'both')}
+                                            onClick={() => setButtonDisplayMode && setButtonDisplayMode('both')}
+                                            title="Show both icons and text"
+                                        >
+                                            🔤 Icons & Text
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(buttonDisplayMode === 'text')}
+                                            onClick={() => setButtonDisplayMode && setButtonDisplayMode('text')}
+                                            title="Show text only"
+                                        >
+                                            📄 Text Only
                                         </button>
                                     </div>
                                 </div>

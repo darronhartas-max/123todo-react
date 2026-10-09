@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar, FileText, ListChecks } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -9,7 +9,9 @@ import { ActionableEntitiesBar } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from '../modals/TimePickerModal';
 
-const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
+    const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
+    const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
     const isUnlimited = taskLengthLimit === 'unlimited';
     const getInitialProjectId = () => {
         const savedLastProject = localStorage.getItem(STORAGE_KEYS.LAST_PROJECT);
@@ -367,13 +369,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         border: '1px solid var(--accent-color)',
         color: isActive ? 'white' : 'var(--accent-color)',
         cursor: 'pointer',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: '4px',
-        fontSize: '0.9rem',
+        justifyContent: 'center',
+        gap: '6px',
+        fontSize: '0.85rem',
         fontWeight: '600',
-        padding: '6px 10px',
-        borderRadius: '4px',
+        padding: showBtnText ? '6px 11px' : '6px 14px',
+        minWidth: showBtnText ? 'auto' : '38px',
+        minHeight: '34px',
+        borderRadius: '6px',
         background: isActive ? 'var(--accent-color)' : 'transparent',
         transition: 'all 0.2s ease',
         boxSizing: 'border-box'
@@ -539,12 +544,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     <button
                         type="button"
                         onClick={() => toggleVoiceInput('title')}
+                        aria-label={listeningTarget === 'title' ? "Listening" : "Talk"}
                         title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to add or append to task title" : "Voice input not supported")}
                         style={{
-                            display: 'flex',
+                            display: 'inline-flex',
                             alignItems: 'center',
+                            justifyContent: 'center',
                             gap: '6px',
-                            padding: '4px 10px',
+                            padding: showBtnText ? '4px 10px' : '5px 12px',
+                            minWidth: showBtnText ? 'auto' : '36px',
+                            minHeight: '32px',
                             borderRadius: '16px',
                             border: `1.5px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
                             background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
@@ -571,8 +580,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             </>
                         ) : (
                             <>
-                                <Mic size={14} color="var(--accent-color)" />
-                                <span>Talk</span>
+                                {showBtnIcons && <Mic size={14} color="var(--accent-color)" />}
+                                {showBtnText && <span>Talk</span>}
                             </>
                         )}
                     </button>
@@ -639,25 +648,44 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 <button
                     onClick={() => setShowNotes(!showNotes)}
                     style={toggleButtonStyle(showNotes)}
+                    aria-label="Notes"
+                    title={showNotes ? "Hide Notes" : "Show Notes"}
                 >
-                    {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                    Notes{(notes && notes.trim().length > 0) || photos.length > 0 ? ' •' : ''}
+                    {showBtnIcons && (buttonDisplayMode === 'both' ? (showNotes ? <Minus size={14} /> : <Plus size={14} />) : <FileText size={15} />)}
+                    {showBtnText && <span>Notes{(notes && notes.trim().length > 0) || photos.length > 0 ? ' •' : ''}</span>}
+                    {!showBtnText && ((notes && notes.trim().length > 0) || photos.length > 0) && (
+                        <span style={{ fontSize: '13px', fontWeight: 'bold' }}>•</span>
+                    )}
                 </button>
                 <button
                     onClick={() => setShowSubtasks(!showSubtasks)}
                     style={toggleButtonStyle(showSubtasks)}
+                    aria-label={`Subtasks (${subtasks.length})`}
+                    title={showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
                 >
-                    {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
-                    Subtasks ({subtasks.length})
+                    {showBtnIcons && (buttonDisplayMode === 'both' ? (showSubtasks ? <Minus size={14} /> : <Plus size={14} />) : <ListChecks size={15} />)}
+                    {showBtnText && <span>Subtasks ({subtasks.length})</span>}
+                    {!showBtnText && (
+                        <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{subtasks.length}</span>
+                    )}
                 </button>
                 <button
                     onClick={() => setShowSchedule(!showSchedule)}
                     style={toggleButtonStyle(showSchedule)}
-                >
-                    {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
-                    {scheduledDate
-                        ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}${timeSchedulingEnabled && scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
+                    aria-label={scheduledDate
+                        ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}`
                         : 'Schedule'}
+                    title={showSchedule ? "Hide Schedule" : "Show Schedule"}
+                >
+                    {showBtnIcons && (buttonDisplayMode === 'both' ? (showSchedule ? <Minus size={14} /> : <Plus size={14} />) : <Calendar size={15} />)}
+                    {showBtnText && <span>{scheduledDate
+                        ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}${timeSchedulingEnabled && scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
+                        : 'Schedule'}</span>}
+                    {!showBtnText && scheduledDate && (
+                        <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                            {formatDisplayDate(scheduledDate, dateFormat)}
+                        </span>
+                    )}
                 </button>
             </div>
 
@@ -668,12 +696,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         <button
                             type="button"
                             onClick={() => toggleVoiceInput('notes')}
+                            aria-label={listeningTarget === 'notes' ? "Listening" : "Talk"}
                             title={listeningTarget === 'notes' ? "Listening - Tap to finish" : (speechSupported ? "Speak to add/append notes" : "Voice input not supported")}
                             style={{
-                                display: 'flex',
+                                display: 'inline-flex',
                                 alignItems: 'center',
+                                justifyContent: 'center',
                                 gap: '4px',
-                                padding: '2px 8px',
+                                padding: showBtnText ? '2px 8px' : '4px 8px',
+                                minWidth: showBtnText ? 'auto' : '30px',
+                                minHeight: '28px',
                                 borderRadius: '12px',
                                 border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
                                 background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
@@ -698,8 +730,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 </>
                             ) : (
                                 <>
-                                    <Mic size={12} color="var(--accent-color)" />
-                                    <span>Talk</span>
+                                    {showBtnIcons && <Mic size={12} color="var(--accent-color)" />}
+                                    {showBtnText && <span>Talk</span>}
                                 </>
                             )}
                         </button>

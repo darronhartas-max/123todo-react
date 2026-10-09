@@ -43,8 +43,17 @@ export const STORAGE_KEYS = {
   SCREEN_SCALING_MODE: '123TodoScreenScalingMode',
   TENANT: '123Todo_Tenant',
   NOTIFICATIONS_ENABLED: '123TodoNotificationsEnabled',
-  TIME_SCHEDULING_ENABLED: '123Todo_TimeSchedulingEnabled'
+  TIME_SCHEDULING_ENABLED: '123Todo_TimeSchedulingEnabled',
+  BUTTON_DISPLAY_MODE: '123Todo_ButtonDisplayMode'
 };
+
+export const BUTTON_DISPLAY_MODES = [
+  { id: 'icons', label: 'Icons (Clean)', desc: 'Show clean icons for features and actions with ample spacing' },
+  { id: 'both', label: 'Icons & Text', desc: 'Show both icons and descriptive text labels together' },
+  { id: 'text', label: 'Text Only', desc: 'Show text labels only without icons' }
+];
+
+export const DEFAULT_BUTTON_DISPLAY_MODE = 'icons';
 
 export const DEFAULT_TIME_SCHEDULING_ENABLED = true;
 
@@ -145,6 +154,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.39': [
+    { title: '✨ UI Decluttering, Button Display Mode Setting & Compact Footer:', desc: 'Introduced a cleaner, distraction-free interface by replacing redundant dual icon-and-text labels with streamlined icons by default, spaced with ample touch-safe padding to prevent mis-clicks. Added a new "Feature Buttons & Labels" setting under Appearance & Styling in Settings to toggle between Icons (Clean), Icons & Text, and Text Only across the top bar, task forms, and notes view. Also streamlined the footer by combining the copyright notice and version number into a single compact line.' }
+  ],
   '3.7.38': [
     { title: '🏆 Streamlined Footer & Top Bar Achievements:', desc: 'Removed the achievements trophy badge/link from the footer since it is already readily accessible near the top of the lists view in Tasks mode, giving the footer a cleaner, minimal presentation.' }
   ],

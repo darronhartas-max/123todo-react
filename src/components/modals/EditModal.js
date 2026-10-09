@@ -4,14 +4,16 @@ import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, Edit2 } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, Edit2, ListChecks } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from './TimePickerModal';
 
-const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true }) => {
+const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
+    const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
+    const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
     const isUnlimited = taskLengthLimit === 'unlimited';
     const [editingTask, setEditingTask] = useState({ ...task, photos: task.photos || [] });
     const createdTs = task?.createdAt;
@@ -312,10 +314,13 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         cursor: 'pointer',
         display: 'inline-flex',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: '6px',
         fontSize: '0.85rem',
         fontWeight: '600',
-        padding: '6px 13px',
+        padding: showBtnText ? '6px 13px' : '6px 14px',
+        minWidth: showBtnText ? 'auto' : '38px',
+        minHeight: '34px',
         borderRadius: '8px',
         background: isActive ? 'var(--accent-color)' : 'var(--item-bg)',
         boxShadow: isActive ? '0 2px 6px rgba(0, 0, 0, 0.15)' : 'none',
@@ -705,7 +710,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                 <div style={{ marginBottom: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <span style={styles.sectionLabel}>Task Description</span>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -716,12 +721,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         setTimeout(() => titleRef.current?.focus(), 50);
                                     }
                                 }}
+                                aria-label={isEditingTitle ? "Done" : "Edit"}
                                 title={isEditingTitle ? "Done editing description" : "Edit task description"}
                                 style={{
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '4px',
-                                    padding: '4px 9px',
+                                    justifyContent: 'center',
+                                    gap: '5px',
+                                    padding: showBtnText ? '4px 9px' : '5px 10px',
+                                    minWidth: showBtnText ? 'auto' : '34px',
+                                    minHeight: '32px',
                                     borderRadius: '8px',
                                     border: `1px solid ${isEditingTitle ? 'var(--accent-color)' : 'var(--border-color)'}`,
                                     background: isEditingTitle ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--item-bg)',
@@ -731,18 +740,22 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     fontWeight: '600'
                                 }}
                             >
-                                {isEditingTitle ? <Check size={12} /> : <Edit2 size={12} />}
-                                <span>{isEditingTitle ? 'Done' : 'Edit'}</span>
+                                {showBtnIcons && (isEditingTitle ? <Check size={13} /> : <Edit2 size={13} />)}
+                                {showBtnText && <span>{isEditingTitle ? 'Done' : 'Edit'}</span>}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setExpandedOverlayField('title')}
+                                aria-label="Expand"
                                 title="Open Full Screen Focus Editor for Task Title"
                                 style={{
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '4px',
-                                    padding: '4px 9px',
+                                    justifyContent: 'center',
+                                    gap: '5px',
+                                    padding: showBtnText ? '4px 9px' : '5px 10px',
+                                    minWidth: showBtnText ? 'auto' : '34px',
+                                    minHeight: '32px',
                                     borderRadius: '8px',
                                     border: '1px solid var(--border-color)',
                                     background: 'var(--item-bg)',
@@ -752,8 +765,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     fontWeight: '600'
                                 }}
                             >
-                                <Maximize2 size={12} />
-                                <span>Expand</span>
+                                {showBtnIcons && <Maximize2 size={13} />}
+                                {showBtnText && <span>Expand</span>}
                             </button>
                             <button
                                 type="button"
@@ -761,12 +774,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     setIsEditingTitle(true);
                                     toggleVoiceInput('title');
                                 }}
+                                aria-label={listeningTarget === 'title' ? "Listening" : "Talk"}
                                 title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
                                 style={{
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
+                                    justifyContent: 'center',
                                     gap: '5px',
-                                    padding: '4px 9px',
+                                    padding: showBtnText ? '4px 9px' : '5px 10px',
+                                    minWidth: showBtnText ? 'auto' : '34px',
+                                    minHeight: '32px',
                                     borderRadius: '8px',
                                     border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
                                     background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
@@ -791,8 +808,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     </>
                                 ) : (
                                     <>
-                                        <Mic size={13} color="var(--accent-color)" />
-                                        <span>Talk</span>
+                                        {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
+                                        {showBtnText && <span>Talk</span>}
                                     </>
                                 )}
                             </button>
@@ -873,27 +890,46 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         type="button"
                         onClick={() => setShowNotes(!showNotes)}
                         style={toggleButtonStyle(showNotes)}
+                        aria-label="Notes"
+                        title={showNotes ? "Hide Notes" : "Show Notes"}
                     >
-                        {showNotes ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>Notes{(editingTask.notes && editingTask.notes.trim().length > 0) || (editingTask.photos && editingTask.photos.length > 0) ? ' •' : ''}</span>
+                        {showBtnIcons && (buttonDisplayMode === 'both' ? (showNotes ? <Minus size={14} /> : <Plus size={14} />) : <FileText size={15} />)}
+                        {showBtnText && <span>Notes{(editingTask.notes && editingTask.notes.trim().length > 0) || (editingTask.photos && editingTask.photos.length > 0) ? ' •' : ''}</span>}
+                        {!showBtnText && ((editingTask.notes && editingTask.notes.trim().length > 0) || (editingTask.photos && editingTask.photos.length > 0)) && (
+                            <span style={{ fontSize: '13px', fontWeight: 'bold' }}>•</span>
+                        )}
                     </button>
                     <button
                         type="button"
                         onClick={() => setShowSubtasks(!showSubtasks)}
                         style={toggleButtonStyle(showSubtasks)}
+                        aria-label={`Subtasks (${subtasks.length})`}
+                        title={showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
                     >
-                        {showSubtasks ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>Subtasks ({subtasks.length})</span>
+                        {showBtnIcons && (buttonDisplayMode === 'both' ? (showSubtasks ? <Minus size={14} /> : <Plus size={14} />) : <ListChecks size={15} />)}
+                        {showBtnText && <span>Subtasks ({subtasks.length})</span>}
+                        {!showBtnText && (
+                            <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{subtasks.length}</span>
+                        )}
                     </button>
                     <button
                         type="button"
                         onClick={() => setShowSchedule(!showSchedule)}
                         style={toggleButtonStyle(showSchedule)}
+                        aria-label={scheduledDate
+                            ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}`
+                            : 'Schedule'}
+                        title={showSchedule ? "Hide Schedule" : "Show Schedule"}
                     >
-                        {showSchedule ? <Minus size={14} /> : <Plus size={14} />}
-                        <span>{scheduledDate
+                        {showBtnIcons && (buttonDisplayMode === 'both' ? (showSchedule ? <Minus size={14} /> : <Plus size={14} />) : <Calendar size={15} />)}
+                        {showBtnText && <span>{scheduledDate
                             ? `${formatDisplayDate(scheduledDate, dateFormat)}${timeSchedulingEnabled && scheduledTime ? ` • ${formatDisplayTime(scheduledTime, dateFormat)}` : ''}`
-                            : 'Schedule'}</span>
+                            : 'Schedule'}</span>}
+                        {!showBtnText && scheduledDate && (
+                            <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                                {formatDisplayDate(scheduledDate, dateFormat)}
+                            </span>
+                        )}
                     </button>
                 </div>
 
@@ -921,7 +957,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     <Minus size={13} />
                                 </button>
                             </div>
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -932,12 +968,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                             setTimeout(() => notesRef.current?.focus(), 50);
                                         }
                                     }}
+                                    aria-label={isEditingNotes ? "Done" : "Edit"}
                                     title={isEditingNotes ? "Done editing notes" : "Edit notes"}
                                     style={{
-                                        display: 'flex',
+                                        display: 'inline-flex',
                                         alignItems: 'center',
+                                        justifyContent: 'center',
                                         gap: '4px',
-                                        padding: '3px 9px',
+                                        padding: showBtnText ? '3px 9px' : '4px 9px',
+                                        minWidth: showBtnText ? 'auto' : '32px',
+                                        minHeight: '30px',
                                         borderRadius: '8px',
                                         border: `1px solid ${isEditingNotes ? 'var(--accent-color)' : 'var(--border-color)'}`,
                                         background: isEditingNotes ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--surface-color)',
@@ -947,8 +987,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         fontWeight: '600'
                                     }}
                                 >
-                                    {isEditingNotes ? <Check size={12} /> : <Edit2 size={12} />}
-                                    <span>{isEditingNotes ? 'Done' : 'Edit'}</span>
+                                    {showBtnIcons && (isEditingNotes ? <Check size={12} /> : <Edit2 size={12} />)}
+                                    {showBtnText && <span>{isEditingNotes ? 'Done' : 'Edit'}</span>}
                                 </button>
                                 <button
                                     type="button"
@@ -956,11 +996,14 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         setIsEditingNotes(true);
                                         handleInsertTimestamp('notes');
                                     }}
+                                    aria-label="+ Timestamp"
                                     title="Insert current date & time stamp into notes"
                                     style={{
-                                        display: 'flex',
+                                        display: 'inline-flex',
                                         alignItems: 'center',
+                                        justifyContent: 'center',
                                         padding: '3px 9px',
+                                        minHeight: '30px',
                                         borderRadius: '8px',
                                         border: '1px solid var(--border-color)',
                                         background: 'var(--surface-color)',
@@ -978,12 +1021,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         setIsEditingNotes(true);
                                         toggleVoiceInput('notes');
                                     }}
+                                    aria-label={listeningTarget === 'notes' ? "Listening" : "Talk"}
                                     title={listeningTarget === 'notes' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to notes" : "Voice input not supported")}
                                     style={{
-                                        display: 'flex',
+                                        display: 'inline-flex',
                                         alignItems: 'center',
+                                        justifyContent: 'center',
                                         gap: '5px',
-                                        padding: '3px 8px',
+                                        padding: showBtnText ? '3px 8px' : '4px 9px',
+                                        minWidth: showBtnText ? 'auto' : '32px',
+                                        minHeight: '30px',
                                         borderRadius: '8px',
                                         border: `1px solid ${listeningTarget === 'notes' ? '#ef4444' : 'var(--border-color)'}`,
                                         background: listeningTarget === 'notes' ? 'rgba(239, 68, 68, 0.15)' : 'var(--surface-color)',
@@ -1008,8 +1055,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         </>
                                     ) : (
                                         <>
-                                            <Mic size={13} color="var(--accent-color)" />
-                                            <span>Talk</span>
+                                            {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
+                                            {showBtnText && <span>Talk</span>}
                                         </>
                                     )}
                                 </button>
@@ -1091,12 +1138,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 <button
                                     type="button"
                                     onClick={() => setExpandedOverlayField('notes')}
+                                    aria-label="Expand"
                                     title="Open Full Screen Focus Editor for Notes"
                                     style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
+                                        justifyContent: 'center',
                                         gap: '5px',
-                                        padding: '4px 10px',
+                                        padding: showBtnText ? '4px 10px' : '5px 10px',
+                                        minWidth: showBtnText ? 'auto' : '34px',
+                                        minHeight: '30px',
                                         borderRadius: '6px',
                                         border: '1px solid var(--border-color)',
                                         background: 'var(--bg-color)',
@@ -1107,8 +1158,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         transition: 'all 0.15s ease'
                                     }}
                                 >
-                                    <Maximize2 size={13} style={{ color: 'var(--accent-color)' }} />
-                                    <span>Expand</span>
+                                    {showBtnIcons && <Maximize2 size={13} style={{ color: 'var(--accent-color)' }} />}
+                                    {showBtnText && <span>Expand</span>}
                                 </button>
                             }
                         />
@@ -1952,11 +2003,15 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     <button
                                         type="button"
                                         onClick={() => toggleVoiceInput(expandedOverlayField)}
+                                        aria-label={listeningTarget === expandedOverlayField ? "Listening" : "Talk"}
                                         style={{
-                                            display: 'flex',
+                                            display: 'inline-flex',
                                             alignItems: 'center',
-                                            gap: '4px',
-                                            padding: '4px 10px',
+                                            justifyContent: 'center',
+                                            gap: '5px',
+                                            padding: showBtnText ? '4px 10px' : '5px 10px',
+                                            minWidth: showBtnText ? 'auto' : '34px',
+                                            minHeight: '32px',
                                             borderRadius: '12px',
                                             border: `1px solid ${listeningTarget === expandedOverlayField ? '#ef4444' : 'var(--border-color)'}`,
                                             background: listeningTarget === expandedOverlayField ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
@@ -1981,8 +2036,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                             </>
                                         ) : (
                                             <>
-                                                <Mic size={14} color="var(--accent-color)" />
-                                                <span>Talk</span>
+                                                {showBtnIcons && <Mic size={14} color="var(--accent-color)" />}
+                                                {showBtnText && <span>Talk</span>}
                                             </>
                                         )}
                                     </button>

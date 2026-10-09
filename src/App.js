@@ -38,7 +38,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { useDeviceResolution } from './hooks/useDeviceResolution';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, DEFAULT_BUTTON_DISPLAY_MODE, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
@@ -495,6 +495,25 @@ const TodoApp = () => {
       localStorage.setItem(STORAGE_KEYS.TIME_SCHEDULING_ENABLED, JSON.stringify(val));
     } catch (e) {
       console.error('Failed to save time scheduling preference:', e);
+    }
+  };
+
+  const [buttonDisplayMode, setButtonDisplayModeState] = useState(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_KEYS.BUTTON_DISPLAY_MODE);
+      if (val) return val;
+      return DEFAULT_BUTTON_DISPLAY_MODE;
+    } catch {
+      return DEFAULT_BUTTON_DISPLAY_MODE;
+    }
+  });
+
+  const setButtonDisplayMode = (val) => {
+    setButtonDisplayModeState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.BUTTON_DISPLAY_MODE, val);
+    } catch (e) {
+      console.error('Failed to save button display mode preference:', e);
     }
   };
 
@@ -1045,6 +1064,7 @@ const TodoApp = () => {
           onSwitchMode={handleSwitchMode}
           isStandalone={isStandalone}
           onOpenInstall={handleInstallClick}
+          buttonDisplayMode={buttonDisplayMode}
         />
 
         <AddTask
@@ -1056,6 +1076,7 @@ const TodoApp = () => {
           dateFormat={dateFormat}
           taskLengthLimit={taskLengthLimit}
           timeSchedulingEnabled={timeSchedulingEnabled}
+          buttonDisplayMode={buttonDisplayMode}
         />
 
         <div style={{
@@ -1098,6 +1119,7 @@ const TodoApp = () => {
               notesFontSize={notesFontSize}
               notesAutosaveDelay={notesAutosaveDelay}
               viewProfile={viewProfile}
+              buttonDisplayMode={buttonDisplayMode}
             />
           ) : (
             <>
@@ -1444,6 +1466,7 @@ const TodoApp = () => {
           dateFormat={dateFormat}
           taskLengthLimit={taskLengthLimit}
           timeSchedulingEnabled={timeSchedulingEnabled}
+          buttonDisplayMode={buttonDisplayMode}
         />
       )}
 
@@ -1609,6 +1632,8 @@ const TodoApp = () => {
         setNotificationsEnabled={setNotificationsEnabled}
         timeSchedulingEnabled={timeSchedulingEnabled}
         setTimeSchedulingEnabled={setTimeSchedulingEnabled}
+        buttonDisplayMode={buttonDisplayMode}
+        setButtonDisplayMode={setButtonDisplayMode}
       />
 
       <EmailClientModal

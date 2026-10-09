@@ -1,7 +1,10 @@
 import React from 'react';
 import { CheckSquare, Mic, Download } from 'lucide-react';
 
-const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall }) => {
+const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall, buttonDisplayMode = 'icons' }) => {
+    const showIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
+    const showText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
+
     const styles = {
         header: {
             display: 'flex',
@@ -23,14 +26,18 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
             padding: '3px',
             border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
             margin: 0,
+            gap: '4px',
             flexShrink: 0,
             boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
         },
         modeButton: (active) => ({
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px',
-            padding: '5px clamp(8px, 2vw, 14px)',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: showText ? '5px clamp(8px, 2vw, 14px)' : '6px 12px',
+            minWidth: showText ? 'auto' : '36px',
+            minHeight: '32px',
             borderRadius: '20px',
             border: 'none',
             backgroundColor: active ? '#2563eb' : 'transparent',
@@ -72,11 +79,15 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                     {!isStandalone && onOpenInstall && (
                         <button
                             onClick={onOpenInstall}
+                            aria-label="Install"
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
+                                justifyContent: 'center',
                                 gap: '5px',
-                                padding: '6px 12px',
+                                padding: showText ? '6px 12px' : '6px 10px',
+                                minWidth: showText ? 'auto' : '36px',
+                                minHeight: '32px',
                                 borderRadius: '20px',
                                 border: '1.5px solid var(--accent-color)',
                                 backgroundColor: 'var(--accent-bg, rgba(99, 102, 241, 0.1))',
@@ -90,8 +101,8 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                             }}
                             title="Install 123 To Do on your device"
                         >
-                            <Download size={14} />
-                            <span>Install</span>
+                            {showIcons && <Download size={14} />}
+                            {showText && <span>Install</span>}
                         </button>
                     )}
 
@@ -100,18 +111,20 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                         <button
                             style={styles.modeButton(appMode === 'tasks')}
                             onClick={() => onSwitchMode('tasks')}
+                            aria-label="Tasks"
                             title="Switch to Task Manager Mode"
                         >
-                            <CheckSquare size={16} />
-                            <span>Tasks</span>
+                            {showIcons && <CheckSquare size={16} />}
+                            {showText && <span>Tasks</span>}
                         </button>
                         <button
                             style={styles.modeButton(appMode === 'notes')}
                             onClick={() => onSwitchMode('notes')}
+                            aria-label="Notes"
                             title="Switch to Notes Mode"
                         >
-                            <Mic size={16} />
-                            <span>Notes</span>
+                            {showIcons && <Mic size={16} />}
+                            {showText && <span>Notes</span>}
                         </button>
                     </div>
                 </div>

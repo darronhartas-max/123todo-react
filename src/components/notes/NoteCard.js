@@ -23,8 +23,11 @@ const NoteCard = ({
   onToggleSelect,
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
-  viewProfile = 'pro'
+  viewProfile = 'pro',
+  buttonDisplayMode = 'icons'
 }) => {
+  const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
+  const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
   const [isEditing, setIsEditing] = useState(false);
   const [isLiteExpanded, setIsLiteExpanded] = useState(false);
   const isLite = viewProfile === 'lite';
@@ -637,11 +640,14 @@ const NoteCard = ({
                 <button
                   type="button"
                   onClick={handleToggleTitleDictation}
+                  aria-label={isDictatingTitle ? "Listening" : "Talk"}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '6px',
-                    padding: '8px 14px',
+                    padding: showBtnText ? '8px 14px' : '8px 14px',
+                    minWidth: showBtnText ? 'auto' : '42px',
                     borderRadius: '10px',
                     border: `1.5px solid ${isDictatingTitle ? '#ef4444' : '#2563eb'}`,
                     backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.1)',
@@ -671,8 +677,8 @@ const NoteCard = ({
                     </>
                   ) : (
                     <>
-                      <Mic size={15} color="#2563eb" />
-                      <span>Talk</span>
+                      {showBtnIcons && <Mic size={15} color="#2563eb" />}
+                      {showBtnText && <span>Talk</span>}
                     </>
                   )}
                 </button>
@@ -681,11 +687,14 @@ const NoteCard = ({
                 <button
                   type="button"
                   onClick={handleSaveEdits}
+                  aria-label="Save Note"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '6px',
-                    padding: '8px 22px',
+                    padding: showBtnText ? '8px 22px' : '8px 16px',
+                    minWidth: showBtnText ? 'auto' : '46px',
                     borderRadius: '10px',
                     border: 'none',
                     backgroundColor: '#2563eb',
@@ -700,8 +709,8 @@ const NoteCard = ({
                   }}
                   title="Save Note / Task changes"
                 >
-                  <Check size={18} strokeWidth={2.6} />
-                  <span>Save Note</span>
+                  {showBtnIcons && <Check size={18} strokeWidth={2.6} />}
+                  {showBtnText && <span>Save Note</span>}
                 </button>
               </div>
             </div>
