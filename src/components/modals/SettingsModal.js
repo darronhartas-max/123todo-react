@@ -294,7 +294,9 @@ const SettingsModal = ({
     timeSchedulingEnabled = true,
     setTimeSchedulingEnabled,
     buttonDisplayMode = 'icons',
-    setButtonDisplayMode
+    setButtonDisplayMode,
+    showTaskCreationDate = false,
+    setShowTaskCreationDate
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -1461,6 +1463,33 @@ const SettingsModal = ({
                                             onClick={() => setTimeSchedulingEnabled && setTimeSchedulingEnabled(false)}
                                         >
                                             Hidden
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Task Creation Date & Time */}
+                                <div style={styles.settingRow}>
+                                    <div style={styles.settingLabel}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Clock size={16} style={{ color: 'var(--accent-color)' }} />
+                                            Task Creation Date & Time
+                                        </span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontWeight: '500' }}>
+                                            Display initial date and time stamp when viewing and editing tasks
+                                        </span>
+                                    </div>
+                                    <div style={styles.segmentContainer}>
+                                        <button
+                                            style={styles.segmentBtn(!showTaskCreationDate)}
+                                            onClick={() => setShowTaskCreationDate && setShowTaskCreationDate(false)}
+                                        >
+                                            Hidden (Default)
+                                        </button>
+                                        <button
+                                            style={styles.segmentBtn(Boolean(showTaskCreationDate))}
+                                            onClick={() => setShowTaskCreationDate && setShowTaskCreationDate(true)}
+                                        >
+                                            Shown
                                         </button>
                                     </div>
                                 </div>

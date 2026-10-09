@@ -11,7 +11,7 @@ import { renderActionableText } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from './TimePickerModal';
 
-const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
+const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', showTaskCreationDate = false }) => {
     const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
     const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -1002,7 +1002,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        padding: '3px 9px',
+                                        gap: '5px',
+                                        padding: showBtnText ? '3px 9px' : '4px 8px',
+                                        minWidth: showBtnText ? 'auto' : '30px',
                                         minHeight: '30px',
                                         borderRadius: '8px',
                                         border: '1px solid var(--border-color)',
@@ -1013,7 +1015,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         fontWeight: '600'
                                     }}
                                 >
-                                    <span>+ Timestamp</span>
+                                    {showBtnIcons && <Clock size={12} />}
+                                    {showBtnText && <span>+ Timestamp</span>}
                                 </button>
                                 <button
                                     type="button"
@@ -1591,6 +1594,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 if (!scheduledDate) setScheduledDate(getTodayDateString());
                                                 setIsTimePickerOpen(true);
                                             }}
+                                            aria-label="Add time"
+                                            title="Add scheduled time"
                                             style={{
                                                 background: 'none',
                                                 border: 'none',
@@ -1601,11 +1606,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 fontWeight: '500',
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: '5px'
+                                                gap: '4px'
                                             }}
                                         >
-                                            <Clock size={12} />
-                                            <span>+ Add time (optional)</span>
+                                            {showBtnIcons && (
+                                                <>
+                                                    <Clock size={13} />
+                                                    <Plus size={11} strokeWidth={2.5} />
+                                                </>
+                                            )}
+                                            {showBtnText && <span>Add time</span>}
                                         </button>
                                     </div>
                                 ) : (
@@ -1864,7 +1874,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     borderTop: '1px solid var(--border-color)'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'var(--muted-text)', flexWrap: 'wrap' }}>
-                        {createdFormatted && (
+                        {showTaskCreationDate && createdFormatted && (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }} title="Initial creation date and time">
                                 <Clock size={13} style={{ opacity: 0.75, flexShrink: 0 }} />
                                 <span>Created: <strong>{createdFormatted}</strong></span>
@@ -1872,7 +1882,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         )}
                         {!isUnlimited && (
                             <span style={{ opacity: 0.85 }}>
-                                {createdFormatted ? '• ' : ''}{`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
+                                {(showTaskCreationDate && createdFormatted) ? '• ' : ''}{`${editingTask.text.length}/${MAX_TASK_LENGTH}`}
                             </span>
                         )}
                     </div>
@@ -1983,11 +1993,16 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         <button
                                             type="button"
                                             onClick={() => handleInsertTimestamp('notes')}
+                                            aria-label="+ Timestamp"
                                             title="Insert current date & time stamp into notes"
                                             style={{
-                                                display: 'flex',
+                                                display: 'inline-flex',
                                                 alignItems: 'center',
-                                                padding: '4px 10px',
+                                                justifyContent: 'center',
+                                                gap: '5px',
+                                                padding: showBtnText ? '4px 10px' : '5px 10px',
+                                                minWidth: showBtnText ? 'auto' : '34px',
+                                                minHeight: '32px',
                                                 borderRadius: '12px',
                                                 border: '1px solid var(--border-color)',
                                                 background: 'var(--item-bg)',
@@ -1997,7 +2012,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 fontWeight: '600'
                                             }}
                                         >
-                                            <span>+ Timestamp</span>
+                                            {showBtnIcons && <Clock size={13} />}
+                                            {showBtnText && <span>+ Timestamp</span>}
                                         </button>
                                     )}
                                     <button

@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.39** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.40** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.39 (Current)
+### v3.7.40 (Current)
+
+- **Streamlined Timestamp & Time Icons, Optional Creation Timestamp**: Replaced textual timestamp buttons in task notes and fullscreen focus editor with a clean Clock icon to match adjacent tool buttons. Streamlined the time adder in Date & Recurrence scheduling with a minimal clock face and plus icon, removing redundant "(optional)" text. Hid the task creation date and time stamp by default for a cleaner, decluttered task editing view, while adding a new "Task Creation Date & Time" toggle in Settings (Tasks & Workflow) for users who prefer displaying creation timestamps.
+
+### v3.7.39
 
 - **UI Decluttering, Button Display Mode Setting & Compact Footer**: Introduced a cleaner, distraction-free interface by replacing redundant dual icon-and-text labels with streamlined icons by default, spaced with ample touch-safe padding to prevent mis-clicks. Added a new "Feature Buttons & Labels" setting under Appearance & Styling in Settings to toggle between Icons (Clean), Icons & Text, and Text Only across the top bar, task forms, and notes view. Also streamlined the footer by combining the copyright notice and version number into a single compact line.
 

@@ -1169,6 +1169,8 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                             if (!scheduledDate) setScheduledDate(getTodayDateString());
                                             setIsTimePickerOpen(true);
                                         }}
+                                        aria-label="Add time"
+                                        title="Add scheduled time"
                                         style={{
                                             background: 'none',
                                             border: 'none',
@@ -1179,11 +1181,16 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                             fontWeight: '500',
                                             display: 'inline-flex',
                                             alignItems: 'center',
-                                            gap: '5px'
+                                            gap: '4px'
                                         }}
                                     >
-                                        <Clock size={12} />
-                                        <span>+ Add time (optional)</span>
+                                        {showBtnIcons && (
+                                            <>
+                                                <Clock size={13} />
+                                                <Plus size={11} strokeWidth={2.5} />
+                                            </>
+                                        )}
+                                        {showBtnText && <span>Add time</span>}
                                     </button>
                                 </div>
                             ) : (

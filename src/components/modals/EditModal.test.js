@@ -210,7 +210,7 @@ describe('EditModal', () => {
     );
 
     // Schedule section is already open because task has scheduledDate
-    const addTimeBtn = screen.getByRole('button', { name: /\+ add time \(optional\)/i });
+    const addTimeBtn = screen.getByRole('button', { name: /add time/i });
     expect(addTimeBtn).toBeInTheDocument();
     fireEvent.click(addTimeBtn);
 
@@ -248,8 +248,8 @@ describe('EditModal', () => {
       />
     );
 
-    // Click "+ Add time (optional)"
-    fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+    // Click "+ Add time"
+    fireEvent.click(screen.getByRole('button', { name: /add time/i }));
 
     // Clock picker modal is open
     expect(screen.getByRole('dialog', { name: /select time/i })).toBeInTheDocument();
@@ -495,7 +495,7 @@ describe('EditModal', () => {
         expect(screen.queryByText(/1970/i)).not.toBeInTheDocument();
     });
 
-    test('displays truthful creation timestamp when valid createdAt is present', () => {
+    test('displays truthful creation timestamp when valid createdAt is present and setting is enabled', () => {
         const timestampedTask = {
             id: 43,
             text: 'Task with genuine timestamp',
@@ -504,12 +504,27 @@ describe('EditModal', () => {
             createdAt: new Date(2026, 8, 12, 14, 30, 0).getTime()
         };
 
-        render(
+        const { rerender } = render(
             <EditModal
                 task={timestampedTask}
                 onSave={jest.fn()}
                 onClose={jest.fn()}
                 projects={sampleProjects}
+                showTaskCreationDate={false}
+            />
+        );
+
+        // Hidden by default
+        expect(screen.queryByText(/Created:/i)).not.toBeInTheDocument();
+
+        // Shown when setting is enabled
+        rerender(
+            <EditModal
+                task={timestampedTask}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+                showTaskCreationDate={true}
             />
         );
 

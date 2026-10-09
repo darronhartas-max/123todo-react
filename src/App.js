@@ -38,7 +38,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { useDeviceResolution } from './hooks/useDeviceResolution';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, DEFAULT_BUTTON_DISPLAY_MODE, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, DEFAULT_BUTTON_DISPLAY_MODE, DEFAULT_SHOW_TASK_CREATION_DATE, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
@@ -514,6 +514,25 @@ const TodoApp = () => {
       localStorage.setItem(STORAGE_KEYS.BUTTON_DISPLAY_MODE, val);
     } catch (e) {
       console.error('Failed to save button display mode preference:', e);
+    }
+  };
+
+  const [showTaskCreationDate, setShowTaskCreationDateState] = useState(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_KEYS.SHOW_TASK_CREATION_DATE);
+      if (val !== null) return JSON.parse(val);
+      return DEFAULT_SHOW_TASK_CREATION_DATE;
+    } catch {
+      return DEFAULT_SHOW_TASK_CREATION_DATE;
+    }
+  });
+
+  const setShowTaskCreationDate = (val) => {
+    setShowTaskCreationDateState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.SHOW_TASK_CREATION_DATE, JSON.stringify(val));
+    } catch (e) {
+      console.error('Failed to save task creation date preference:', e);
     }
   };
 
@@ -1467,6 +1486,7 @@ const TodoApp = () => {
           taskLengthLimit={taskLengthLimit}
           timeSchedulingEnabled={timeSchedulingEnabled}
           buttonDisplayMode={buttonDisplayMode}
+          showTaskCreationDate={showTaskCreationDate}
         />
       )}
 
@@ -1634,6 +1654,8 @@ const TodoApp = () => {
         setTimeSchedulingEnabled={setTimeSchedulingEnabled}
         buttonDisplayMode={buttonDisplayMode}
         setButtonDisplayMode={setButtonDisplayMode}
+        showTaskCreationDate={showTaskCreationDate}
+        setShowTaskCreationDate={setShowTaskCreationDate}
       />
 
       <EmailClientModal

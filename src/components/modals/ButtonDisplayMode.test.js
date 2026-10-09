@@ -76,4 +76,30 @@ describe('Button Display Mode & Decluttering', () => {
         // Dot separator between copyright and version
         expect(screen.getByText('·')).toBeInTheDocument();
     });
+
+    test('SettingsModal renders Task Creation Date & Time setting and allows toggling', () => {
+        const setShowTaskCreationDateMock = jest.fn();
+        render(
+            <SettingsModal
+                isOpen={true}
+                onClose={jest.fn()}
+                initialTab="tasks"
+                showTaskCreationDate={false}
+                setShowTaskCreationDate={setShowTaskCreationDateMock}
+            />
+        );
+
+        expect(screen.getByText('Task Creation Date & Time')).toBeInTheDocument();
+        const hiddenBtn = screen.getByRole('button', { name: /Hidden \(Default\)/i });
+        const shownBtn = screen.getByRole('button', { name: /^Shown$/i });
+
+        expect(hiddenBtn).toBeInTheDocument();
+        expect(shownBtn).toBeInTheDocument();
+
+        fireEvent.click(shownBtn);
+        expect(setShowTaskCreationDateMock).toHaveBeenCalledWith(true);
+
+        fireEvent.click(hiddenBtn);
+        expect(setShowTaskCreationDateMock).toHaveBeenCalledWith(false);
+    });
 });

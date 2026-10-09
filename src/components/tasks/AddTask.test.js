@@ -122,7 +122,7 @@ test('allows adding and removing time when scheduling a task in AddTask', () => 
   fireEvent.click(dayButton);
 
   // Initially minimalist "+ Add time (optional)" is shown
-  const addTimeBtn = screen.getByRole('button', { name: /\+ add time \(optional\)/i });
+  const addTimeBtn = screen.getByRole('button', { name: /add time/i });
   expect(addTimeBtn).toBeInTheDocument();
   fireEvent.click(addTimeBtn);
 
@@ -162,7 +162,7 @@ test('removing scheduled time reverts back to + Add time button in AddTask', () 
   fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
 
   // Click "+ Add time (optional)" to open circular clock picker
-  fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+  fireEvent.click(screen.getByRole('button', { name: /add time/i }));
 
   // In modal, click Set Time
   fireEvent.click(screen.getByRole('button', { name: /set time/i }));
@@ -173,7 +173,7 @@ test('removing scheduled time reverts back to + Add time button in AddTask', () 
   fireEvent.click(removeBtn);
 
   // Reverts back to "+ Add time (optional)"
-  expect(screen.getByRole('button', { name: /\+ add time \(optional\)/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /add time/i })).toBeInTheDocument();
 });
 
 test('renders Google Cal and Apple Cal buttons when scheduled date is set', () => {
@@ -231,7 +231,7 @@ test('allows setting time via circular clock picker in AddTask', () => {
   fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
 
   // Click "+ Add time (optional)" to open clock face modal
-  fireEvent.click(screen.getByRole('button', { name: /\+ add time \(optional\)/i }));
+  fireEvent.click(screen.getByRole('button', { name: /add time/i }));
 
   // Clock picker dialog is open
   expect(screen.getByRole('dialog', { name: /select time/i })).toBeInTheDocument();
