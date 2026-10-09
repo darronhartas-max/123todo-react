@@ -157,6 +157,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.41': [
+    { title: '🔁 Streamlined Recurrence Icon on Schedule Row & Right-Aligned Add Note:', desc: 'Replaced the textual "Repeat this task" label with a clean Repeat icon toggle, unified directly onto the same line as the schedule time icon to maximize vertical screen space in both Add Task and Edit Task modals. In Notes mode, relocated the Add Note button to the right side of the header bar with generous touch targets for rapid, thumb-friendly note capture.' }
+  ],
   '3.7.40': [
     { title: '🕒 Streamlined Timestamp & Time Icons, Optional Creation Timestamp:', desc: 'Replaced textual timestamp buttons in task notes and fullscreen focus editor with a clean Clock icon to match adjacent tool buttons. Streamlined the time adder in Date & Recurrence scheduling with a minimal clock face and plus icon, removing redundant "(optional)" text. Hid the task creation date and time stamp by default for a cleaner, decluttered task editing view, while adding a new "Task Creation Date & Time" toggle in Settings (Tasks & Workflow) for users who prefer displaying creation timestamps.' }
   ],

@@ -102,4 +102,51 @@ describe('Button Display Mode & Decluttering', () => {
         fireEvent.click(hiddenBtn);
         expect(setShowTaskCreationDateMock).toHaveBeenCalledWith(false);
     });
+
+    test('AddTask renders Repeat icon button on same scheduling row and toggles recurrence', () => {
+        const { default: AddTask } = require('../tasks/AddTask');
+        render(
+            <AddTask
+                isOpen={true}
+                onAdd={jest.fn()}
+                onClose={jest.fn()}
+                projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+            />
+        );
+
+        // Open Schedule section
+        fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+        // Both Add time and Repeat buttons exist
+        const addTimeBtn = screen.getByRole('button', { name: /add time/i });
+        const repeatBtn = screen.getByRole('checkbox', { name: /repeat this task/i });
+        expect(addTimeBtn).toBeInTheDocument();
+        expect(repeatBtn).toBeInTheDocument();
+
+        // Initially recurrence interval settings are not displayed
+        expect(screen.queryByText(/Every/i)).not.toBeInTheDocument();
+
+        // Click Repeat icon button to enable recurrence
+        fireEvent.click(repeatBtn);
+        expect(screen.getByText(/Every/i)).toBeInTheDocument();
+
+        // Click again to turn off
+        fireEvent.click(repeatBtn);
+        expect(screen.queryByText(/Every/i)).not.toBeInTheDocument();
+    });
+
+    test('NotesView positions Add Note button on the right side with marginLeft auto', () => {
+        const { default: NotesView } = require('../notes/NotesView');
+        render(
+            <NotesView
+                tasks={[]}
+                projects={[{ id: 'general', name: 'General', color: '#6b7280' }]}
+                onAddNote={jest.fn()}
+            />
+        );
+
+        const addNoteBtn = screen.getByRole('button', { name: /add new note/i });
+        expect(addNoteBtn).toBeInTheDocument();
+        expect(addNoteBtn.style.marginLeft).toBe('auto');
+    });
 });

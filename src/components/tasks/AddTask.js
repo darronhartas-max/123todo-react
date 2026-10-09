@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar, FileText, ListChecks } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar, FileText, ListChecks, Repeat } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -1157,11 +1157,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         )}
                     </div>
 
-                    {/* Minimalist Time Input with Circular Clock Face */}
-                    {timeSchedulingEnabled && (
-                        <>
-                            {!showTimeInput && !scheduledTime ? (
-                                <div style={{ marginBottom: '6px' }}>
+                    {/* Time & Repeat Scheduling Row */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        marginBottom: '8px',
+                        flexWrap: 'wrap'
+                    }}>
+                        {/* Minimalist Time Input with Circular Clock Face */}
+                        {timeSchedulingEnabled && (
+                            <>
+                                {!showTimeInput && !scheduledTime ? (
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -1192,81 +1199,116 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                         )}
                                         {showBtnText && <span>Add time</span>}
                                     </button>
-                                </div>
-                            ) : (
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    marginBottom: '8px',
-                                    flexWrap: 'nowrap'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
-                                        <Clock size={13} />
-                                        <label htmlFor="start-scheduled-time">Time:</label>
+                                ) : (
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        flexWrap: 'nowrap'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
+                                            <Clock size={13} />
+                                            <label htmlFor="start-scheduled-time">Time:</label>
+                                        </div>
+                                        <button
+                                            id="start-scheduled-time"
+                                            type="button"
+                                            onClick={() => setIsTimePickerOpen(true)}
+                                            aria-label="Select time"
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '0.82rem',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                background: 'var(--item-bg)',
+                                                color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
+                                                fontWeight: scheduledTime ? '600' : '400',
+                                                outline: 'none',
+                                                boxSizing: 'border-box',
+                                                cursor: 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setScheduledTime(null);
+                                                setShowTimeInput(false);
+                                            }}
+                                            style={{
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: 'var(--muted-text)',
+                                                cursor: 'pointer',
+                                                fontSize: '0.78rem',
+                                                padding: '4px 6px',
+                                                borderRadius: '4px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center'
+                                            }}
+                                            title="Remove time"
+                                        >
+                                            Remove
+                                        </button>
                                     </div>
-                                    <button
-                                        id="start-scheduled-time"
-                                        type="button"
-                                        onClick={() => setIsTimePickerOpen(true)}
-                                        aria-label="Select time"
-                                        style={{
-                                            padding: '4px 8px',
-                                            fontSize: '0.82rem',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '4px',
-                                            background: 'var(--item-bg)',
-                                            color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
-                                            fontWeight: scheduledTime ? '600' : '400',
-                                            outline: 'none',
-                                            boxSizing: 'border-box',
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '4px'
-                                        }}
-                                    >
-                                        {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setScheduledTime(null);
-                                            setShowTimeInput(false);
-                                        }}
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            color: 'var(--muted-text)',
-                                            cursor: 'pointer',
-                                            fontSize: '0.78rem',
-                                            padding: '4px 6px',
-                                            borderRadius: '4px',
-                                            display: 'inline-flex',
-                                            alignItems: 'center'
-                                        }}
-                                        title="Remove time"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            )}
+                                )}
+                            </>
+                        )}
 
-                            <TimePickerModal
-                                isOpen={isTimePickerOpen}
-                                value={scheduledTime}
-                                onSave={(newTime) => {
-                                    setScheduledTime(newTime);
-                                    if (newTime && !scheduledDate) {
-                                        setScheduledDate(getTodayDateString());
-                                    }
-                                    if (!newTime) {
-                                        setShowTimeInput(false);
-                                    }
-                                }}
-                                onClose={() => setIsTimePickerOpen(false)}
-                            />
-                        </>
+                        {/* Repeat Toggle Icon Button (on the same line) */}
+                        <button
+                            type="button"
+                            role="checkbox"
+                            aria-checked={isRecurring}
+                            aria-label="Repeat this task"
+                            title={isRecurring ? "Repeating task: active (tap to turn off recurrence)" : "Repeat this task (recurrence)"}
+                            onClick={() => {
+                                const next = !isRecurring;
+                                setIsRecurring(next);
+                                if (next && !scheduledDate) {
+                                    setScheduledDate(getTodayDateString());
+                                }
+                            }}
+                            style={{
+                                background: isRecurring ? 'rgba(59, 130, 246, 0.12)' : 'none',
+                                border: isRecurring ? '1px solid var(--accent-color)' : '1px solid transparent',
+                                borderRadius: '6px',
+                                padding: '3px 8px',
+                                minHeight: '26px',
+                                color: isRecurring ? 'var(--accent-color)' : 'var(--muted-text)',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: isRecurring ? '600' : '500',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.15s ease'
+                            }}
+                        >
+                            {showBtnIcons && <Repeat size={13} strokeWidth={isRecurring ? 2.5 : 2} />}
+                            {showBtnText && <span>Repeat</span>}
+                        </button>
+                    </div>
+
+                    {timeSchedulingEnabled && (
+                        <TimePickerModal
+                            isOpen={isTimePickerOpen}
+                            value={scheduledTime}
+                            onSave={(newTime) => {
+                                setScheduledTime(newTime);
+                                if (newTime && !scheduledDate) {
+                                    setScheduledDate(getTodayDateString());
+                                }
+                                if (!newTime) {
+                                    setShowTimeInput(false);
+                                }
+                            }}
+                            onClose={() => setIsTimePickerOpen(false)}
+                        />
                     )}
 
                     {/* Add to External Calendars */}
@@ -1336,24 +1378,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         </div>
                     )}
 
-                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '10px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '500' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={isRecurring}
-                                    onChange={(e) => {
-                                        setIsRecurring(e.target.checked);
-                                        if (e.target.checked && !scheduledDate) {
-                                            setScheduledDate(getTodayDateString());
-                                        }
-                                    }}
-                                    style={{ cursor: 'pointer', width: '15px', height: '15px' }}
-                                />
-                                🔁 Repeat this task
-                            </label>
-
-                            {isRecurring && (
-                                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {isRecurring && (
+                        <div style={{
+                            marginTop: '4px',
+                            marginBottom: '10px',
+                            padding: '10px 12px',
+                            background: 'var(--item-bg)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                        }}>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '1.05rem' }}>
                                             <span>Every</span>
@@ -1442,7 +1478,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                     )}
                                 </div>
                             )}
-                        </div>
                 </div>
             )}
 

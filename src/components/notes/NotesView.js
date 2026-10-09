@@ -461,7 +461,7 @@ const NotesView = ({
           )}
         </div>
 
-        {/* 3. Add Note + / - toggle button */}
+        {/* 3. Add Note + / - toggle button (positioned on the right side for effortless, fast tapping) */}
         <button
           type="button"
           onClick={() => setShowAddNote(!showAddNote)}
@@ -471,12 +471,15 @@ const NotesView = ({
             color: '#dc2626',
             cursor: 'pointer',
             padding: 0,
-            width: '32px',
-            height: '32px',
-            display: 'flex',
+            width: '36px',
+            height: '36px',
+            minWidth: '36px',
+            minHeight: '36px',
+            display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
+            marginLeft: 'auto',
             transition: 'transform 0.2s ease'
           }}
           aria-label={showAddNote ? "Close add note" : "Add new note"}
