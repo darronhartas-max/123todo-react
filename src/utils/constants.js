@@ -45,7 +45,8 @@ export const STORAGE_KEYS = {
   NOTIFICATIONS_ENABLED: '123TodoNotificationsEnabled',
   TIME_SCHEDULING_ENABLED: '123Todo_TimeSchedulingEnabled',
   BUTTON_DISPLAY_MODE: '123Todo_ButtonDisplayMode',
-  SHOW_TASK_CREATION_DATE: '123Todo_ShowTaskCreationDate'
+  SHOW_TASK_CREATION_DATE: '123Todo_ShowTaskCreationDate',
+  STARTED_USING: '123TodoStartedUsing'
 };
 
 export const BUTTON_DISPLAY_MODES = [
@@ -157,6 +158,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.43': [
+    { title: '📘 First-Time User "Getting Started" Guide & Disappearing Helper:', desc: 'Added an intuitive Getting Started function tailored for first-time visitors that links to the beginner-friendly quick-start guide on the website, addressing core concerns about offline data safety, 1-2-3 priorities, and zero-knowledge device syncing. The Getting Started button in the header and welcome banner automatically disappears once the user begins actively adding, completing, or organizing tasks. Added permanent links to both the Beginner\'s Guide and the new in-depth Feature Mastery Guide in Settings under App & Updates.' }
+  ],
   '3.7.42': [
     { title: '🌟 Frictionless First-Time User Experience & 1-2-3 Starter Onboarding:', desc: 'Transformed the initial user experience for first-time visitors by eliminating screen-blocking welcome modals and aggressive installation popups. First-time users now land directly into a clean, inviting workspace with a sleek, non-blocking In-Line Welcome Banner introducing the 1-2-3 methodology. Streamlined default sample tasks down to 3 interactive starter tasks demonstrating the Must Do, Should Do, and Could Do tiers. Softened install prompts with consumer-friendly "Add to Home Screen" language and prevented early pop-up interruptions until users have meaningfully engaged with the app.' }
   ],

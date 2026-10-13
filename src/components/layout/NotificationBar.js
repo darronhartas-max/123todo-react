@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Download } from 'lucide-react';
+import { Sparkles, Download, BookOpen } from 'lucide-react';
 
-export const WelcomeBanner = ({ onDismiss }) => (
+export const WelcomeBanner = ({ onDismiss, onGettingStarted }) => (
     <div style={{
         background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.08))',
         border: '1.5px solid var(--accent-color, #2563eb)',
@@ -25,24 +25,51 @@ export const WelcomeBanner = ({ onDismiss }) => (
                 Organize your day with simple 1-2-3 priorities (1 = Must Do, 2 = Should Do, 3 = Could Do). All tasks are auto-saved locally on your device with zero sign-up required.
             </p>
         </div>
-        <button
-            onClick={onDismiss}
-            style={{
-                background: 'var(--accent-color, #2563eb)',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '8px 16px',
-                fontSize: '0.88rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
-                transition: 'transform 0.1s ease'
-            }}
-        >
-            Got it! ✓
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <a
+                href="https://www.123todo.com/getting-started-with-123-todo"
+                target="_blank"
+                rel="noreferrer"
+                onClick={onGettingStarted}
+                style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'var(--surface-color, #ffffff)',
+                    color: 'var(--accent-color, #2563eb)',
+                    border: '1.5px solid var(--accent-color, #2563eb)',
+                    borderRadius: '8px',
+                    padding: '8px 14px',
+                    fontSize: '0.86rem',
+                    fontWeight: '700',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease'
+                }}
+            >
+                <BookOpen size={14} />
+                <span>Beginners Guide ➔</span>
+            </a>
+            <button
+                onClick={onDismiss}
+                style={{
+                    background: 'var(--accent-color, #2563eb)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '0.88rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+                    transition: 'transform 0.1s ease'
+                }}
+            >
+                Got it! ✓
+            </button>
+        </div>
     </div>
 );
 

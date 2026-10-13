@@ -83,4 +83,32 @@ describe('useAppSystem install reminders', () => {
     // Capped at 4 declines
     expect(result.current.showInstallModal).toBe(false);
   });
+
+  test('tracks hasStartedUsingApp state and updates when user takes action', () => {
+    // New user with 0 archived tasks
+    const { result } = renderHook(() => useAppSystem(0, 3, false));
+
+    expect(result.current.hasStartedUsingApp).toBe(false);
+    expect(localStorage.getItem(STORAGE_KEYS.STARTED_USING)).toBeNull();
+
+    act(() => {
+      result.current.recordAppUsageAction('add');
+    });
+
+    expect(result.current.hasStartedUsingApp).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEYS.STARTED_USING)).toBe('true');
+  });
+
+  test('dismissing welcome banner marks app as started', () => {
+    const { result } = renderHook(() => useAppSystem(0, 0, false));
+
+    expect(result.current.hasStartedUsingApp).toBe(false);
+
+    act(() => {
+      result.current.dismissWelcome();
+    });
+
+    expect(result.current.hasStartedUsingApp).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEYS.STARTED_USING)).toBe('true');
+  });
 });

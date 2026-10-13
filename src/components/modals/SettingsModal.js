@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2, Bell, Clock } from 'lucide-react';
+import { X, Trash2, Edit2, Plus, Sliders, FolderOpen, Check, Keyboard, GripVertical, MoveHorizontal, Flag, PauseCircle, Slash, CheckSquare, RefreshCw, Cloud, Download, ExternalLink, Smartphone, Laptop, CheckCircle2, Mic, Info, ListChecks, Sparkles, Building2, Bell, Clock, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PROJECT_COLORS, SWIPE_ACTIONS, APP_VERSION, DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, migrateProjectColor } from '../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../utils/emailUtils';
@@ -2316,7 +2316,95 @@ const SettingsModal = ({
                                     </div>
                                 </div>
 
-                                {/* Full Blog Post Link */}
+                                {/* Official Guides & Tutorials */}
+                                <div style={{ fontSize: '1rem', fontWeight: '700', marginTop: '16px', marginBottom: '10px', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <BookOpen size={18} /> Official Guides & Tutorials
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
+                                    <a
+                                        href="https://www.123todo.com/getting-started-with-123-todo"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                            background: 'var(--bg-color)',
+                                            padding: '12px 14px',
+                                            borderRadius: '10px',
+                                            border: '1px solid var(--border-color)',
+                                            textDecoration: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            gap: '12px'
+                                        }}
+                                    >
+                                        <div>
+                                            <div style={{ fontWeight: '700', color: 'var(--accent-color)', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                Getting Started: 3-Minute Beginner's Guide
+                                            </div>
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.4' }}>
+                                                The absolute basics to get organized today—1-2-3 rule, offline safety, and home screen install.
+                                            </div>
+                                        </div>
+                                        <ExternalLink size={15} color="var(--accent-color)" style={{ flexShrink: 0 }} />
+                                    </a>
+
+                                    <a
+                                        href="https://www.123todo.com/123-todo-feature-mastery-guide"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                            background: 'var(--bg-color)',
+                                            padding: '12px 14px',
+                                            borderRadius: '10px',
+                                            border: '1px solid var(--border-color)',
+                                            textDecoration: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            gap: '12px'
+                                        }}
+                                    >
+                                        <div>
+                                            <div style={{ fontWeight: '700', color: 'var(--accent-color)', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                The Complete Feature Guide: Power User Walkthrough
+                                            </div>
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.4' }}>
+                                                Master midnight rollovers, analog clock face scheduling, subtask checklists, and encrypted sync.
+                                            </div>
+                                        </div>
+                                        <ExternalLink size={15} color="var(--accent-color)" style={{ flexShrink: 0 }} />
+                                    </a>
+
+                                    <a
+                                        href="https://www.123todo.com/user-guide"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                            background: 'var(--bg-color)',
+                                            padding: '12px 14px',
+                                            borderRadius: '10px',
+                                            border: '1px solid var(--border-color)',
+                                            textDecoration: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            gap: '12px'
+                                        }}
+                                    >
+                                        <div>
+                                            <div style={{ fontWeight: '700', color: 'var(--accent-color)', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                Full User Guide & Documentation
+                                            </div>
+                                            <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)', marginTop: '2px', lineHeight: '1.4' }}>
+                                                Complete guide to all keyboard shortcuts, gestural controls, and power workflows.
+                                            </div>
+                                        </div>
+                                        <ExternalLink size={15} color="var(--accent-color)" style={{ flexShrink: 0 }} />
+                                    </a>
+                                </div>
+
+                                {/* Full PWA Guide Link */}
                                 <div style={{
                                     background: 'var(--item-bg)',
                                     padding: '12px 16px',
@@ -2329,13 +2417,13 @@ const SettingsModal = ({
                                     gap: '10px'
                                 }}>
                                     <div>
-                                        <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Want to learn more?</div>
+                                        <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>What is a PWA?</div>
                                         <div style={{ fontSize: '0.82rem', color: 'var(--muted-text)' }}>
-                                            Read our beginner-friendly article on what a PWA is and why to install it.
+                                            Read our beginner-friendly article on what a Progressive Web App is and why to install it.
                                         </div>
                                     </div>
                                     <a
-                                        href="/how-to-install-123todo-pwa.md"
+                                        href="https://www.123todo.com/how-to-install-123todo-pwa"
                                         target="_blank"
                                         rel="noreferrer"
                                         style={{

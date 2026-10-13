@@ -1,7 +1,16 @@
 import React from 'react';
-import { CheckSquare, Mic, Download } from 'lucide-react';
+import { CheckSquare, Mic, Download, BookOpen } from 'lucide-react';
 
-const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalone = false, onOpenInstall, buttonDisplayMode = 'icons' }) => {
+const Header = ({
+    isDark,
+    appMode = 'tasks',
+    onSwitchMode = () => {},
+    isStandalone = false,
+    onOpenInstall,
+    buttonDisplayMode = 'icons',
+    showGettingStarted = false,
+    onGettingStartedClick
+}) => {
     const showIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
     const showText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
 
@@ -76,6 +85,40 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
 
                 {/* Right Header Actions */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {showGettingStarted && (
+                        <a
+                            href="https://www.123todo.com/getting-started-with-123-todo"
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={onGettingStartedClick}
+                            aria-label="Getting Started Guide"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
+                                padding: '6px clamp(8px, 1.5vw, 12px)',
+                                minHeight: '32px',
+                                borderRadius: '20px',
+                                border: '1.5px solid #2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                color: '#2563eb',
+                                fontSize: '13px',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                textDecoration: 'none',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 1px 4px rgba(37, 99, 235, 0.2)'
+                            }}
+                            title="New to 123 To Do? Read our quick 3-minute beginner's guide"
+                        >
+                            <BookOpen size={14} />
+                            <span>Getting Started</span>
+                        </a>
+                    )}
+
                     {!isStandalone && onOpenInstall && (
                         <button
                             onClick={onOpenInstall}

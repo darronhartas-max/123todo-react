@@ -4,6 +4,23 @@ import { checkForUpdates as triggerSWUpdateCheck } from '../serviceWorkerRegistr
 
 export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = false) => {
     const [showWelcome, setShowWelcome] = useState(false);
+    const [hasStartedUsingApp, setHasStartedUsingAppState] = useState(() => {
+        if (typeof window === 'undefined') return true;
+        if (localStorage.getItem(STORAGE_KEYS.STARTED_USING) === 'true') return true;
+        try {
+            const archived = localStorage.getItem(STORAGE_KEYS.ARCHIVE);
+            if (archived && archived !== '[]' && JSON.parse(archived).length > 0) return true;
+        } catch (e) {}
+        return false;
+    });
+
+    const markStartedUsingApp = useCallback(() => {
+        setHasStartedUsingAppState(true);
+        try {
+            localStorage.setItem(STORAGE_KEYS.STARTED_USING, 'true');
+        } catch (e) {}
+    }, []);
+
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [showInstallModal, setShowInstallModal] = useState(false);
     const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
@@ -141,6 +158,8 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
 
     // Call when user adds or completes tasks (starting to use app properly)
     const recordAppUsageAction = useCallback((actionType = 'action') => {
+        markStartedUsingApp();
+
         if (typeof window === 'undefined') return;
         const inStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
         if (inStandalone) return;
@@ -162,7 +181,7 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
                 }, 1200);
             }
         }
-    }, [canShowInstallReminder, tasksCount, archivedCount, showWelcome]);
+    }, [canShowInstallReminder, tasksCount, archivedCount, showWelcome, markStartedUsingApp]);
 
     // Initialize system states
     useEffect(() => {
@@ -222,6 +241,7 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
     const dismissWelcome = () => {
         setShowWelcome(false);
         localStorage.setItem(STORAGE_KEYS.WELCOME_SEEN, 'true');
+        markStartedUsingApp();
     };
 
     const dismissInstallPrompt = useCallback((fromModal = false) => {
@@ -265,6 +285,8 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
 
     return {
         showWelcome,
+        hasStartedUsingApp,
+        markStartedUsingApp,
         showInstallPrompt,
         showInstallModal,
         setShowInstallModal,

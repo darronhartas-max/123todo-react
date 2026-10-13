@@ -83,7 +83,7 @@ const TodoApp = () => {
   } = activeSync;
 
   const {
-    showWelcome, showInstallPrompt, showInstallModal, showBackupReminder, showCongrats,
+    showWelcome, hasStartedUsingApp, markStartedUsingApp, showInstallPrompt, showInstallModal, showBackupReminder, showCongrats,
     setShowCongrats, checkMilestones, dismissWelcome, dismissInstallPrompt,
     recordAppUsageAction,
     dismissBackupReminder, recordBackup, checkForUpdates,
@@ -1083,6 +1083,8 @@ const TodoApp = () => {
           isStandalone={isStandalone}
           onOpenInstall={handleInstallClick}
           buttonDisplayMode={buttonDisplayMode}
+          showGettingStarted={!hasStartedUsingApp}
+          onGettingStartedClick={markStartedUsingApp}
         />
 
         <AddTask
@@ -1112,7 +1114,10 @@ const TodoApp = () => {
           )}
 
           {showWelcome && (
-            <WelcomeBanner onDismiss={dismissWelcome} />
+            <WelcomeBanner
+              onDismiss={dismissWelcome}
+              onGettingStarted={markStartedUsingApp}
+            />
           )}
 
           {showInstallPrompt && (
