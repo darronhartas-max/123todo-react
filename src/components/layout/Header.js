@@ -99,7 +99,7 @@ const Header = ({ isDark, appMode = 'tasks', onSwitchMode = () => {}, isStandalo
                                 flexShrink: 0,
                                 transition: 'all 0.2s ease'
                             }}
-                            title="Install 123 To Do on your device"
+                            title="Add 123 To Do to your home screen"
                         >
                             {showIcons && <Download size={14} />}
                             {showText && <span>Install</span>}

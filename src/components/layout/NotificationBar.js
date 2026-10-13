@@ -2,6 +2,50 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Download } from 'lucide-react';
 
+export const WelcomeBanner = ({ onDismiss }) => (
+    <div style={{
+        background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.08))',
+        border: '1.5px solid var(--accent-color, #2563eb)',
+        borderRadius: '12px',
+        padding: '12px 16px',
+        margin: '8px 12px 12px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        flexWrap: 'wrap',
+        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.08)'
+    }}>
+        <div style={{ flex: '1 1 240px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', fontSize: '0.98rem', color: 'var(--text-color)', marginBottom: '3px' }}>
+                <Sparkles size={18} style={{ color: 'var(--accent-color, #2563eb)' }} />
+                <span>Welcome to 123 To Do</span>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--muted-text)', lineHeight: 1.45 }}>
+                Organize your day with simple 1-2-3 priorities (1 = Must Do, 2 = Should Do, 3 = Could Do). All tasks are auto-saved locally on your device with zero sign-up required.
+            </p>
+        </div>
+        <button
+            onClick={onDismiss}
+            style={{
+                background: 'var(--accent-color, #2563eb)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 16px',
+                fontSize: '0.88rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+                transition: 'transform 0.1s ease'
+            }}
+        >
+            Got it! ✓
+        </button>
+    </div>
+);
+
 export const InstallPrompt = ({ onInstall, onDismiss }) => (
     <div style={{
         background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
@@ -19,9 +63,9 @@ export const InstallPrompt = ({ onInstall, onDismiss }) => (
         flexWrap: 'wrap'
     }}>
         <div style={{ flex: '1 1 240px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '1.1rem' }}>📱</span>
+            <span style={{ fontSize: '1.1rem' }}>💡</span>
             <span>
-                <strong>Install 123 To Do as an app</strong> — 1-tap home screen access, works 100% offline, no app store needed!
+                <strong>Add 123 To Do to your Home Screen</strong> — 1-tap instant access, works 100% offline, no app store download needed!
             </span>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -43,7 +87,7 @@ export const InstallPrompt = ({ onInstall, onDismiss }) => (
                 }}
             >
                 <Download size={14} />
-                <span>Install / How to</span>
+                <span>See How</span>
             </button>
             <button
                 onClick={onDismiss}

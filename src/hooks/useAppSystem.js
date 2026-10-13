@@ -38,7 +38,9 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
 
         const lastDismissed = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_INSTALL_DISMISSED) || '0', 10);
         if (!lastDismissed) {
-            return true; // Never dismissed yet
+            // First-time users: require meaningful engagement (at least 5 user actions) before any install reminder
+            const actionsCount = parseInt(localStorage.getItem(STORAGE_KEYS.INSTALL_ACTIONS_COUNT) || '0', 10);
+            return actionsCount >= 5;
         }
 
         const now = Date.now();
@@ -167,7 +169,7 @@ export const useAppSystem = (archivedCount = 0, tasksCount = 0, isSyncAuthed = f
         // Welcome screen
         const hasSeenWelcome = localStorage.getItem(STORAGE_KEYS.WELCOME_SEEN);
         if (!hasSeenWelcome) {
-            setTimeout(() => setShowWelcome(true), 500);
+            setShowWelcome(true);
         }
 
         // Milestones

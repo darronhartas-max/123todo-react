@@ -66,9 +66,9 @@ const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false })
                             borderColor: 'var(--accent-color)',
                             color: 'var(--accent-color)'
                         }}
-                        title="Download & Install 123 To Do on your device"
+                        title="Add 123 To Do to your home screen"
                     >
-                        📲 Install App
+                        📲 Add to Home Screen
                     </button>
                 </div>
             )}

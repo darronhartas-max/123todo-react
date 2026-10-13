@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.41** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.42** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.41 (Current)
+### v3.7.42 (Current)
+
+- **Frictionless First-Time User Experience & 1-2-3 Starter Onboarding**: Transformed the initial user experience for first-time visitors by eliminating screen-blocking welcome modals and aggressive installation popups. First-time users now land directly into a clean, inviting workspace with a sleek, non-blocking In-Line Welcome Banner introducing the 1-2-3 methodology. Streamlined default sample tasks down to 3 interactive starter tasks demonstrating the Must Do, Should Do, and Could Do tiers. Softened install prompts with consumer-friendly "Add to Home Screen" language and prevented early pop-up interruptions until users have meaningfully engaged with the app.
+
+### v3.7.41
 
 - **Streamlined Recurrence Icon on Schedule Row & Right-Aligned Add Note**: Replaced the textual "Repeat this task" label with a clean Repeat icon toggle, unified directly onto the same line as the schedule time icon to maximize vertical screen space in both Add Task and Edit Task modals. In Notes mode, relocated the Add Note button to the right side of the header bar with generous touch targets for rapid, thumb-friendly note capture.
 

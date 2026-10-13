@@ -13,7 +13,6 @@ import DeleteProjectModal from './components/modals/DeleteProjectModal';
 import SettingsModal from './components/modals/SettingsModal';
 import ProjectTabs from './components/projects/ProjectTabs';
 import EditModal from './components/modals/EditModal';
-import WelcomeModal from './components/modals/WelcomeModal';
 import CongratsModal from './components/modals/CongratsModal';
 import AchievementsModal from './components/modals/AchievementsModal';
 import TodoistImportModal from './components/modals/TodoistImportModal';
@@ -32,7 +31,7 @@ import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
 import InstallGuideModal from './components/modals/InstallGuideModal';
 import EmailClientModal from './components/modals/EmailClientModal';
 import NotesView from './components/notes/NotesView';
-import { InstallPrompt, BackupReminder, SyncOfflinePrompt } from './components/layout/NotificationBar';
+import { InstallPrompt, BackupReminder, SyncOfflinePrompt, WelcomeBanner } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
@@ -1112,6 +1111,10 @@ const TodoApp = () => {
             />
           )}
 
+          {showWelcome && (
+            <WelcomeBanner onDismiss={dismissWelcome} />
+          )}
+
           {showInstallPrompt && (
             <InstallPrompt onInstall={handleInstallClick} onDismiss={dismissInstallPrompt} />
           )}
@@ -1509,15 +1512,6 @@ const TodoApp = () => {
           onClose={() => setShowArchive(false)}
           dateFormat={dateFormat}
           taskViewMode={taskViewMode}
-        />
-      )}
-
-      {showWelcome && (
-        <WelcomeModal
-          onAccept={dismissWelcome}
-          canNativeInstall={canNativeInstall}
-          onInstall={triggerNativeInstall}
-          isStandalone={isStandalone}
         />
       )}
 
