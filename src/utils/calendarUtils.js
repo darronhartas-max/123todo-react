@@ -2,6 +2,38 @@
  * Utility functions for exporting and adding scheduled tasks to external calendars (Google Calendar & Apple Calendar / iCal).
  */
 
+export const CALENDAR_TITLE_MAX_LENGTH = 40;
+
+/**
+ * Formats a task text into a clean, concise calendar event title.
+ * Capped at maxLength (default 40 characters) on a word boundary without trailing ellipses,
+ * allowing the user to immediately type and add to or edit the title in their calendar.
+ *
+ * @param {string} text - Raw task text
+ * @param {number} [maxLength=40] - Maximum character length
+ * @returns {string} Clean concise title
+ */
+export const formatCalendarTitle = (text, maxLength = CALENDAR_TITLE_MAX_LENGTH) => {
+    if (!text) return 'Scheduled Task';
+    // Normalize newlines and excess whitespace into a single line
+    const singleLine = text.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!singleLine) return 'Scheduled Task';
+
+    if (singleLine.length <= maxLength) {
+        return singleLine;
+    }
+
+    // Truncate at word boundary up to maxLength
+    const truncated = singleLine.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    // If there is a word break at a reasonable point (at least 15 chars), truncate at word boundary
+    const candidate = (lastSpace >= 15) ? truncated.slice(0, lastSpace) : truncated;
+
+    // Strip trailing punctuation (comma, semicolon, colon, dash, period) so the user can edit smoothly
+    const clean = candidate.replace(/[,;:\-\s.]+$/, '').trim();
+    return clean || singleLine.slice(0, maxLength);
+};
+
 /**
  * Formats a YYYY-MM-DD date and optional HH:MM time into Google Calendar date range format.
  * All-day: YYYYMMDD/YYYYMMDD (next day)
@@ -51,18 +83,25 @@ export const formatGoogleCalendarDates = (scheduledDate, scheduledTime = null) =
 export const generateGoogleCalendarUrl = ({ title, scheduledDate, scheduledTime = null, notes = '' }) => {
     if (!scheduledDate) return '';
     const dates = formatGoogleCalendarDates(scheduledDate, scheduledTime);
-    const cleanTitle = (title || 'Scheduled Task').trim();
-    let details = (notes || '').trim();
-    if (details) {
-        details += '\n\n';
+    const rawTitle = (title || '').trim();
+    const cleanTitle = formatCalendarTitle(rawTitle);
+
+    const isTruncated = rawTitle && rawTitle !== cleanTitle;
+    const detailsParts = [];
+    if (isTruncated) {
+        detailsParts.push(`Task: ${rawTitle}`);
     }
-    details += 'Scheduled via 123 To Do (https://123todo.com)';
+    const cleanNotes = (notes || '').trim();
+    if (cleanNotes) {
+        detailsParts.push(cleanNotes);
+    }
+    detailsParts.push('Scheduled via 123 To Do (https://123todo.com)');
 
     const params = new URLSearchParams({
         action: 'TEMPLATE',
         text: cleanTitle,
         dates,
-        details
+        details: detailsParts.join('\n\n')
     });
 
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -102,13 +141,21 @@ const escapeIcsText = (str) => {
 export const generateIcsContent = ({ title, scheduledDate, scheduledTime = null, notes = '' }) => {
     if (!scheduledDate) return '';
     const cleanDate = scheduledDate.replace(/-/g, '');
-    const cleanTitle = escapeIcsText((title || 'Scheduled Task').trim());
-    let cleanNotes = (notes || '').trim();
-    if (cleanNotes) {
-        cleanNotes += '\n\n';
+    const rawTitle = (title || '').trim();
+    const eventTitle = formatCalendarTitle(rawTitle);
+    const cleanTitle = escapeIcsText(eventTitle);
+
+    const isTruncated = rawTitle && rawTitle !== eventTitle;
+    const detailsParts = [];
+    if (isTruncated) {
+        detailsParts.push(`Task: ${rawTitle}`);
     }
-    cleanNotes += 'Scheduled via 123 To Do (https://123todo.com)';
-    const escapedDetails = escapeIcsText(cleanNotes);
+    const cleanNotes = (notes || '').trim();
+    if (cleanNotes) {
+        detailsParts.push(cleanNotes);
+    }
+    detailsParts.push('Scheduled via 123 To Do (https://123todo.com)');
+    const escapedDetails = escapeIcsText(detailsParts.join('\n\n'));
 
     const now = new Date();
     const dtStamp = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
@@ -173,7 +220,8 @@ export const downloadAppleCalendarIcs = (options) => {
     const icsContent = generateIcsContent(options);
     if (!icsContent) return;
 
-    const safeTitle = (options.title || 'task')
+    const cleanTitle = formatCalendarTitle(options.title || '');
+    const safeTitle = cleanTitle
         .replace(/[^a-zA-Z0-9_-]/g, '_')
         .slice(0, 30);
     const filename = `${safeTitle || 'event'}.ics`;

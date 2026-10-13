@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.44
+
+- **📅 Concise Calendar Event Titles & Full Details Preservation:** When adding scheduled tasks to Google Calendar or Apple Calendar (.ics), the event title is now cleanly formatted to a concise headline (up to 40 characters) on natural word boundaries without trailing ellipses, allowing you to immediately tap and edit or expand the title in your calendar. The complete original task text and any associated task notes are safely preserved in the calendar event description field so no context is ever lost.
+
 ### v3.7.43
 
 - **📘 First-Time User "Getting Started" Guide & Disappearing Helper:** Added an intuitive Getting Started function tailored for first-time visitors that links to the beginner-friendly quick-start guide on the website, addressing core concerns about offline data safety, 1-2-3 priorities, and zero-knowledge device syncing. The Getting Started button in the header and welcome banner automatically disappears once the user begins actively adding, completing, or organizing tasks. Added permanent links to both the Beginner's Guide and the new in-depth Feature Mastery Guide in Settings under App & Updates.
