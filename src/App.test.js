@@ -95,8 +95,8 @@ test('renders On Hold tasks with draggable attribute and drag support', () => {
 
   render(<App />);
 
-  // Click on "Show On Hold Tasks"
-  const toggleBtn = screen.getByRole('button', { name: /Show On Hold Tasks \(2\)/i });
+  // Click on "On Hold Tasks"
+  const toggleBtn = screen.getByRole('button', { name: /On Hold Tasks \(2\)/i });
   act(() => {
     toggleBtn.click();
   });
@@ -118,12 +118,12 @@ test('renders On Hold and Scheduled sections without grey padding border', () =>
 
   render(<App />);
 
-  const onHoldBtn = screen.getByRole('button', { name: /Show On Hold Tasks \(1\)/i });
+  const onHoldBtn = screen.getByRole('button', { name: /On Hold Tasks \(1\)/i });
   const onHoldContainer = onHoldBtn.parentElement;
   expect(onHoldContainer).toHaveStyle({ background: 'transparent' });
   expect(onHoldContainer).toHaveStyle({ border: '2px dashed transparent' });
 
-  const scheduledBtn = screen.getByRole('button', { name: /Show Scheduled & Recurring \(1\)/i });
+  const scheduledBtn = screen.getByRole('button', { name: /Scheduled & Recurring \(1\)/i });
   const scheduledContainer = scheduledBtn.parentElement;
   expect(scheduledContainer).toHaveStyle({ background: 'transparent' });
   expect(scheduledContainer).toHaveStyle({ border: 'none' });
@@ -154,7 +154,7 @@ test('displays scheduled tasks in chronological order with soonest due date at t
   render(<App />);
 
   // Expand Scheduled section
-  const toggleBtn = screen.getByRole('button', { name: /Show Scheduled & Recurring \(3\)/i });
+  const toggleBtn = screen.getByRole('button', { name: /Scheduled & Recurring \(3\)/i });
   act(() => {
     toggleBtn.click();
   });

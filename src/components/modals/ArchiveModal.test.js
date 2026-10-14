@@ -164,3 +164,61 @@ test('allows canceling archive deletion at step 1 or step 2', () => {
     expect(handleDelete).not.toHaveBeenCalled();
 });
 
+test('shows confirmation popup when an archived task is clicked to edit and restores task upon confirmation', () => {
+    const handleRestore = jest.fn();
+    const handleEdit = jest.fn();
+
+    render(
+        <ArchiveModal
+            archived={sampleArchivedTasks}
+            projects={sampleProjects}
+            onRestore={handleRestore}
+            onDelete={jest.fn()}
+            onUpdate={jest.fn()}
+            onEdit={handleEdit}
+            onClose={jest.fn()}
+        />
+    );
+
+    // Click on the task description
+    fireEvent.click(screen.getByText('Fix navigation bar bug'));
+
+    // Confirmation popup should appear
+    expect(screen.getByText('Place Back into Live System?')).toBeInTheDocument();
+    expect(screen.getByText(/To edit this task, it will be placed back into your active tasks list first/i)).toBeInTheDocument();
+
+    // Confirm restore & edit
+    const confirmBtn = screen.getByRole('button', { name: /Restore & Edit/i });
+    fireEvent.click(confirmBtn);
+
+    expect(handleRestore).toHaveBeenCalledWith(101);
+    expect(handleEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 101, text: 'Fix navigation bar bug' }));
+});
+
+test('cancels confirmation popup when Cancel is clicked', () => {
+    const handleRestore = jest.fn();
+    const handleEdit = jest.fn();
+
+    render(
+        <ArchiveModal
+            archived={sampleArchivedTasks}
+            projects={sampleProjects}
+            onRestore={handleRestore}
+            onDelete={jest.fn()}
+            onUpdate={jest.fn()}
+            onEdit={handleEdit}
+            onClose={jest.fn()}
+        />
+    );
+
+    // Click on the task description
+    fireEvent.click(screen.getByText('Fix navigation bar bug'));
+    expect(screen.getByText('Place Back into Live System?')).toBeInTheDocument();
+
+    // Click Cancel
+    fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+    expect(screen.queryByText('Place Back into Live System?')).not.toBeInTheDocument();
+    expect(handleRestore).not.toHaveBeenCalled();
+    expect(handleEdit).not.toHaveBeenCalled();
+});
+

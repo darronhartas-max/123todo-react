@@ -1,15 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Search, X, Trash2, Calendar, Repeat, Filter, ArrowUpDown, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Archive, Search, X, Trash2, Calendar, Repeat, Filter, ArrowUpDown, AlertTriangle, ShieldAlert, RotateCcw } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 import { formatDisplayDate, isValidEvidentiaryTimestamp } from '../../utils/dateUtils';
 import TaskItem from '../tasks/TaskItem';
 
-const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpdate, onClose, dateFormat = 'UK', taskViewMode = 'compact' }) => {
+const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpdate, onEdit, onClose, dateFormat = 'UK', taskViewMode = 'compact' }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProject, setSelectedProject] = useState('all');
     const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'oldest' | 'priority' | 'name'
     const [clearStep, setClearStep] = useState(0); // 0: idle, 1: first approval, 2: second approval
+    const [taskToRestoreAndEdit, setTaskToRestoreAndEdit] = useState(null);
 
     // Close on Escape key press
     useEffect(() => {
@@ -112,11 +113,11 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
             gap: '12px'
         },
         iconCircle: {
-            width: '42px',
-            height: '42px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-            color: '#667eea',
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            background: 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+            color: 'var(--accent-color, #2563eb)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -132,12 +133,13 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
             gap: '10px'
         },
         badge: {
-            background: 'rgba(102, 126, 234, 0.12)',
-            color: '#667eea',
-            fontSize: '0.85rem',
+            background: 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+            color: 'var(--accent-color, #2563eb)',
+            fontSize: '0.82rem',
             fontWeight: '700',
-            padding: '3px 10px',
-            borderRadius: '12px'
+            padding: '2px 8px',
+            borderRadius: '10px',
+            border: '1px solid rgba(37, 99, 235, 0.18)'
         },
         closeBtn: {
             background: 'transparent',
@@ -600,9 +602,10 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                                 onRestore={onRestore}
                                                 onDelete={onDelete}
                                                 onUpdate={onUpdate}
-                                                showFullDetails={true}
+                                                onEdit={(t) => setTaskToRestoreAndEdit(t)}
+                                                showFullDetails={false}
                                                 dateFormat={dateFormat}
-                                                taskViewMode={taskViewMode}
+                                                taskViewMode="compact"
                                             />
                                         </div>
                                     );
@@ -621,6 +624,132 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                         Press <kbd style={{ background: 'var(--bg-color)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-color)', fontFamily: 'monospace' }}>Esc</kbd> to close
                     </div>
                 </div>
+
+                {/* Place Back into Live System First Confirmation Popup */}
+                {taskToRestoreAndEdit && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'rgba(0, 0, 0, 0.65)',
+                            backdropFilter: 'blur(3px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1200,
+                            padding: '16px'
+                        }}
+                        onClick={() => setTaskToRestoreAndEdit(null)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ duration: 0.15 }}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                background: 'var(--surface-color)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '14px',
+                                padding: '22px',
+                                maxWidth: '440px',
+                                width: '100%',
+                                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.35)',
+                                color: 'var(--text-color)'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                                <div style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '10px',
+                                    background: 'var(--accent-bg, rgba(37, 99, 235, 0.1))',
+                                    color: 'var(--accent-color, #2563eb)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <RotateCcw size={18} />
+                                </div>
+                                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '800' }}>
+                                    Place Back into Live System?
+                                </h3>
+                            </div>
+
+                            <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--muted-text)', lineHeight: '1.45' }}>
+                                To edit this task, it will be placed back into your active tasks list first.
+                            </p>
+
+                            <div style={{
+                                padding: '10px 12px',
+                                borderRadius: '8px',
+                                background: 'var(--bg-color)',
+                                border: '1px solid var(--border-color)',
+                                fontSize: '0.9rem',
+                                fontWeight: '500',
+                                color: 'var(--text-color)',
+                                marginBottom: '18px',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                lineHeight: '1.35'
+                            }}>
+                                "{taskToRestoreAndEdit.text}"
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setTaskToRestoreAndEdit(null)}
+                                    style={{
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--border-color)',
+                                        background: 'transparent',
+                                        color: 'var(--text-color)',
+                                        fontWeight: '600',
+                                        fontSize: '0.88rem',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const task = taskToRestoreAndEdit;
+                                        setTaskToRestoreAndEdit(null);
+                                        onRestore && onRestore(task.id);
+                                        if (onEdit) {
+                                            onEdit(task);
+                                        }
+                                    }}
+                                    style={{
+                                        padding: '8px 18px',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        background: 'var(--accent-color, #2563eb)',
+                                        color: '#ffffff',
+                                        fontWeight: '700',
+                                        fontSize: '0.88rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}
+                                >
+                                    <RotateCcw size={15} /> Restore & Edit
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
             </motion.div>
         </div>
     );

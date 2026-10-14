@@ -1266,7 +1266,7 @@ const TodoApp = () => {
                   <button
                     type="button"
                     onClick={() => setShowOnHold(!showOnHold)}
-                    aria-label={showOnHold ? 'Hide On Hold Tasks' : `Show On Hold Tasks (${onHoldTasksFiltered.length})`}
+                    aria-label={showOnHold ? `Collapse On Hold Tasks (${onHoldTasksFiltered.length})` : `Expand On Hold Tasks (${onHoldTasksFiltered.length})`}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -1293,7 +1293,7 @@ const TodoApp = () => {
                         color: '#9333ea',
                         textAlign: 'left'
                       }}>
-                        {showOnHold ? 'Hide On Hold Tasks' : `Show On Hold Tasks (${onHoldTasksFiltered.length})`}
+                        On Hold Tasks ({onHoldTasksFiltered.length})
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', color: '#9333ea' }}>
@@ -1369,7 +1369,7 @@ const TodoApp = () => {
               <button
                 type="button"
                 onClick={() => setShowScheduled(!showScheduled)}
-                aria-label={showScheduled ? 'Hide' : `Show Scheduled & Recurring (${filteredScheduled.length})`}
+                aria-label={showScheduled ? `Collapse Scheduled & Recurring (${filteredScheduled.length})` : `Expand Scheduled & Recurring (${filteredScheduled.length})`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1396,7 +1396,7 @@ const TodoApp = () => {
                     color: 'var(--accent-color)',
                     textAlign: 'left'
                   }}>
-                    {showScheduled ? 'Hide' : 'Show'} Scheduled & Recurring ({filteredScheduled.length})
+                    Scheduled & Recurring ({filteredScheduled.length})
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
@@ -1514,6 +1514,10 @@ const TodoApp = () => {
           onRestore={onRestoreRequest}
           onDelete={deleteArchivedTask}
           onUpdate={updateTask}
+          onEdit={(task) => {
+            setShowArchive(false);
+            setEditingTask(task);
+          }}
           onClose={() => setShowArchive(false)}
           dateFormat={dateFormat}
           taskViewMode={taskViewMode}

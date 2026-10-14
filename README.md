@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.45** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.46** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,12 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.45 (Current)
+### v3.7.46 (Current)
 
-- **5 Photo Attachments, Cursor Viewport Scrolling & Collapsible Sections**: Increased maximum image attachments per task or note from 3 to 5. Resolved task description editing viewport scrolling so active text lines (including the very top of the task) remain clearly visible while typing. Added persistent collapsible sections for Notes, Subtasks, and Schedule in the Task Edit view that remember their collapsed or expanded states across sessions, and removed redundant edit icon buttons above the description and notes boxes for direct click-to-edit.
-- **Smart Voice Dictation Newlines & Instant Save Commands**: Voice dictation appended to existing tasks and notes now automatically begins on a new line unless a custom cursor position is placed. Spoken voice commands like "save task" or "save note" now instantly commit the newly transcribed text to state and close the task modal cleanly.
+- **Inline Time Lozenge Wrapping & Clean Section Headings**: When a scheduled time is set on a task, the time lozenge is now rendered inline with the task description, allowing text lines to cleanly wrap directly underneath the lozenge to eliminate awkward gaps and maximize usable space. Also standardized priority list headers by removing the redundant "Show" and "Hide" prefixes from On Hold and Scheduled sections for complete visual uniformity.
+- **Modernized Archive Listing, 2-Line Clamping & Safe Edit Flow**: Refined the Archive modal with modernized theme-consistent styling. Archived tasks are now neatly clamped to 2 lines of description for rapid scanning, and clicking an archived task now presents an intuitive confirmation popup prompting to restore it into the live system before opening it in the task editor.
 
-### v3.7.44
+### v3.7.45
 
 - **Concise Calendar Event Titles & Full Details Preservation**: When adding scheduled tasks to Google Calendar or Apple Calendar (.ics), the event title is now cleanly formatted to a concise headline (up to 40 characters) on natural word boundaries without trailing ellipses, allowing you to immediately tap and edit or expand the title in your calendar. The complete original task text and any associated task notes are safely preserved in the calendar event description field so no context is ever lost.
 

@@ -327,7 +327,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             borderBottom: isDragging ? '1px solid var(--accent-color)' : '1px solid var(--border-color)',
             borderLeft: projectColor ? `6px solid ${projectColor}` : (task.isSample ? '6px solid #0ea5e9' : (isDragging ? '1px solid var(--accent-color)' : 'none')),
             background: task.isSample ? 'rgba(14, 165, 233, 0.1)' : 'var(--item-bg)',
-            cursor: isArchived ? 'default' : 'move',
+            cursor: isArchived ? (onEdit ? 'pointer' : 'default') : 'move',
             borderRadius: '6px',
             marginBottom: 'var(--task-margin, 4px)',
             transition: 'background 0.2s ease, border-color 0.2s ease, opacity 0.15s ease',
@@ -344,7 +344,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             background: 'transparent',
             fontSize: 'var(--task-font-size, 1.05rem)',
             color: 'var(--text-color)',
-            cursor: isArchived ? 'default' : 'pointer',
+            cursor: isArchived ? (onEdit ? 'pointer' : 'default') : 'pointer',
             fontFamily: 'Inter, sans-serif',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere',
@@ -354,7 +354,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             lineHeight: '1.35',
             margin: 0,
             minWidth: 0,
-            ...(taskViewMode === 'compact' ? {
+            ...(isArchived || taskViewMode === 'compact' ? {
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
@@ -613,10 +613,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                         e.preventDefault();
                         return;
                     }
-                    if (!isArchived && onEdit) onEdit(task);
+                    if (onEdit) onEdit(task);
                 }}
-                onMouseEnter={() => !isArchived && setIsHovered(true)}
-                onMouseLeave={() => !isArchived && setIsHovered(false)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
             >
             {isDragOver && (
                 <div style={{
@@ -671,32 +671,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 {isLite ? (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 0, width: '100%', gap: '6px' }}>
-                        {timeSchedulingEnabled && task.scheduledTime && (
-                            <span
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '3px',
-                                    fontSize: '0.72rem',
-                                    fontWeight: '700',
-                                    color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
-                                    background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
-                                    border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
-                                    padding: '1px 5px',
-                                    borderRadius: '4px',
-                                    flexShrink: 0,
-                                    lineHeight: '14px',
-                                    letterSpacing: '0.2px',
-                                    marginTop: '2px',
-                                    opacity: isArchived ? 0.6 : 1
-                                }}
-                                title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
-                            >
-                                <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                                <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
-                            </span>
-                        )}
+                    <div style={{ minWidth: 0, width: '100%' }}>
                         <span 
                             style={{
                                 ...styles.taskText,
@@ -714,6 +689,33 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                             }}
                             title={task.text}
                         >
+                            {timeSchedulingEnabled && task.scheduledTime && (
+                                <span
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: '700',
+                                        color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
+                                        background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+                                        border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
+                                        padding: '1px 5px',
+                                        borderRadius: '4px',
+                                        flexShrink: 0,
+                                        lineHeight: '14px',
+                                        letterSpacing: '0.2px',
+                                        marginRight: '6px',
+                                        verticalAlign: 'middle',
+                                        marginTop: '-2px',
+                                        opacity: isArchived ? 0.6 : 1
+                                    }}
+                                    title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
+                                >
+                                    <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                                    <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
+                                </span>
+                            )}
                             {renderActionableText(task.text)}
                         </span>
                     </div>
@@ -732,70 +734,75 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                 ● {projectName}
                             </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
-                            {timeSchedulingEnabled && task.scheduledTime && (
-                                <span
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700',
-                                        color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
-                                        background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
-                                        border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
-                                        padding: '1px 5px',
-                                        borderRadius: '4px',
-                                        flexShrink: 0,
-                                        lineHeight: '14px',
-                                        letterSpacing: '0.2px',
-                                        marginTop: '2px',
-                                        opacity: isArchived ? 0.6 : 1
-                                    }}
-                                    title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
-                                >
-                                    <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                                    <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
-                                </span>
-                            )}
+                        <div style={{ minWidth: 0, width: '100%' }}>
                             <span 
                                 className={taskViewMode === 'compact' ? 'task-text-compact' : ''}
                                 style={styles.taskText}
                                 title={taskViewMode === 'compact' ? task.text : undefined}
                             >
+                                {timeSchedulingEnabled && task.scheduledTime && (
+                                    <span
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '3px',
+                                            fontSize: '0.72rem',
+                                            fontWeight: '700',
+                                            color: isArchived ? 'var(--muted-text)' : 'var(--accent-color, #2563eb)',
+                                            background: isArchived ? 'transparent' : 'var(--accent-bg, rgba(37, 99, 235, 0.08))',
+                                            border: `1px solid ${isArchived ? 'var(--border-color)' : 'rgba(37, 99, 235, 0.22)'}`,
+                                            padding: '1px 5px',
+                                            borderRadius: '4px',
+                                            flexShrink: 0,
+                                            lineHeight: '14px',
+                                            letterSpacing: '0.2px',
+                                            marginRight: '6px',
+                                            verticalAlign: 'middle',
+                                            marginTop: '-2px',
+                                            opacity: isArchived ? 0.6 : 1
+                                        }}
+                                        title={`Scheduled time: ${formatDisplayTime(task.scheduledTime, dateFormat)}`}
+                                    >
+                                        <Clock size={10} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                                        <span>{formatDisplayTime(task.scheduledTime, dateFormat)}</span>
+                                    </span>
+                                )}
                                 {renderActionableText(task.text)}
+                                {!isArchived && task.photos && task.photos.length > 0 && (
+                                    <span
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowNotesExpanded(prev => !prev);
+                                        }}
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '3px',
+                                            fontSize: '0.70rem',
+                                            color: '#0284c7',
+                                            background: 'rgba(2, 132, 199, 0.08)',
+                                            border: '1px solid rgba(2, 132, 199, 0.28)',
+                                            padding: '1px 5px',
+                                            borderRadius: '4px',
+                                            fontWeight: '700',
+                                            flexShrink: 0,
+                                            cursor: 'pointer',
+                                            lineHeight: '14px',
+                                            marginLeft: '6px',
+                                            verticalAlign: 'middle',
+                                            marginTop: '-2px'
+                                        }}
+                                        title={`${task.photos.length} photo${task.photos.length > 1 ? 's' : ''} attached (click to view)`}
+                                    >
+                                        <Camera size={11} strokeWidth={2.2} />
+                                        {task.photos.length}
+                                    </span>
+                                )}
                             </span>
-                            {task.photos && task.photos.length > 0 && (
-                                <span
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowNotesExpanded(prev => !prev);
-                                    }}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '3px',
-                                        fontSize: '0.70rem',
-                                        color: '#0284c7',
-                                        background: 'rgba(2, 132, 199, 0.08)',
-                                        border: '1px solid rgba(2, 132, 199, 0.28)',
-                                        padding: '1px 5px',
-                                        borderRadius: '4px',
-                                        fontWeight: '700',
-                                        flexShrink: 0,
-                                        cursor: 'pointer',
-                                        lineHeight: '14px'
-                                    }}
-                                    title={`${task.photos.length} photo${task.photos.length > 1 ? 's' : ''} attached (click to view)`}
-                                >
-                                    <Camera size={11} strokeWidth={2.2} />
-                                    {task.photos.length}
-                                </span>
-                            )}
                         </div>
 
                         {/* Compact Note Preview: first line only in smaller font, space-efficient */}
-                        {(() => {
+                        {!isArchived && (() => {
                             const firstNoteLine = task.notes ? task.notes.trim().split('\n')[0].trim() : '';
                             if (!firstNoteLine) return null;
                             return (
@@ -988,7 +995,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                 )}
 
                 {/* Subtask indicator and checklist */}
-                {subtasksCount > 0 && (
+                {subtasksCount > 0 && !isArchived && (
                     <div style={{ marginTop: '8px', width: '100%', paddingRight: '8px', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <button
@@ -1238,7 +1245,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 )}
 
-                {effectiveShowFull && (task.notes || (task.photos && task.photos.length > 0)) && (
+                {effectiveShowFull && !isArchived && (task.notes || (task.photos && task.photos.length > 0)) && (
                     <div style={{ marginTop: '6px', width: '100%' }}>
                         <button
                             type="button"
@@ -1306,21 +1313,52 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
             <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '8px', alignSelf: hasExtraDetails ? 'flex-start' : 'center', marginTop: hasExtraDetails ? '2px' : '0' }}>
                 {isArchived ? (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onRestore(task.id); }}
-                        style={{
-                            ...styles.actionBtn,
-                            color: '#3b82f6',
-                            background: 'rgba(59, 130, 246, 0.08)',
-                            width: 'var(--task-action-btn-size, 32px)',
-                            height: 'var(--task-action-btn-size, 32px)',
-                            minWidth: 'var(--task-action-btn-size, 32px)',
-                            marginTop: '0px'
-                        }}
-                        title="Restore Task"
-                    >
-                        <RotateCcw size={17} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onRestore && onRestore(task.id); }}
+                            style={{
+                                ...styles.actionBtn,
+                                color: '#3b82f6',
+                                background: 'rgba(59, 130, 246, 0.08)',
+                                border: '1px solid rgba(59, 130, 246, 0.25)',
+                                borderRadius: '6px',
+                                width: 'var(--task-action-btn-size, 32px)',
+                                height: 'var(--task-action-btn-size, 32px)',
+                                minWidth: 'var(--task-action-btn-size, 32px)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginTop: '0px'
+                            }}
+                            title="Restore task to live system"
+                        >
+                            <RotateCcw size={16} />
+                        </button>
+                        {onDelete && (
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+                                style={{
+                                    ...styles.actionBtn,
+                                    color: '#ef4444',
+                                    background: 'rgba(239, 68, 68, 0.08)',
+                                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                                    borderRadius: '6px',
+                                    width: 'var(--task-action-btn-size, 32px)',
+                                    height: 'var(--task-action-btn-size, 32px)',
+                                    minWidth: 'var(--task-action-btn-size, 32px)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginTop: '0px'
+                                }}
+                                title="Permanently delete from archive"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        )}
+                    </div>
                 ) : (
                     <>
                         {!isLite && task.scheduledDate && (
