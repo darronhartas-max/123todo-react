@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.46** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.47** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.46 (Current)
+### v3.7.47 (Current)
+
+- **Clarified Lightbox Actions, Generous Touch Targets & Spacing**: Simplified and clarified the photo viewer controls by streamlining the "Save to Photos / Share" button to a clear "Share" button for standard system sharing, with generous 38px touch targets, comfortable 12px spacing between action buttons, and clear interactive feedback badges.
+- **Reliable Photo Download & Expansive Desktop Lightbox View**: Fixed the photo Download button to reliably export full-resolution images across all desktop and mobile browsers via Blob URLs and IndexedDB hydration. Also resolved images displaying small on desktop monitors by expanding the Lightbox container to up to 1400px wide with aspect-ratio-preserving viewport fitting, and bumped preview thumbnail generation to 480px for sharp previews on high-DPI displays.
+
+### v3.7.46
 
 - **Inline Time Lozenge Wrapping & Clean Section Headings**: When a scheduled time is set on a task, the time lozenge is now rendered inline with the task description, allowing text lines to cleanly wrap directly underneath the lozenge to eliminate awkward gaps and maximize usable space. Also standardized priority list headers by removing the redundant "Show" and "Hide" prefixes from On Hold and Scheduled sections for complete visual uniformity.
 - **Modernized Archive Listing, 2-Line Clamping & Safe Edit Flow**: Refined the Archive modal with modernized theme-consistent styling. Archived tasks are now neatly clamped to 2 lines of description for rapid scanning, and clicking an archived task now presents an intuitive confirmation popup prompting to restore it into the live system before opening it in the task editor.

@@ -158,6 +158,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.47': [
+    { title: '🖼️ Clarified Lightbox Actions, Generous Touch Targets & Spacing:', desc: 'Simplified and clarified the photo viewer controls by streamlining the "Save to Photos / Share" button to a clear "Share" button for standard system sharing, with generous 38px touch targets, comfortable 12px spacing between action buttons, and clear interactive feedback badges.' },
+    { title: '💾 Reliable Photo Download & Expansive Desktop Lightbox View:', desc: 'Fixed the photo Download button to reliably export full-resolution images across all desktop and mobile browsers via Blob URLs and IndexedDB hydration. Also resolved images displaying small on desktop monitors by expanding the Lightbox container to up to 1400px wide with aspect-ratio-preserving viewport fitting, and bumped preview thumbnail generation to 480px for sharp previews on high-DPI displays.' }
+  ],
   '3.7.46': [
     { title: '⏱️ Inline Time Lozenge Wrapping & Clean Section Headings:', desc: 'When a scheduled time is set on a task, the time lozenge is now rendered inline with the task description, allowing text lines to cleanly wrap directly underneath the lozenge to eliminate awkward gaps and maximize usable space. Also standardized priority list headers by removing the redundant "Show" and "Hide" prefixes from On Hold and Scheduled sections for complete visual uniformity.' },
     { title: '📦 Modernized Archive Listing, 2-Line Clamping & Safe Edit Flow:', desc: 'Refined the Archive modal with modernized theme-consistent styling. Archived tasks are now neatly clamped to 2 lines of description for rapid scanning, and clicking an archived task now presents an intuitive confirmation popup prompting to restore it into the live system before opening it in the task editor.' }

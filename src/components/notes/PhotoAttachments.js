@@ -26,6 +26,7 @@ const PhotoAttachments = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [copiedPhotoTimestamp, setCopiedPhotoTimestamp] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
+  const [downloadStatus, setDownloadStatus] = useState('');
 
   const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -33,9 +34,64 @@ const PhotoAttachments = ({
 
   const clearError = () => setErrorMessage('');
 
+  const handleDownloadPhoto = async (photo) => {
+    try {
+      let dataUrl = photo?.dataUrl;
+      if (!dataUrl && photo?.id) {
+        const full = await getPhoto(photo.id);
+        dataUrl = full?.dataUrl;
+      }
+      if (!dataUrl) {
+        dataUrl = photo?.thumbnail;
+      }
+      if (!dataUrl) return;
+
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
+      const fileName = getPhotoExportFileName(photo, ext);
+
+      if (window.URL && window.URL.createObjectURL) {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => {
+          if (window.URL && window.URL.revokeObjectURL) {
+            window.URL.revokeObjectURL(blobUrl);
+          }
+        }, 1500);
+      } else {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      setDownloadStatus('Downloaded');
+      setTimeout(() => setDownloadStatus(''), 2500);
+    } catch (err) {
+      console.error('Download error:', err);
+    }
+  };
+
   const handleShareOrSavePhoto = async (photo) => {
     try {
-      const dataUrl = photo.dataUrl || (await getPhoto(photo.id))?.dataUrl;
+      let dataUrl = photo?.dataUrl;
+      if (!dataUrl && photo?.id) {
+        const full = await getPhoto(photo.id);
+        dataUrl = full?.dataUrl;
+      }
+      if (!dataUrl) {
+        dataUrl = photo?.thumbnail;
+      }
       if (!dataUrl) return;
 
       const res = await fetch(dataUrl);
@@ -49,7 +105,7 @@ const PhotoAttachments = ({
           files: [file],
           title: formatPhotoDisplayName(photo.name, photo.timestamp)
         });
-        setShareStatus('Saved/Shared!');
+        setShareStatus('Shared');
         setTimeout(() => setShareStatus(''), 2500);
         return;
       }
@@ -59,16 +115,7 @@ const PhotoAttachments = ({
     }
 
     // Fallback: direct browser download
-    try {
-      const link = document.createElement('a');
-      link.href = photo.dataUrl;
-      link.download = getPhotoExportFileName(photo, 'webp');
-      link.click();
-      setShareStatus('Downloaded!');
-      setTimeout(() => setShareStatus(''), 2500);
-    } catch (e) {
-      console.error('Download error:', e);
-    }
+    handleDownloadPhoto(photo);
   };
 
   const handleCopyPhotoTimestamp = (ts) => {
@@ -154,20 +201,18 @@ const PhotoAttachments = ({
 
   // Handle opening lightbox with full-resolution photo (hydrating from IndexedDB if needed)
   const handleOpenLightbox = async (photo) => {
-    if (photo.dataUrl) {
-      setActiveLightboxPhoto(photo);
-      return;
-    }
-    try {
-      const full = await getPhoto(photo.id);
-      if (full && full.dataUrl) {
-        setActiveLightboxPhoto({ ...photo, ...full });
-        return;
-      }
-    } catch (e) {
-      console.warn('Could not load full photo from IndexedDB:', e);
-    }
+    if (!photo) return;
     setActiveLightboxPhoto(photo);
+    if (!photo.dataUrl && photo.id) {
+      try {
+        const full = await getPhoto(photo.id);
+        if (full && full.dataUrl) {
+          setActiveLightboxPhoto(prev => (prev && prev.id === photo.id ? { ...prev, ...full } : prev));
+        }
+      } catch (e) {
+        console.warn('Could not load full photo from IndexedDB:', e);
+      }
+    }
   };
 
   // Clipboard Paste Support (Cmd+V / Ctrl+V for Desktop Screen Grabs)
@@ -499,14 +544,14 @@ const PhotoAttachments = ({
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.88)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(0, 0, 0, 0.90)',
+            backdropFilter: 'blur(6px)',
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '12px 10px',
+            padding: '16px 20px',
             boxSizing: 'border-box'
           }}
         >
@@ -515,12 +560,12 @@ const PhotoAttachments = ({
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: '900px',
+              maxWidth: 'min(96vw, 1400px)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
+              gap: '8px',
               color: '#ffffff',
-              marginBottom: '10px',
+              marginBottom: '12px',
               boxSizing: 'border-box'
             }}
           >
@@ -529,7 +574,7 @@ const PhotoAttachments = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '10px',
+              gap: '16px',
               width: '100%',
               minWidth: 0
             }}>
@@ -537,12 +582,14 @@ const PhotoAttachments = ({
               <div style={{ minWidth: 0, flex: '1 1 auto', overflow: 'hidden' }}>
                 <span 
                   style={{
-                    fontSize: '0.98rem',
+                    fontSize: '1.05rem',
                     fontWeight: '700',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    display: 'block'
+                    display: 'block',
+                    color: '#ffffff',
+                    letterSpacing: '-0.01em'
                   }}
                   title={activeLightboxPhoto.name || 'Photo Attachment'}
                 >
@@ -550,75 +597,85 @@ const PhotoAttachments = ({
                 </span>
               </div>
 
-              {/* Right: Actions (Flex-shrink: 0 ensures buttons NEVER bleed off screen) */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                {/* Share / Save to Photos button */}
+              {/* Right: Actions (Spaced out, larger touch targets, crystal-clear labels) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                {/* Share button */}
                 <button
                   type="button"
                   onClick={() => handleShareOrSavePhoto(activeLightboxPhoto)}
-                  aria-label="Save to Photos / Share"
-                  title="Save to Photos / Share (AirDrop, WhatsApp, Files, etc.)"
+                  aria-label="Share"
+                  title="Share image (AirDrop, Messages, Drive, etc.)"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '6px 12px',
-                    borderRadius: '18px',
+                    gap: '7px',
+                    padding: '8px 16px',
+                    height: '38px',
+                    borderRadius: '20px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
                     color: '#ffffff',
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     fontWeight: '700',
                     whiteSpace: 'nowrap',
-                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
+                    transition: 'transform 0.15s ease, opacity 0.15s ease'
                   }}
                 >
-                  <Share2 size={14} />
-                  <span>{shareStatus ? `✓ ${shareStatus}` : 'Save to Photos / Share'}</span>
+                  <Share2 size={16} />
+                  <span>{shareStatus ? `✓ ${shareStatus}` : 'Share'}</span>
                 </button>
 
                 {/* Download button */}
-                <a
-                  href={activeLightboxPhoto.dataUrl}
-                  download={getPhotoExportFileName(activeLightboxPhoto, 'webp')}
-                  title="Download original photo"
+                <button
+                  type="button"
+                  onClick={() => handleDownloadPhoto(activeLightboxPhoto)}
+                  aria-label="Download"
+                  title="Download image"
                   style={{
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
+                    gap: '7px',
+                    padding: '8px 16px',
+                    height: '38px',
+                    borderRadius: '20px',
                     background: 'rgba(255, 255, 255, 0.18)',
                     color: '#ffffff',
-                    textDecoration: 'none',
-                    flexShrink: 0
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    whiteSpace: 'nowrap',
+                    transition: 'background 0.15s ease'
                   }}
                 >
                   <Download size={16} />
-                </a>
+                  <span>{downloadStatus ? `✓ ${downloadStatus}` : 'Download'}</span>
+                </button>
 
                 {/* Close Button */}
                 <button
                   type="button"
                   onClick={() => setActiveLightboxPhoto(null)}
                   title="Close (Esc)"
+                  aria-label="Close"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: '32px',
-                    height: '32px',
+                    width: '38px',
+                    height: '38px',
                     borderRadius: '50%',
                     background: 'rgba(255, 255, 255, 0.18)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
                     color: '#ffffff',
-                    border: 'none',
                     cursor: 'pointer',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    transition: 'background 0.15s ease'
                   }}
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
             </div>
@@ -630,7 +687,7 @@ const PhotoAttachments = ({
               justifyContent: 'space-between',
               gap: '8px',
               flexWrap: 'wrap',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               opacity: 0.9,
               color: 'rgba(255, 255, 255, 0.85)'
             }}>
@@ -642,8 +699,8 @@ const PhotoAttachments = ({
               </div>
 
               {activeLightboxPhoto.timestamp ? (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.15)', padding: '2px 8px', borderRadius: '4px' }}>
-                  <Clock size={11} />
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.15)', padding: '3px 9px', borderRadius: '4px' }}>
+                  <Clock size={12} />
                   <span>Captured: {formatEvidentiaryTimestamp(activeLightboxPhoto.timestamp)}</span>
                   <button
                     type="button"
@@ -658,11 +715,11 @@ const PhotoAttachments = ({
                       alignItems: 'center',
                       gap: '2px',
                       fontWeight: '700',
-                      fontSize: '0.72rem'
+                      fontSize: '0.75rem'
                     }}
                     title="Copy photo evidentiary timestamp"
                   >
-                    {copiedPhotoTimestamp ? <Check size={11} strokeWidth={3} /> : <Copy size={11} />}
+                    {copiedPhotoTimestamp ? <Check size={12} strokeWidth={3} /> : <Copy size={12} />}
                     <span>{copiedPhotoTimestamp ? 'Copied' : 'Copy'}</span>
                   </button>
                 </span>
@@ -674,8 +731,11 @@ const PhotoAttachments = ({
           <div 
             onClick={(e) => e.stopPropagation()}
             style={{
-              maxWidth: '900px',
-              maxHeight: 'calc(90vh - 60px)',
+              flex: '1 1 auto',
+              width: '100%',
+              maxWidth: 'min(96vw, 1400px)',
+              height: 'calc(88vh - 80px)',
+              maxHeight: 'calc(88vh - 80px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -687,10 +747,13 @@ const PhotoAttachments = ({
               alt={activeLightboxPhoto.name || 'Full view'}
               style={{
                 maxWidth: '100%',
-                maxHeight: 'calc(90vh - 60px)',
+                maxHeight: 'calc(88vh - 80px)',
+                width: 'auto',
+                height: 'auto',
+                minWidth: 'min(360px, 90vw)',
                 objectFit: 'contain',
-                borderRadius: '6px',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+                borderRadius: '8px',
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.65)'
               }}
             />
           </div>

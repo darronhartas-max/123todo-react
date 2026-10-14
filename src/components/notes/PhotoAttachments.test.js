@@ -82,7 +82,7 @@ describe('PhotoAttachments Component', () => {
     expect(screen.queryByText('receipt.webp')).not.toBeInTheDocument();
   });
 
-  test('displays Save to Photos / Share button and photo timestamp in lightbox', () => {
+  test('displays Share and Download buttons and photo timestamp in lightbox', async () => {
     const photosWithTimestamp = [
       {
         ...mockPhotos[0],
@@ -95,15 +95,24 @@ describe('PhotoAttachments Component', () => {
     const images = screen.getAllByRole('img');
     fireEvent.click(images[0]);
 
-    // Save to Photos / Share button should be present in Lightbox
-    const shareBtn = screen.getByRole('button', { name: /Save to Photos \/ Share/i });
+    // Share button should be present in Lightbox with clear "Share" label
+    const shareBtn = screen.getByRole('button', { name: /^Share/i });
     expect(shareBtn).toBeInTheDocument();
+
+    // Download button should be present in Lightbox with clear "Download" label
+    const downloadBtn = screen.getByRole('button', { name: /^Download/i });
+    expect(downloadBtn).toBeInTheDocument();
 
     // Timestamp should be displayed
     expect(screen.getByText(/Captured: 10 Sep 2026/i)).toBeInTheDocument();
 
     // Copy photo timestamp button should be present
     expect(screen.getByTitle(/Copy photo evidentiary timestamp/i)).toBeInTheDocument();
+
+    // Clicking download should trigger download flow cleanly
+    window.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
+    window.URL.revokeObjectURL = jest.fn();
+    fireEvent.click(downloadBtn);
   });
 
   test('formats long numerical filenames into concise, relevant titles in lightbox', () => {
@@ -127,8 +136,9 @@ describe('PhotoAttachments Component', () => {
     expect(screen.getByText('Photo • 10 Sep, 15:45')).toBeInTheDocument();
     expect(screen.queryByText('1741624385920384729.jpg')).not.toBeInTheDocument();
 
-    // Share and close buttons are still cleanly available
-    expect(screen.getByRole('button', { name: /Save to Photos \/ Share/i })).toBeInTheDocument();
+    // Share, Download and close buttons are cleanly available
+    expect(screen.getByRole('button', { name: /^Share/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Download/i })).toBeInTheDocument();
     expect(screen.getByTitle('Close (Esc)')).toBeInTheDocument();
   });
 });

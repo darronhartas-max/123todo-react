@@ -68,8 +68,8 @@ export const compressImage = async (input, options = {}) => {
   const {
     maxDimension = 2048,
     quality = 0.82,
-    thumbDimension = 160,
-    thumbQuality = 0.70,
+    thumbDimension = 480,
+    thumbQuality = 0.75,
     fileName = 'photo.webp'
   } = options;
 
