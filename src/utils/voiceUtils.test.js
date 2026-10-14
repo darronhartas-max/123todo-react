@@ -72,6 +72,12 @@ describe('voiceUtils - mergeBaseAndTranscript', () => {
     expect(mergeBaseAndTranscript('Call John on his mobile.', 'His mobile is not answering.'))
       .toBe('Call John on his mobile. His mobile is not answering.');
   });
+
+  test('starts newly transcribed text on a new line when base ends with newline', () => {
+    expect(mergeBaseAndTranscript('First line\n', 'Second line')).toBe('First line\nSecond line');
+    expect(mergeBaseAndTranscript('Meeting notes:\n', 'Check invoices')).toBe('Meeting notes:\nCheck invoices');
+    expect(mergeBaseAndTranscript('Point 1\n\n', 'Point 2')).toBe('Point 1\n\nPoint 2');
+  });
 });
 
 describe('voiceUtils - processVoiceCommands', () => {

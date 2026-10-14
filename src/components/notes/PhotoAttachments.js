@@ -91,7 +91,7 @@ const PhotoAttachments = ({
     const availableSlots = maxPhotos - currentPhotos.length;
 
     if (availableSlots <= 0) {
-      setErrorMessage(`Maximum of ${maxPhotos} photos per note reached.`);
+      setErrorMessage(`Maximum of ${maxPhotos} photos reached.`);
       setTimeout(clearError, 4000);
       return;
     }

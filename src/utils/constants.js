@@ -158,6 +158,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.45': [
+    { title: '📸 5 Photo Attachments, Cursor Viewport Scrolling & Collapsible Sections:', desc: 'Increased maximum image attachments per task or note from 3 to 5. Improved task description editing by ensuring the active cursor and lines being edited (including the start of the task) remain smoothly visible in the viewport instead of scrolling out of view. In Task Edit, added persistent collapsible sections for Notes, Subtasks, and Schedule with toggle memory across view and edit sessions, and removed redundant edit icon buttons above the description and notes boxes for direct, frictionless typing.' },
+    { title: '🎙️ Smart Voice Dictation Newlines & Instant Save Commands:', desc: 'When appending transcribed voice dictation to existing tasks or notes, new speech now cleanly begins on a new line automatically unless the cursor is positioned elsewhere. Saying "save task" or "save note" now immediately and reliably persists newly transcribed text and closes the modal.' }
+  ],
   '3.7.44': [
     { title: '📅 Concise Calendar Event Titles & Full Details Preservation:', desc: 'When adding scheduled tasks to Google Calendar or Apple Calendar (.ics), the event title is now cleanly formatted to a concise headline (up to 40 characters) on natural word boundaries without trailing ellipses, allowing you to immediately tap and edit or expand the title in your calendar. The complete original task text and any associated task notes are safely preserved in the calendar event description field so no context is ever lost.' }
   ],

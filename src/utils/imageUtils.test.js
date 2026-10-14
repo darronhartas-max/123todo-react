@@ -11,7 +11,7 @@ import {
 
 describe('imageUtils', () => {
   test('constants are correctly configured', () => {
-    expect(MAX_PHOTOS_PER_NOTE).toBe(3);
+    expect(MAX_PHOTOS_PER_NOTE).toBe(5);
   });
 
   test('isValidImageFile correctly identifies supported formats', () => {

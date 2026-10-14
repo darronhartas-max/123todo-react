@@ -4,7 +4,7 @@ import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, Edit2, ListChecks, Repeat } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, ListChecks, Repeat } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
@@ -25,7 +25,53 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
-    const [showNotes, setShowNotes] = useState(() => Boolean((task.notes && task.notes.trim().length > 0) || (task.photos && task.photos.length > 0)));
+    // Section Visibility Persistence: Remember whether Note, Subtasks, Schedule are hidden/shown
+    const getInitialVisibility = (sectionKey, defaultHasData) => {
+        try {
+            const stored = localStorage.getItem(`123todo_task_sections_${task.id}`);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (typeof parsed[sectionKey] === 'boolean') {
+                    return parsed[sectionKey];
+                }
+            }
+        } catch {}
+        if (task.sectionVisibility && typeof task.sectionVisibility[sectionKey] === 'boolean') {
+            return task.sectionVisibility[sectionKey];
+        }
+        return Boolean(defaultHasData);
+    };
+
+    const [showNotes, setShowNotes] = useState(() => 
+        getInitialVisibility('notes', (task.notes && task.notes.trim().length > 0) || (task.photos && task.photos.length > 0))
+    );
+    const [showSubtasks, setShowSubtasks] = useState(() => 
+        getInitialVisibility('subtasks', !!task.subtasks && task.subtasks.length > 0)
+    );
+    const [showSchedule, setShowSchedule] = useState(() => 
+        getInitialVisibility('schedule', !!task.scheduledDate)
+    );
+
+    const toggleSection = (sectionKey, forceValue) => {
+        let nextValue;
+        if (sectionKey === 'notes') {
+            nextValue = typeof forceValue === 'boolean' ? forceValue : !showNotes;
+            setShowNotes(nextValue);
+        } else if (sectionKey === 'subtasks') {
+            nextValue = typeof forceValue === 'boolean' ? forceValue : !showSubtasks;
+            setShowSubtasks(nextValue);
+        } else if (sectionKey === 'schedule') {
+            nextValue = typeof forceValue === 'boolean' ? forceValue : !showSchedule;
+            setShowSchedule(nextValue);
+        }
+        try {
+            const key = `123todo_task_sections_${task.id}`;
+            const existing = JSON.parse(localStorage.getItem(key) || '{}');
+            existing[sectionKey] = nextValue;
+            localStorage.setItem(key, JSON.stringify(existing));
+        } catch {}
+    };
+
     const [isEditingTitle, setIsEditingTitle] = useState(() => !(task?.text && task.text.trim().length > 0));
     const [isEditingNotes, setIsEditingNotes] = useState(false);
 
@@ -33,30 +79,66 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const notesRef = useRef(null);
     const focusTextareaRef = useRef(null);
 
-    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
+    const editingTaskRef = useRef(editingTask);
+    editingTaskRef.current = editingTask;
+
+    const cursorPositionsRef = useRef({ title: null, notes: null });
+
+    const ensureCursorVisible = (textarea) => {
+        if (!textarea) return;
+        const selStart = textarea.selectionStart;
+        if (typeof selStart !== 'number') return;
+        const textBeforeCursor = textarea.value.slice(0, selStart);
+        const lineCount = textBeforeCursor.split('\n').length;
+        const computed = window.getComputedStyle(textarea);
+        const lineHeight = parseFloat(computed.lineHeight) || 24;
+        const paddingTop = parseFloat(computed.paddingTop) || 10;
+        const cursorTop = (lineCount - 1) * lineHeight;
+        const cursorBottom = cursorTop + lineHeight + paddingTop;
+
+        if (cursorTop < textarea.scrollTop) {
+            textarea.scrollTop = Math.max(0, cursorTop);
+        } else if (cursorBottom > textarea.scrollTop + textarea.clientHeight) {
+            textarea.scrollTop = cursorBottom - textarea.clientHeight;
+        }
+    };
+
+    // Auto-expand textarea without forcing scroll to bottom during manual editing
     useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = 'auto';
             const targetH = Math.max(titleRef.current.scrollHeight, 48);
             titleRef.current.style.height = `${targetH}px`;
-            titleRef.current.scrollTop = titleRef.current.scrollHeight;
+            if (listeningTarget === 'title') {
+                titleRef.current.scrollTop = titleRef.current.scrollHeight;
+            } else {
+                ensureCursorVisible(titleRef.current);
+            }
         }
-    }, [editingTask.text, isEditingTitle]);
+    }, [editingTask.text, isEditingTitle, listeningTarget]);
 
     useEffect(() => {
         if (notesRef.current) {
             notesRef.current.style.height = 'auto';
             const targetH = Math.max(notesRef.current.scrollHeight, 85);
             notesRef.current.style.height = `${targetH}px`;
-            notesRef.current.scrollTop = notesRef.current.scrollHeight;
+            if (listeningTarget === 'notes') {
+                notesRef.current.scrollTop = notesRef.current.scrollHeight;
+            } else {
+                ensureCursorVisible(notesRef.current);
+            }
         }
-    }, [editingTask.notes, isEditingNotes]);
+    }, [editingTask.notes, isEditingNotes, listeningTarget]);
 
     useEffect(() => {
         if (focusTextareaRef.current) {
-            focusTextareaRef.current.scrollTop = focusTextareaRef.current.scrollHeight;
+            if (listeningTarget) {
+                focusTextareaRef.current.scrollTop = focusTextareaRef.current.scrollHeight;
+            } else {
+                ensureCursorVisible(focusTextareaRef.current);
+            }
         }
-    }, [editingTask.text, editingTask.notes, expandedOverlayField]);
+    }, [editingTask.text, editingTask.notes, expandedOverlayField, listeningTarget]);
 
     const activePriority = PRIORITIES[editingTask.priority] || PRIORITIES[3];
     const activeProject = (projects || []).find(p => p.id === (editingTask.projectId || 'general')) || { id: 'general', name: 'General', color: '#6b7280' };
@@ -91,22 +173,39 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             setIsEditingTitle(true);
         }
 
-        const initialVal = targetField === 'title' ? (editingTask.text || '') : (editingTask.notes || '');
+        const currentVal = targetField === 'title' ? (editingTask.text || '') : (editingTask.notes || '');
+        const cursorPos = cursorPositionsRef.current[targetField];
+        const userPlacedCursorElsewhere = typeof cursorPos === 'number' && cursorPos < currentVal.length;
+
+        let prefix = '';
+        let suffix = '';
+
+        if (currentVal.trim().length > 0) {
+            if (userPlacedCursorElsewhere) {
+                prefix = currentVal.slice(0, cursorPos);
+                suffix = currentVal.slice(cursorPos);
+            } else {
+                const separator = currentVal.endsWith('\n') ? '' : '\n';
+                prefix = currentVal + separator;
+                suffix = '';
+            }
+        }
 
         const rec = startVoiceDictation({
-            initialText: initialVal,
+            initialText: prefix,
+            prefix,
+            suffix,
             onTranscript: (updatedText, isSubmitCommand) => {
-                setEditingTask(prev => ({
-                    ...prev,
-                    [targetField === 'title' ? 'text' : 'notes']: updatedText
-                }));
+                const fieldKey = targetField === 'title' ? 'text' : 'notes';
+                setEditingTask(prev => {
+                    const next = { ...prev, [fieldKey]: updatedText };
+                    editingTaskRef.current = next;
+                    return next;
+                });
                 if (isSubmitCommand && updatedText.trim().length > 0) {
                     stopVoice();
                     setVoiceStatus('Auto-saving task...');
-                    setTimeout(() => {
-                        handleSave();
-                        setVoiceStatus('');
-                    }, 200);
+                    handleSave({ [fieldKey]: updatedText });
                 }
             },
             onStatusChange: (statusMsg) => {
@@ -115,6 +214,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             onEnd: () => {
                 setListeningTarget(null);
                 recognitionRef.current = null;
+                cursorPositionsRef.current[targetField] = null;
             }
         });
 
@@ -125,7 +225,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     };
 
     // Subtask states
-    const [showSubtasks, setShowSubtasks] = useState(!!task.subtasks && task.subtasks.length > 0);
     const [subtasks, setSubtasks] = useState(task.subtasks || []);
     const [newSubtaskText, setNewSubtaskText] = useState('');
     const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
@@ -206,7 +305,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     };
 
     // Scheduling and recurrence states
-    const [showSchedule, setShowSchedule] = useState(!!task.scheduledDate);
     const [scheduledDate, setScheduledDate] = useState(task.scheduledDate || null);
     const [scheduledTime, setScheduledTime] = useState(task.scheduledTime || null);
     const [showTimeInput, setShowTimeInput] = useState(!!task.scheduledTime);
@@ -265,7 +363,11 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         e.target.style.height = e.target.scrollHeight + 'px';
     };
 
-    const handleSave = () => {
+    const handleSave = (overrides = {}) => {
+        const currentTask = editingTaskRef.current || editingTask;
+        const textToSave = overrides.text !== undefined ? overrides.text : (currentTask.text || '');
+        const notesToSave = overrides.notes !== undefined ? overrides.notes : (currentTask.notes || '');
+
         let recurrence = null;
         let finalScheduledDate = scheduledDate;
         if (isRecurring) {
@@ -283,16 +385,21 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         }
 
         onSave(editingTask.id, {
-            text: editingTask.text,
+            text: textToSave,
             priority: editingTask.priority,
             projectId: editingTask.projectId,
-            notes: editingTask.notes,
+            notes: notesToSave,
             photos: editingTask.photos || [],
             scheduledDate: finalScheduledDate,
             scheduledTime: (finalScheduledDate && timeSchedulingEnabled) ? scheduledTime : null,
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
-            recurrence
+            recurrence,
+            sectionVisibility: {
+                notes: showNotes,
+                subtasks: showSubtasks,
+                schedule: showSchedule
+            }
         });
         onClose();
     };
@@ -713,38 +820,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    if (isEditingTitle) {
-                                        setIsEditingTitle(false);
-                                    } else {
-                                        setIsEditingTitle(true);
-                                        setTimeout(() => titleRef.current?.focus(), 50);
-                                    }
-                                }}
-                                aria-label={isEditingTitle ? "Done" : "Edit"}
-                                title={isEditingTitle ? "Done editing description" : "Edit task description"}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '5px',
-                                    padding: showBtnText ? '4px 9px' : '5px 10px',
-                                    minWidth: showBtnText ? 'auto' : '34px',
-                                    minHeight: '32px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${isEditingTitle ? 'var(--accent-color)' : 'var(--border-color)'}`,
-                                    background: isEditingTitle ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--item-bg)',
-                                    color: isEditingTitle ? 'var(--accent-color)' : 'var(--text-color)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {showBtnIcons && (isEditingTitle ? <Check size={13} /> : <Edit2 size={13} />)}
-                                {showBtnText && <span>{isEditingTitle ? 'Done' : 'Edit'}</span>}
-                            </button>
-                            <button
-                                type="button"
                                 onClick={() => setExpandedOverlayField('title')}
                                 aria-label="Expand"
                                 title="Open Full Screen Focus Editor for Task Title"
@@ -824,13 +899,19 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             onClick={(e) => {
                                 if (e.target.tagName !== 'A' && !e.target.closest('a')) {
                                     setIsEditingTitle(true);
-                                    setTimeout(() => titleRef.current?.focus(), 50);
+                                    setTimeout(() => {
+                                        titleRef.current?.focus();
+                                        ensureCursorVisible(titleRef.current);
+                                    }, 50);
                                 }
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     setIsEditingTitle(true);
-                                    setTimeout(() => titleRef.current?.focus(), 50);
+                                    setTimeout(() => {
+                                        titleRef.current?.focus();
+                                        ensureCursorVisible(titleRef.current);
+                                    }, 50);
                                 }
                             }}
                             title="Click to edit task description"
@@ -858,11 +939,30 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             ref={titleRef}
                             autoFocus
                             value={editingTask.text}
-                            onChange={(e) => setEditingTask({ ...editingTask, text: e.target.value })}
-                            onInput={handleInput}
+                            onChange={(e) => {
+                                setEditingTask({ ...editingTask, text: e.target.value });
+                                ensureCursorVisible(e.target);
+                            }}
+                            onInput={(e) => {
+                                handleInput(e);
+                                ensureCursorVisible(e.target);
+                            }}
+                            onSelect={(e) => {
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target);
+                            }}
+                            onClick={(e) => {
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target);
+                            }}
+                            onKeyUp={(e) => {
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target);
+                            }}
                             onFocus={(e) => {
                                 e.target.style.borderColor = 'var(--accent-color)';
                                 e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                                ensureCursorVisible(e.target);
                             }}
                             onBlur={(e) => {
                                 e.target.style.borderColor = 'var(--border-color)';
@@ -888,7 +988,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                     <button
                         type="button"
-                        onClick={() => setShowNotes(!showNotes)}
+                        onClick={() => toggleSection('notes')}
                         style={toggleButtonStyle(showNotes)}
                         aria-label="Notes"
                         title={showNotes ? "Hide Notes" : "Show Notes"}
@@ -901,7 +1001,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     </button>
                     <button
                         type="button"
-                        onClick={() => setShowSubtasks(!showSubtasks)}
+                        onClick={() => toggleSection('subtasks')}
                         style={toggleButtonStyle(showSubtasks)}
                         aria-label={`Subtasks (${subtasks.length})`}
                         title={showSubtasks ? "Hide Subtasks" : "Show Subtasks"}
@@ -914,7 +1014,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     </button>
                     <button
                         type="button"
-                        onClick={() => setShowSchedule(!showSchedule)}
+                        onClick={() => toggleSection('schedule')}
                         style={toggleButtonStyle(showSchedule)}
                         aria-label={scheduledDate
                             ? `Scheduled: ${formatDisplayDate(scheduledDate, dateFormat)}`
@@ -941,7 +1041,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 <span style={styles.sectionLabel}>Notes & Details</span>
                                 <button
                                     type="button"
-                                    onClick={() => setShowNotes(false)}
+                                    onClick={() => toggleSection('notes', false)}
                                     title="Contract notes"
                                     style={{
                                         background: 'transparent',
@@ -958,38 +1058,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </button>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (isEditingNotes) {
-                                            setIsEditingNotes(false);
-                                        } else {
-                                            setIsEditingNotes(true);
-                                            setTimeout(() => notesRef.current?.focus(), 50);
-                                        }
-                                    }}
-                                    aria-label={isEditingNotes ? "Done" : "Edit"}
-                                    title={isEditingNotes ? "Done editing notes" : "Edit notes"}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '4px',
-                                        padding: showBtnText ? '3px 9px' : '4px 9px',
-                                        minWidth: showBtnText ? 'auto' : '32px',
-                                        minHeight: '30px',
-                                        borderRadius: '8px',
-                                        border: `1px solid ${isEditingNotes ? 'var(--accent-color)' : 'var(--border-color)'}`,
-                                        background: isEditingNotes ? 'var(--accent-bg, rgba(37, 99, 235, 0.1))' : 'var(--surface-color)',
-                                        color: isEditingNotes ? 'var(--accent-color)' : 'var(--text-color)',
-                                        cursor: 'pointer',
-                                        fontSize: '0.8rem',
-                                        fontWeight: '600'
-                                    }}
-                                >
-                                    {showBtnIcons && (isEditingNotes ? <Check size={12} /> : <Edit2 size={12} />)}
-                                    {showBtnText && <span>{isEditingNotes ? 'Done' : 'Edit'}</span>}
-                                </button>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -1073,13 +1141,19 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 onClick={(e) => {
                                     if (e.target.tagName !== 'A' && !e.target.closest('a')) {
                                         setIsEditingNotes(true);
-                                        setTimeout(() => notesRef.current?.focus(), 50);
+                                        setTimeout(() => {
+                                            notesRef.current?.focus();
+                                            ensureCursorVisible(notesRef.current);
+                                        }, 50);
                                     }
                                 }}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                         setIsEditingNotes(true);
-                                        setTimeout(() => notesRef.current?.focus(), 50);
+                                        setTimeout(() => {
+                                            notesRef.current?.focus();
+                                            ensureCursorVisible(notesRef.current);
+                                        }, 50);
                                     }
                                 }}
                                 title="Click to edit notes"
@@ -1108,11 +1182,30 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 ref={notesRef}
                                 autoFocus
                                 value={editingTask.notes || ''}
-                                onChange={(e) => setEditingTask({ ...editingTask, notes: e.target.value })}
-                                onInput={handleInput}
+                                onChange={(e) => {
+                                    setEditingTask({ ...editingTask, notes: e.target.value });
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onInput={(e) => {
+                                    handleInput(e);
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onSelect={(e) => {
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onClick={(e) => {
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onKeyUp={(e) => {
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
                                 onFocus={(e) => {
                                     e.target.style.borderColor = 'var(--accent-color)';
                                     e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
+                                    ensureCursorVisible(e.target);
                                 }}
                                 onBlur={(e) => {
                                     e.target.style.borderColor = 'var(--border-color)';
@@ -1190,9 +1283,28 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                 {showSubtasks && (
                     <div style={styles.cardSection}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={styles.sectionLabel}>
-                                Subtasks {subtasks.length > 0 ? `(${subtasks.filter(s => s.completed).length}/${subtasks.length})` : ''}
-                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={styles.sectionLabel}>
+                                    Subtasks {subtasks.length > 0 ? `(${subtasks.filter(s => s.completed).length}/${subtasks.length})` : ''}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => toggleSection('subtasks', false)}
+                                    title="Contract subtasks"
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: 'var(--muted-text)',
+                                        padding: '2px 4px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        borderRadius: '4px'
+                                    }}
+                                >
+                                    <Minus size={13} />
+                                </button>
+                            </div>
                         </div>
                         {subtasks.length > 0 && (
                             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
@@ -1480,7 +1592,26 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                 {showSchedule && (
                     <div style={styles.cardSection}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={styles.sectionLabel}>Date & Recurrence</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={styles.sectionLabel}>Date & Recurrence</span>
+                                <button
+                                    type="button"
+                                    onClick={() => toggleSection('schedule', false)}
+                                    title="Contract schedule"
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: 'var(--muted-text)',
+                                        padding: '2px 4px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        borderRadius: '4px'
+                                    }}
+                                >
+                                    <Minus size={13} />
+                                </button>
+                            </div>
                         </div>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px', flexWrap: 'nowrap', width: '100%', boxSizing: 'border-box' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>

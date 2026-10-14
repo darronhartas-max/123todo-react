@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import EditModal from './EditModal';
 
 describe('EditModal', () => {
@@ -19,6 +19,11 @@ describe('EditModal', () => {
     { id: 'general', name: 'General', color: '#6b7280' },
     { id: 'work', name: 'Work', color: '#3b82f6' }
   ];
+
+  beforeEach(() => {
+    localStorage.clear();
+    jest.clearAllMocks();
+  });
 
   test('contracts and expands notes when Notes button is clicked', () => {
     render(
@@ -607,7 +612,7 @@ describe('EditModal', () => {
         expect(screen.queryByRole('button', { name: /\+ add time/i })).not.toBeInTheDocument();
     });
 
-    test('toggles edit mode in description and notes via Edit/Done buttons or clicking inside boxes', () => {
+    test('toggles edit mode in description and notes by clicking inside boxes and blurring', () => {
         const taskWithEntities = {
             id: 203,
             text: 'Call client on 07123456789 directly',
@@ -632,20 +637,120 @@ describe('EditModal', () => {
 
         // Clicking the link does NOT trigger editing
         fireEvent.click(callLink);
-        expect(screen.getAllByRole('button', { name: /Edit/i }).length).toBeGreaterThanOrEqual(1);
+        expect(callLink).toBeInTheDocument();
 
-        // Clicking Edit button toggles into edit mode with textarea
-        const editButtons = screen.getAllByRole('button', { name: /Edit/i });
-        fireEvent.click(editButtons[0]); // Description edit button
+        // Clicking the description textbox switches into edit mode
+        const descBox = screen.getByTitle('Click to edit task description');
+        fireEvent.click(descBox);
 
-        // Description is now in edit mode, showing Done button and textarea
-        expect(screen.getByRole('button', { name: /Done/i })).toBeInTheDocument();
+        // Description is now in edit mode with textarea
         const titleTextarea = screen.getByPlaceholderText('Enter task description...');
         expect(titleTextarea).toBeInTheDocument();
 
-        // Clicking Done button returns to view mode
-        fireEvent.click(screen.getByRole('button', { name: /Done/i }));
+        // Blurring the textarea returns to view mode with actionable links
+        fireEvent.blur(titleTextarea);
         expect(screen.getByRole('link', { name: /07123456789/i })).toBeInTheDocument();
+    });
+
+    test('remembers collapsed section position in localStorage across opens', () => {
+        const taskWithAllSections = {
+            id: 301,
+            text: 'Task with everything',
+            notes: 'Detailed notes here',
+            subtasks: [{ id: 1, text: 'Sub 1', completed: false }],
+            scheduledDate: '2026-10-20',
+            priority: 1,
+            projectId: 'general'
+        };
+
+        const { unmount } = render(
+            <EditModal
+                task={taskWithAllSections}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Sections initially shown because content is present
+        expect(screen.getByText('Notes & Details')).toBeInTheDocument();
+        expect(screen.getByText(/Subtasks \(0\/1\)/i)).toBeInTheDocument();
+        expect(screen.getByText('Date & Recurrence')).toBeInTheDocument();
+
+        // Contract Subtasks via contract button
+        fireEvent.click(screen.getByTitle('Contract subtasks'));
+        expect(screen.queryByText(/Subtasks \(0\/1\)/i)).not.toBeInTheDocument();
+
+        // Verify stored in localStorage
+        const stored = JSON.parse(localStorage.getItem('123todo_task_sections_301') || '{}');
+        expect(stored.subtasks).toBe(false);
+
+        unmount();
+
+        // Reopen task modal - subtasks should remain hidden as remembered!
+        render(
+            <EditModal
+                task={taskWithAllSections}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        expect(screen.queryByText(/Subtasks \(0\/1\)/i)).not.toBeInTheDocument();
+        expect(screen.getByText('Notes & Details')).toBeInTheDocument();
+    });
+
+    test('saves newly transcribed text when save task voice command is spoken', () => {
+        const onSaveMock = jest.fn();
+        const onCloseMock = jest.fn();
+
+        const taskToVoiceEdit = {
+            id: 401,
+            text: 'Original task description',
+            notes: 'Existing note',
+            priority: 1,
+            projectId: 'general'
+        };
+
+        const voiceUtils = require('../../utils/voiceUtils');
+        jest.spyOn(voiceUtils, 'isSpeechRecognitionSupported').mockReturnValue(true);
+        let transcriptCallback = null;
+        jest.spyOn(voiceUtils, 'startVoiceDictation').mockImplementation(({ onTranscript }) => {
+            transcriptCallback = onTranscript;
+            return { stop: jest.fn() };
+        });
+
+        render(
+            <EditModal
+                task={taskToVoiceEdit}
+                onSave={onSaveMock}
+                onClose={onCloseMock}
+                projects={sampleProjects}
+            />
+        );
+
+        // Trigger voice input on notes
+        const talkButtons = screen.getAllByRole('button', { name: /Talk/i });
+        // The second talk button is for notes
+        fireEvent.click(talkButtons[talkButtons.length - 1]);
+
+        expect(voiceUtils.startVoiceDictation).toHaveBeenCalled();
+
+        // Simulate voice transcription saying "Added important info" and then "save note"
+        expect(transcriptCallback).toBeTruthy();
+        act(() => {
+            transcriptCallback('Existing note\nAdded important info.', true);
+        });
+
+        // Should immediately save the newly transcribed text and close the modal
+        expect(onSaveMock).toHaveBeenCalledWith(
+            401,
+            expect.objectContaining({
+                notes: 'Existing note\nAdded important info.'
+            })
+        );
+        expect(onCloseMock).toHaveBeenCalled();
     });
 });
 

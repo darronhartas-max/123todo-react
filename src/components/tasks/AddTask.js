@@ -185,10 +185,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             setPriority(1);
         }
 
-        const initialVal = targetField === 'title' ? text : notes;
+        const currentVal = targetField === 'title' ? text : notes;
+        const prefix = currentVal && currentVal.trim().length > 0
+            ? (currentVal.endsWith('\n') ? currentVal : `${currentVal}\n`)
+            : '';
 
         const rec = startVoiceDictation({
-            initialText: initialVal,
+            initialText: prefix,
+            prefix,
             onTranscript: (updatedText, isSubmitCommand) => {
                 if (targetField === 'title') {
                     setText(updatedText);
@@ -199,14 +203,12 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 if (isSubmitCommand) {
                     stopVoice();
                     setVoiceStatus('Auto-submitting task...');
-                    setTimeout(() => {
-                        if (targetField === 'title') {
-                            if (updatedText.trim().length > 0) handleSubmit(updatedText);
-                        } else {
-                            handleSubmit(text, updatedText);
-                        }
-                        setVoiceStatus('');
-                    }, 200);
+                    if (targetField === 'title') {
+                        if (updatedText.trim().length > 0) handleSubmit(updatedText);
+                    } else {
+                        handleSubmit(text, updatedText);
+                    }
+                    setTimeout(() => setVoiceStatus(''), 200);
                 }
             },
             onStatusChange: (statusMsg) => {

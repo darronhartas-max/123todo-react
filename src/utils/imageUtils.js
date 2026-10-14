@@ -2,7 +2,7 @@
  * Utility functions for Photo Attachments in Notes (Client-Side Compression & Lightbox)
  */
 
-export const MAX_PHOTOS_PER_NOTE = 3;
+export const MAX_PHOTOS_PER_NOTE = 5;
 
 /**
  * Validates if the file is a supported image format.

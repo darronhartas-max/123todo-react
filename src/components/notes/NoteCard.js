@@ -45,6 +45,7 @@ const NoteCard = ({
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
   const titleTextareaRef = useRef(null);
+  const titleCursorPosRef = useRef(null);
   const editAutoSaveTimerRef = useRef(null);
   const archiveTimeoutRef = useRef(null);
 
@@ -250,37 +251,60 @@ const NoteCard = ({
     }
 
     setIsDictatingTitle(true);
-    const initialNoteTitle = titleText;
+    const currentVal = titleText || '';
+    const cursorPos = titleCursorPosRef.current;
+    const userPlacedCursorElsewhere = typeof cursorPos === 'number' && cursorPos < currentVal.length;
+
+    let prefix = '';
+    let suffix = '';
+
+    if (currentVal.trim().length > 0) {
+      if (userPlacedCursorElsewhere) {
+        prefix = currentVal.slice(0, cursorPos);
+        suffix = currentVal.slice(cursorPos);
+      } else {
+        const separator = currentVal.endsWith('\n') ? '' : '\n';
+        prefix = currentVal + separator;
+        suffix = '';
+      }
+    }
 
     titleRecognitionRef.current = startVoiceDictation({
-      initialText: initialNoteTitle,
+      initialText: prefix,
+      prefix,
+      suffix,
       onTranscript: (updatedText, isSubmitCommand) => {
+        setTitleText(updatedText);
+        onUpdateNote(note.id, { text: updatedText });
         if (isSubmitCommand) {
           if (titleRecognitionRef.current) {
             try { titleRecognitionRef.current.stop(); } catch (e) {}
             titleRecognitionRef.current = null;
           }
           setIsDictatingTitle(false);
-        } else {
-          setTitleText(updatedText);
-          onUpdateNote(note.id, { text: updatedText });
+          if (isEditing) {
+            handleSaveEdits();
+          }
         }
       },
       onStatusChange: (msg) => setStatusMessage(msg),
       onEnd: () => {
         setIsDictatingTitle(false);
         titleRecognitionRef.current = null;
+        titleCursorPosRef.current = null;
       }
     });
 
-    // Move cursor to end of textarea
-    setTimeout(() => {
-      if (titleTextareaRef.current) {
-        titleTextareaRef.current.focus();
-        const len = titleTextareaRef.current.value.length;
-        titleTextareaRef.current.setSelectionRange(len, len);
-      }
-    }, 100);
+    if (!userPlacedCursorElsewhere) {
+      // Move cursor to end of textarea
+      setTimeout(() => {
+        if (titleTextareaRef.current) {
+          titleTextareaRef.current.focus();
+          const len = titleTextareaRef.current.value.length;
+          titleTextareaRef.current.setSelectionRange(len, len);
+        }
+      }, 100);
+    }
   };
 
   const handleCancelEdits = (e) => {
@@ -719,6 +743,9 @@ const NoteCard = ({
               ref={titleTextareaRef}
               value={titleText}
               onChange={(e) => setTitleText(e.target.value)}
+              onSelect={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
+              onClick={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
+              onKeyUp={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();

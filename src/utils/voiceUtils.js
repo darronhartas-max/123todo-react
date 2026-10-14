@@ -145,11 +145,12 @@ export const cleanDuplicateWordsAndPhrases = (text) => {
  * Handles punctuation differences, case sensitivity, and sub-sequence overlaps.
  */
 export const mergeBaseAndTranscript = (baseText, speechText) => {
+  const trailingNewlines = (baseText || '').match(/(\n+)$/)?.[1] || '';
   const base = (baseText || '').trim();
   const rawSpeech = (speechText || '').trim();
 
   if (!base) return cleanDuplicateWordsAndPhrases(rawSpeech);
-  if (!rawSpeech) return cleanDuplicateWordsAndPhrases(base);
+  if (!rawSpeech) return cleanDuplicateWordsAndPhrases(baseText);
 
   const speech = cleanDuplicateWordsAndPhrases(rawSpeech);
 
@@ -202,9 +203,14 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
   const combineBaseAndRemainingSpeech = (baseStr, remainingSpeechWords) => {
     if (!remainingSpeechWords || remainingSpeechWords.length === 0) return baseStr;
     const remainingText = remainingSpeechWords.join(' ');
-    const separator = baseStr.endsWith(' ') ? '' : ' ';
-    let result = `${baseStr}${separator}${remainingText}`.trim();
-    result = result.replace(/\s+/g, ' ').replace(/\s+([.,?!:;])/g, '$1');
+    let result;
+    if (trailingNewlines) {
+      result = `${baseStr}${trailingNewlines}${remainingText}`;
+    } else {
+      const separator = baseStr.endsWith(' ') ? '' : ' ';
+      result = `${baseStr}${separator}${remainingText}`.trim();
+    }
+    result = result.replace(/[ \t]+/g, ' ').replace(/[ \t]+([.,?!:;])/g, '$1');
     return cleanDuplicateWordsAndPhrases(result);
   };
 
@@ -266,8 +272,13 @@ export const mergeBaseAndTranscript = (baseText, speechText) => {
   }
 
   // 6. Fallback standard concatenation with clean spacing
-  const separator = base.endsWith(' ') ? '' : ' ';
-  const combined = `${base}${separator}${speech}`;
+  let combined;
+  if (trailingNewlines) {
+    combined = `${base}${trailingNewlines}${speech}`;
+  } else {
+    const separator = base.endsWith(' ') ? '' : ' ';
+    combined = `${base}${separator}${speech}`;
+  }
   return cleanDuplicateWordsAndPhrases(combined);
 };
 
@@ -620,6 +631,8 @@ export const isMobileDevice = () => {
  */
 export const startVoiceDictation = ({
   initialText = '',
+  prefix = null,
+  suffix = null,
   onTranscript,
   onStatusChange,
   onEnd,
@@ -636,7 +649,9 @@ export const startVoiceDictation = ({
   // True continuous recognition across all platforms
   const isContinuous = continuous !== undefined ? continuous : true;
 
-  const baseText = (initialText || '').trim();
+  const effectiveInitialText = prefix !== null && prefix !== undefined ? prefix : initialText;
+  const trailingNewlines = (effectiveInitialText || '').match(/(\n+)$/)?.[1] || '';
+  const baseText = (effectiveInitialText || '').replace(/\s+$/, '') + trailingNewlines;
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
   let recognition = null;
@@ -780,7 +795,8 @@ export const startVoiceDictation = ({
         }
 
         lastEmittedText = finalText;
-        onTranscript(finalText, isSubmitCommand);
+        const emittedWithSuffix = suffix ? `${finalText}${suffix}` : finalText;
+        onTranscript(emittedWithSuffix, isSubmitCommand);
       };
 
       recognition.onerror = (event) => {

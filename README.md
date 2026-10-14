@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.44** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.45** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -10,7 +10,7 @@
 - **Actionable Links, Emails & Phone Numbers**: Email addresses (`mailto:`), phone numbers (`tel:`), and web URLs in tasks, task notes, and notes are automatically clickable for instant dialing, emailing, and browsing without opening edit mode.
 - **PWA Installation & Awareness Hub**: Simple, device-detected installation guidance (iOS Safari, Android Chrome, Mac/PC) and 1-click install prompt support so users can run 123 To Do as a full-screen, offline native app.
 - **Free Core App & Uncapped**: Priority matrix (P1–P4), recurring tasks, subtasks, unlimited projects, unlimited notes, and photo attachments without mandatory subscriptions.
-- **Photo Attachments in Notes**: Attach up to 3 photos or screenshots per note on mobile (camera / gallery) and desktop (drag & drop, direct `Cmd+V` / `Ctrl+V` paste) with sharp client-side compression, IndexedDB caching, and full-screen Lightbox viewer.
+- **Photo Attachments in Notes & Tasks**: Attach up to 5 photos or screenshots per note or task on mobile (camera / gallery) and desktop (drag & drop, direct `Cmd+V` / `Ctrl+V` paste) with sharp client-side compression, IndexedDB caching, and full-screen Lightbox viewer.
 - **Productivity & Achievements Hub**: Top header trophy badge opening an interactive house-styled modal with 10-tier level progression, Productivity Points, 6-card productivity insights, daily streaks, 1-2-3 rule balance ratios, unlockable milestone badges, and official 123todo.com blog guides.
 - **Dual-Skin OS**: Instant 1-tap toggle between structured **Task Manager Mode** and distraction-free **Simple Voice Notes Mode**.
 - **Interactive Drag-and-Drop Subtasks**: Multi-line auto-wrapping checklist subtasks with draggable reordering across Add Task, Edit Task, and Task lists.
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.44 (Current)
+### v3.7.45 (Current)
+
+- **5 Photo Attachments, Cursor Viewport Scrolling & Collapsible Sections**: Increased maximum image attachments per task or note from 3 to 5. Resolved task description editing viewport scrolling so active text lines (including the very top of the task) remain clearly visible while typing. Added persistent collapsible sections for Notes, Subtasks, and Schedule in the Task Edit view that remember their collapsed or expanded states across sessions, and removed redundant edit icon buttons above the description and notes boxes for direct click-to-edit.
+- **Smart Voice Dictation Newlines & Instant Save Commands**: Voice dictation appended to existing tasks and notes now automatically begins on a new line unless a custom cursor position is placed. Spoken voice commands like "save task" or "save note" now instantly commit the newly transcribed text to state and close the task modal cleanly.
+
+### v3.7.44
 
 - **Concise Calendar Event Titles & Full Details Preservation**: When adding scheduled tasks to Google Calendar or Apple Calendar (.ics), the event title is now cleanly formatted to a concise headline (up to 40 characters) on natural word boundaries without trailing ellipses, allowing you to immediately tap and edit or expand the title in your calendar. The complete original task text and any associated task notes are safely preserved in the calendar event description field so no context is ever lost.
 

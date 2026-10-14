@@ -24,7 +24,7 @@ describe('PhotoAttachments Component', () => {
     render(<PhotoAttachments photos={[]} onChange={jest.fn()} readOnly={false} />);
     expect(screen.getByText('Camera')).toBeInTheDocument();
     expect(screen.getByText('Attach')).toBeInTheDocument();
-    expect(screen.getByText('Photos: 0/3')).toBeInTheDocument();
+    expect(screen.getByText('Photos: 0/5')).toBeInTheDocument();
   });
 
   test('does not render action buttons in readOnly mode', () => {
