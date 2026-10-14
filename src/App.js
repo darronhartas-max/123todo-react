@@ -1266,7 +1266,7 @@ const TodoApp = () => {
                   <button
                     type="button"
                     onClick={() => setShowOnHold(!showOnHold)}
-                    aria-label={showOnHold ? `Collapse On Hold Tasks (${onHoldTasksFiltered.length})` : `Expand On Hold Tasks (${onHoldTasksFiltered.length})`}
+                    aria-label={showOnHold ? `Collapse On Hold (${onHoldTasksFiltered.length})` : `Expand On Hold (${onHoldTasksFiltered.length})`}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -1293,7 +1293,7 @@ const TodoApp = () => {
                         color: '#9333ea',
                         textAlign: 'left'
                       }}>
-                        On Hold Tasks ({onHoldTasksFiltered.length})
+                        On Hold ({onHoldTasksFiltered.length})
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', color: '#9333ea' }}>

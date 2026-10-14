@@ -1313,52 +1313,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
 
             <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: '8px', alignSelf: hasExtraDetails ? 'flex-start' : 'center', marginTop: hasExtraDetails ? '2px' : '0' }}>
                 {isArchived ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); onRestore && onRestore(task.id); }}
-                            style={{
-                                ...styles.actionBtn,
-                                color: '#3b82f6',
-                                background: 'rgba(59, 130, 246, 0.08)',
-                                border: '1px solid rgba(59, 130, 246, 0.25)',
-                                borderRadius: '6px',
-                                width: 'var(--task-action-btn-size, 32px)',
-                                height: 'var(--task-action-btn-size, 32px)',
-                                minWidth: 'var(--task-action-btn-size, 32px)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginTop: '0px'
-                            }}
-                            title="Restore task to live system"
-                        >
-                            <RotateCcw size={16} />
-                        </button>
-                        {onDelete && (
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-                                style={{
-                                    ...styles.actionBtn,
-                                    color: '#ef4444',
-                                    background: 'rgba(239, 68, 68, 0.08)',
-                                    border: '1px solid rgba(239, 68, 68, 0.25)',
-                                    borderRadius: '6px',
-                                    width: 'var(--task-action-btn-size, 32px)',
-                                    height: 'var(--task-action-btn-size, 32px)',
-                                    minWidth: 'var(--task-action-btn-size, 32px)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginTop: '0px'
-                                }}
-                                title="Permanently delete from archive"
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        )}
-                    </div>
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onRestore && onRestore(task.id); }}
+                        style={{
+                            ...styles.actionBtn,
+                            color: '#3b82f6',
+                            background: 'rgba(59, 130, 246, 0.08)',
+                            border: '1px solid rgba(59, 130, 246, 0.25)',
+                            borderRadius: '6px',
+                            width: 'var(--task-action-btn-size, 32px)',
+                            height: 'var(--task-action-btn-size, 32px)',
+                            minWidth: 'var(--task-action-btn-size, 32px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: '0px'
+                        }}
+                        title="Restore task to live system"
+                    >
+                        <RotateCcw size={16} />
+                    </button>
                 ) : (
                     <>
                         {!isLite && task.scheduledDate && (

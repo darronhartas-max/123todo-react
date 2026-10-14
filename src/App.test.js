@@ -95,8 +95,8 @@ test('renders On Hold tasks with draggable attribute and drag support', () => {
 
   render(<App />);
 
-  // Click on "On Hold Tasks"
-  const toggleBtn = screen.getByRole('button', { name: /On Hold Tasks \(2\)/i });
+  // Click on "On Hold"
+  const toggleBtn = screen.getByRole('button', { name: /On Hold \(2\)/i });
   act(() => {
     toggleBtn.click();
   });
@@ -118,7 +118,7 @@ test('renders On Hold and Scheduled sections without grey padding border', () =>
 
   render(<App />);
 
-  const onHoldBtn = screen.getByRole('button', { name: /On Hold Tasks \(1\)/i });
+  const onHoldBtn = screen.getByRole('button', { name: /On Hold \(1\)/i });
   const onHoldContainer = onHoldBtn.parentElement;
   expect(onHoldContainer).toHaveStyle({ background: 'transparent' });
   expect(onHoldContainer).toHaveStyle({ border: '2px dashed transparent' });

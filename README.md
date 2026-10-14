@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.47** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.48** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.47 (Current)
+### v3.7.48 (Current)
+
+- **Uniform "On Hold" Section Heading**: Standardized the On Hold tasks header in the main task list from "ON HOLD TASKS" to simply "ON HOLD", establishing full visual and typographic uniformity alongside Must Do, Should Do, and Could Do sections.
+- **Streamlined Archive Row Action Buttons**: Removed the redundant secondary permanent delete button that appeared alongside the Restore button on each archived task row, preserving the dedicated delete button on the left of each task for a cleaner, uncluttered interface.
+
+### v3.7.47
 
 - **Clarified Lightbox Actions, Generous Touch Targets & Spacing**: Simplified and clarified the photo viewer controls by streamlining the "Save to Photos / Share" button to a clear "Share" button for standard system sharing, with generous 38px touch targets, comfortable 12px spacing between action buttons, and clear interactive feedback badges.
 - **Reliable Photo Download & Expansive Desktop Lightbox View**: Fixed the photo Download button to reliably export full-resolution images across all desktop and mobile browsers via Blob URLs and IndexedDB hydration. Also resolved images displaying small on desktop monitors by expanding the Lightbox container to up to 1400px wide with aspect-ratio-preserving viewport fitting, and bumped preview thumbnail generation to 480px for sharp previews on high-DPI displays.

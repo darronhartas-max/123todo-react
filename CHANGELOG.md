@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.48
+
+- **🏷️ Uniform "On Hold" Section Heading:** Standardized the On Hold tasks header in the main task list from "ON HOLD TASKS" to simply "ON HOLD", establishing full visual and typographic uniformity alongside Must Do, Should Do, and Could Do sections.
+- **🧹 Streamlined Archive Row Action Buttons:** Removed the redundant secondary permanent delete button that appeared alongside the Restore button on each archived task row, preserving the dedicated delete button on the left of each task for a cleaner, uncluttered interface.
+
 ### v3.7.47
 
 - **🖼️ Clarified Lightbox Actions, Generous Touch Targets & Spacing:** Simplified and clarified the photo viewer controls by streamlining the "Save to Photos / Share" button to a clear "Share" button for standard system sharing, with generous 38px touch targets, comfortable 12px spacing between action buttons, and clear interactive feedback badges.
