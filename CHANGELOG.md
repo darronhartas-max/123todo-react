@@ -17,6 +17,12 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.49
+
+- **🎙️ Voice Dictation Viewport Visibility & Cursor Tracking:** When using voice dictation to insert text at the beginning or middle of a task description or note, newly transcribed text now remains smoothly visible inside the viewing pane instead of forcing the textarea to scroll all the way to the bottom.
+- **🔍 Search Results Auto-Expansion & Unified Search Close:** When searching for tasks, priority sections (Must Do, Should Do, Could Do, On Hold, and Scheduled) with matching tasks now automatically expand so search results are immediately visible. Streamlined search controls with a single, clear close button on the search bar while keeping the toolbar magnifying glass persistent.
+- **❌ Instant Cancel for New Tasks & Notes:** Added an intuitive, unambiguous way to cancel or dismiss task and note creation at any point. You can now tap the header close "X" button, the dedicated Cancel button next to ADD / Save, or press the Escape key to cleanly discard pending input.
+
 ### v3.7.48
 
 - **🏷️ Uniform "On Hold" Section Heading:** Standardized the On Hold tasks header in the main task list from "ON HOLD TASKS" to simply "ON HOLD", establishing full visual and typographic uniformity alongside Must Do, Should Do, and Could Do sections.

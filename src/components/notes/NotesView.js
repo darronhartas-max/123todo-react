@@ -175,6 +175,26 @@ const NotesView = ({
     setTimeout(() => setStatusMessage(''), 2500);
   }, [newNotes, newPhotos, targetProjectId, onAddNote]);
 
+  const handleCancelQuickAdd = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    if (quickRecognitionRef.current) {
+      try { quickRecognitionRef.current.stop(); } catch (e) {}
+      quickRecognitionRef.current = null;
+    }
+    setIsDictatingQuickAdd(false);
+    setStatusMessage('');
+    setShowAddNote(false);
+    setNewNotes('');
+    setNewPhotos([]);
+    try {
+      localStorage.removeItem('123Todo_Draft_Note');
+      localStorage.removeItem('123Todo_Draft_Photos');
+    } catch (e) {}
+  }, []);
+
   // Auto-save: automatically saves note after configured idle period so taking notes, inspecting jobs, or walking away never loses data
   useEffect(() => {
     if (autosaveDelayMs === 0) return;
@@ -317,9 +337,10 @@ const NotesView = ({
             transition: 'all 0.2s ease',
             flexShrink: 0
           }}
-          title={showSearch ? "Hide Search" : "Show Search"}
+          title={showSearch ? "Close Search" : "Search"}
+          aria-label={showSearch ? "Close Search" : "Search"}
         >
-          {showSearch ? <X size={16} /> : <Search size={16} />}
+          <Search size={16} />
         </button>
 
         {/* 2. Projects Filter Dropdown (matching Task mode styling with brand colors) */}
@@ -546,34 +567,29 @@ const NotesView = ({
             {/* Cancel Button */}
             <button
               type="button"
-              onClick={() => {
-                setShowAddNote(false);
-                setNewNotes('');
-                setNewPhotos([]);
-              }}
+              onClick={handleCancelQuickAdd}
               aria-label="Cancel"
               style={{
-                padding: showBtnText ? '9px 12px' : '9px 12px',
-                minWidth: showBtnText ? 'auto' : '40px',
+                padding: '9px 14px',
                 borderRadius: '10px',
                 border: '1px solid var(--border-color, #d1d5db)',
                 backgroundColor: 'transparent',
                 color: 'var(--text-secondary, #6b7280)',
-                fontWeight: '600',
+                fontWeight: '700',
                 fontSize: '14px',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
+                gap: '6px',
                 transition: 'all 0.15s ease',
                 minHeight: '42px',
                 boxSizing: 'border-box'
               }}
-              title="Cancel"
+              title="Cancel (Esc)"
             >
-              {showBtnIcons && <X size={16} />}
-              {showBtnText && <span>Cancel</span>}
+              <X size={16} />
+              <span>Cancel</span>
             </button>
 
             {/* Large Prominent Save Button to the left of Talk */}
@@ -653,7 +669,10 @@ const NotesView = ({
           value={newNotes}
           onChange={(e) => setNewNotes(e.target.value)}
           onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              handleCancelQuickAdd();
+            } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
               e.preventDefault();
               handleCreateNote();
             }
@@ -692,23 +711,42 @@ const NotesView = ({
           gap: '6px'
         }}>
           <span>💡 {notesAutosaveDelay !== 'off' ? `Auto-saves after ${notesAutosaveDelay === '30s' ? '30s' : notesAutosaveDelay === '60s' ? '1 min' : notesAutosaveDelay === '120s' ? '2 mins' : '5 mins'} idle • ` : ''}Say <em>"add note"</em> or press <strong>Cmd+Enter</strong> to save</span>
-          {(newNotes.trim() || newPhotos.length > 0) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               type="button"
-              onClick={() => handleCreateNote()}
+              onClick={handleCancelQuickAdd}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#2563eb',
+                color: 'var(--text-secondary, #6b7280)',
                 fontSize: '12px',
-                fontWeight: '700',
+                fontWeight: '600',
                 cursor: 'pointer',
-                padding: '2px 6px'
+                padding: '2px 6px',
+                textDecoration: 'underline'
               }}
+              title="Cancel and discard note"
             >
-              ✓ Save Now
+              Cancel
             </button>
-          )}
+            {(newNotes.trim() || newPhotos.length > 0) && (
+              <button
+                type="button"
+                onClick={() => handleCreateNote()}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#2563eb',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  padding: '2px 6px'
+                }}
+              >
+                ✓ Save Now
+              </button>
+            )}
+          </div>
         </div>
       </div>
       )}

@@ -22,7 +22,8 @@ const PrioritySection = ({
     dateFormat,
     taskViewMode = 'compact',
     viewProfile = 'lite',
-    timeSchedulingEnabled = true
+    timeSchedulingEnabled = true,
+    searchTerm = ''
 }) => {
     const config = PRIORITIES[priority];
     const sectionTasks = tasks.filter(t => t.priority === priority);
@@ -82,8 +83,10 @@ const PrioritySection = ({
 
     if (sectionTasks.length === 0 && priority === 4) return null; // Hide On Hold if empty
 
+    const isSearching = Boolean(searchTerm && searchTerm.trim());
+    const isEffectiveCollapsed = isSearching ? (sectionTasks.length === 0) : isCollapsed;
     const isDragOverSection = dragOverId === `priority-${priority}`;
-    const shouldShowList = !isCollapsed || isDragOverSection;
+    const shouldShowList = !isEffectiveCollapsed || isDragOverSection;
 
     return (
         <div 
@@ -93,7 +96,7 @@ const PrioritySection = ({
         >
             <div
                 onClick={toggleCollapse}
-                title={isCollapsed ? `Expand ${config.label}` : `Collapse ${config.label}`}
+                title={isEffectiveCollapsed ? `Expand ${config.label}` : `Collapse ${config.label}`}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -124,8 +127,8 @@ const PrioritySection = ({
                         fontWeight: '700',
                         padding: '1px 6px',
                         borderRadius: '10px',
-                        background: isCollapsed ? 'var(--accent-bg)' : 'rgba(0, 0, 0, 0.05)',
-                        color: isCollapsed ? 'var(--accent-color)' : 'var(--muted-text)'
+                        background: isEffectiveCollapsed ? 'var(--accent-bg)' : 'rgba(0, 0, 0, 0.05)',
+                        color: isEffectiveCollapsed ? 'var(--accent-color)' : 'var(--muted-text)'
                     }}>
                         {sectionTasks.length}
                     </span>
@@ -145,7 +148,7 @@ const PrioritySection = ({
                             color: config.color
                         }}
                     >
-                        {isCollapsed ? <ChevronRight size={16} color={config.color} /> : <ChevronDown size={16} color={config.color} />}
+                        {isEffectiveCollapsed ? <ChevronRight size={16} color={config.color} /> : <ChevronDown size={16} color={config.color} />}
                     </button>
                 </div>
             </div>

@@ -77,8 +77,14 @@ const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
                 style={styles.input}
                 autoFocus
             />
-            {value && (
-                <button onClick={onClear} style={styles.clearBtn}>
+            {onClear && (
+                <button
+                    type="button"
+                    onClick={onClear}
+                    style={styles.clearBtn}
+                    aria-label="Close search"
+                    title="Close search (Esc)"
+                >
                     <X size={16} />
                 </button>
             )}

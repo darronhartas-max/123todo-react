@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle, Trophy } from 'lucide-react';
+import { ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle, Trophy } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 
 const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings, onOpenAchievements, onToggleAdd, isAddOpen, viewProfile = 'lite' }) => {
@@ -169,15 +169,18 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
             <div style={styles.tabContainer}>
                 {/* 1. Search magnifying glass icon at start of line */}
                 <button
+                    type="button"
                     onClick={onToggleSearch}
                     style={{
                         ...styles.actionBtn,
                         borderColor: showSearch ? 'var(--accent-color)' : 'var(--border-color)',
-                        background: showSearch ? 'var(--accent-bg)' : 'var(--bg-color)'
+                        background: showSearch ? 'var(--accent-bg)' : 'var(--bg-color)',
+                        color: showSearch ? 'var(--accent-color)' : 'var(--text-color)'
                     }}
-                    title={showSearch ? "Hide Search" : "Show Search"}
+                    title={showSearch ? "Close Search" : "Search"}
+                    aria-label={showSearch ? "Close Search" : "Search"}
                 >
-                    {showSearch ? <X size={16} /> : <SearchIcon size={16} />}
+                    <SearchIcon size={16} />
                 </button>
 
                 {/* 2. Projects drop-down, with flexible width and line-wrapping for long names */}

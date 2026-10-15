@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar, FileText, ListChecks, Repeat } from 'lucide-react';
+import { Plus, Minus, Mic, ChevronDown, GripVertical, FastForward, Clock, Calendar, FileText, ListChecks, Repeat, X } from 'lucide-react';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
@@ -133,13 +133,33 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [voiceStatus, setVoiceStatus] = useState('');
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
+    const cursorPositionsRef = useRef({ title: null, notes: null });
 
-    // Auto-expand and scroll to bottom so newly spoken/typed text is always clearly visible
+    const ensureCursorVisible = (textarea, customCursorPos = null) => {
+        if (!textarea) return;
+        const selStart = typeof customCursorPos === 'number' ? customCursorPos : textarea.selectionStart;
+        if (typeof selStart !== 'number') return;
+        const textBeforeCursor = textarea.value.slice(0, selStart);
+        const lineCount = textBeforeCursor.split('\n').length;
+        const computed = window.getComputedStyle(textarea);
+        const lineHeight = parseFloat(computed.lineHeight) || 24;
+        const paddingTop = parseFloat(computed.paddingTop) || 10;
+        const cursorTop = (lineCount - 1) * lineHeight;
+        const cursorBottom = cursorTop + lineHeight + paddingTop;
+
+        if (cursorTop < textarea.scrollTop) {
+            textarea.scrollTop = Math.max(0, cursorTop);
+        } else if (cursorBottom > textarea.scrollTop + textarea.clientHeight) {
+            textarea.scrollTop = cursorBottom - textarea.clientHeight;
+        }
+    };
+
+    // Auto-expand and scroll so newly spoken/typed text is always clearly visible in the viewing pane
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.style.height = 'auto';
             inputRef.current.style.height = Math.max(inputRef.current.scrollHeight, 48) + 'px';
-            inputRef.current.scrollTop = inputRef.current.scrollHeight;
+            ensureCursorVisible(inputRef.current, cursorPositionsRef.current.title);
             if (listeningTarget === 'title') {
                 try { inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
             }
@@ -150,7 +170,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         if (notesRef.current) {
             notesRef.current.style.height = 'auto';
             notesRef.current.style.height = Math.max(notesRef.current.scrollHeight, 80) + 'px';
-            notesRef.current.scrollTop = notesRef.current.scrollHeight;
+            ensureCursorVisible(notesRef.current, cursorPositionsRef.current.notes);
             if (listeningTarget === 'notes') {
                 try { notesRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
             }
@@ -163,6 +183,27 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         }
         recognitionRef.current = null;
         setListeningTarget(null);
+    };
+
+    const handleCancel = () => {
+        stopVoice();
+        setText('');
+        setNotes('');
+        setPhotos([]);
+        setSubtasks([]);
+        setNewSubtaskText('');
+        setScheduledDate(null);
+        setScheduledTime(null);
+        setShowTimeInput(false);
+        setIsRecurring(false);
+        setRecurrenceFrequency(1);
+        setRecurrenceInterval('days');
+        setRecurrenceDaysOfWeek([]);
+        setShowSchedule(false);
+        setShowNotes(false);
+        setShowSubtasks(false);
+        cursorPositionsRef.current = { title: null, notes: null };
+        if (onClose) onClose();
     };
 
     const toggleVoiceInput = (targetField = 'title') => {
@@ -186,18 +227,45 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         }
 
         const currentVal = targetField === 'title' ? text : notes;
-        const prefix = currentVal && currentVal.trim().length > 0
-            ? (currentVal.endsWith('\n') ? currentVal : `${currentVal}\n`)
-            : '';
+        const cursorPos = cursorPositionsRef.current[targetField];
+        const userPlacedCursorElsewhere = typeof cursorPos === 'number' && cursorPos < currentVal.length;
+
+        let prefix = '';
+        let suffix = '';
+
+        if (currentVal && currentVal.trim().length > 0) {
+            if (userPlacedCursorElsewhere) {
+                prefix = currentVal.slice(0, cursorPos);
+                suffix = currentVal.slice(cursorPos);
+            } else {
+                const separator = currentVal.endsWith('\n') ? '' : '\n';
+                prefix = currentVal + separator;
+                suffix = '';
+            }
+        }
 
         const rec = startVoiceDictation({
             initialText: prefix,
             prefix,
+            suffix,
             onTranscript: (updatedText, isSubmitCommand) => {
+                const insertionPos = userPlacedCursorElsewhere
+                    ? Math.max(0, updatedText.length - suffix.length)
+                    : updatedText.length;
+                cursorPositionsRef.current[targetField] = insertionPos;
+
                 if (targetField === 'title') {
                     setText(updatedText);
                 } else {
                     setNotes(updatedText);
+                }
+
+                const el = targetField === 'title' ? inputRef.current : notesRef.current;
+                if (el) {
+                    try {
+                        el.setSelectionRange(insertionPos, insertionPos);
+                        ensureCursorVisible(el, insertionPos);
+                    } catch (e) {}
                 }
 
                 if (isSubmitCommand) {
@@ -596,6 +664,40 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             {`${text.length}/${MAX_TASK_LENGTH}`}
                         </div>
                     )}
+                    {onClose && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            aria-label="Cancel and close"
+                            title="Cancel (Esc)"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '50%',
+                                border: '1px solid var(--border-color)',
+                                background: 'transparent',
+                                color: 'var(--muted-text)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                padding: 0
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#ef4444';
+                                e.currentTarget.style.borderColor = '#ef4444';
+                                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--muted-text)';
+                                e.currentTarget.style.borderColor = 'var(--border-color)';
+                                e.currentTarget.style.background = 'transparent';
+                            }}
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -634,8 +736,14 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onInput={handleInput}
-                onKeyPress={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                onClick={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
+                onKeyUp={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
+                onSelect={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        handleCancel();
+                    } else if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         handleSubmit();
                     }
@@ -743,6 +851,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         onInput={handleInput}
+                        onClick={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
+                        onKeyUp={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
+                        onSelect={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
+                                e.preventDefault();
+                                handleCancel();
+                            }
+                        }}
                         placeholder="Add notes..."
                         style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
                     />
@@ -1500,6 +1617,40 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         {PRIORITIES[p].label}
                     </button>
                 ))}
+                {onClose && (
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        style={{
+                            padding: '7px 12px',
+                            background: 'transparent',
+                            color: 'var(--muted-text)',
+                            border: '1.5px solid var(--border-color)',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.3px',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            flex: '0 0 auto',
+                            whiteSpace: 'nowrap',
+                            boxSizing: 'border-box'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = '#ef4444';
+                            e.currentTarget.style.color = '#ef4444';
+                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.06)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--border-color)';
+                            e.currentTarget.style.color = 'var(--muted-text)';
+                            e.currentTarget.style.background = 'transparent';
+                        }}
+                    >
+                        Cancel
+                    </button>
+                )}
                 <button
                     onClick={handleSubmit}
                     style={{

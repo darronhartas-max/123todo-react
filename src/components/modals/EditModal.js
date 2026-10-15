@@ -84,9 +84,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
     const cursorPositionsRef = useRef({ title: null, notes: null });
 
-    const ensureCursorVisible = (textarea) => {
+    const ensureCursorVisible = (textarea, customCursorPos = null) => {
         if (!textarea) return;
-        const selStart = textarea.selectionStart;
+        const selStart = typeof customCursorPos === 'number' ? customCursorPos : textarea.selectionStart;
         if (typeof selStart !== 'number') return;
         const textBeforeCursor = textarea.value.slice(0, selStart);
         const lineCount = textBeforeCursor.split('\n').length;
@@ -103,17 +103,13 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         }
     };
 
-    // Auto-expand textarea without forcing scroll to bottom during manual editing
+    // Auto-expand textarea without forcing scroll to bottom during manual or voice editing
     useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = 'auto';
             const targetH = Math.max(titleRef.current.scrollHeight, 48);
             titleRef.current.style.height = `${targetH}px`;
-            if (listeningTarget === 'title') {
-                titleRef.current.scrollTop = titleRef.current.scrollHeight;
-            } else {
-                ensureCursorVisible(titleRef.current);
-            }
+            ensureCursorVisible(titleRef.current, cursorPositionsRef.current.title);
         }
     }, [editingTask.text, isEditingTitle, listeningTarget]);
 
@@ -122,21 +118,14 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             notesRef.current.style.height = 'auto';
             const targetH = Math.max(notesRef.current.scrollHeight, 85);
             notesRef.current.style.height = `${targetH}px`;
-            if (listeningTarget === 'notes') {
-                notesRef.current.scrollTop = notesRef.current.scrollHeight;
-            } else {
-                ensureCursorVisible(notesRef.current);
-            }
+            ensureCursorVisible(notesRef.current, cursorPositionsRef.current.notes);
         }
     }, [editingTask.notes, isEditingNotes, listeningTarget]);
 
     useEffect(() => {
         if (focusTextareaRef.current) {
-            if (listeningTarget) {
-                focusTextareaRef.current.scrollTop = focusTextareaRef.current.scrollHeight;
-            } else {
-                ensureCursorVisible(focusTextareaRef.current);
-            }
+            const activeField = expandedOverlayField === 'title' ? 'title' : 'notes';
+            ensureCursorVisible(focusTextareaRef.current, cursorPositionsRef.current[activeField]);
         }
     }, [editingTask.text, editingTask.notes, expandedOverlayField, listeningTarget]);
 
@@ -196,12 +185,29 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             prefix,
             suffix,
             onTranscript: (updatedText, isSubmitCommand) => {
+                const insertionPos = userPlacedCursorElsewhere
+                    ? Math.max(0, updatedText.length - suffix.length)
+                    : updatedText.length;
+                cursorPositionsRef.current[targetField] = insertionPos;
+
                 const fieldKey = targetField === 'title' ? 'text' : 'notes';
                 setEditingTask(prev => {
                     const next = { ...prev, [fieldKey]: updatedText };
                     editingTaskRef.current = next;
                     return next;
                 });
+
+                const el = targetField === 'title' ? titleRef.current : notesRef.current;
+                const overlayEl = focusTextareaRef.current;
+                [el, overlayEl].forEach(element => {
+                    if (element) {
+                        try {
+                            element.setSelectionRange(insertionPos, insertionPos);
+                            ensureCursorVisible(element, insertionPos);
+                        } catch (e) {}
+                    }
+                });
+
                 if (isSubmitCommand && updatedText.trim().length > 0) {
                     stopVoice();
                     setVoiceStatus('Auto-saving task...');
@@ -214,7 +220,6 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             onEnd: () => {
                 setListeningTarget(null);
                 recognitionRef.current = null;
-                cursorPositionsRef.current[targetField] = null;
             }
         });
 
@@ -2248,6 +2253,21 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     ...editingTask,
                                     [expandedOverlayField === 'title' ? 'text' : 'notes']: e.target.value
                                 })}
+                                onSelect={(e) => {
+                                    const f = expandedOverlayField === 'title' ? 'title' : 'notes';
+                                    cursorPositionsRef.current[f] = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onClick={(e) => {
+                                    const f = expandedOverlayField === 'title' ? 'title' : 'notes';
+                                    cursorPositionsRef.current[f] = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
+                                onKeyUp={(e) => {
+                                    const f = expandedOverlayField === 'title' ? 'title' : 'notes';
+                                    cursorPositionsRef.current[f] = e.target.selectionStart;
+                                    ensureCursorVisible(e.target);
+                                }}
                                 placeholder={expandedOverlayField === 'title' ? 'Enter full task description...' : 'Add rich notes, bullet points, or extra details...'}
                                 style={{
                                     width: '100%',

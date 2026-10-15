@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.48** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.49** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.48 (Current)
+### v3.7.49 (Current)
+
+- **Voice Dictation Viewport Visibility & Cursor Tracking**: When inserting transcribed text at the beginning or middle of a task description or note using voice mode, the text editor intelligently calculates the cursor insertion point and ensures newly spoken words remain smoothly visible in the viewport instead of forcing the textarea to scroll to the bottom.
+- **Search Results Auto-Expansion & Unified Search Close**: Searching for tasks now automatically expands all matching priority sections (Must Do, Should Do, Could Do, On Hold, and Scheduled), ensuring immediate visibility without manual expansion. Streamlined search controls with a single, clear close button on the search bar while keeping the toolbar search icon persistent.
+- **Instant Cancel Workflow for Tasks & Notes**: Added clear, unambiguous ways to cancel or dismiss task and note creation at any point. Users can tap the header close "X" button, the dedicated Cancel button next to ADD / Save, or press the Escape key to cleanly discard pending input.
+
+### v3.7.48
 
 - **Uniform "On Hold" Section Heading**: Standardized the On Hold tasks header in the main task list from "ON HOLD TASKS" to simply "ON HOLD", establishing full visual and typographic uniformity alongside Must Do, Should Do, and Could Do sections.
 - **Streamlined Archive Row Action Buttons**: Removed the redundant secondary permanent delete button that appeared alongside the Restore button on each archived task row, preserving the dedicated delete button on the left of each task for a cleaner, uncluttered interface.

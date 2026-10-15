@@ -1196,6 +1196,7 @@ const TodoApp = () => {
                       key={project.id}
                       project={project}
                       tasks={filteredTasks}
+                      searchTerm={searchTerm}
                       projects={[...DEFAULT_PROJECTS, ...projects]}
                       onComplete={handleCompleteTask}
                       onEdit={setEditingTask}
@@ -1221,6 +1222,7 @@ const TodoApp = () => {
                       key={priority}
                       priority={priority}
                       tasks={filteredTasks}
+                      searchTerm={searchTerm}
                       projects={[...DEFAULT_PROJECTS, ...projects]}
                       onComplete={handleCompleteTask}
                       onEdit={setEditingTask}
@@ -1248,192 +1250,200 @@ const TodoApp = () => {
                 )}
               </div>
 
-              {onHoldTasksFiltered.length > 0 && (
-                <div 
-                  style={{ 
-                    padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
-                    margin: 0,
-                    background: dragOverId === 'priority-4' ? 'rgba(147, 51, 234, 0.08)' : 'transparent',
-                    border: dragOverId === 'priority-4' ? '2px dashed #9333ea' : '2px dashed transparent',
-                    borderRadius: '6px',
-                    boxSizing: 'border-box',
-                    transition: 'all 0.2s ease',
-                    marginBottom: 'var(--section-margin, 16px)'
-                  }}
-                  onDragOver={(e) => handleDragOver(e, 'priority-4')}
-                  onDrop={(e) => handleDrop(e, 'priority-4')}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setShowOnHold(!showOnHold)}
-                    aria-label={showOnHold ? `Collapse On Hold (${onHoldTasksFiltered.length})` : `Expand On Hold (${onHoldTasksFiltered.length})`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      padding: '2px 4px',
-                      marginTop: '12px',
-                      marginBottom: '6px',
-                      borderRadius: '4px',
-                      textAlign: 'left',
-                      transition: 'background-color 0.15s ease'
+              {onHoldTasksFiltered.length > 0 && (() => {
+                const isSearching = Boolean(searchTerm && searchTerm.trim());
+                const effectiveShowOnHold = isSearching ? true : showOnHold;
+                return (
+                  <div 
+                    style={{ 
+                      padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
+                      margin: 0,
+                      background: dragOverId === 'priority-4' ? 'rgba(147, 51, 234, 0.08)' : 'transparent',
+                      border: dragOverId === 'priority-4' ? '2px dashed #9333ea' : '2px dashed transparent',
+                      borderRadius: '6px',
+                      boxSizing: 'border-box',
+                      transition: 'all 0.2s ease',
+                      marginBottom: 'var(--section-margin, 16px)'
                     }}
+                    onDragOver={(e) => handleDragOver(e, 'priority-4')}
+                    onDrop={(e) => handleDrop(e, 'priority-4')}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{
-                        fontSize: '0.85rem',
-                        fontWeight: '800',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        color: '#9333ea',
-                        textAlign: 'left'
-                      }}>
-                        On Hold ({onHoldTasksFiltered.length})
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', color: '#9333ea' }}>
-                      {showOnHold ? <ChevronDown size={16} color="#9333ea" /> : <ChevronRight size={16} color="#9333ea" />}
-                    </div>
-                  </button>
-                  {showOnHold && (
-                    <ul 
+                    <button
+                      type="button"
+                      onClick={() => setShowOnHold(!effectiveShowOnHold)}
+                      aria-label={effectiveShowOnHold ? `Collapse On Hold (${onHoldTasksFiltered.length})` : `Expand On Hold (${onHoldTasksFiltered.length})`}
                       style={{
-                        ...styles.taskList,
-                        minHeight: dragOverId === 'priority-4' ? '60px' : 'auto',
-                        padding: dragOverId === 'priority-4' ? '4px 0' : '0'
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        padding: '2px 4px',
+                        marginTop: '12px',
+                        marginBottom: '6px',
+                        borderRadius: '4px',
+                        textAlign: 'left',
+                        transition: 'background-color 0.15s ease'
                       }}
-                      onDragOver={(e) => handleDragOver(e, 'priority-4')}
-                      onDrop={(e) => handleDrop(e, 'priority-4')}
                     >
-                      <AnimatePresence>
-                        {onHoldTasksFiltered.map(task => {
-                          const proj = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
-                          return (
-                            <TaskItem
-                              key={task.id}
-                              task={task}
-                              projectColor={proj ? proj.color : null}
-                              projectName={proj ? proj.name : null}
-                              onComplete={handleCompleteTask}
-                              onEdit={setEditingTask}
-                              onUpdate={updateTask}
-                              swipeSettings={swipeSettings}
-                              onSwipeAction={handleSwipeAction}
-                              dateFormat={dateFormat}
-                              showFullDetails={true}
-                              taskViewMode={taskViewMode}
-                              viewProfile={viewProfile}
-                              timeSchedulingEnabled={timeSchedulingEnabled}
-                              isDragging={draggedId === task.id}
-                              isDragOver={dragOverId === task.id}
-                              dragHandlers={{
-                                onDragStart: (e) => handleDragStart(e, task.id),
-                                onDragOver: (e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-                                  handleDragOver(e, task.id);
-                                },
-                                onDrop: (e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleDrop(e, task.id);
-                                },
-                                onDragEnd: handleDragEnd
-                              }}
-                            />
-                          );
-                        })}
-                      </AnimatePresence>
-                    </ul>
-                  )}
-                </div>
-              )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: '800',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          color: '#9333ea',
+                          textAlign: 'left'
+                        }}>
+                          On Hold ({onHoldTasksFiltered.length})
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', color: '#9333ea' }}>
+                        {effectiveShowOnHold ? <ChevronDown size={16} color="#9333ea" /> : <ChevronRight size={16} color="#9333ea" />}
+                      </div>
+                    </button>
+                    {effectiveShowOnHold && (
+                      <ul 
+                        style={{
+                          ...styles.taskList,
+                          minHeight: dragOverId === 'priority-4' ? '60px' : 'auto',
+                          padding: dragOverId === 'priority-4' ? '4px 0' : '0'
+                        }}
+                        onDragOver={(e) => handleDragOver(e, 'priority-4')}
+                        onDrop={(e) => handleDrop(e, 'priority-4')}
+                      >
+                        <AnimatePresence>
+                          {onHoldTasksFiltered.map(task => {
+                            const proj = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
+                            return (
+                              <TaskItem
+                                key={task.id}
+                                task={task}
+                                projectColor={proj ? proj.color : null}
+                                projectName={proj ? proj.name : null}
+                                onComplete={handleCompleteTask}
+                                onEdit={setEditingTask}
+                                onUpdate={updateTask}
+                                swipeSettings={swipeSettings}
+                                onSwipeAction={handleSwipeAction}
+                                dateFormat={dateFormat}
+                                showFullDetails={true}
+                                taskViewMode={taskViewMode}
+                                viewProfile={viewProfile}
+                                timeSchedulingEnabled={timeSchedulingEnabled}
+                                isDragging={draggedId === task.id}
+                                isDragOver={dragOverId === task.id}
+                                dragHandlers={{
+                                  onDragStart: (e) => handleDragStart(e, task.id),
+                                  onDragOver: (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                                    handleDragOver(e, task.id);
+                                  },
+                                  onDrop: (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleDrop(e, task.id);
+                                  },
+                                  onDragEnd: handleDragEnd
+                                }}
+                              />
+                            );
+                          })}
+                        </AnimatePresence>
+                      </ul>
+                    )}
+                  </div>
+                );
+              })()}
 
-          {filteredScheduled.length > 0 && (
-            <div 
-              style={{ 
-                padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
-                margin: 0,
-                background: 'transparent',
-                border: 'none',
-                boxSizing: 'border-box',
-                marginBottom: 'var(--section-margin, 16px)'
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setShowScheduled(!showScheduled)}
-                aria-label={showScheduled ? `Collapse Scheduled & Recurring (${filteredScheduled.length})` : `Expand Scheduled & Recurring (${filteredScheduled.length})`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
+          {filteredScheduled.length > 0 && (() => {
+            const isSearching = Boolean(searchTerm && searchTerm.trim());
+            const effectiveShowScheduled = isSearching ? true : showScheduled;
+            return (
+              <div 
+                style={{ 
+                  padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
+                  margin: 0,
                   background: 'transparent',
                   border: 'none',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  padding: '2px 4px',
-                  marginTop: '12px',
-                  marginBottom: '6px',
-                  borderRadius: '4px',
-                  textAlign: 'left',
-                  transition: 'background-color 0.15s ease'
+                  boxSizing: 'border-box',
+                  marginBottom: 'var(--section-margin, 16px)'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{
-                    fontSize: '0.85rem',
-                    fontWeight: '800',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    color: 'var(--accent-color)',
-                    textAlign: 'left'
-                  }}>
-                    Scheduled & Recurring ({filteredScheduled.length})
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
-                  {showScheduled ? <ChevronDown size={16} color="var(--accent-color)" /> : <ChevronRight size={16} color="var(--accent-color)" />}
-                </div>
-              </button>
-              {showScheduled && (
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                  <AnimatePresence mode="popLayout">
-                    {filteredScheduled.map(task => {
-                      const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                        p.name.toLowerCase() === task.projectId?.toLowerCase()
-                      );
-                      return (
-                        <TaskItem
-                          key={task.id}
-                          task={task}
-                          projectColor={project?.color}
-                          onComplete={handleCompleteTask}
-                          onEdit={setEditingTask}
-                          onUpdate={updateTask}
-                          swipeSettings={swipeSettings}
-                          onSwipeAction={handleSwipeAction}
-                          dateFormat={dateFormat}
-                          showFullDetails={true}
-                          taskViewMode={taskViewMode}
-                          viewProfile={viewProfile}
-                          timeSchedulingEnabled={timeSchedulingEnabled}
-                        />
-                      );
-                    })}
-                  </AnimatePresence>
-                </ul>
-              )}
-            </div>
-          )}
+                <button
+                  type="button"
+                  onClick={() => setShowScheduled(!effectiveShowScheduled)}
+                  aria-label={effectiveShowScheduled ? `Collapse Scheduled & Recurring (${filteredScheduled.length})` : `Expand Scheduled & Recurring (${filteredScheduled.length})`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    padding: '2px 4px',
+                    marginTop: '12px',
+                    marginBottom: '6px',
+                    borderRadius: '4px',
+                    textAlign: 'left',
+                    transition: 'background-color 0.15s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{
+                      fontSize: '0.85rem',
+                      fontWeight: '800',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      color: 'var(--accent-color)',
+                      textAlign: 'left'
+                    }}>
+                      Scheduled & Recurring ({filteredScheduled.length})
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
+                    {effectiveShowScheduled ? <ChevronDown size={16} color="var(--accent-color)" /> : <ChevronRight size={16} color="var(--accent-color)" />}
+                  </div>
+                </button>
+                {effectiveShowScheduled && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    <AnimatePresence mode="popLayout">
+                      {filteredScheduled.map(task => {
+                        const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
+                          p.id.toLowerCase() === task.projectId?.toLowerCase() || 
+                          p.name.toLowerCase() === task.projectId?.toLowerCase()
+                        );
+                        return (
+                          <TaskItem
+                            key={task.id}
+                            task={task}
+                            projectColor={project?.color}
+                            onComplete={handleCompleteTask}
+                            onEdit={setEditingTask}
+                            onUpdate={updateTask}
+                            swipeSettings={swipeSettings}
+                            onSwipeAction={handleSwipeAction}
+                            dateFormat={dateFormat}
+                            showFullDetails={true}
+                            taskViewMode={taskViewMode}
+                            viewProfile={viewProfile}
+                            timeSchedulingEnabled={timeSchedulingEnabled}
+                          />
+                        );
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                )}
+              </div>
+            );
+          })()}
 
           <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
             <button

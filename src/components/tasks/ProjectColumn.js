@@ -22,7 +22,8 @@ const ProjectColumn = ({
     dateFormat,
     taskViewMode = 'compact',
     viewProfile = 'lite',
-    timeSchedulingEnabled = true
+    timeSchedulingEnabled = true,
+    searchTerm = ''
 }) => {
     const projectTasks = tasks.filter(t => 
         (t.projectId || 'general').toLowerCase() === project.id.toLowerCase() ||
@@ -36,8 +37,10 @@ const ProjectColumn = ({
         setIsCollapsed(prev => !prev);
     };
 
+    const isSearching = Boolean(searchTerm && searchTerm.trim());
+    const isEffectiveCollapsed = isSearching ? (projectTasks.length === 0) : isCollapsed;
     const isDragOverSection = dragOverId === `project-${project.id}`;
-    const shouldShowList = !isCollapsed || isDragOverSection;
+    const shouldShowList = !isEffectiveCollapsed || isDragOverSection;
 
     return (
         <div 
@@ -53,7 +56,7 @@ const ProjectColumn = ({
         >
             <div
                 onClick={toggleCollapse}
-                title={isCollapsed ? `Expand ${project.name}` : `Collapse ${project.name}`}
+                title={isEffectiveCollapsed ? `Expand ${project.name}` : `Collapse ${project.name}`}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -138,7 +141,7 @@ const ProjectColumn = ({
                             color: 'var(--muted-text)'
                         }}
                     >
-                        {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                        {isEffectiveCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
                     </button>
                 </div>
             </div>

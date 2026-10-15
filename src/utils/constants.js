@@ -158,6 +158,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.49': [
+    { title: '🎙️ Voice Dictation Viewport Visibility & Cursor Tracking:', desc: 'When using voice dictation to insert text at the beginning or middle of a task description or note, newly transcribed text now remains smoothly visible inside the viewing pane instead of forcing the textarea to scroll all the way to the bottom.' },
+    { title: '🔍 Search Results Auto-Expansion & Unified Search Close:', desc: 'When searching for tasks, priority sections (Must Do, Should Do, Could Do, On Hold, and Scheduled) with matching tasks now automatically expand so search results are immediately visible. Streamlined search controls with a single, clear close button on the search bar while keeping the toolbar magnifying glass persistent.' },
+    { title: '❌ Instant Cancel for New Tasks & Notes:', desc: 'Added an intuitive, unambiguous way to cancel or dismiss task and note creation at any point. You can now tap the header close "X" button, the dedicated Cancel button next to ADD / Save, or press the Escape key to cleanly discard pending input.' }
+  ],
   '3.7.48': [
     { title: '🏷️ Uniform "On Hold" Section Heading:', desc: 'Standardized the On Hold tasks header in the main task list from "ON HOLD TASKS" to simply "ON HOLD", establishing full visual and typographic uniformity alongside Must Do, Should Do, and Could Do sections.' },
     { title: '🧹 Streamlined Archive Row Action Buttons:', desc: 'Removed the redundant secondary permanent delete button that appeared alongside the Restore button on each archived task row, preserving the dedicated delete button on the left of each task for a cleaner, uncluttered interface.' }
