@@ -429,3 +429,140 @@ export const ActionableEntitiesBar = ({ text, texts, style = {}, compact = false
     );
 };
 
+/**
+ * Ensures the cursor inside a textarea is kept visible in the textarea's internal scroll pane.
+ * Automatically handles cursor at end (scroll to bottom), cursor at start (scroll to top),
+ * and middle cursor positions across soft-wrapped lines and explicit newlines.
+ */
+export const ensureCursorVisible = (textarea, customCursorPos = null) => {
+    if (!textarea || typeof window === 'undefined') return;
+
+    const performCursorScroll = () => {
+        if (!textarea) return;
+        const val = textarea.value || '';
+        const selStart = typeof customCursorPos === 'number' ? customCursorPos : textarea.selectionStart;
+
+        // If cursor is at or near the very end, directly ensure the bottom is visible
+        if (typeof selStart !== 'number' || selStart >= val.length - 1) {
+            textarea.scrollTop = textarea.scrollHeight;
+            return;
+        }
+
+        // If cursor is at the very beginning, ensure the top is visible
+        if (selStart <= 1) {
+            textarea.scrollTop = 0;
+            return;
+        }
+
+        // Mid-text cursor positioning: accurately measure line height including word wraps
+        const textBeforeCursor = val.slice(0, selStart);
+        let computed;
+        try {
+            computed = window.getComputedStyle(textarea);
+        } catch (e) {
+            return;
+        }
+        const lineHeight = parseFloat(computed.lineHeight) || 24;
+        const paddingTop = parseFloat(computed.paddingTop) || 10;
+
+        let mirror = document.getElementById('textarea-cursor-measure-mirror');
+        if (!mirror && typeof document !== 'undefined') {
+            mirror = document.createElement('div');
+            mirror.id = 'textarea-cursor-measure-mirror';
+            mirror.style.position = 'fixed';
+            mirror.style.top = '-9999px';
+            mirror.style.left = '-9999px';
+            mirror.style.visibility = 'hidden';
+            mirror.style.pointerEvents = 'none';
+            mirror.style.whiteSpace = 'pre-wrap';
+            mirror.style.wordBreak = 'break-word';
+            document.body.appendChild(mirror);
+        }
+
+        if (mirror) {
+            mirror.style.width = `${textarea.clientWidth || 300}px`;
+            mirror.style.fontFamily = computed.fontFamily;
+            mirror.style.fontSize = computed.fontSize;
+            mirror.style.fontWeight = computed.fontWeight;
+            mirror.style.lineHeight = computed.lineHeight;
+            mirror.style.letterSpacing = computed.letterSpacing;
+            mirror.style.padding = computed.padding;
+            mirror.style.boxSizing = computed.boxSizing;
+
+            mirror.textContent = textBeforeCursor + (textBeforeCursor.endsWith('\n') ? ' ' : '');
+            const cursorBottom = mirror.scrollHeight;
+            const cursorTop = Math.max(0, cursorBottom - lineHeight);
+
+            if (cursorTop < textarea.scrollTop) {
+                textarea.scrollTop = Math.max(0, cursorTop - 4);
+            } else if (cursorBottom > textarea.scrollTop + textarea.clientHeight) {
+                textarea.scrollTop = cursorBottom - textarea.clientHeight + paddingTop + 4;
+            }
+        }
+    };
+
+    performCursorScroll();
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(performCursorScroll);
+    }
+};
+
+/**
+ * Ensures the target editing element is kept comfortably visible within the user's viewport
+ * (and scrollable parent container like a modal), especially when the mobile virtual keyboard is displayed.
+ */
+export const ensureElementInViewport = (element, { preferBottom = true, scrollContainer = null, behavior = 'smooth' } = {}) => {
+    if (!element || typeof window === 'undefined') return;
+
+    const performScroll = () => {
+        if (!element) return;
+
+        // 1. If element is inside a scrollable modal container
+        const container = scrollContainer || (element.closest && element.closest('[style*="overflow-y: auto"], [style*="overflowY: auto"], [data-scroll-container]'));
+        if (container && container !== document.documentElement && container !== document.body) {
+            try {
+                const containerRect = container.getBoundingClientRect();
+                const elemRect = element.getBoundingClientRect();
+
+                if (preferBottom) {
+                    const overflowBottom = elemRect.bottom - containerRect.bottom;
+                    if (overflowBottom > -20) {
+                        container.scrollTop += (overflowBottom + 36);
+                    }
+                } else {
+                    const overflowTop = elemRect.top - containerRect.top;
+                    if (overflowTop < 15) {
+                        container.scrollTop += (overflowTop - 25);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 2. Ensure visible within the device screen / visual viewport
+        try {
+            const elemRect = element.getBoundingClientRect();
+            const viewportHeight = (window.visualViewport && window.visualViewport.height) 
+                ? window.visualViewport.height 
+                : window.innerHeight;
+
+            const isBelowScreenViewport = elemRect.bottom > (viewportHeight - 20);
+            const isAboveScreenViewport = elemRect.top < 15;
+
+            if (preferBottom && isBelowScreenViewport) {
+                element.scrollIntoView({ behavior, block: 'end' });
+            } else if (!preferBottom && isAboveScreenViewport) {
+                element.scrollIntoView({ behavior, block: 'start' });
+            }
+        } catch (e) {
+            try {
+                element.scrollIntoView({ behavior, block: preferBottom ? 'end' : 'nearest' });
+            } catch (err) {}
+        }
+    };
+
+    performScroll();
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(performScroll);
+    }
+};
+

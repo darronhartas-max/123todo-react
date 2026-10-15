@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.49** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.50** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.49 (Current)
+### v3.7.50 (Current)
+
+- **Active Text Viewport Visibility & Cursor Tracking in Notes and Tasks**: When editing a note attached to a task or typing task descriptions in Add Task and Edit Task modals, the active cursor and newly added text now remain visible inside the viewport at all times. Resolved mobile and desktop issues where adding text to the end of a long note pushed the editing line outside the visible pane or behind the virtual keyboard.
+- **Precision Soft-Wrap Line Measuring & Container Auto-Scroll**: Upgraded the internal cursor position tracker with an off-screen typographic measuring mirror that accurately accounts for soft-wrapped sentences without hard returns. Both the internal textarea scroll and the modal container auto-scroll in real time with frame-synchronized alignment during both keyboard typing and voice transcription.
+
+### v3.7.49
 
 - **Voice Dictation Viewport Visibility & Cursor Tracking**: When inserting transcribed text at the beginning or middle of a task description or note using voice mode, the text editor intelligently calculates the cursor insertion point and ensures newly spoken words remain smoothly visible in the viewport instead of forcing the textarea to scroll to the bottom.
 - **Search Results Auto-Expansion & Unified Search Close**: Searching for tasks now automatically expands all matching priority sections (Must Do, Should Do, Could Do, On Hold, and Scheduled), ensuring immediate visibility without manual expansion. Streamlined search controls with a single, clear close button on the search bar while keeping the toolbar search icon persistent.

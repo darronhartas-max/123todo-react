@@ -158,6 +158,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.50': [
+    { title: '👁️ Active Text Viewport Visibility & Cursor Tracking in Notes and Tasks:', desc: 'When editing a note attached to a task or typing task descriptions in Add Task and Edit Task modals, the active cursor and newly added text now remain visible inside the viewport at all times. Resolved mobile and desktop issues where adding text to the end of a long note pushed the editing line outside the visible pane or behind the virtual keyboard.' },
+    { title: '📐 Precision Soft-Wrap Line Measuring & Container Auto-Scroll:', desc: 'Upgraded the internal cursor position tracker with an off-screen typographic measuring mirror that accurately accounts for soft-wrapped sentences without hard returns. Both the internal textarea scroll and the modal container auto-scroll in real time with frame-synchronized alignment during both keyboard typing and voice transcription.' }
+  ],
   '3.7.49': [
     { title: '🎙️ Voice Dictation Viewport Visibility & Cursor Tracking:', desc: 'When using voice dictation to insert text at the beginning or middle of a task description or note, newly transcribed text now remains smoothly visible inside the viewing pane instead of forcing the textarea to scroll all the way to the bottom.' },
     { title: '🔍 Search Results Auto-Expansion & Unified Search Close:', desc: 'When searching for tasks, priority sections (Must Do, Should Do, Could Do, On Hold, and Scheduled) with matching tasks now automatically expand so search results are immediately visible. Streamlined search controls with a single, clear close button on the search bar while keeping the toolbar magnifying glass persistent.' },

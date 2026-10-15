@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.50
+
+- **👁️ Active Text Viewport Visibility & Cursor Tracking in Notes and Tasks:** When editing a note attached to a task or typing task descriptions in Add Task and Edit Task modals, the active cursor and newly added text now remain visible inside the viewport at all times. Resolved mobile and desktop issues where adding text to the end of a long note pushed the editing line outside the visible pane or behind the virtual keyboard.
+- **📐 Precision Soft-Wrap Line Measuring & Container Auto-Scroll:** Upgraded the internal cursor position tracker with an off-screen typographic measuring mirror that accurately accounts for soft-wrapped sentences without hard returns. Both the internal textarea scroll and the modal container auto-scroll in real time with frame-synchronized alignment during both keyboard typing and voice transcription.
+
 ### v3.7.49
 
 - **🎙️ Voice Dictation Viewport Visibility & Cursor Tracking:** When using voice dictation to insert text at the beginning or middle of a task description or note, newly transcribed text now remains smoothly visible inside the viewing pane instead of forcing the textarea to scroll all the way to the bottom.

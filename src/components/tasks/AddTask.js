@@ -5,7 +5,7 @@ import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjus
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
-import { ActionableEntitiesBar } from '../../utils/textUtils';
+import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from '../modals/TimePickerModal';
 
@@ -135,34 +135,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const speechSupported = isSpeechRecognitionSupported();
     const cursorPositionsRef = useRef({ title: null, notes: null });
 
-    const ensureCursorVisible = (textarea, customCursorPos = null) => {
-        if (!textarea) return;
-        const selStart = typeof customCursorPos === 'number' ? customCursorPos : textarea.selectionStart;
-        if (typeof selStart !== 'number') return;
-        const textBeforeCursor = textarea.value.slice(0, selStart);
-        const lineCount = textBeforeCursor.split('\n').length;
-        const computed = window.getComputedStyle(textarea);
-        const lineHeight = parseFloat(computed.lineHeight) || 24;
-        const paddingTop = parseFloat(computed.paddingTop) || 10;
-        const cursorTop = (lineCount - 1) * lineHeight;
-        const cursorBottom = cursorTop + lineHeight + paddingTop;
-
-        if (cursorTop < textarea.scrollTop) {
-            textarea.scrollTop = Math.max(0, cursorTop);
-        } else if (cursorBottom > textarea.scrollTop + textarea.clientHeight) {
-            textarea.scrollTop = cursorBottom - textarea.clientHeight;
-        }
-    };
-
     // Auto-expand and scroll so newly spoken/typed text is always clearly visible in the viewing pane
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.style.height = 'auto';
             inputRef.current.style.height = Math.max(inputRef.current.scrollHeight, 48) + 'px';
             ensureCursorVisible(inputRef.current, cursorPositionsRef.current.title);
-            if (listeningTarget === 'title') {
-                try { inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
-            }
+            ensureElementInViewport(inputRef.current, { preferBottom: true });
         }
     }, [text, listeningTarget]);
 
@@ -171,9 +150,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             notesRef.current.style.height = 'auto';
             notesRef.current.style.height = Math.max(notesRef.current.scrollHeight, 80) + 'px';
             ensureCursorVisible(notesRef.current, cursorPositionsRef.current.notes);
-            if (listeningTarget === 'notes') {
-                try { notesRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
-            }
+            ensureElementInViewport(notesRef.current, { preferBottom: true });
         }
     }, [notes, listeningTarget]);
 
@@ -265,6 +242,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     try {
                         el.setSelectionRange(insertionPos, insertionPos);
                         ensureCursorVisible(el, insertionPos);
+                        ensureElementInViewport(el, { preferBottom: true });
                     } catch (e) {}
                 }
 
@@ -734,11 +712,36 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             <textarea
                 ref={inputRef}
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                onInput={handleInput}
-                onClick={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
-                onKeyUp={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
-                onSelect={(e) => { cursorPositionsRef.current.title = e.target.selectionStart; }}
+                onChange={(e) => {
+                    setText(e.target.value);
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                }}
+                onInput={(e) => {
+                    handleInput(e);
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                }}
+                onClick={(e) => {
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                }}
+                onKeyUp={(e) => {
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                }}
+                onSelect={(e) => {
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                }}
+                onFocus={(e) => {
+                    cursorPositionsRef.current.title = e.target.selectionStart;
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                }}
                 onKeyDown={(e) => {
                     if (e.key === 'Escape') {
                         e.preventDefault();
@@ -849,11 +852,36 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     <textarea
                         ref={notesRef}
                         value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        onInput={handleInput}
-                        onClick={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
-                        onKeyUp={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
-                        onSelect={(e) => { cursorPositionsRef.current.notes = e.target.selectionStart; }}
+                        onChange={(e) => {
+                            setNotes(e.target.value);
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                            ensureElementInViewport(e.target, { preferBottom: true });
+                        }}
+                        onInput={(e) => {
+                            handleInput(e);
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                            ensureElementInViewport(e.target, { preferBottom: true });
+                        }}
+                        onClick={(e) => {
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                            ensureElementInViewport(e.target, { preferBottom: true });
+                        }}
+                        onKeyUp={(e) => {
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                        }}
+                        onSelect={(e) => {
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                        }}
+                        onFocus={(e) => {
+                            cursorPositionsRef.current.notes = e.target.selectionStart;
+                            ensureCursorVisible(e.target, e.target.selectionStart);
+                            ensureElementInViewport(e.target, { preferBottom: true });
+                        }}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {
                                 e.preventDefault();

@@ -7,7 +7,7 @@ import PhotoAttachments from './PhotoAttachments';
 import SearchBar from '../tasks/SearchBar';
 import './NotesView.css';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
-import { ActionableEntitiesBar } from '../../utils/textUtils';
+import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
 
 const NotesView = ({
@@ -64,13 +64,8 @@ const NotesView = ({
       el.style.height = 'auto';
       const targetHeight = Math.max(el.scrollHeight, 80);
       el.style.height = `${targetHeight}px`;
-      el.scrollTop = el.scrollHeight;
-
-      if (isDictatingQuickAdd) {
-        try {
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (e) {}
-      }
+      ensureCursorVisible(el);
+      ensureElementInViewport(el, { preferBottom: true });
     }
   }, [newNotes, isDictatingQuickAdd]);
 
@@ -667,7 +662,15 @@ const NotesView = ({
           className="quick-add-body-textarea"
           rows={3}
           value={newNotes}
-          onChange={(e) => setNewNotes(e.target.value)}
+          onChange={(e) => {
+            setNewNotes(e.target.value);
+            ensureCursorVisible(e.target, e.target.selectionStart);
+            ensureElementInViewport(e.target, { preferBottom: true });
+          }}
+          onFocus={(e) => {
+            ensureCursorVisible(e.target, e.target.selectionStart);
+            ensureElementInViewport(e.target, { preferBottom: true });
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               e.preventDefault();

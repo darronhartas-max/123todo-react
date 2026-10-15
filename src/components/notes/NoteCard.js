@@ -8,7 +8,7 @@ import {
 import { PRIORITIES } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from './PhotoAttachments';
-import { renderActionableText, ActionableEntitiesBar } from '../../utils/textUtils';
+import { renderActionableText, ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 
 const NoteCard = ({
@@ -94,13 +94,8 @@ const NoteCard = ({
       el.style.height = 'auto';
       const targetHeight = Math.max(el.scrollHeight, 46);
       el.style.height = `${targetHeight}px`;
-
-      if (isDictatingTitle) {
-        el.scrollTop = el.scrollHeight;
-        try {
-          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (e) {}
-      }
+      ensureCursorVisible(el, titleCursorPosRef.current);
+      ensureElementInViewport(el, { preferBottom: true });
     }
   }, [titleText, isEditing, isDictatingTitle]);
 
@@ -111,6 +106,8 @@ const NoteCard = ({
       el.style.height = 'auto';
       const targetHeight = Math.max(el.scrollHeight, 60);
       el.style.height = `${targetHeight}px`;
+      ensureCursorVisible(el);
+      ensureElementInViewport(el, { preferBottom: true });
     }
   }, [notesText, isEditing]);
 
@@ -742,10 +739,30 @@ const NoteCard = ({
             <textarea
               ref={titleTextareaRef}
               value={titleText}
-              onChange={(e) => setTitleText(e.target.value)}
-              onSelect={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
-              onClick={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
-              onKeyUp={(e) => { titleCursorPosRef.current = e.target.selectionStart; }}
+              onChange={(e) => {
+                setTitleText(e.target.value);
+                titleCursorPosRef.current = e.target.selectionStart;
+                ensureCursorVisible(e.target, e.target.selectionStart);
+                ensureElementInViewport(e.target, { preferBottom: true });
+              }}
+              onSelect={(e) => {
+                titleCursorPosRef.current = e.target.selectionStart;
+                ensureCursorVisible(e.target, e.target.selectionStart);
+              }}
+              onClick={(e) => {
+                titleCursorPosRef.current = e.target.selectionStart;
+                ensureCursorVisible(e.target, e.target.selectionStart);
+                ensureElementInViewport(e.target, { preferBottom: true });
+              }}
+              onKeyUp={(e) => {
+                titleCursorPosRef.current = e.target.selectionStart;
+                ensureCursorVisible(e.target, e.target.selectionStart);
+              }}
+              onFocus={(e) => {
+                titleCursorPosRef.current = e.target.selectionStart;
+                ensureCursorVisible(e.target, e.target.selectionStart);
+                ensureElementInViewport(e.target, { preferBottom: true });
+              }}
               onKeyDown={(e) => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();
@@ -779,7 +796,15 @@ const NoteCard = ({
                 <textarea
                   ref={noteTextareaRef}
                   value={notesText}
-                  onChange={(e) => setNotesText(e.target.value)}
+                  onChange={(e) => {
+                    setNotesText(e.target.value);
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                  }}
+                  onFocus={(e) => {
+                    ensureCursorVisible(e.target, e.target.selectionStart);
+                    ensureElementInViewport(e.target, { preferBottom: true });
+                  }}
                   onKeyDown={(e) => {
                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                       e.preventDefault();

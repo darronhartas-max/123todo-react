@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, ListChecks, Repeat } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
-import { renderActionableText } from '../../utils/textUtils';
+import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
 import TimePickerModal from './TimePickerModal';
 
@@ -78,38 +78,21 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const titleRef = useRef(null);
     const notesRef = useRef(null);
     const focusTextareaRef = useRef(null);
+    const modalContentRef = useRef(null);
 
     const editingTaskRef = useRef(editingTask);
     editingTaskRef.current = editingTask;
 
     const cursorPositionsRef = useRef({ title: null, notes: null });
 
-    const ensureCursorVisible = (textarea, customCursorPos = null) => {
-        if (!textarea) return;
-        const selStart = typeof customCursorPos === 'number' ? customCursorPos : textarea.selectionStart;
-        if (typeof selStart !== 'number') return;
-        const textBeforeCursor = textarea.value.slice(0, selStart);
-        const lineCount = textBeforeCursor.split('\n').length;
-        const computed = window.getComputedStyle(textarea);
-        const lineHeight = parseFloat(computed.lineHeight) || 24;
-        const paddingTop = parseFloat(computed.paddingTop) || 10;
-        const cursorTop = (lineCount - 1) * lineHeight;
-        const cursorBottom = cursorTop + lineHeight + paddingTop;
-
-        if (cursorTop < textarea.scrollTop) {
-            textarea.scrollTop = Math.max(0, cursorTop);
-        } else if (cursorBottom > textarea.scrollTop + textarea.clientHeight) {
-            textarea.scrollTop = cursorBottom - textarea.clientHeight;
-        }
-    };
-
-    // Auto-expand textarea without forcing scroll to bottom during manual or voice editing
+    // Auto-expand textarea and guarantee newly spoken/typed text is always visible in viewport
     useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = 'auto';
             const targetH = Math.max(titleRef.current.scrollHeight, 48);
             titleRef.current.style.height = `${targetH}px`;
             ensureCursorVisible(titleRef.current, cursorPositionsRef.current.title);
+            ensureElementInViewport(titleRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
         }
     }, [editingTask.text, isEditingTitle, listeningTarget]);
 
@@ -119,6 +102,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             const targetH = Math.max(notesRef.current.scrollHeight, 85);
             notesRef.current.style.height = `${targetH}px`;
             ensureCursorVisible(notesRef.current, cursorPositionsRef.current.notes);
+            ensureElementInViewport(notesRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
         }
     }, [editingTask.notes, isEditingNotes, listeningTarget]);
 
@@ -204,6 +188,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         try {
                             element.setSelectionRange(insertionPos, insertionPos);
                             ensureCursorVisible(element, insertionPos);
+                            ensureElementInViewport(element, { preferBottom: true, scrollContainer: modalContentRef.current });
                         } catch (e) {}
                     }
                 });
@@ -505,7 +490,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
     return (
         <div style={COMMON_STYLES.modalOverlay} onClick={onClose}>
-            <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div ref={modalContentRef} style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 
                 {/* MODAL HEADER: Title, Quick Archive Button, Close */}
                 <div style={{
@@ -907,6 +892,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     setTimeout(() => {
                                         titleRef.current?.focus();
                                         ensureCursorVisible(titleRef.current);
+                                        ensureElementInViewport(titleRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
                                     }, 50);
                                 }
                             }}
@@ -916,6 +902,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     setTimeout(() => {
                                         titleRef.current?.focus();
                                         ensureCursorVisible(titleRef.current);
+                                        ensureElementInViewport(titleRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
                                     }, 50);
                                 }
                             }}
@@ -946,28 +933,35 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             value={editingTask.text}
                             onChange={(e) => {
                                 setEditingTask({ ...editingTask, text: e.target.value });
-                                ensureCursorVisible(e.target);
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target, e.target.selectionStart);
+                                ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                             }}
                             onInput={(e) => {
                                 handleInput(e);
-                                ensureCursorVisible(e.target);
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target, e.target.selectionStart);
+                                ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                             }}
                             onSelect={(e) => {
                                 cursorPositionsRef.current.title = e.target.selectionStart;
-                                ensureCursorVisible(e.target);
+                                ensureCursorVisible(e.target, e.target.selectionStart);
                             }}
                             onClick={(e) => {
                                 cursorPositionsRef.current.title = e.target.selectionStart;
-                                ensureCursorVisible(e.target);
+                                ensureCursorVisible(e.target, e.target.selectionStart);
+                                ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                             }}
                             onKeyUp={(e) => {
                                 cursorPositionsRef.current.title = e.target.selectionStart;
-                                ensureCursorVisible(e.target);
+                                ensureCursorVisible(e.target, e.target.selectionStart);
                             }}
                             onFocus={(e) => {
                                 e.target.style.borderColor = 'var(--accent-color)';
                                 e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
-                                ensureCursorVisible(e.target);
+                                cursorPositionsRef.current.title = e.target.selectionStart;
+                                ensureCursorVisible(e.target, e.target.selectionStart);
+                                ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                             }}
                             onBlur={(e) => {
                                 e.target.style.borderColor = 'var(--border-color)';
@@ -1149,6 +1143,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         setTimeout(() => {
                                             notesRef.current?.focus();
                                             ensureCursorVisible(notesRef.current);
+                                            ensureElementInViewport(notesRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
                                         }, 50);
                                     }
                                 }}
@@ -1158,6 +1153,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         setTimeout(() => {
                                             notesRef.current?.focus();
                                             ensureCursorVisible(notesRef.current);
+                                            ensureElementInViewport(notesRef.current, { preferBottom: true, scrollContainer: modalContentRef.current });
                                         }, 50);
                                     }
                                 }}
@@ -1189,28 +1185,35 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 value={editingTask.notes || ''}
                                 onChange={(e) => {
                                     setEditingTask({ ...editingTask, notes: e.target.value });
-                                    ensureCursorVisible(e.target);
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
+                                    ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                                 }}
                                 onInput={(e) => {
                                     handleInput(e);
-                                    ensureCursorVisible(e.target);
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
+                                    ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                                 }}
                                 onSelect={(e) => {
                                     cursorPositionsRef.current.notes = e.target.selectionStart;
-                                    ensureCursorVisible(e.target);
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
                                 }}
                                 onClick={(e) => {
                                     cursorPositionsRef.current.notes = e.target.selectionStart;
-                                    ensureCursorVisible(e.target);
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
+                                    ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                                 }}
                                 onKeyUp={(e) => {
                                     cursorPositionsRef.current.notes = e.target.selectionStart;
-                                    ensureCursorVisible(e.target);
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
                                 }}
                                 onFocus={(e) => {
                                     e.target.style.borderColor = 'var(--accent-color)';
                                     e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
-                                    ensureCursorVisible(e.target);
+                                    cursorPositionsRef.current.notes = e.target.selectionStart;
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
+                                    ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                                 }}
                                 onBlur={(e) => {
                                     e.target.style.borderColor = 'var(--border-color)';
@@ -2249,10 +2252,15 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 ref={focusTextareaRef}
                                 autoFocus
                                 value={expandedOverlayField === 'title' ? editingTask.text : (editingTask.notes || '')}
-                                onChange={(e) => setEditingTask({
-                                    ...editingTask,
-                                    [expandedOverlayField === 'title' ? 'text' : 'notes']: e.target.value
-                                })}
+                                onChange={(e) => {
+                                    const f = expandedOverlayField === 'title' ? 'title' : 'notes';
+                                    cursorPositionsRef.current[f] = e.target.selectionStart;
+                                    setEditingTask({
+                                        ...editingTask,
+                                        [expandedOverlayField === 'title' ? 'text' : 'notes']: e.target.value
+                                    });
+                                    ensureCursorVisible(e.target, e.target.selectionStart);
+                                }}
                                 onSelect={(e) => {
                                     const f = expandedOverlayField === 'title' ? 'title' : 'notes';
                                     cursorPositionsRef.current[f] = e.target.selectionStart;

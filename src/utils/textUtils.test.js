@@ -153,6 +153,53 @@ describe('textUtils', () => {
             const webLinks = screen.getAllByRole('link', { name: /Open/i });
             expect(webLinks).toHaveLength(1);
         });
+    });
 
+    describe('ensureCursorVisible & ensureElementInViewport', () => {
+        test('ensureCursorVisible handles cursor at end by scrolling to scrollHeight', () => {
+            const textarea = document.createElement('textarea');
+            textarea.value = 'Hello world\nLine 2\nLine 3';
+            Object.defineProperty(textarea, 'scrollHeight', { value: 300, writable: true });
+            textarea.selectionStart = textarea.value.length;
+            document.body.appendChild(textarea);
+
+            const { ensureCursorVisible } = require('./textUtils');
+            ensureCursorVisible(textarea);
+            expect(textarea.scrollTop).toBe(300);
+            document.body.removeChild(textarea);
+        });
+
+        test('ensureCursorVisible handles cursor at start by scrolling to top', () => {
+            const textarea = document.createElement('textarea');
+            textarea.value = 'Hello world\nLine 2\nLine 3';
+            Object.defineProperty(textarea, 'scrollHeight', { value: 300, writable: true });
+            textarea.scrollTop = 150;
+            textarea.selectionStart = 0;
+            document.body.appendChild(textarea);
+
+            const { ensureCursorVisible } = require('./textUtils');
+            ensureCursorVisible(textarea, 0);
+            expect(textarea.scrollTop).toBe(0);
+            document.body.removeChild(textarea);
+        });
+
+        test('ensureElementInViewport scrolls container when element overflows bottom', () => {
+            const container = document.createElement('div');
+            container.style.overflowY = 'auto';
+            const element = document.createElement('textarea');
+            container.appendChild(element);
+            document.body.appendChild(container);
+
+            container.getBoundingClientRect = () => ({ top: 0, bottom: 200, height: 200 });
+            element.getBoundingClientRect = () => ({ top: 180, bottom: 250, height: 70 });
+            element.scrollIntoView = jest.fn();
+
+            const { ensureElementInViewport } = require('./textUtils');
+            ensureElementInViewport(element, { preferBottom: true, scrollContainer: container });
+            expect(container.scrollTop).toBeGreaterThan(0);
+
+            document.body.removeChild(container);
+        });
     });
 });
+
