@@ -1645,40 +1645,6 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                         {PRIORITIES[p].label}
                     </button>
                 ))}
-                {onClose && (
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        style={{
-                            padding: '7px 12px',
-                            background: 'transparent',
-                            color: 'var(--muted-text)',
-                            border: '1.5px solid var(--border-color)',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.3px',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            flex: '0 0 auto',
-                            whiteSpace: 'nowrap',
-                            boxSizing: 'border-box'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = '#ef4444';
-                            e.currentTarget.style.color = '#ef4444';
-                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.06)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--border-color)';
-                            e.currentTarget.style.color = 'var(--muted-text)';
-                            e.currentTarget.style.background = 'transparent';
-                        }}
-                    >
-                        Cancel
-                    </button>
-                )}
                 <button
                     onClick={handleSubmit}
                     style={{

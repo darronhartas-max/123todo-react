@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.51
+
+- **✨ Streamlined Add Task Controls & Space Optimization:** Removed the redundant Cancel button from the bottom priority button row in the Add Task form, reclaiming valuable horizontal space for priority tier buttons and the Add Task action. Task creation can still be cleanly cancelled at any time via the prominent close cross (✕) in the top right or by pressing the Escape key.
+
 ### v3.7.50
 
 - **👁️ Active Text Viewport Visibility & Cursor Tracking in Notes and Tasks:** When editing a note attached to a task or typing task descriptions in Add Task and Edit Task modals, the active cursor and newly added text now remain visible inside the viewport at all times. Resolved mobile and desktop issues where adding text to the end of a long note pushed the editing line outside the visible pane or behind the virtual keyboard.

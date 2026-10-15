@@ -276,6 +276,32 @@ test('hides time selection button when timeSchedulingEnabled is false', () => {
   expect(screen.queryByLabelText(/time:/i)).not.toBeInTheDocument();
 });
 
+test('top right close cross closes and cancels AddTask without a redundant bottom cancel button', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const onCloseMock = jest.fn();
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={onCloseMock}
+      projects={[{ id: 'general', name: 'General' }]}
+    />
+  );
+
+  // Close cross exists in top right
+  const closeCrossBtn = screen.getByRole('button', { name: /cancel and close/i });
+  expect(closeCrossBtn).toBeInTheDocument();
+
+  // No redundant bottom cancel button
+  expect(screen.queryByRole('button', { name: /^cancel$/i })).not.toBeInTheDocument();
+
+  // Clicking close cross triggers onClose
+  fireEvent.click(closeCrossBtn);
+  expect(onCloseMock).toHaveBeenCalledTimes(1);
+});
+
+
 
 
 

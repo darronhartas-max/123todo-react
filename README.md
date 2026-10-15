@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.50** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.51** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.50 (Current)
+### v3.7.51 (Current)
+
+- **Streamlined Add Task Controls & Space Optimization**: Removed the redundant Cancel button from the bottom priority button row in the Add Task form, reclaiming valuable horizontal space for priority tier buttons and the Add Task action. Task creation can still be cleanly cancelled at any time via the prominent close cross (✕) in the top right or by pressing the Escape key.
+
+### v3.7.50
 
 - **Active Text Viewport Visibility & Cursor Tracking in Notes and Tasks**: When editing a note attached to a task or typing task descriptions in Add Task and Edit Task modals, the active cursor and newly added text now remain visible inside the viewport at all times. Resolved mobile and desktop issues where adding text to the end of a long note pushed the editing line outside the visible pane or behind the virtual keyboard.
 - **Precision Soft-Wrap Line Measuring & Container Auto-Scroll**: Upgraded the internal cursor position tracker with an off-screen typographic measuring mirror that accurately accounts for soft-wrapped sentences without hard returns. Both the internal textarea scroll and the modal container auto-scroll in real time with frame-synchronized alignment during both keyboard typing and voice transcription.
