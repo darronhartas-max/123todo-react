@@ -2,6 +2,44 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { encryptData, decryptData } from '../utils/crypto';
 import { mergeSyncDatasets } from '../utils/syncUtils';
 
+let gsiLoadingPromise = null;
+
+export const loadGoogleGsiScript = () => {
+    if (typeof window === 'undefined') return Promise.resolve(false);
+    if (window.google && window.google.accounts) return Promise.resolve(true);
+    if (gsiLoadingPromise) return gsiLoadingPromise;
+
+    gsiLoadingPromise = new Promise((resolve) => {
+        const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+        if (existing) {
+            if (window.google && window.google.accounts) {
+                resolve(true);
+                return;
+            }
+            existing.addEventListener('load', () => resolve(true), { once: true });
+            existing.addEventListener('error', () => {
+                gsiLoadingPromise = null;
+                resolve(false);
+            }, { once: true });
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve(true);
+        script.onerror = () => {
+            console.warn('Failed to load Google Identity Services script');
+            gsiLoadingPromise = null;
+            resolve(false);
+        };
+        document.head.appendChild(script);
+    });
+
+    return gsiLoadingPromise;
+};
+
 // The Client ID from the Google Cloud Console
 const CLIENT_ID = '831861694055-fco4oka90dc7npbglscjad0prqpeu2oh.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
@@ -153,87 +191,104 @@ export const useGoogleDriveSync = (localData, importDataCallback, enabled = true
         }
     }, [passphrase, importDataCallback, handleTokenExpired, enabled]);
 
-    // Initialize Google Identity Services
-    useEffect(() => {
-        const initGoogleClient = () => {
-            if (window.google && window.google.accounts) {
-                // First, check if we have a valid stored token. If so, use it immediately!
-                const storedToken = localStorage.getItem('123Todo_Google_AccessToken');
-                const storedExpiry = localStorage.getItem('123Todo_Google_TokenExpiry');
-                let hasValidToken = false;
+    // Initialize Google Identity Services token client
+    const initGoogleClient = useCallback(() => {
+        if (!window.google || !window.google.accounts) return;
 
-                if (storedToken && storedExpiry && Date.now() < parseInt(storedExpiry, 10)) {
-                    accessTokenRef.current = storedToken;
-                    setIsAuthed(true);
-                    hasValidToken = true;
-                    // Trigger an initial pull/sync only when enabled
-                    if (enabled) {
-                        performSync(true);
-                    }
-                }
+        // First, check if we have a valid stored token. If so, use it immediately!
+        const storedToken = localStorage.getItem('123Todo_Google_AccessToken');
+        const storedExpiry = localStorage.getItem('123Todo_Google_TokenExpiry');
+        let hasValidToken = false;
 
-                tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES,
-                    callback: (tokenResponse) => {
-                        if (tokenResponse.error !== undefined) {
-                            console.error('Google Auth Error:', tokenResponse);
-                            setIsAuthed(false);
-                            localStorage.removeItem('123Todo_Google_AccessToken');
-                            localStorage.removeItem('123Todo_Google_TokenExpiry');
-                            if (localStorage.getItem('123Todo_Google_Authed') === 'true') {
-                                setIsSyncDropped(true);
-                            }
-                            if (tokenResponse.type === 'tokenFailed') {
-                                localStorage.removeItem('123Todo_Google_Authed');
-                            }
-                            return;
-                        }
-                        accessTokenRef.current = tokenResponse.access_token;
-                        setIsAuthed(true);
-                        setIsSyncDropped(false);
-                        localStorage.setItem('123Todo_Google_Authed', 'true');
-                        // Store the token and expiry (expires_in is in seconds, e.g. 3600)
-                        const expiryTime = Date.now() + (parseInt(tokenResponse.expires_in, 10) || 3600) * 1000;
-                        localStorage.setItem('123Todo_Google_AccessToken', tokenResponse.access_token);
-                        localStorage.setItem('123Todo_Google_TokenExpiry', expiryTime.toString());
-                        // Trigger an initial pull/sync only when enabled
-                        if (enabled) {
-                            performSync(true);
-                        }
-                    },
-                });
+        if (storedToken && storedExpiry && Date.now() < parseInt(storedExpiry, 10)) {
+            accessTokenRef.current = storedToken;
+            setIsAuthed(true);
+            hasValidToken = true;
+            // Trigger an initial pull/sync only when enabled
+            if (enabled) {
+                performSync(true);
+            }
+        }
 
-                // Attempt silent automatic token refresh only if Google Drive sync is enabled AND user previously signed in AND token is expired
-                if (enabled && !hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
-                    try {
-                        // prompt: 'none' requests token silently in background without displaying any popup/UI
-                        tokenClientRef.current.requestAccessToken({ prompt: 'none' });
-                    } catch (err) {
-                        console.warn('Silent token refresh failed:', err);
-                        setIsAuthed(false);
-                        setSyncStatus('offline');
+        tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: (tokenResponse) => {
+                if (tokenResponse.error !== undefined) {
+                    console.error('Google Auth Error:', tokenResponse);
+                    setIsAuthed(false);
+                    localStorage.removeItem('123Todo_Google_AccessToken');
+                    localStorage.removeItem('123Todo_Google_TokenExpiry');
+                    if (localStorage.getItem('123Todo_Google_Authed') === 'true') {
                         setIsSyncDropped(true);
                     }
-                } else if (!hasValidToken) {
-                    setIsAuthed(false);
-                    setSyncStatus('offline');
+                    if (tokenResponse.type === 'tokenFailed') {
+                        localStorage.removeItem('123Todo_Google_Authed');
+                    }
+                    return;
                 }
+                accessTokenRef.current = tokenResponse.access_token;
+                setIsAuthed(true);
+                setIsSyncDropped(false);
+                localStorage.setItem('123Todo_Google_Authed', 'true');
+                // Store the token and expiry (expires_in is in seconds, e.g. 3600)
+                const expiryTime = Date.now() + (parseInt(tokenResponse.expires_in, 10) || 3600) * 1000;
+                localStorage.setItem('123Todo_Google_AccessToken', tokenResponse.access_token);
+                localStorage.setItem('123Todo_Google_TokenExpiry', expiryTime.toString());
+                // Trigger an initial pull/sync only when enabled
+                if (enabled) {
+                    performSync(true);
+                }
+            },
+        });
 
-            } else {
-                // If script hasn't loaded yet, try again in 500ms
-                setTimeout(initGoogleClient, 500);
+        // Attempt silent automatic token refresh only if Google Drive sync is enabled AND user previously signed in AND token is expired
+        if (enabled && !hasValidToken && localStorage.getItem('123Todo_Google_Authed') === 'true') {
+            try {
+                // prompt: 'none' requests token silently in background without displaying any popup/UI
+                tokenClientRef.current.requestAccessToken({ prompt: 'none' });
+            } catch (err) {
+                console.warn('Silent token refresh failed:', err);
+                setIsAuthed(false);
+                setSyncStatus('offline');
+                setIsSyncDropped(true);
             }
-        };
-        initGoogleClient();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [performSync, enabled]);
+        } else if (!hasValidToken) {
+            setIsAuthed(false);
+            setSyncStatus('offline');
+        }
+    }, [enabled, performSync]);
 
-    const signIn = useCallback(() => {
+    // Initialize Google Identity Services only when Google Drive sync is enabled or user previously authorized
+    useEffect(() => {
+        const isPreviouslyAuthed = localStorage.getItem('123Todo_Google_Authed') === 'true';
+        if (!enabled && !isPreviouslyAuthed) {
+            return;
+        }
+
+        let isMounted = true;
+        loadGoogleGsiScript().then((loaded) => {
+            if (isMounted && loaded) {
+                initGoogleClient();
+            }
+        });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [enabled, initGoogleClient]);
+
+    const signIn = useCallback(async () => {
+        if (!tokenClientRef.current) {
+            const loaded = await loadGoogleGsiScript();
+            if (loaded) {
+                initGoogleClient();
+            }
+        }
         if (tokenClientRef.current) {
             tokenClientRef.current.requestAccessToken();
         }
-    }, []);
+    }, [initGoogleClient]);
 
     const signOut = useCallback(() => {
         if (accessTokenRef.current && window.google) {

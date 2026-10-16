@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.55
+
+- **🔒 Security Hardening & Content Security Policy (Phase 3):** Introduced strict Content-Security-Policy (CSP) headers restricting script execution, network endpoints, and frame embeddings to authenticated origins.
+- **🛡️ Cloudflare Worker Hardening & Dynamic Google GSI Loading:** Upgraded device pairing codes to cryptographically secure random values (crypto.getRandomValues) and enforced a 2MB maximum payload limit on cloud sync pushes. Replaced unconditional Google Identity Services script loading with on-demand dynamic script injection only when Google Drive sync is active.
+
 ### v3.7.54
 
 - **⚡ Performance & Rendering Optimization (Phase 2):** Memoized TaskItem, NoteCard, PrioritySection, and ProjectColumn components to eliminate unnecessary re-renders across task and note lists. Replaced linear project lookups with O(1) indexed maps for smoother dragging and list interactions.

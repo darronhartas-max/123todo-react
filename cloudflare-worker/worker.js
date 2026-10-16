@@ -30,8 +30,12 @@ function generateId(length = 24) {
   return result;
 }
 
+const MAX_PAYLOAD_BYTES = 2 * 1024 * 1024; // 2 MB safety limit for D1 rows
+
 function generate6DigitCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return (100000 + (buf[0] % 900000)).toString();
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +131,10 @@ export default {
 
         if (!syncId || !deviceToken || typeof payload !== 'string') {
           return jsonResponse({ error: 'Invalid parameters' }, 400);
+        }
+
+        if (payload.length > MAX_PAYLOAD_BYTES) {
+          return jsonResponse({ error: 'Payload exceeds maximum allowed size (2MB)' }, 413);
         }
 
         const rateCheck = checkRateLimit(`sync_${syncId}`, 150, 10 * 60 * 1000);
