@@ -847,16 +847,6 @@ const NoteCard = ({
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 8px 0' }}>
                   {subtasks.map((st) => (
                     <li key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', borderBottom: '1px solid var(--border-color, #f3f4f6)' }}>
-                      <input
-                        type="checkbox"
-                        checked={st.completed}
-                        onChange={() => {
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
-                          setSubtasks(updated);
-                          onUpdateNote(note.id, { subtasks: updated });
-                        }}
-                        style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0 }}
-                      />
                       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                         <textarea
                           ref={(el) => {
@@ -915,17 +905,18 @@ const NoteCard = ({
                         />
                         <ActionableEntitiesBar text={st.text} compact />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = subtasks.filter(s => s.id !== st.id);
+                      <input
+                        type="checkbox"
+                        checked={st.completed}
+                        onChange={() => {
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
                           setSubtasks(updated);
                           onUpdateNote(note.id, { subtasks: updated });
                         }}
-                        style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '2px 4px', fontSize: '12px', fontWeight: '600' }}
-                      >
-                        ✕
-                      </button>
+                        aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
+                        title={st.completed ? "Mark incomplete" : "Mark completed"}
+                        style={{ cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0, marginRight: '2px' }}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -1121,16 +1112,6 @@ const NoteCard = ({
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {subtasks.map((st) => (
                     <li key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0' }}>
-                      <input
-                        type="checkbox"
-                        checked={st.completed}
-                        onChange={() => {
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
-                          setSubtasks(updated);
-                          onUpdateNote(note.id, { subtasks: updated });
-                        }}
-                        style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0 }}
-                      />
                       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                         <input
                           type="text"
@@ -1169,6 +1150,18 @@ const NoteCard = ({
                         />
                         <ActionableEntitiesBar text={st.text} compact />
                       </div>
+                      <input
+                        type="checkbox"
+                        checked={st.completed}
+                        onChange={() => {
+                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                          setSubtasks(updated);
+                          onUpdateNote(note.id, { subtasks: updated });
+                        }}
+                        aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
+                        title={st.completed ? "Mark incomplete" : "Mark completed"}
+                        style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0, marginRight: '2px' }}
+                      />
                     </li>
                   ))}
                 </ul>

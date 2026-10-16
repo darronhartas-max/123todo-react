@@ -40,6 +40,10 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
         e.stopPropagation();
         if (!e.touches || e.touches.length !== 1) return;
 
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
+
         touchSubtaskRef.current = {
             startIndex: index,
             lastOverIndex: index,
@@ -1139,37 +1143,33 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                             <div
                                                 className="subtask-drag-handle"
                                                 onTouchStart={(e) => handleSubtaskTouchStart(e, index)}
+                                                onMouseDown={(e) => {
+                                                    if (window.getSelection) {
+                                                        window.getSelection().removeAllRanges();
+                                                    }
+                                                }}
                                                 style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     cursor: isDraggingThis ? 'grabbing' : 'grab',
-                                                    padding: '4px 3px',
-                                                    margin: '-2px 0 0 -2px',
+                                                    padding: '4px 6px',
+                                                    minWidth: '28px',
+                                                    minHeight: '28px',
                                                     color: isDraggingThis ? 'var(--accent-color)' : 'var(--muted-text)',
-                                                    opacity: isDraggingThis ? 1 : 0.65,
+                                                    opacity: isDraggingThis ? 1 : 0.7,
                                                     flexShrink: 0,
                                                     touchAction: 'none',
                                                     userSelect: 'none',
                                                     WebkitUserSelect: 'none',
-                                                    borderRadius: '4px'
+                                                    borderRadius: '4px',
+                                                    background: 'var(--border-color, rgba(0,0,0,0.05))'
                                                 }}
                                                 title="Drag to rearrange subtask (or use Alt+Up / Alt+Down)"
                                                 aria-label="Drag to rearrange subtask"
                                             >
                                                 <GripVertical size={14} />
                                             </div>
-                                            <input
-                                                type="checkbox"
-                                                draggable={false}
-                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                checked={st.completed}
-                                                onChange={() => {
-                                                    const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
-                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
-                                                }}
-                                                style={{ cursor: 'pointer', width: '14px', height: '14px', flexShrink: 0, marginTop: '3px' }}
-                                            />
                                             <textarea
                                                 ref={(el) => {
                                                     if (el) {
@@ -1212,6 +1212,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                                     textDecoration: st.completed ? 'line-through' : 'none',
                                                     outline: 'none',
                                                     padding: '2px 4px',
+                                                    margin: '0 4px',
                                                     borderRadius: '4px',
                                                     fontFamily: 'inherit',
                                                     resize: 'none',
@@ -1236,6 +1237,19 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                                         onUpdate && onUpdate(task.id, { subtasks: updated });
                                                     }
                                                 }}
+                                            />
+                                            <input
+                                                type="checkbox"
+                                                draggable={false}
+                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                                checked={st.completed}
+                                                onChange={() => {
+                                                    const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                                                    onUpdate && onUpdate(task.id, { subtasks: updated });
+                                                }}
+                                                aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
+                                                title={st.completed ? "Mark incomplete" : "Mark completed"}
+                                                style={{ cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0, marginTop: '4px', marginRight: '2px' }}
                                             />
                                         </li>
                                     );

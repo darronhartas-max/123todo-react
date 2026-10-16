@@ -31,6 +31,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [notes, setNotes] = useState('');
     const [photos, setPhotos] = useState([]);
     const [showNotes, setShowNotes] = useState(false);
+    const [isNotesFocused, setIsNotesFocused] = useState(false);
     const [priority, setPriority] = useState(1);
     
     // New scheduling and subtask states
@@ -54,6 +55,10 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const handleSubtaskTouchStart = (e, index) => {
         e.stopPropagation();
         if (!e.touches || e.touches.length !== 1) return;
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
 
         touchSubtaskRef.current = {
             startIndex: index,
@@ -878,9 +883,13 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             ensureCursorVisible(e.target, e.target.selectionStart);
                         }}
                         onFocus={(e) => {
+                            setIsNotesFocused(true);
                             cursorPositionsRef.current.notes = e.target.selectionStart;
                             ensureCursorVisible(e.target, e.target.selectionStart);
                             ensureElementInViewport(e.target, { preferBottom: true });
+                        }}
+                        onBlur={() => {
+                            setIsNotesFocused(false);
                         }}
                         onKeyDown={(e) => {
                             if (e.key === 'Escape') {
@@ -888,7 +897,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 handleCancel();
                             }
                         }}
-                        placeholder="Add notes..."
+                        placeholder={isNotesFocused ? '' : 'Add notes...'}
                         style={{ ...styles.taskInput, minHeight: '60px', marginTop: '0' }}
                     />
                     <PhotoAttachments
@@ -1013,37 +1022,34 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                         <div
                                             className="subtask-drag-handle"
                                             onTouchStart={(e) => handleSubtaskTouchStart(e, index)}
+                                            onMouseDown={(e) => {
+                                                if (window.getSelection) {
+                                                    window.getSelection().removeAllRanges();
+                                                }
+                                            }}
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 cursor: isDraggingThis ? 'grabbing' : 'grab',
-                                                padding: '6px 4px',
-                                                margin: '-2px 0 0 -2px',
+                                                padding: '6px 8px',
+                                                minWidth: '32px',
+                                                minHeight: '32px',
                                                 color: isDraggingThis ? 'var(--accent-color)' : 'var(--muted-text)',
-                                                opacity: isDraggingThis ? 1 : 0.65,
+                                                opacity: isDraggingThis ? 1 : 0.7,
                                                 flexShrink: 0,
                                                 touchAction: 'none',
                                                 userSelect: 'none',
                                                 WebkitUserSelect: 'none',
-                                                borderRadius: '4px'
+                                                borderRadius: '6px',
+                                                background: 'var(--border-color, rgba(0,0,0,0.05))'
                                             }}
                                             title="Drag to rearrange subtask (or use Alt+Up / Alt+Down)"
                                             aria-label="Drag to rearrange subtask"
                                         >
                                             <GripVertical size={16} />
                                         </div>
-                                        <input
-                                            type="checkbox"
-                                            draggable={false}
-                                            onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                            checked={st.completed}
-                                            onChange={() => {
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
-                                            }}
-                                            style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
-                                        />
-                                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', margin: '0 6px' }}>
                                             <textarea
                                                 ref={(el) => {
                                                     if (el) {
@@ -1110,25 +1116,18 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                                 }}
                                             />
                                         </div>
-                                        <button
-                                            type="button"
+                                        <input
+                                            type="checkbox"
                                             draggable={false}
                                             onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                            onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
-                                            style={{
-                                                border: 'none',
-                                                background: 'transparent',
-                                                color: '#ef4444',
-                                                cursor: 'pointer',
-                                                fontSize: '0.95rem',
-                                                fontWeight: '600',
-                                                padding: '2px 6px',
-                                                flexShrink: 0,
-                                                marginTop: '2px'
+                                            checked={st.completed}
+                                            onChange={() => {
+                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
                                             }}
-                                        >
-                                            Delete
-                                        </button>
+                                            aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
+                                            title={st.completed ? "Mark incomplete" : "Mark completed"}
+                                            style={{ cursor: 'pointer', width: '18px', height: '18px', flexShrink: 0, marginTop: '6px', marginRight: '4px' }}
+                                        />
                                     </li>
                                 );
                             })}

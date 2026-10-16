@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.51** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.52** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,14 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.51 (Current)
+### v3.7.52 (Current)
+
+- **Streamlined Subtasks & Right-Aligned Completion**: Streamlined checklist subtasks across Add Task, Edit Task, Task Item, and Notes views. Moved the completed checkbox from the left to replace the old delete button on the right side. Re-isolated and enlarged the drag handle with dedicated touch and selection safeguards so reordering subtasks never accidentally triggers text selection or focus in the text area.
+- **Action Buttons Row Reorganization (Expand & Voice Repositioned)**: Moved the Expand focus editor and Voice (Talk) dictation buttons from the top of the task description title down to the far right of the unified action buttons line (alongside Notes, Subtasks, and Schedule) with generous spacing.
+- **Evidentiary Stamp Icon for Notes Timestamps**: Updated the "+ Timestamp" button icon in task notes and the full-screen focus editor to a crisp official stamp icon, replacing the clock face for greater clarity.
+- **Dynamic Notes Placeholder on Focus**: The holding placeholder text in the notes entry box now vanishes cleanly as soon as the user clicks or focuses into the text field, providing an uncluttered writing space.
+
+### v3.7.51
 
 - **Streamlined Add Task Controls & Space Optimization**: Removed the redundant Cancel button from the bottom priority button row in the Add Task form, reclaiming valuable horizontal space for priority tier buttons and the Add Task action. Task creation can still be cleanly cancelled at any time via the prominent close cross (✕) in the top right or by pressing the Escape key.
 

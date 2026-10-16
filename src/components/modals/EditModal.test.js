@@ -375,8 +375,8 @@ describe('EditModal', () => {
 
         // Clicking timestamp button appends a timestamp tag to notes
         fireEvent.click(timestampBtn);
-        const notesTextarea = screen.getByPlaceholderText('Add notes or extra details...');
-        expect(notesTextarea.value).toMatch(/\[\d{1,2} [A-Za-z]{3} \d{4}, \d{2}:\d{2}\]/);
+        const notesTextarea = screen.getByDisplayValue(/\[\d{1,2} [A-Za-z]{3} \d{4}, \d{2}:\d{2}\]/);
+        expect(notesTextarea).toBeInTheDocument();
     });
 
     test('reorders subtasks using drag and drop events', () => {
@@ -751,6 +751,90 @@ describe('EditModal', () => {
             })
         );
         expect(onCloseMock).toHaveBeenCalled();
+    });
+
+    test('streamlines subtask items: checkbox on the right, delete button removed, and robust drag handle', () => {
+        const { container } = render(
+            <EditModal
+                task={{
+                    ...sampleTaskWithNotes,
+                    subtasks: [
+                        { id: 201, text: 'Streamlined subtask item', completed: false }
+                    ]
+                }}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Subtask item exists
+        const subtaskLi = container.querySelector('li[data-subtask-index="0"]');
+        expect(subtaskLi).toBeInTheDocument();
+
+        // No Delete button
+        expect(screen.queryByTitle(/delete step/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+
+        // Checkbox is present and located after the textarea
+        const checkbox = screen.getByRole('checkbox', { name: /mark subtask completed/i });
+        expect(checkbox).toBeInTheDocument();
+        expect(checkbox.checked).toBe(false);
+
+        // Drag handle exists with clear drag target styling
+        const dragHandle = container.querySelector('.subtask-drag-handle');
+        expect(dragHandle).toBeInTheDocument();
+
+        // Mousedown clears document selection to prevent text highlight interference
+        const removeAllRangesMock = jest.fn();
+        window.getSelection = jest.fn().mockReturnValue({ removeAllRanges: removeAllRangesMock });
+        fireEvent.mouseDown(dragHandle);
+        expect(removeAllRangesMock).toHaveBeenCalled();
+
+        // Toggle completion
+        fireEvent.click(checkbox);
+        expect(checkbox.checked).toBe(true);
+    });
+
+    test('clears holding placeholder text in notes textarea when clicked or focused', () => {
+        render(
+            <EditModal
+                task={{
+                    id: 99,
+                    text: 'Task with blank notes',
+                    priority: 1,
+                    projectId: 'general',
+                    notes: '',
+                    subtasks: []
+                }}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Open notes section
+        const notesToggle = screen.getByRole('button', { name: /^Notes/i });
+        fireEvent.click(notesToggle);
+
+        // When not yet editing, display placeholder text is shown
+        const placeholderDiv = screen.getByText('Add notes or extra details...');
+        expect(placeholderDiv).toBeInTheDocument();
+
+        // Click to enter editing mode
+        fireEvent.click(placeholderDiv);
+
+        // Active textarea is rendered
+        const notesTextarea = screen.getByRole('textbox', { name: '' });
+        expect(notesTextarea).toBeInTheDocument();
+
+        // When focused, placeholder is cleared
+        fireEvent.focus(notesTextarea);
+        expect(notesTextarea.getAttribute('placeholder')).toBe('');
+
+        // When blurred, returns to inactive display showing placeholder
+        fireEvent.blur(notesTextarea);
+        expect(screen.getByText('Add notes or extra details...')).toBeInTheDocument();
     });
 });
 

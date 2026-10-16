@@ -4,7 +4,7 @@ import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, ListChecks, Repeat } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, ListChecks, Repeat, Stamp } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
@@ -25,6 +25,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [expandedOverlayField, setExpandedOverlayField] = useState(null); // 'title' | 'notes' | null
     const [isPriorityOpen, setIsPriorityOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
+    const [isNotesInputFocused, setIsNotesInputFocused] = useState(false);
+    const [isOverlayFocused, setIsOverlayFocused] = useState(false);
     // Section Visibility Persistence: Remember whether Note, Subtasks, Schedule are hidden/shown
     const getInitialVisibility = (sectionKey, defaultHasData) => {
         try {
@@ -234,6 +236,10 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const handleSubtaskTouchStart = (e, index) => {
         e.stopPropagation();
         if (!e.touches || e.touches.length !== 1) return;
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
 
         touchSubtaskRef.current = {
             startIndex: index,
@@ -805,80 +811,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
                 {/* 2. TASK TITLE / DESCRIPTION */}
                 <div style={{ marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <div style={{ marginBottom: '6px' }}>
                         <span style={styles.sectionLabel}>Task Description</span>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <button
-                                type="button"
-                                onClick={() => setExpandedOverlayField('title')}
-                                aria-label="Expand"
-                                title="Open Full Screen Focus Editor for Task Title"
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '5px',
-                                    padding: showBtnText ? '4px 9px' : '5px 10px',
-                                    minWidth: showBtnText ? 'auto' : '34px',
-                                    minHeight: '32px',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--border-color)',
-                                    background: 'var(--item-bg)',
-                                    color: 'var(--text-color)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {showBtnIcons && <Maximize2 size={13} />}
-                                {showBtnText && <span>Expand</span>}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setIsEditingTitle(true);
-                                    toggleVoiceInput('title');
-                                }}
-                                aria-label={listeningTarget === 'title' ? "Listening" : "Talk"}
-                                title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '5px',
-                                    padding: showBtnText ? '4px 9px' : '5px 10px',
-                                    minWidth: showBtnText ? 'auto' : '34px',
-                                    minHeight: '32px',
-                                    borderRadius: '8px',
-                                    border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
-                                    background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
-                                    color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.82rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {listeningTarget === 'title' ? (
-                                    <>
-                                        <span style={{
-                                            width: '7px',
-                                            height: '7px',
-                                            borderRadius: '50%',
-                                            background: '#ef4444',
-                                            boxShadow: '0 0 6px #ef4444',
-                                            animation: 'pulse 1s infinite'
-                                        }} />
-                                        <Mic size={13} color="#ef4444" />
-                                        <span>Listening...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
-                                        {showBtnText && <span>Talk</span>}
-                                    </>
-                                )}
-                            </button>
-                        </div>
                     </div>
 
                     {!isEditingTitle ? (
@@ -983,8 +917,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     )}
                 </div>
 
-                {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, and Schedule on the SAME line */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                {/* 3. UNIFIED ACTION BUTTONS ROW: Notes, Subtasks, Schedule, and on the far right: Expand and Voice */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '12px' }}>
                     <button
                         type="button"
                         onClick={() => toggleSection('notes')}
@@ -1030,6 +964,79 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             </span>
                         )}
                     </button>
+
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button
+                            type="button"
+                            onClick={() => setExpandedOverlayField('title')}
+                            aria-label="Expand"
+                            title="Open Full Screen Focus Editor for Task Title"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
+                                padding: showBtnText ? '4px 9px' : '5px 10px',
+                                minWidth: showBtnText ? 'auto' : '34px',
+                                minHeight: '32px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-color)',
+                                background: 'var(--item-bg)',
+                                color: 'var(--text-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {showBtnIcons && <Maximize2 size={13} />}
+                            {showBtnText && <span>Expand</span>}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsEditingTitle(true);
+                                toggleVoiceInput('title');
+                            }}
+                            aria-label={listeningTarget === 'title' ? "Listening" : "Talk"}
+                            title={listeningTarget === 'title' ? "Listening - Tap to finish" : (speechSupported ? "Speak to append to title" : "Voice input not supported")}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
+                                padding: showBtnText ? '4px 9px' : '5px 10px',
+                                minWidth: showBtnText ? 'auto' : '34px',
+                                minHeight: '32px',
+                                borderRadius: '8px',
+                                border: `1px solid ${listeningTarget === 'title' ? '#ef4444' : 'var(--border-color)'}`,
+                                background: listeningTarget === 'title' ? 'rgba(239, 68, 68, 0.15)' : 'var(--item-bg)',
+                                color: listeningTarget === 'title' ? '#ef4444' : 'var(--text-color)',
+                                cursor: 'pointer',
+                                fontSize: '0.82rem',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {listeningTarget === 'title' ? (
+                                <>
+                                    <span style={{
+                                        width: '7px',
+                                        height: '7px',
+                                        borderRadius: '50%',
+                                        background: '#ef4444',
+                                        boxShadow: '0 0 6px #ef4444',
+                                        animation: 'pulse 1s infinite'
+                                    }} />
+                                    <Mic size={13} color="#ef4444" />
+                                    <span>Listening...</span>
+                                </>
+                            ) : (
+                                <>
+                                    {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
+                                    {showBtnText && <span>Talk</span>}
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Notes Editor (Visible when Notes button is active) */}
@@ -1082,7 +1089,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         fontWeight: '600'
                                     }}
                                 >
-                                    {showBtnIcons && <Clock size={12} />}
+                                    {showBtnIcons && <Stamp size={13} />}
                                     {showBtnText && <span>+ Timestamp</span>}
                                 </button>
                                 <button
@@ -1209,6 +1216,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     ensureCursorVisible(e.target, e.target.selectionStart);
                                 }}
                                 onFocus={(e) => {
+                                    setIsNotesInputFocused(true);
                                     e.target.style.borderColor = 'var(--accent-color)';
                                     e.target.style.boxShadow = '0 0 0 2px var(--accent-bg)';
                                     cursorPositionsRef.current.notes = e.target.selectionStart;
@@ -1216,13 +1224,14 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     ensureElementInViewport(e.target, { preferBottom: true, scrollContainer: modalContentRef.current });
                                 }}
                                 onBlur={(e) => {
+                                    setIsNotesInputFocused(false);
                                     e.target.style.borderColor = 'var(--border-color)';
                                     e.target.style.boxShadow = 'none';
                                     if (listeningTarget !== 'notes') {
                                         setIsEditingNotes(false);
                                     }
                                 }}
-                                placeholder="Add notes or extra details..."
+                                placeholder={isNotesInputFocused ? '' : 'Add notes or extra details...'}
                                 style={{
                                     ...styles.textarea,
                                     minHeight: '85px',
@@ -1417,37 +1426,34 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                             <div
                                                 className="subtask-drag-handle"
                                                 onTouchStart={(e) => handleSubtaskTouchStart(e, index)}
+                                                onMouseDown={(e) => {
+                                                    if (window.getSelection) {
+                                                        window.getSelection().removeAllRanges();
+                                                    }
+                                                }}
                                                 style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     cursor: isDraggingThis ? 'grabbing' : 'grab',
-                                                    padding: '6px 4px',
-                                                    margin: '-2px 0 0 -2px',
+                                                    padding: '6px 8px',
+                                                    minWidth: '32px',
+                                                    minHeight: '32px',
                                                     color: isDraggingThis ? 'var(--accent-color)' : 'var(--muted-text)',
-                                                    opacity: isDraggingThis ? 1 : 0.65,
+                                                    opacity: isDraggingThis ? 1 : 0.7,
                                                     flexShrink: 0,
                                                     touchAction: 'none',
                                                     userSelect: 'none',
                                                     WebkitUserSelect: 'none',
-                                                    borderRadius: '4px'
+                                                    borderRadius: '6px',
+                                                    background: 'var(--border-color, rgba(0,0,0,0.05))'
                                                 }}
                                                 title="Drag to rearrange subtask (or use Alt+Up / Alt+Down)"
                                                 aria-label="Drag to rearrange subtask"
                                             >
                                                 <GripVertical size={16} />
                                             </div>
-                                            <input
-                                                type="checkbox"
-                                                draggable={false}
-                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                checked={st.completed}
-                                                onChange={() => {
-                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
-                                                }}
-                                                style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, marginTop: '5px' }}
-                                            />
-                                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', margin: '0 6px' }}>
                                                 <textarea
                                                     ref={(el) => {
                                                         if (el) {
@@ -1514,27 +1520,18 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                     }}
                                                 />
                                             </div>
-                                            <button
-                                                type="button"
+                                            <input
+                                                type="checkbox"
                                                 draggable={false}
                                                 onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                onClick={() => setSubtasks(subtasks.filter(s => s.id !== st.id))}
-                                                style={{
-                                                    border: 'none',
-                                                    background: 'transparent',
-                                                    color: '#ef4444',
-                                                    cursor: 'pointer',
-                                                    padding: '4px 6px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    flexShrink: 0,
-                                                    marginTop: '2px'
+                                                checked={st.completed}
+                                                onChange={() => {
+                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
                                                 }}
-                                                title="Delete step"
-                                            >
-                                                <X size={16} />
-                                            </button>
+                                                aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
+                                                title={st.completed ? "Mark incomplete" : "Mark completed"}
+                                                style={{ cursor: 'pointer', width: '18px', height: '18px', flexShrink: 0, marginTop: '6px', marginRight: '4px' }}
+                                            />
                                         </li>
                                     );
                                 })}
@@ -2186,7 +2183,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 fontWeight: '600'
                                             }}
                                         >
-                                            {showBtnIcons && <Clock size={13} />}
+                                            {showBtnIcons && <Stamp size={14} />}
                                             {showBtnText && <span>+ Timestamp</span>}
                                         </button>
                                     )}
@@ -2276,7 +2273,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     cursorPositionsRef.current[f] = e.target.selectionStart;
                                     ensureCursorVisible(e.target);
                                 }}
-                                placeholder={expandedOverlayField === 'title' ? 'Enter full task description...' : 'Add rich notes, bullet points, or extra details...'}
+                                onFocus={() => setIsOverlayFocused(true)}
+                                onBlur={() => setIsOverlayFocused(false)}
+                                placeholder={isOverlayFocused ? '' : (expandedOverlayField === 'title' ? 'Enter full task description...' : 'Add rich notes, bullet points, or extra details...')}
                                 style={{
                                     width: '100%',
                                     flex: 1,
