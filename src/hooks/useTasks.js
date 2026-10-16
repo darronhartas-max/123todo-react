@@ -228,6 +228,23 @@ export const useTasks = () => {
             if (!savedTasks && !savedArchived) {
                 initializeSampleTasks();
             }
+
+            // Prune orphaned task section persistence keys for deleted tasks
+            try {
+                const allValidIds = new Set([
+                    ...initialTasks.map(t => String(t.id)),
+                    ...sanitized.archived.map(t => String(t.id))
+                ]);
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith(STORAGE_KEYS.TASK_SECTIONS_PREFIX)) {
+                        const taskId = key.slice(STORAGE_KEYS.TASK_SECTIONS_PREFIX.length);
+                        if (!allValidIds.has(taskId)) {
+                            localStorage.removeItem(key);
+                        }
+                    }
+                });
+            } catch (pruneErr) {}
+
             setIsLoaded(true);
         } catch (error) {
             console.error('Error loading data from localStorage:', error);
@@ -444,6 +461,9 @@ export const useTasks = () => {
             return prevArchived.filter(t => String(t.id) !== String(id));
         });
         setTasks(prevTasks => prevTasks.filter(t => String(t.id) !== String(id)));
+        try {
+            localStorage.removeItem(`${STORAGE_KEYS.TASK_SECTIONS_PREFIX}${id}`);
+        } catch (e) {}
         setTimestamp(Date.now());
     }, []);
 

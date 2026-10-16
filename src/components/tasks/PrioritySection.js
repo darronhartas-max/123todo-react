@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import TaskItem from './TaskItem';
-import { PRIORITIES } from '../../utils/constants';
+import { PRIORITIES, STORAGE_KEYS } from '../../utils/constants';
 
 const PrioritySection = ({
     priority,
@@ -43,7 +43,7 @@ const PrioritySection = ({
             return true;
         }
         try {
-            const stored = localStorage.getItem('123Todo_Collapsed_Priorities');
+            const stored = localStorage.getItem(STORAGE_KEYS.COLLAPSED_PRIORITIES);
             if (stored) {
                 const list = JSON.parse(stored);
                 return Array.isArray(list) && list.includes(priority);
@@ -61,7 +61,7 @@ const PrioritySection = ({
             }
         } else {
             try {
-                const stored = localStorage.getItem('123Todo_Collapsed_Priorities');
+                const stored = localStorage.getItem(STORAGE_KEYS.COLLAPSED_PRIORITIES);
                 if (stored) {
                     const list = JSON.parse(stored);
                     setIsCollapsed(Array.isArray(list) && list.includes(priority));
@@ -77,7 +77,7 @@ const PrioritySection = ({
         setIsCollapsed(prev => {
             const nextState = !prev;
             try {
-                const stored = localStorage.getItem('123Todo_Collapsed_Priorities');
+                const stored = localStorage.getItem(STORAGE_KEYS.COLLAPSED_PRIORITIES);
                 let list = stored ? JSON.parse(stored) : [];
                 if (!Array.isArray(list)) list = [];
                 if (nextState) {
@@ -85,7 +85,7 @@ const PrioritySection = ({
                 } else {
                     list = list.filter(id => id !== priority);
                 }
-                localStorage.setItem('123Todo_Collapsed_Priorities', JSON.stringify(list));
+                localStorage.setItem(STORAGE_KEYS.COLLAPSED_PRIORITIES, JSON.stringify(list));
             } catch (err) {}
             return nextState;
         });

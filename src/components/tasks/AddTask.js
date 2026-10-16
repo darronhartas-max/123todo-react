@@ -7,6 +7,7 @@ import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/v
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
+import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
 import TimePickerModal from '../modals/TimePickerModal';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
@@ -38,86 +39,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const [showSubtasks, setShowSubtasks] = useState(false);
     const [subtasks, setSubtasks] = useState([]);
     const [newSubtaskText, setNewSubtaskText] = useState('');
-    const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
-    const [dragOverSubtaskInfo, setDragOverSubtaskInfo] = useState(null);
-    const touchSubtaskRef = useRef(null);
-    const touchCleanupsRef = useRef(null);
-
-    useEffect(() => {
-        return () => {
-            if (touchCleanupsRef.current) {
-                touchCleanupsRef.current();
-                touchCleanupsRef.current = null;
-            }
-        };
-    }, []);
-
-    const handleSubtaskTouchStart = (e, index) => {
-        e.stopPropagation();
-        if (!e.touches || e.touches.length !== 1) return;
-
-        if (document.activeElement && typeof document.activeElement.blur === 'function') {
-            document.activeElement.blur();
-        }
-
-        touchSubtaskRef.current = {
-            startIndex: index,
-            lastOverIndex: index,
-            lastPosition: 'before'
-        };
-        setDraggedSubtaskIndex(index);
-        if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-            try { window.navigator.vibrate(12); } catch (err) {}
-        }
-
-        const onTouchMove = (moveEvent) => {
-            if (!touchSubtaskRef.current) return;
-            if (moveEvent.cancelable) moveEvent.preventDefault();
-            const currentTouch = moveEvent.touches[0];
-            if (!currentTouch) return;
-
-            const targetEl = document.elementFromPoint(currentTouch.clientX, currentTouch.clientY);
-            const targetLi = targetEl ? targetEl.closest('[data-subtask-index]') : null;
-            if (targetLi) {
-                const targetIdx = parseInt(targetLi.getAttribute('data-subtask-index'), 10);
-                if (!isNaN(targetIdx)) {
-                    const rect = targetLi.getBoundingClientRect();
-                    const pos = currentTouch.clientY < (rect.top + rect.height / 2) ? 'before' : 'after';
-                    touchSubtaskRef.current.lastOverIndex = targetIdx;
-                    touchSubtaskRef.current.lastPosition = pos;
-                    setDragOverSubtaskInfo({ index: targetIdx, position: pos });
-                }
-            }
-        };
-
-        const onTouchEnd = () => {
-            removeListeners();
-            const active = touchSubtaskRef.current;
-            if (active && active.startIndex !== null && active.lastOverIndex !== null) {
-                setSubtasks((prevSubtasks) => {
-                    return reorderList(prevSubtasks, active.startIndex, active.lastOverIndex, active.lastPosition);
-                });
-                if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-                    try { window.navigator.vibrate(10); } catch (err) {}
-                }
-            }
-            touchSubtaskRef.current = null;
-            setDraggedSubtaskIndex(null);
-            setDragOverSubtaskInfo(null);
-        };
-
-        const removeListeners = () => {
-            window.removeEventListener('touchmove', onTouchMove);
-            window.removeEventListener('touchend', onTouchEnd);
-            window.removeEventListener('touchcancel', onTouchEnd);
-            touchCleanupsRef.current = null;
-        };
-        touchCleanupsRef.current = removeListeners;
-
-        window.addEventListener('touchmove', onTouchMove, { passive: false });
-        window.addEventListener('touchend', onTouchEnd);
-        window.addEventListener('touchcancel', onTouchEnd);
-    };
+    const {
+        draggedSubtaskIndex,
+        dragOverSubtaskInfo,
+        handleSubtaskTouchStart,
+        setDraggedSubtaskIndex,
+        setDragOverSubtaskInfo
+    } = useSubtaskReorder(subtasks, (reordered) => {
+        setSubtasks(reordered);
+    });
     
     const [showSchedule, setShowSchedule] = useState(false);
     const [scheduledDate, setScheduledDate] = useState(null);

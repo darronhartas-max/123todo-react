@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH } from '../../utils/constants';
+import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
@@ -9,6 +9,7 @@ import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/v
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { reorderList } from '../../utils/reorderUtils';
+import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
 import TimePickerModal from './TimePickerModal';
 
 const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', showTaskCreationDate = false }) => {
@@ -30,7 +31,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     // Section Visibility Persistence: Remember whether Note, Subtasks, Schedule are hidden/shown
     const getInitialVisibility = (sectionKey, defaultHasData) => {
         try {
-            const stored = localStorage.getItem(`123todo_task_sections_${task.id}`);
+            const stored = localStorage.getItem(`${STORAGE_KEYS.TASK_SECTIONS_PREFIX}${task.id}`);
             if (stored) {
                 const parsed = JSON.parse(stored);
                 if (typeof parsed[sectionKey] === 'boolean') {
@@ -67,7 +68,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             setShowSchedule(nextValue);
         }
         try {
-            const key = `123todo_task_sections_${task.id}`;
+            const key = `${STORAGE_KEYS.TASK_SECTIONS_PREFIX}${task.id}`;
             const existing = JSON.parse(localStorage.getItem(key) || '{}');
             existing[sectionKey] = nextValue;
             localStorage.setItem(key, JSON.stringify(existing));
@@ -219,86 +220,15 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     // Subtask states
     const [subtasks, setSubtasks] = useState(task.subtasks || []);
     const [newSubtaskText, setNewSubtaskText] = useState('');
-    const [draggedSubtaskIndex, setDraggedSubtaskIndex] = useState(null);
-    const [dragOverSubtaskInfo, setDragOverSubtaskInfo] = useState(null);
-    const touchSubtaskRef = useRef(null);
-    const touchCleanupsRef = useRef(null);
-
-    useEffect(() => {
-        return () => {
-            if (touchCleanupsRef.current) {
-                touchCleanupsRef.current();
-                touchCleanupsRef.current = null;
-            }
-        };
-    }, []);
-
-    const handleSubtaskTouchStart = (e, index) => {
-        e.stopPropagation();
-        if (!e.touches || e.touches.length !== 1) return;
-
-        if (document.activeElement && typeof document.activeElement.blur === 'function') {
-            document.activeElement.blur();
-        }
-
-        touchSubtaskRef.current = {
-            startIndex: index,
-            lastOverIndex: index,
-            lastPosition: 'before'
-        };
-        setDraggedSubtaskIndex(index);
-        if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-            try { window.navigator.vibrate(12); } catch (err) {}
-        }
-
-        const onTouchMove = (moveEvent) => {
-            if (!touchSubtaskRef.current) return;
-            if (moveEvent.cancelable) moveEvent.preventDefault();
-            const currentTouch = moveEvent.touches[0];
-            if (!currentTouch) return;
-
-            const targetEl = document.elementFromPoint(currentTouch.clientX, currentTouch.clientY);
-            const targetLi = targetEl ? targetEl.closest('[data-subtask-index]') : null;
-            if (targetLi) {
-                const targetIdx = parseInt(targetLi.getAttribute('data-subtask-index'), 10);
-                if (!isNaN(targetIdx)) {
-                    const rect = targetLi.getBoundingClientRect();
-                    const pos = currentTouch.clientY < (rect.top + rect.height / 2) ? 'before' : 'after';
-                    touchSubtaskRef.current.lastOverIndex = targetIdx;
-                    touchSubtaskRef.current.lastPosition = pos;
-                    setDragOverSubtaskInfo({ index: targetIdx, position: pos });
-                }
-            }
-        };
-
-        const onTouchEnd = () => {
-            removeListeners();
-            const active = touchSubtaskRef.current;
-            if (active && active.startIndex !== null && active.lastOverIndex !== null) {
-                setSubtasks((prevSubtasks) => {
-                    return reorderList(prevSubtasks, active.startIndex, active.lastOverIndex, active.lastPosition);
-                });
-                if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-                    try { window.navigator.vibrate(10); } catch (err) {}
-                }
-            }
-            touchSubtaskRef.current = null;
-            setDraggedSubtaskIndex(null);
-            setDragOverSubtaskInfo(null);
-        };
-
-        const removeListeners = () => {
-            window.removeEventListener('touchmove', onTouchMove);
-            window.removeEventListener('touchend', onTouchEnd);
-            window.removeEventListener('touchcancel', onTouchEnd);
-            touchCleanupsRef.current = null;
-        };
-        touchCleanupsRef.current = removeListeners;
-
-        window.addEventListener('touchmove', onTouchMove, { passive: false });
-        window.addEventListener('touchend', onTouchEnd);
-        window.addEventListener('touchcancel', onTouchEnd);
-    };
+    const {
+        draggedSubtaskIndex,
+        dragOverSubtaskInfo,
+        handleSubtaskTouchStart,
+        setDraggedSubtaskIndex,
+        setDragOverSubtaskInfo
+    } = useSubtaskReorder(subtasks, (reordered) => {
+        setSubtasks(reordered);
+    });
 
     // Scheduling and recurrence states
     const [scheduledDate, setScheduledDate] = useState(task.scheduledDate || null);

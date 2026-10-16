@@ -17,6 +17,12 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.56
+
+- **🔄 Unified Subtask Reorder Hook & Modular Architecture (Phase 4):** Extracted duplicated touch, boundary collision, and drag-and-drop gesture handlers across TaskItem, AddTask, and EditModal into a reusable useSubtaskReorder hook, eliminating redundant reordering logic and ensuring unified vibration feedback.
+- **🗄️ Storage Keys Centralization & Orphan Section Key Pruning:** Centralized all local storage identifiers into the STORAGE_KEYS registry, resolving fragmented key usage. Added automated pruning of orphaned task section keys on app startup and task deletion to prevent storage leaks.
+- **🛡️ Safe Silent Background Service Worker Activation:** Enhanced silent background service worker update transitions to safeguard against reloading while any modal dialog or active input editing is open, safely deferring reloads until the app is backgrounded.
+
 ### v3.7.55
 
 - **🔒 Security Hardening & Content Security Policy (Phase 3):** Introduced strict Content-Security-Policy (CSP) headers restricting script execution, network endpoints, and frame embeddings to authenticated origins.

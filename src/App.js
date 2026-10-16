@@ -73,7 +73,7 @@ const TodoApp = () => {
     tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp,
     dateFormat: localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT,
     taskLengthLimit: localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT,
-    adminPasswordHash: localStorage.getItem('123TodoAdminPassHash')
+    adminPasswordHash: localStorage.getItem(STORAGE_KEYS.ADMIN_PASS_HASH)
   }), [tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp]);
 
   const gdriveSync = useGoogleDriveSync(syncPayloadData, importData, syncProvider === 'gdrive');
@@ -194,7 +194,7 @@ const TodoApp = () => {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUpdatedModal, setShowUpdatedModal] = useState(false);
-  const [prevVersionStr] = useState(() => localStorage.getItem('123Todo_Previous_Version') || '');
+  const [prevVersionStr] = useState(() => localStorage.getItem(STORAGE_KEYS.PREVIOUS_VERSION) || '');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showInstallGuideModal, setShowInstallGuideModal] = useState(false);
   const [emailModalState, setEmailModalState] = useState({
@@ -232,8 +232,8 @@ const TodoApp = () => {
 
   // Record latest seen version silently for background updates
   useEffect(() => {
-    localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
-    localStorage.removeItem('123Todo_Show_Updated_Modal');
+    localStorage.setItem(STORAGE_KEYS.LAST_SEEN_VERSION, APP_VERSION);
+    localStorage.removeItem(STORAGE_KEYS.SHOW_UPDATED_MODAL);
   }, []);
 
   // Initialise first-use timestamp for smart share modal
@@ -291,7 +291,7 @@ const TodoApp = () => {
 
   // Preference state loaded from localStorage or default
   const [fontSize, setFontSizeState] = useState(() => {
-    const saved = localStorage.getItem('123TodoFontSize');
+    const saved = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
     if (saved) {
       const parsed = parseInt(saved, 10);
       if (!isNaN(parsed) && parsed >= 8 && parsed <= 24) {
@@ -301,7 +301,7 @@ const TodoApp = () => {
     return getDefaultFontSize();
   });
   const [notesFontSize, setNotesFontSizeState] = useState(() => {
-    const saved = localStorage.getItem('123TodoNotesFontSize');
+    const saved = localStorage.getItem(STORAGE_KEYS.NOTES_FONT_SIZE);
     if (saved) {
       const parsed = parseInt(saved, 10);
       if (!isNaN(parsed) && parsed >= 8 && parsed <= 24) {
@@ -311,24 +311,24 @@ const TodoApp = () => {
     return 18;
   });
   const [layoutWidth, setLayoutWidthState] = useState(() => {
-    const saved = localStorage.getItem('123TodoLayoutWidth');
+    const saved = localStorage.getItem(STORAGE_KEYS.LAYOUT_WIDTH);
     if (saved === '800px' || saved === '1200px') return '480px';
     return saved || '480px';
   });
   const [wideColumnView, setWideColumnViewState] = useState(() => {
-    return localStorage.getItem('123TodoWideColumnView') || 'priorities';
+    return localStorage.getItem(STORAGE_KEYS.WIDE_COLUMN_VIEW) || 'priorities';
   });
   const [syncSpeed, setSyncSpeedState] = useState(() => {
-    return localStorage.getItem('123Todo_Sync_Speed') || 'adaptive';
+    return localStorage.getItem(STORAGE_KEYS.SYNC_SPEED) || 'adaptive';
   });
   const [, setIsChiefProgrammerState] = useState(() => {
     try {
-      if (localStorage.getItem('123Todo_ChiefProgrammer') === 'true') return true;
+      if (localStorage.getItem(STORAGE_KEYS.CHIEF_PROGRAMMER) === 'true') return true;
       if (typeof window !== 'undefined' && window.location) {
         const s = window.location.search || '';
         if (s.includes('chief=true') || s.includes('programmer=true')) {
-          localStorage.setItem('123Todo_ChiefProgrammer', 'true');
-          localStorage.setItem('123Todo_Sync_Speed', 'instant');
+          localStorage.setItem(STORAGE_KEYS.CHIEF_PROGRAMMER, 'true');
+          localStorage.setItem(STORAGE_KEYS.SYNC_SPEED, 'instant');
           return true;
         }
       }
@@ -340,12 +340,12 @@ const TodoApp = () => {
     setIsChiefProgrammerState(prev => {
       const nextVal = enable !== undefined ? Boolean(enable) : !prev;
       if (nextVal) {
-        localStorage.setItem('123Todo_ChiefProgrammer', 'true');
-        localStorage.setItem('123Todo_Sync_Speed', 'instant');
+        localStorage.setItem(STORAGE_KEYS.CHIEF_PROGRAMMER, 'true');
+        localStorage.setItem(STORAGE_KEYS.SYNC_SPEED, 'instant');
         setSyncSpeedState('instant');
       } else {
-        localStorage.removeItem('123Todo_ChiefProgrammer');
-        localStorage.removeItem('123Todo_Sync_Speed');
+        localStorage.removeItem(STORAGE_KEYS.CHIEF_PROGRAMMER);
+        localStorage.removeItem(STORAGE_KEYS.SYNC_SPEED);
         setSyncSpeedState('adaptive');
       }
       return nextVal;
@@ -363,10 +363,10 @@ const TodoApp = () => {
     };
   }, [toggleChiefProgrammerMode]);
   const [themeMode, setThemeModeState] = useState(() => {
-    return localStorage.getItem('123TodoThemeMode') || 'system';
+    return localStorage.getItem(STORAGE_KEYS.THEME_MODE) || 'system';
   });
   const [lightModeTone, setLightModeToneState] = useState(() => {
-    return localStorage.getItem('123TodoLightModeTone') || DEFAULT_LIGHT_MODE_TONE;
+    return localStorage.getItem(STORAGE_KEYS.LIGHT_MODE_TONE) || DEFAULT_LIGHT_MODE_TONE;
   });
   const [dateFormat, setDateFormatState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT;
@@ -375,7 +375,7 @@ const TodoApp = () => {
     return localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT;
   });
   const [isBoldFont, setIsBoldFontState] = useState(() => {
-    return localStorage.getItem('123TodoBoldFont') === 'true';
+    return localStorage.getItem(STORAGE_KEYS.BOLD_FONT) === 'true';
   });
   const [taskViewMode, setTaskViewModeState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.TASK_VIEW_MODE) || DEFAULT_TASK_VIEW_MODE;
@@ -390,11 +390,11 @@ const TodoApp = () => {
 
   const setFontSize = (size) => {
     setFontSizeState(size);
-    localStorage.setItem('123TodoFontSize', size.toString());
+    localStorage.setItem(STORAGE_KEYS.FONT_SIZE, size.toString());
   };
   const setNotesFontSize = (size) => {
     setNotesFontSizeState(size);
-    localStorage.setItem('123TodoNotesFontSize', size.toString());
+    localStorage.setItem(STORAGE_KEYS.NOTES_FONT_SIZE, size.toString());
   };
   const setNotesAutosaveDelay = (val) => {
     setNotesAutosaveDelayState(val);
@@ -402,23 +402,23 @@ const TodoApp = () => {
   };
   const setLayoutWidth = (val) => {
     setLayoutWidthState(val);
-    localStorage.setItem('123TodoLayoutWidth', val);
+    localStorage.setItem(STORAGE_KEYS.LAYOUT_WIDTH, val);
   };
   const setWideColumnView = (val) => {
     setWideColumnViewState(val);
-    localStorage.setItem('123TodoWideColumnView', val);
+    localStorage.setItem(STORAGE_KEYS.WIDE_COLUMN_VIEW, val);
   };
   const setSyncSpeed = (val) => {
     setSyncSpeedState(val);
-    localStorage.setItem('123Todo_Sync_Speed', val);
+    localStorage.setItem(STORAGE_KEYS.SYNC_SPEED, val);
   };
   const setThemeMode = (mode) => {
     setThemeModeState(mode);
-    localStorage.setItem('123TodoThemeMode', mode);
+    localStorage.setItem(STORAGE_KEYS.THEME_MODE, mode);
   };
   const setLightModeTone = (tone) => {
     setLightModeToneState(tone);
-    localStorage.setItem('123TodoLightModeTone', tone);
+    localStorage.setItem(STORAGE_KEYS.LIGHT_MODE_TONE, tone);
   };
   const setDateFormat = (val) => {
     setDateFormatState(val);
@@ -439,7 +439,7 @@ const TodoApp = () => {
   const setIsBoldFont = (val) => {
     setIsBoldFontState(val);
     try {
-      localStorage.setItem('123TodoBoldFont', val ? 'true' : 'false');
+      localStorage.setItem(STORAGE_KEYS.BOLD_FONT, val ? 'true' : 'false');
     } catch (e) {
       console.error('Failed to save bold font preference:', e);
     }
@@ -698,7 +698,7 @@ const TodoApp = () => {
   }, [themeMode, lightModeTone]);
 
   const handleOpenRestoreShadow = () => {
-    const shadowRaw = localStorage.getItem('123TodoShadowBackup');
+    const shadowRaw = localStorage.getItem(STORAGE_KEYS.SHADOW_BACKUP);
     if (!shadowRaw) {
       alert("No shadow backup found on this browser.");
       return;
@@ -1716,9 +1716,9 @@ const TodoApp = () => {
           oldVersion={prevVersionStr}
           newVersion={APP_VERSION}
           onClose={() => {
-            localStorage.setItem('123Todo_Last_Seen_Version', APP_VERSION);
-            localStorage.removeItem('123Todo_Show_Updated_Modal');
-            localStorage.removeItem('123Todo_Previous_Version');
+            localStorage.setItem(STORAGE_KEYS.LAST_SEEN_VERSION, APP_VERSION);
+            localStorage.removeItem(STORAGE_KEYS.SHOW_UPDATED_MODAL);
+            localStorage.removeItem(STORAGE_KEYS.PREVIOUS_VERSION);
             setShowUpdatedModal(false);
           }}
         />

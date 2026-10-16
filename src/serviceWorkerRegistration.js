@@ -22,13 +22,18 @@ export function register(config) {
         let refreshing = false;
         const reloadSilently = () => {
             if (refreshing) return;
-            // Defer if user is currently typing in an input/textarea to preserve active typing
+            // Defer if user is currently typing in an input/textarea or has an active modal open
             const isEditing = document.activeElement && (
                 document.activeElement.tagName === 'INPUT' ||
                 document.activeElement.tagName === 'TEXTAREA' ||
                 document.activeElement.isContentEditable
             );
-            if (isEditing) {
+            const isModalOpen = Boolean(
+                document.querySelector('[role="dialog"]') ||
+                document.querySelector('.modal-overlay')
+            );
+
+            if (isEditing || isModalOpen) {
                 const performDeferredReload = () => {
                     if (!refreshing) {
                         refreshing = true;
@@ -38,7 +43,9 @@ export function register(config) {
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'hidden') performDeferredReload();
                 }, { once: true });
-                document.activeElement.addEventListener('blur', performDeferredReload, { once: true });
+                if (isEditing && document.activeElement) {
+                    document.activeElement.addEventListener('blur', performDeferredReload, { once: true });
+                }
                 return;
             }
             refreshing = true;

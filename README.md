@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.55** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.56** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.55 (Current)
+### v3.7.56 (Current)
+
+- **Unified Subtask Reorder Hook & Modular Architecture (Phase 4)**: Extracted duplicated touch, boundary collision, and drag-and-drop gesture handlers across `TaskItem`, `AddTask`, and `EditModal` into a reusable `useSubtaskReorder` hook, eliminating redundant code and unifying vibration feedback.
+- **Storage Keys Centralization & Orphan Key Pruning**: Centralized all local storage identifiers into the `STORAGE_KEYS` registry, resolving fragmented key usage. Added automated pruning of orphaned task section keys on app startup and task deletion to prevent storage leaks.
+- **Safe Silent Background Service Worker Activation**: Enhanced silent background service worker update transitions to safeguard against reloading while any modal dialog or active input editing is open, safely deferring reloads until the app is backgrounded.
+
+### v3.7.55
 
 - **Security Hardening & Content Security Policy (Phase 3)**: Introduced strict Content-Security-Policy (CSP) headers restricting script execution, network endpoints, and frame embeddings to authenticated origins.
 - **Cloudflare Worker Hardening & Dynamic Google GSI Loading**: Upgraded device pairing codes to cryptographically secure random values (`crypto.getRandomValues`) and enforced a 2MB maximum payload limit on cloud sync pushes. Replaced unconditional Google Identity Services script loading with on-demand dynamic script injection only when Google Drive sync is active.

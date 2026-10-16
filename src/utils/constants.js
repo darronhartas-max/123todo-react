@@ -46,7 +46,25 @@ export const STORAGE_KEYS = {
   TIME_SCHEDULING_ENABLED: '123Todo_TimeSchedulingEnabled',
   BUTTON_DISPLAY_MODE: '123Todo_ButtonDisplayMode',
   SHOW_TASK_CREATION_DATE: '123Todo_ShowTaskCreationDate',
-  STARTED_USING: '123TodoStartedUsing'
+  STARTED_USING: '123TodoStartedUsing',
+  FONT_SIZE: '123TodoFontSize',
+  THEME_MODE: '123TodoThemeMode',
+  BOLD_FONT: '123TodoBoldFont',
+  SYNC_PASSPHRASE: '123Todo_Sync_Passphrase',
+  GOOGLE_AUTHED: '123Todo_Google_Authed',
+  GOOGLE_ACCESS_TOKEN: '123Todo_Google_AccessToken',
+  GOOGLE_TOKEN_EXPIRY: '123Todo_Google_TokenExpiry',
+  COLLAPSED_PRIORITIES: '123Todo_Collapsed_Priorities',
+  TASK_SECTIONS_PREFIX: '123todo_task_sections_',
+  ADMIN_PASS_HASH: '123TodoAdminPassHash',
+  LAYOUT_WIDTH: '123TodoLayoutWidth',
+  WIDE_COLUMN_VIEW: '123TodoWideColumnView',
+  SYNC_SPEED: '123Todo_Sync_Speed',
+  CHIEF_PROGRAMMER: '123Todo_ChiefProgrammer',
+  LIGHT_MODE_TONE: '123TodoLightModeTone',
+  LAST_SEEN_VERSION: '123Todo_Last_Seen_Version',
+  PREVIOUS_VERSION: '123Todo_Previous_Version',
+  SHOW_UPDATED_MODAL: '123Todo_Show_Updated_Modal'
 };
 
 export const BUTTON_DISPLAY_MODES = [
@@ -158,6 +176,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.56': [
+    { title: '🔄 Unified Subtask Reorder Hook & Modular Architecture (Phase 4):', desc: 'Extracted duplicated touch, boundary collision, and drag-and-drop gesture handlers across TaskItem, AddTask, and EditModal into a reusable useSubtaskReorder hook, eliminating redundant reordering logic and ensuring unified vibration feedback.' },
+    { title: '🗄️ Storage Keys Centralization & Orphan Section Key Pruning:', desc: 'Centralized all local storage identifiers into the STORAGE_KEYS registry, resolving fragmented key usage. Added automated pruning of orphaned task section keys on app startup and task deletion to prevent storage leaks.' },
+    { title: '🛡️ Safe Silent Background Service Worker Activation:', desc: 'Enhanced silent background service worker update transitions to safeguard against reloading while any modal dialog or active input editing is open, safely deferring reloads until the app is backgrounded.' }
+  ],
   '3.7.55': [
     { title: '🔒 Security Hardening & Content Security Policy (Phase 3):', desc: 'Introduced strict Content-Security-Policy (CSP) headers restricting script execution, network endpoints, and frame embeddings to authenticated origins.' },
     { title: '🛡️ Cloudflare Worker Hardening & Dynamic Google GSI Loading:', desc: 'Upgraded device pairing codes to cryptographically secure random values (crypto.getRandomValues) and enforced a 2MB maximum payload limit on cloud sync pushes. Replaced unconditional Google Identity Services script loading with on-demand dynamic script injection only when Google Drive sync is active.' }
