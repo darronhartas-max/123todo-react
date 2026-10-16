@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.54
+
+- **⚡ Performance & Rendering Optimization (Phase 2):** Memoized TaskItem, NoteCard, PrioritySection, and ProjectColumn components to eliminate unnecessary re-renders across task and note lists. Replaced linear project lookups with O(1) indexed maps for smoother dragging and list interactions.
+- **💾 Granular Storage Persistence & Bounded Photo Caching:** Optimized local storage persistence to only synchronize modified state slices instead of re-serializing the entire archive and active datasets on every state change. Added a bounded 25-item LRU cache and persistent connection pooling for IndexedDB photo storage.
+
 ### v3.7.53
 
 - **⚡ Performance & Bundle Optimization (Phase 1):** Introduced intelligent dynamic code-splitting with React.lazy and Suspense for all modal dialogs and secondary views. Cut initial production entry bundle size by 25% (saving ~65kB gzipped) for faster initial app load and snappy responsiveness on mobile devices.

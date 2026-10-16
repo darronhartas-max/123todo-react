@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import TaskItem from './TaskItem';
@@ -25,6 +25,16 @@ const ProjectColumn = ({
     timeSchedulingEnabled = true,
     searchTerm = ''
 }) => {
+    const projectLookup = useMemo(() => {
+        const map = new Map();
+        if (!projects || !Array.isArray(projects)) return map;
+        for (const p of projects) {
+            if (p.id) map.set(p.id.toLowerCase(), p);
+            if (p.name) map.set(p.name.toLowerCase(), p);
+        }
+        return map;
+    }, [projects]);
+
     const projectTasks = tasks.filter(t => 
         (t.projectId || 'general').toLowerCase() === project.id.toLowerCase() ||
         (t.projectId || 'general').toLowerCase() === project.name.toLowerCase()
@@ -186,10 +196,7 @@ const ProjectColumn = ({
 
                             <AnimatePresence initial={false}>
                                 {projectTasks.map(task => {
-                                    const proj = projects.find(p => 
-                                        p.id.toLowerCase() === (task.projectId || 'general').toLowerCase() || 
-                                        p.name.toLowerCase() === (task.projectId || 'general').toLowerCase()
-                                    );
+                                    const proj = projectLookup.get((task.projectId || 'general').toLowerCase());
                                     return (
                                         <TaskItem
                                             key={task.id}
@@ -234,4 +241,4 @@ const ProjectColumn = ({
     );
 };
 
-export default ProjectColumn;
+export default React.memo(ProjectColumn);

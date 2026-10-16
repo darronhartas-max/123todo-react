@@ -1447,4 +1447,27 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
     );
 };
 
-export default TaskItem;
+const areTaskItemPropsEqual = (prevProps, nextProps) => {
+    return (
+        prevProps.task === nextProps.task &&
+        prevProps.isArchived === nextProps.isArchived &&
+        prevProps.isDragging === nextProps.isDragging &&
+        prevProps.isDragOver === nextProps.isDragOver &&
+        prevProps.projectColor === nextProps.projectColor &&
+        prevProps.projectName === nextProps.projectName &&
+        prevProps.showFullDetails === nextProps.showFullDetails &&
+        prevProps.dateFormat === nextProps.dateFormat &&
+        prevProps.taskViewMode === nextProps.taskViewMode &&
+        prevProps.viewProfile === nextProps.viewProfile &&
+        prevProps.timeSchedulingEnabled === nextProps.timeSchedulingEnabled &&
+        prevProps.swipeSettings === nextProps.swipeSettings &&
+        prevProps.onComplete === nextProps.onComplete &&
+        prevProps.onDelete === nextProps.onDelete &&
+        prevProps.onRestore === nextProps.onRestore &&
+        prevProps.onEdit === nextProps.onEdit &&
+        prevProps.onUpdate === nextProps.onUpdate &&
+        prevProps.onSwipeAction === nextProps.onSwipeAction
+    );
+};
+
+export default React.memo(TaskItem, areTaskItemPropsEqual);

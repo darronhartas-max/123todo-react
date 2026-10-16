@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
 import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp, promoteDueScheduledTasks, insertTaskInTimeOrder } from '../utils/dateUtils';
 import { savePhotos } from '../utils/photoStorage';
@@ -98,6 +98,14 @@ export const useTasks = () => {
     const [counter, setCounter] = useState(0);
     const [timestamp, setTimestamp] = useState(Date.now());
     const [isLoaded, setIsLoaded] = useState(false);
+
+    const prevTasksRef = useRef();
+    const prevArchivedRef = useRef();
+    const prevProjectsRef = useRef();
+    const prevDeletedProjectsRef = useRef();
+    const prevDeletedTasksRef = useRef();
+    const prevCounterRef = useRef();
+    const prevTimestampRef = useRef();
 
     const initializeSampleTasks = useCallback(() => {
         const userDataKeys = Object.keys(localStorage).filter(key =>
@@ -233,15 +241,36 @@ export const useTasks = () => {
     useEffect(() => {
         if (!isLoaded) return;
         try {
-            const stTasks = sanitizeTasksForStorage(tasks);
-            const stArchived = sanitizeTasksForStorage(archived);
-            localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(stTasks));
-            localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(stArchived));
-            localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
-            localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
-            localStorage.setItem(STORAGE_KEYS.DELETED_TASKS, JSON.stringify(deletedTaskKeys));
-            localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
-            localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
+            if (prevTasksRef.current !== tasks) {
+                const stTasks = sanitizeTasksForStorage(tasks);
+                localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(stTasks));
+                prevTasksRef.current = tasks;
+            }
+            if (prevArchivedRef.current !== archived) {
+                const stArchived = sanitizeTasksForStorage(archived);
+                localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(stArchived));
+                prevArchivedRef.current = archived;
+            }
+            if (prevProjectsRef.current !== projects) {
+                localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+                prevProjectsRef.current = projects;
+            }
+            if (prevDeletedProjectsRef.current !== deletedProjects) {
+                localStorage.setItem(STORAGE_KEYS.DELETED_PROJECTS, JSON.stringify(deletedProjects));
+                prevDeletedProjectsRef.current = deletedProjects;
+            }
+            if (prevDeletedTasksRef.current !== deletedTaskKeys) {
+                localStorage.setItem(STORAGE_KEYS.DELETED_TASKS, JSON.stringify(deletedTaskKeys));
+                prevDeletedTasksRef.current = deletedTaskKeys;
+            }
+            if (prevCounterRef.current !== counter) {
+                localStorage.setItem(STORAGE_KEYS.COUNTER, counter.toString());
+                prevCounterRef.current = counter;
+            }
+            if (prevTimestampRef.current !== timestamp) {
+                localStorage.setItem(STORAGE_KEYS.TIMESTAMP, timestamp.toString());
+                prevTimestampRef.current = timestamp;
+            }
         } catch (storageErr) {
             console.warn('⚠️ LocalStorage save quota warning, performing safe recovery:', storageErr);
             try {

@@ -7,19 +7,44 @@ const DB_NAME = '123TodoPhotoDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'photos';
 
-// In-memory fallback if IndexedDB is blocked (e.g. strict private browsing or non-browser environments)
+// In-memory LRU cache (capped at 25 photos to eliminate RAM ballooning & memory leaks)
+const MAX_MEMORY_CACHE_ITEMS = 25;
 const memoryCache = new Map();
 
+function setMemoryCache(id, photo) {
+  if (!id || !photo) return;
+  if (memoryCache.has(id)) {
+    memoryCache.delete(id); // refresh entry position for LRU
+  } else if (memoryCache.size >= MAX_MEMORY_CACHE_ITEMS) {
+    // Evict oldest (least-recently accessed) entry
+    const oldestKey = memoryCache.keys().next().value;
+    if (oldestKey) memoryCache.delete(oldestKey);
+  }
+  memoryCache.set(id, photo);
+}
+
+function getMemoryCache(id) {
+  if (!id || !memoryCache.has(id)) return null;
+  const item = memoryCache.get(id);
+  // Re-insert to mark as recently used
+  memoryCache.delete(id);
+  memoryCache.set(id, item);
+  return item;
+}
+
+// Persistent database connection promise to eliminate connection churn
+let dbPromise = null;
+
 /**
- * Opens or upgrades the IndexedDB database.
+ * Opens or reuses the IndexedDB database connection.
  */
 const openDB = () => {
-  return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !window.indexedDB) {
-      resolve(null);
-      return;
-    }
+  if (dbPromise) return dbPromise;
+  if (typeof window === 'undefined' || !window.indexedDB) {
+    return Promise.resolve(null);
+  }
 
+  dbPromise = new Promise((resolve) => {
     try {
       const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -31,18 +56,25 @@ const openDB = () => {
       };
 
       request.onsuccess = (event) => {
-        resolve(event.target.result);
+        const db = event.target.result;
+        db.onclose = () => { dbPromise = null; };
+        db.onversionchange = () => { db.close(); dbPromise = null; };
+        resolve(db);
       };
 
       request.onerror = (event) => {
         console.warn('IndexedDB open error, falling back to in-memory:', event.target.error);
+        dbPromise = null;
         resolve(null);
       };
     } catch (err) {
       console.warn('IndexedDB access blocked, falling back to in-memory:', err);
+      dbPromise = null;
       resolve(null);
     }
   });
+
+  return dbPromise;
 };
 
 /**
@@ -51,7 +83,7 @@ const openDB = () => {
 export const savePhoto = async (photo) => {
   if (!photo || !photo.id) return photo;
 
-  memoryCache.set(photo.id, photo);
+  setMemoryCache(photo.id, photo);
 
   const db = await openDB();
   if (!db) return photo;
@@ -88,8 +120,9 @@ export const savePhotos = async (photos) => {
 export const getPhoto = async (id) => {
   if (!id) return null;
 
-  if (memoryCache.has(id)) {
-    return memoryCache.get(id);
+  const cached = getMemoryCache(id);
+  if (cached) {
+    return cached;
   }
 
   const db = await openDB();
@@ -103,7 +136,7 @@ export const getPhoto = async (id) => {
 
       req.onsuccess = () => {
         const result = req.result || null;
-        if (result) memoryCache.set(id, result);
+        if (result) setMemoryCache(id, result);
         resolve(result);
       };
       req.onerror = () => resolve(null);

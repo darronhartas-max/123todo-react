@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import TaskItem from './TaskItem';
@@ -27,6 +27,16 @@ const PrioritySection = ({
 }) => {
     const config = PRIORITIES[priority];
     const sectionTasks = tasks.filter(t => t.priority === priority);
+
+    const projectLookup = useMemo(() => {
+        const map = new Map();
+        if (!projects || !Array.isArray(projects)) return map;
+        for (const p of projects) {
+            if (p.id) map.set(p.id.toLowerCase(), p);
+            if (p.name) map.set(p.name.toLowerCase(), p);
+        }
+        return map;
+    }, [projects]);
 
     const [isCollapsed, setIsCollapsed] = useState(() => {
         if (viewProfile === 'lite' && priority !== 1) {
@@ -178,10 +188,7 @@ const PrioritySection = ({
                         >
                             <AnimatePresence initial={false}>
                                 {sectionTasks.map(task => {
-                                    const project = projects.find(p => 
-                                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                                        p.name.toLowerCase() === task.projectId?.toLowerCase()
-                                    );
+                                    const project = task.projectId ? projectLookup.get(task.projectId.toLowerCase()) : undefined;
                                     return (
                                         <TaskItem
                                             key={task.id}
@@ -226,4 +233,4 @@ const PrioritySection = ({
     );
 };
 
-export default PrioritySection;
+export default React.memo(PrioritySection);

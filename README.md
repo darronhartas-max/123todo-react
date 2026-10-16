@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.53** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.54** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.53 (Current)
+### v3.7.54 (Current)
+
+- **Performance & Rendering Optimization (Phase 2)**: Memoized `TaskItem`, `NoteCard`, `PrioritySection`, and `ProjectColumn` components with custom equality comparators to eliminate unnecessary re-renders across task and note lists. Replaced linear project scans with O(1) indexed maps for smoother dragging and list interactions.
+- **Granular Storage Persistence & Bounded Photo Caching**: Optimized local storage persistence in `useTasks.js` to only synchronize modified state slices instead of re-serializing the entire archive and active datasets on every state change. Added a bounded 25-item LRU cache and persistent connection pooling for IndexedDB photo storage.
+
+### v3.7.53
 
 - **Performance & Bundle Optimization (Phase 1)**: Introduced intelligent dynamic code-splitting with `React.lazy` and `Suspense` for all modal dialogs and secondary views. Cut initial production entry bundle size by 25% (saving ~65kB gzipped) for faster initial app load and snappy responsiveness on mobile devices.
 - **Asset & Storage Streamlining**: Purged over 3.5MB of unused legacy assets, duplicate share images, and unreferenced screenshots from repository and build artifacts, streamlining clean deployments.

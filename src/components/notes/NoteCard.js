@@ -1393,4 +1393,16 @@ const NoteCard = ({
   );
 };
 
-export default NoteCard;
+const areNoteCardPropsEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.note === nextProps.note &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.projects === nextProps.projects &&
+    prevProps.notesFontSize === nextProps.notesFontSize &&
+    prevProps.notesAutosaveDelay === nextProps.notesAutosaveDelay &&
+    prevProps.viewProfile === nextProps.viewProfile &&
+    prevProps.buttonDisplayMode === nextProps.buttonDisplayMode
+  );
+};
+
+export default React.memo(NoteCard, areNoteCardPropsEqual);
