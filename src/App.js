@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Archive, ChevronDown, ChevronRight } from 'lucide-react';
 import Header from './components/layout/Header';
@@ -9,28 +9,7 @@ import PrioritySection from './components/tasks/PrioritySection';
 import ProjectColumn from './components/tasks/ProjectColumn';
 import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
-import DeleteProjectModal from './components/modals/DeleteProjectModal';
-import SettingsModal from './components/modals/SettingsModal';
 import ProjectTabs from './components/projects/ProjectTabs';
-import EditModal from './components/modals/EditModal';
-import CongratsModal from './components/modals/CongratsModal';
-import AchievementsModal from './components/modals/AchievementsModal';
-import TodoistImportModal from './components/modals/TodoistImportModal';
-import TodoistGuideModal from './components/modals/TodoistGuideModal';
-import UniversalImportModal from './components/modals/UniversalImportModal';
-import ImportSelectionModal from './components/modals/ImportSelectionModal';
-import RestoreShadowModal from './components/modals/RestoreShadowModal';
-import SyncModal from './components/modals/SyncModal';
-import SyncDroppedModal from './components/modals/SyncDroppedModal';
-import UpdatedModal from './components/modals/UpdatedModal';
-import ExportModal from './components/modals/ExportModal';
-import SharePromptModal from './components/modals/SharePromptModal';
-import ArchiveModal from './components/modals/ArchiveModal';
-import AdminStatsModal from './components/modals/AdminStatsModal';
-import SkinDiscoveryModal from './components/modals/SkinDiscoveryModal';
-import InstallGuideModal from './components/modals/InstallGuideModal';
-import EmailClientModal from './components/modals/EmailClientModal';
-import NotesView from './components/notes/NotesView';
 import { InstallPrompt, BackupReminder, SyncOfflinePrompt, WelcomeBanner } from './components/layout/NotificationBar';
 import { useTasks } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
@@ -43,6 +22,29 @@ import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 import { TenantProvider, useTenant } from './context/TenantContext';
+
+// Lazy-loaded modals & heavy views for optimal initial bundle size
+const DeleteProjectModal = lazy(() => import('./components/modals/DeleteProjectModal'));
+const SettingsModal = lazy(() => import('./components/modals/SettingsModal'));
+const EditModal = lazy(() => import('./components/modals/EditModal'));
+const CongratsModal = lazy(() => import('./components/modals/CongratsModal'));
+const AchievementsModal = lazy(() => import('./components/modals/AchievementsModal'));
+const TodoistImportModal = lazy(() => import('./components/modals/TodoistImportModal'));
+const TodoistGuideModal = lazy(() => import('./components/modals/TodoistGuideModal'));
+const UniversalImportModal = lazy(() => import('./components/modals/UniversalImportModal'));
+const ImportSelectionModal = lazy(() => import('./components/modals/ImportSelectionModal'));
+const RestoreShadowModal = lazy(() => import('./components/modals/RestoreShadowModal'));
+const SyncModal = lazy(() => import('./components/modals/SyncModal'));
+const SyncDroppedModal = lazy(() => import('./components/modals/SyncDroppedModal'));
+const UpdatedModal = lazy(() => import('./components/modals/UpdatedModal'));
+const ExportModal = lazy(() => import('./components/modals/ExportModal'));
+const SharePromptModal = lazy(() => import('./components/modals/SharePromptModal'));
+const ArchiveModal = lazy(() => import('./components/modals/ArchiveModal'));
+const AdminStatsModal = lazy(() => import('./components/modals/AdminStatsModal'));
+const SkinDiscoveryModal = lazy(() => import('./components/modals/SkinDiscoveryModal'));
+const InstallGuideModal = lazy(() => import('./components/modals/InstallGuideModal'));
+const EmailClientModal = lazy(() => import('./components/modals/EmailClientModal'));
+const NotesView = lazy(() => import('./components/notes/NotesView'));
 
 const TodoApp = () => {
   const {
@@ -1129,25 +1131,27 @@ const TodoApp = () => {
           )}
 
           {appMode === 'notes' ? (
-            <NotesView
-              tasks={tasks}
-              projects={availableProjects}
-              onAddNote={handleAddNote}
-              onUpdateTask={updateTask}
-              onConvertNoteToTask={(id, p) => convertNoteToTask(id, p)}
-              onCompleteTask={handleCompleteTask}
-              onDeleteTask={(id) => handleCompleteTask(id)}
-              onAssignProject={(id, projId) => updateTask(id, { projectId: projId })}
-              onBulkAssignProject={bulkAssignProject}
-              activeProjectFilter={currentProjectId}
-              onSelectProjectFilter={setCurrentProjectId}
-              searchQuery={searchTerm}
-              onSearchChange={setSearchTerm}
-              notesFontSize={notesFontSize}
-              notesAutosaveDelay={notesAutosaveDelay}
-              viewProfile={viewProfile}
-              buttonDisplayMode={buttonDisplayMode}
-            />
+            <Suspense fallback={null}>
+              <NotesView
+                tasks={tasks}
+                projects={availableProjects}
+                onAddNote={handleAddNote}
+                onUpdateTask={updateTask}
+                onConvertNoteToTask={(id, p) => convertNoteToTask(id, p)}
+                onCompleteTask={handleCompleteTask}
+                onDeleteTask={(id) => handleCompleteTask(id)}
+                onAssignProject={(id, projId) => updateTask(id, { projectId: projId })}
+                onBulkAssignProject={bulkAssignProject}
+                activeProjectFilter={currentProjectId}
+                onSelectProjectFilter={setCurrentProjectId}
+                searchQuery={searchTerm}
+                onSearchChange={setSearchTerm}
+                notesFontSize={notesFontSize}
+                notesAutosaveDelay={notesAutosaveDelay}
+                viewProfile={viewProfile}
+                buttonDisplayMode={buttonDisplayMode}
+              />
+            </Suspense>
           ) : (
             <>
               {showSearch && (
@@ -1180,13 +1184,15 @@ const TodoApp = () => {
               />
 
               {projectToDelete && (
-                <DeleteProjectModal
-                  project={projectToDelete}
-                  projects={projects}
-                  taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
-                  onConfirm={handleDeleteProjectConfirm}
-                  onClose={() => setProjectToDelete(null)}
-                />
+                <Suspense fallback={null}>
+                  <DeleteProjectModal
+                    project={projectToDelete}
+                    projects={projects}
+                    taskCount={tasks.filter(t => t.projectId === projectToDelete.id).length + archived.filter(t => t.projectId === projectToDelete.id).length}
+                    onConfirm={handleDeleteProjectConfirm}
+                    onClose={() => setProjectToDelete(null)}
+                  />
+                </Suspense>
               )}
 
               <div style={styles.sectionsContainer}>
@@ -1473,6 +1479,7 @@ const TodoApp = () => {
 
       {tenantConfig?.features?.socialShare !== false && <SocialShare />}
 
+      <Suspense fallback={null}>
       {showShareModal && (
         <SharePromptModal
           onClose={() => {
@@ -1823,6 +1830,7 @@ const TodoApp = () => {
         currentMode={appMode}
         onSwitchMode={handleSwitchMode}
       />
+      </Suspense>
     </div>
   );
 };

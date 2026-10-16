@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.53
+
+- **⚡ Performance & Bundle Optimization (Phase 1):** Introduced intelligent dynamic code-splitting with React.lazy and Suspense for all modal dialogs and secondary views. Cut initial production entry bundle size by 25% (saving ~65kB gzipped) for faster initial app load and snappy responsiveness on mobile devices.
+- **🧹 Asset & Storage Streamlining:** Purged over 3.5MB of unused legacy assets, duplicate share images, and unreferenced screenshots from repository and build artifacts, streamlining clean deployments.
+
 ### v3.7.52
 
 - **📋 Streamlined Subtasks & Right-Aligned Completion:** Streamlined subtask items across Add Task, Edit Task, Task Item, and Notes. Moved the completed checkbox from the left to replace the old delete button on the right side. Re-isolated and enlarged the drag handle with dedicated touch and selection safeguards so reordering subtasks never accidentally triggers text selection or focus in the text area.

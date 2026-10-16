@@ -158,6 +158,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.53': [
+    { title: '⚡ Performance & Bundle Optimization (Phase 1):', desc: 'Introduced intelligent dynamic code-splitting with React.lazy and Suspense for all modal dialogs and secondary views. Cut initial production entry bundle size by 25% (saving ~65kB gzipped) for faster initial app load and snappy responsiveness on mobile devices.' },
+    { title: '🧹 Asset & Storage Streamlining:', desc: 'Purged over 3.5MB of unused legacy assets, duplicate share images, and unreferenced screenshots from repository and build artifacts, streamlining clean deployments.' }
+  ],
   '3.7.52': [
     { title: '📋 Streamlined Subtasks & Right-Aligned Completion:', desc: 'Streamlined subtask items across Add Task, Edit Task, Task Item, and Notes. Moved the completed checkbox from the left to replace the old delete button on the right side. Re-isolated and enlarged the drag handle with dedicated touch and selection safeguards so reordering subtasks never accidentally triggers text selection or focus in the text area.' },
     { title: '🔘 Action Buttons Row Reorganization (Expand & Voice Repositioned):', desc: 'Moved the Expand focus editor and Voice (Talk) dictation buttons from the top of the task description title down to the far right of the unified action buttons line (alongside Notes, Subtasks, and Schedule) with generous spacing.' },

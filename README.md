@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.52** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.53** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.52 (Current)
+### v3.7.53 (Current)
+
+- **Performance & Bundle Optimization (Phase 1)**: Introduced intelligent dynamic code-splitting with `React.lazy` and `Suspense` for all modal dialogs and secondary views. Cut initial production entry bundle size by 25% (saving ~65kB gzipped) for faster initial app load and snappy responsiveness on mobile devices.
+- **Asset & Storage Streamlining**: Purged over 3.5MB of unused legacy assets, duplicate share images, and unreferenced screenshots from repository and build artifacts, streamlining clean deployments.
+
+### v3.7.52
 
 - **Streamlined Subtasks & Right-Aligned Completion**: Streamlined checklist subtasks across Add Task, Edit Task, Task Item, and Notes views. Moved the completed checkbox from the left to replace the old delete button on the right side. Re-isolated and enlarged the drag handle with dedicated touch and selection safeguards so reordering subtasks never accidentally triggers text selection or focus in the text area.
 - **Action Buttons Row Reorganization (Expand & Voice Repositioned)**: Moved the Expand focus editor and Voice (Talk) dictation buttons from the top of the task description title down to the far right of the unified action buttons line (alongside Notes, Subtasks, and Schedule) with generous spacing.

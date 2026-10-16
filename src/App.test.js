@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import App from './App';
 import { APP_VERSION } from './utils/constants';
 
@@ -52,38 +52,40 @@ test('defaults to 11pt font size on desktop when no localStorage setting exists'
   expect(document.documentElement.style.fontSize).toBe('11pt');
 });
 
-test('displays UpdatedModal with recent versions when clicking Latest Update Info in Settings', () => {
+test('displays UpdatedModal with recent versions when clicking Latest Update Info in Settings', async () => {
   render(<App />);
 
   // Open settings
   const settingsBtn = screen.getByTitle('Settings');
-  act(() => {
+  await act(async () => {
     settingsBtn.click();
   });
 
-  // Navigate to App & Updates tab
-  const appTab = screen.getByRole('button', { name: /App & Updates/i });
-  act(() => {
+  // Navigate to App & Updates tab (wait for lazy loaded SettingsModal)
+  const appTab = await screen.findByRole('button', { name: /App & Updates/i });
+  await act(async () => {
     appTab.click();
   });
 
   // Click Latest Update Info button
-  const updateInfoBtn = screen.getByRole('button', { name: /Latest Update Info/i });
-  act(() => {
+  const updateInfoBtn = await screen.findByRole('button', { name: /Latest Update Info/i });
+  await act(async () => {
     updateInfoBtn.click();
   });
 
-  expect(screen.getByText('123 To Do Updated!')).toBeInTheDocument();
+  expect(await screen.findByText('123 To Do Updated!')).toBeInTheDocument();
   expect(screen.getAllByText(new RegExp(`v${APP_VERSION}`)).length).toBeGreaterThanOrEqual(1);
   expect(screen.getAllByText(/✨ What's New in v/i).length).toBeGreaterThanOrEqual(2);
 
   // Closing modal
-  const goBtn = screen.getByRole('button', { name: /Awesome, Let's Go!/i });
-  act(() => {
+  const goBtn = await screen.findByRole('button', { name: /Awesome, Let's Go!/i });
+  await act(async () => {
     goBtn.click();
   });
 
-  expect(screen.queryByText('123 To Do Updated!')).not.toBeInTheDocument();
+  await waitFor(() => {
+    expect(screen.queryByText('123 To Do Updated!')).not.toBeInTheDocument();
+  });
 });
 
 test('renders On Hold tasks with draggable attribute and drag support', () => {
