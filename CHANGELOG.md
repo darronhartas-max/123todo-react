@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.0
+
+- **📥 Dedicated Photo Download vs. Share Actions:** The Download button in the photo Lightbox viewer now strictly triggers direct file downloads to your Downloads folder on all devices, keeping it distinct from the Share button which opens the system share sheet (AirDrop, Messages, Mail, WhatsApp).
+- **⏱️ Extended Download Reliability:** Extended file blob download lifetime to ensure smooth, uncorrupted downloads for high-resolution images across all mobile and desktop browsers.
+
 ### v3.7.59
 
 - **📥 Full-Resolution Photo Download & Native Save:** Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails.

@@ -185,5 +185,5 @@ export const downloadBlob = (blob, fileName) => {
   document.body.removeChild(a);
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 2000);
+  }, 20000);
 };

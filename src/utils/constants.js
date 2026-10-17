@@ -176,6 +176,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.0': [
+    { title: '📥 Dedicated Photo Download vs. Share Actions:', desc: 'The Download button in the photo Lightbox viewer now strictly triggers direct file downloads to your Downloads folder on all devices, keeping it distinct from the Share button which opens the system share sheet (AirDrop, Messages, Mail, WhatsApp).' },
+    { title: '⏱️ Extended Download Reliability:', desc: 'Extended file blob download lifetime to ensure smooth, uncorrupted downloads for high-resolution images across all mobile and desktop browsers.' }
+  ],
   '3.7.59': [
     { title: '📥 Full-Resolution Photo Download & Native Save:', desc: 'Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails.' },
     { title: '⚡ Cloud Sync Payload Optimization:', desc: 'Cloudflare and Google Drive sync payloads now strictly transmit lightweight metadata and compact thumbnails, keeping background sync fast, data-friendly, and well within Cloudflare Worker limits.' }

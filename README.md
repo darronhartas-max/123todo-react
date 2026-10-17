@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.59** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.59 (Current)
+### v3.8.0 (Current)
+
+- **Dedicated Photo Download vs. Share Actions**: The Download button in the photo Lightbox viewer now strictly executes a direct browser file download to save the original high-resolution image directly into the device's Downloads folder, completely distinct from the Share button which triggers the native system share sheet (AirDrop, Messages, Mail, WhatsApp).
+- **Extended Blob Download Reliability**: Extended object URL revocation timeout in `downloadBlob` to 20 seconds, preventing premature download cancellation on mobile networks and larger files.
+
+### v3.7.59
 
 - **Full-Resolution Photo Download & Native Save**: Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails via the native system share sheet.
 - **Cloud Sync Payload Optimization**: Cloudflare and Google Drive sync payloads now strictly transmit lightweight metadata and compact thumbnails, keeping background sync fast, cellular-data-friendly, and well within Cloudflare Worker limits.

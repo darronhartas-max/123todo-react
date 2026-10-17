@@ -95,32 +95,7 @@ const PhotoAttachments = ({
       const ext = mimeType.includes('png') ? 'png' : mimeType.includes('webp') ? 'webp' : 'jpg';
       const fileName = getPhotoExportFileName(photoToUse, ext);
 
-      // Mobile devices (iOS Safari & Android PWA): WebKit ignores <a download> for blobs.
-      // navigator.share allows direct "Save Image" to Photos, "Save to Files", or Mail attachment.
-      const isMobileDevice = typeof navigator !== 'undefined' && (
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-        (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent))
-      );
-
-      if (isMobileDevice && navigator.canShare && typeof File !== 'undefined') {
-        try {
-          const file = new File([blob], fileName, { type: mimeType });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: formatPhotoDisplayName(photoToUse.name, photoToUse.timestamp)
-            });
-            setDownloadStatus('Saved');
-            setTimeout(() => setDownloadStatus(''), 2500);
-            return;
-          }
-        } catch (shareErr) {
-          if (shareErr.name === 'AbortError') return;
-          console.warn('Native mobile share failed, falling back to download:', shareErr);
-        }
-      }
-
-      // Desktop and standard browser download
+      // Perform direct browser download of the image file
       downloadBlob(blob, fileName);
       setDownloadStatus('Downloaded');
       setTimeout(() => setDownloadStatus(''), 2500);
