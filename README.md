@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.4** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.5** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.4 (Current)
+### v3.8.5 (Current)
+
+- **SettingsModal Modularization (Phase 3)**: Decomposed the monolithic 2,592-line `SettingsModal.js` into 8 focused, isolated domain subcomponents under `src/components/modals/settings/` (`SettingsProjectsTab`, `SettingsAppearanceTab`, `SettingsTasksTab`, `SettingsSwipeTab`, `SettingsVoiceTab`, `SettingsShortcutsTab`, `SettingsSyncTab`, `SettingsAboutTab`), reducing main modal complexity down to ~455 lines (-2,137 lines) while preserving 100% pixel-perfect styling, gestures, keyboard navigation, and responsive behavior.
+- **Critical Modal & Storage Test Suite Expansion**: Expanded unit test coverage past the 400-test milestone (48 test suites, 401 tests passing) by adding comprehensive automated test suites for `SettingsModal`, all individual settings tabs, `ExportModal`, `SyncModal`, `UniversalImportModal`, and IndexedDB `photoStorage`.
+- **Universal Import Component Hardening**: Enhanced `UniversalImportModal` project mapper with robust type-safe normalization handling both string and object project structures seamlessly to prevent runtime rendering crashes.
+
+### v3.8.4
 
 - **Task Editor Architecture Deduplication (Phase 2)**: Extracted shared task editing logic into reusable, modular micro-components (`ProjectPicker`, `PrioritySelector`, `SchedulePicker`, `RecurrencePicker`, `SubtasksEditor`) under `src/components/tasks/editor/`.
 - **Codebase Streamlining & Unified Behaviors**: Eliminated over 1,740 lines of duplicate logic across `AddTask` and `EditModal`, standardizing subtask drag-and-drop reordering, circular time scheduling, calendar exports, and project selection while maintaining 100% visual styling and full test coverage.

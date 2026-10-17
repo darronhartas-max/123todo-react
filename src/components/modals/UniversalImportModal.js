@@ -276,9 +276,10 @@ const UniversalImportModal = ({ onClose, onImport, onOpenGuide, existingProjects
                                         }}
                                     >
                                         <option value="General">General Inbox</option>
-                                        {existingProjects.map(p => (
-                                            <option key={p} value={p}>{p}</option>
-                                        ))}
+                                        {existingProjects.map(p => {
+                                            const pName = typeof p === 'string' ? p : (p.name || p.id || 'Project');
+                                            return <option key={pName} value={pName}>{pName}</option>;
+                                        })}
                                     </select>
                                     <button
                                         onClick={() => setIsCreatingNewProject(true)}

@@ -179,6 +179,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.5': [
+    { title: '🎛️ Settings Architecture Modularization (Phase 3):', desc: 'Decomposed the monolithic SettingsModal (2,592 lines) into 8 dedicated domain subcomponents (SettingsProjectsTab, SettingsAppearanceTab, SettingsTasksTab, SettingsSwipeTab, SettingsVoiceTab, SettingsShortcutsTab, SettingsSyncTab, SettingsAboutTab) under src/components/modals/settings/.' },
+    { title: '🧪 Comprehensive Critical Modal Test Suites:', desc: 'Added dedicated test suites for SettingsModal, ExportModal, SyncModal, UniversalImportModal, and photoStorage, expanding automated test coverage past 400 unit tests across 48 test suites with 100% pass rate.' }
+  ],
   '3.8.4': [
     { title: '🧩 Task Editor Architecture Deduplication (Phase 2):', desc: 'Extracted shared task editing domain logic into modular micro-components (ProjectPicker, PrioritySelector, SchedulePicker, RecurrencePicker, SubtasksEditor) under src/components/tasks/editor/.' },
     { title: '📉 Codebase Streamlining & Unified Behaviors:', desc: 'Eliminated over 1,740 lines of duplicated code across AddTask and EditModal, standardizing subtask drag-and-drop, circular clock scheduling, external calendar sync, and project picking while ensuring 100% UI consistency and test coverage.' }

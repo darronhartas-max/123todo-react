@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.5
+
+- **🎛️ Settings Architecture Modularization (Phase 3):** Decomposed the monolithic SettingsModal (2,592 lines) into 8 dedicated domain subcomponents (SettingsProjectsTab, SettingsAppearanceTab, SettingsTasksTab, SettingsSwipeTab, SettingsVoiceTab, SettingsShortcutsTab, SettingsSyncTab, SettingsAboutTab) under src/components/modals/settings/.
+- **🧪 Comprehensive Critical Modal Test Suites:** Added dedicated test suites for SettingsModal, ExportModal, SyncModal, UniversalImportModal, and photoStorage, expanding automated test coverage past 400 unit tests across 48 test suites with 100% pass rate.
+
 ### v3.8.4
 
 - **🧩 Task Editor Architecture Deduplication (Phase 2):** Extracted shared task editing domain logic into modular micro-components (ProjectPicker, PrioritySelector, SchedulePicker, RecurrencePicker, SubtasksEditor) under src/components/tasks/editor/.
