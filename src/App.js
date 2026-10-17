@@ -11,7 +11,7 @@ import TaskItem from './components/tasks/TaskItem';
 import SearchBar from './components/tasks/SearchBar';
 import ProjectTabs from './components/projects/ProjectTabs';
 import { InstallPrompt, BackupReminder, SyncOfflinePrompt, WelcomeBanner } from './components/layout/NotificationBar';
-import { useTasks } from './hooks/useTasks';
+import { useTasks, sanitizeTasksForStorage } from './hooks/useTasks';
 import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
@@ -70,7 +70,9 @@ const TodoApp = () => {
   };
 
   const syncPayloadData = useMemo(() => ({
-    tasks, archived, projects, deletedProjects, deletedTaskKeys, counter, timestamp,
+    tasks: sanitizeTasksForStorage(tasks),
+    archived: sanitizeTasksForStorage(archived),
+    projects, deletedProjects, deletedTaskKeys, counter, timestamp,
     dateFormat: localStorage.getItem(STORAGE_KEYS.DATE_FORMAT) || DEFAULT_DATE_FORMAT,
     taskLengthLimit: localStorage.getItem(STORAGE_KEYS.TASK_LENGTH_LIMIT) || DEFAULT_TASK_LENGTH_LIMIT,
     adminPasswordHash: localStorage.getItem(STORAGE_KEYS.ADMIN_PASS_HASH)

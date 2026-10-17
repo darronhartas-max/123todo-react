@@ -10,6 +10,7 @@ import {
 } from '../../utils/imageUtils';
 import { savePhoto, getPhoto, getPhotos, deletePhoto } from '../../utils/photoStorage';
 import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
+import { dataUrlToBytes, downloadBlob } from '../../utils/zipUtils';
 
 const PhotoAttachments = ({
   photos = [],
@@ -65,73 +66,98 @@ const PhotoAttachments = ({
   const handleDownloadPhoto = async (photo) => {
     try {
       let dataUrl = photo?.dataUrl;
+      let photoToUse = photo;
       if (!dataUrl && photo?.id) {
         const full = await getPhoto(photo.id);
-        dataUrl = full?.dataUrl;
+        if (full) {
+          dataUrl = full.dataUrl || full.thumbnail;
+          photoToUse = { ...photo, ...full };
+        }
       }
       if (!dataUrl) {
         dataUrl = photo?.thumbnail;
       }
-      if (!dataUrl) return;
-
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
-      const fileName = getPhotoExportFileName(photo, ext);
-
-      if (window.URL && window.URL.createObjectURL) {
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = fileName;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => {
-          if (window.URL && window.URL.revokeObjectURL) {
-            window.URL.revokeObjectURL(blobUrl);
-          }
-        }, 1500);
-      } else {
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = fileName;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      if (!dataUrl) {
+        alert('Could not find photo data to download.');
+        return;
       }
 
+      // Synchronously decode base64 without fetch(dataUrl), preventing WebKit/iOS Safari fetch network errors
+      const mimeMatch = dataUrl.match(/^data:([^;]+);base64,/);
+      const mimeType = mimeMatch ? mimeMatch[1] : (dataUrl.includes('image/webp') ? 'image/webp' : dataUrl.includes('image/png') ? 'image/png' : 'image/jpeg');
+      const bytes = dataUrlToBytes(dataUrl);
+      if (!bytes || bytes.length === 0) {
+        alert('Could not decode photo for download.');
+        return;
+      }
+
+      const blob = new Blob([bytes], { type: mimeType });
+      const ext = mimeType.includes('png') ? 'png' : mimeType.includes('webp') ? 'webp' : 'jpg';
+      const fileName = getPhotoExportFileName(photoToUse, ext);
+
+      // Mobile devices (iOS Safari & Android PWA): WebKit ignores <a download> for blobs.
+      // navigator.share allows direct "Save Image" to Photos, "Save to Files", or Mail attachment.
+      const isMobileDevice = typeof navigator !== 'undefined' && (
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent))
+      );
+
+      if (isMobileDevice && navigator.canShare && typeof File !== 'undefined') {
+        try {
+          const file = new File([blob], fileName, { type: mimeType });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: formatPhotoDisplayName(photoToUse.name, photoToUse.timestamp)
+            });
+            setDownloadStatus('Saved');
+            setTimeout(() => setDownloadStatus(''), 2500);
+            return;
+          }
+        } catch (shareErr) {
+          if (shareErr.name === 'AbortError') return;
+          console.warn('Native mobile share failed, falling back to download:', shareErr);
+        }
+      }
+
+      // Desktop and standard browser download
+      downloadBlob(blob, fileName);
       setDownloadStatus('Downloaded');
       setTimeout(() => setDownloadStatus(''), 2500);
     } catch (err) {
       console.error('Download error:', err);
+      alert('Could not download photo. Please try again.');
     }
   };
 
   const handleShareOrSavePhoto = async (photo) => {
     try {
       let dataUrl = photo?.dataUrl;
+      let photoToUse = photo;
       if (!dataUrl && photo?.id) {
         const full = await getPhoto(photo.id);
-        dataUrl = full?.dataUrl;
+        if (full) {
+          dataUrl = full.dataUrl || full.thumbnail;
+          photoToUse = { ...photo, ...full };
+        }
       }
       if (!dataUrl) {
         dataUrl = photo?.thumbnail;
       }
       if (!dataUrl) return;
 
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
-      const fileName = getPhotoExportFileName(photo, ext);
-      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+      const mimeMatch = dataUrl.match(/^data:([^;]+);base64,/);
+      const mimeType = mimeMatch ? mimeMatch[1] : (dataUrl.includes('image/webp') ? 'image/webp' : dataUrl.includes('image/png') ? 'image/png' : 'image/jpeg');
+      const bytes = dataUrlToBytes(dataUrl);
+      const blob = new Blob([bytes], { type: mimeType });
+      const ext = mimeType.includes('png') ? 'png' : mimeType.includes('webp') ? 'webp' : 'jpg';
+      const fileName = getPhotoExportFileName(photoToUse, ext);
+      const file = new File([blob], fileName, { type: mimeType });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: formatPhotoDisplayName(photo.name, photo.timestamp)
+          title: formatPhotoDisplayName(photoToUse.name, photoToUse.timestamp)
         });
         setShareStatus('Shared');
         setTimeout(() => setShareStatus(''), 2500);

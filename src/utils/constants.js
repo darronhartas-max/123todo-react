@@ -176,6 +176,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.59': [
+    { title: '📥 Full-Resolution Photo Download & Native Save:', desc: 'Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails.' },
+    { title: '⚡ Cloud Sync Payload Optimization:', desc: 'Cloudflare and Google Drive sync payloads now strictly transmit lightweight metadata and compact thumbnails, keeping background sync fast, data-friendly, and well within Cloudflare Worker limits.' }
+  ],
   '3.7.58': [
     { title: '🛡️ Zero Photo Loss & Storage Protection:', desc: 'Note photos are permanently preserved in IndexedDB with browser Persistent Storage protection, completely safeguarding photos from eviction or 5MB quota errors.' },
     { title: '📦 1-Click Physical Photo ZIP Export:', desc: 'New "Export All Photos (.ZIP)" tool in Data Backup & Settings exports all high-resolution note photos across active and archived tasks into a single physical ZIP file.' },

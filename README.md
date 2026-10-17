@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.58** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.59** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.58 (Current)
+### v3.7.59 (Current)
+
+- **Full-Resolution Photo Download & Native Save**: Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails via the native system share sheet.
+- **Cloud Sync Payload Optimization**: Cloudflare and Google Drive sync payloads now strictly transmit lightweight metadata and compact thumbnails, keeping background sync fast, cellular-data-friendly, and well within Cloudflare Worker limits.
+
+### v3.7.58
 
 - **Zero Photo Loss & Quota-Proof Architecture**: Note photos are permanently stored and safeguarded in IndexedDB protected by the browser Persistent Storage API, eliminating 5MB local storage quota limitations even with hundreds or thousands of photos.
 - **Physical Photo ZIP Export**: Added a 1-click "Export All Photos (.ZIP)" feature in both the Export modal and Settings (Cloud Sync & Backup Options) allowing users to download all high-resolution attached note photos across active and archived tasks into a single physical ZIP file.

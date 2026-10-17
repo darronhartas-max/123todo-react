@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.59
+
+- **📥 Full-Resolution Photo Download & Native Save:** Fixed photo Download in the Lightbox viewer. Desktop users get instant file downloads to their Downloads folder, while mobile users on iOS and Android can 1-tap "Save Image" to their Camera Roll, save to Files, or attach directly to emails.
+- **⚡ Cloud Sync Payload Optimization:** Cloudflare and Google Drive sync payloads now strictly transmit lightweight metadata and compact thumbnails, keeping background sync fast, data-friendly, and well within Cloudflare Worker limits.
+
 ### v3.7.58
 
 - **🛡️ Zero Photo Loss & Storage Protection:** Note photos are permanently preserved in IndexedDB with browser Persistent Storage protection, completely safeguarding photos from eviction or 5MB quota errors.
