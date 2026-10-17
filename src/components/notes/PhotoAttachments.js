@@ -8,7 +8,7 @@ import {
   formatPhotoDisplayName,
   getPhotoExportFileName
 } from '../../utils/imageUtils';
-import { savePhoto, getPhoto, deletePhoto } from '../../utils/photoStorage';
+import { savePhoto, getPhoto, getPhotos, deletePhoto } from '../../utils/photoStorage';
 import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 
 const PhotoAttachments = ({
@@ -21,12 +21,40 @@ const PhotoAttachments = ({
   rightAction = null
 }) => {
   const [activeLightboxPhoto, setActiveLightboxPhoto] = useState(null);
+  const [hydratedThumbnails, setHydratedThumbnails] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [copiedPhotoTimestamp, setCopiedPhotoTimestamp] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
   const [downloadStatus, setDownloadStatus] = useState('');
+
+  // Hydrate thumbnails from IndexedDB for photos stored lightweight in localStorage
+  useEffect(() => {
+    let isMounted = true;
+    const missingPhotos = (photos || []).filter(
+      p => p && p.id && !p.thumbnail && !p.dataUrl && !hydratedThumbnails[p.id]
+    );
+
+    if (missingPhotos.length > 0) {
+      getPhotos(missingPhotos.map(p => p.id)).then(loadedList => {
+        if (!isMounted) return;
+        const newMap = {};
+        loadedList.forEach(p => {
+          if (p && p.id && (p.thumbnail || p.dataUrl)) {
+            newMap[p.id] = p.thumbnail || p.dataUrl;
+          }
+        });
+        if (Object.keys(newMap).length > 0) {
+          setHydratedThumbnails(prev => ({ ...prev, ...newMap }));
+        }
+      }).catch(err => console.warn('Could not hydrate note thumbnails from IndexedDB:', err));
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [photos, hydratedThumbnails]);
 
   const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -202,11 +230,14 @@ const PhotoAttachments = ({
   // Handle opening lightbox with full-resolution photo (hydrating from IndexedDB if needed)
   const handleOpenLightbox = async (photo) => {
     if (!photo) return;
-    setActiveLightboxPhoto(photo);
-    if (!photo.dataUrl && photo.id) {
+    const initialPhoto = hydratedThumbnails[photo.id]
+      ? { ...photo, thumbnail: photo.thumbnail || hydratedThumbnails[photo.id] }
+      : photo;
+    setActiveLightboxPhoto(initialPhoto);
+    if (!initialPhoto.dataUrl && initialPhoto.id) {
       try {
-        const full = await getPhoto(photo.id);
-        if (full && full.dataUrl) {
+        const full = await getPhoto(initialPhoto.id);
+        if (full && (full.dataUrl || full.thumbnail)) {
           setActiveLightboxPhoto(prev => (prev && prev.id === photo.id ? { ...prev, ...full } : prev));
         }
       } catch (e) {
@@ -453,7 +484,7 @@ const PhotoAttachments = ({
           marginTop: readOnly ? '4px' : '0'
         }}>
           {photos.map((photo, idx) => {
-            const displaySrc = photo.thumbnail || photo.dataUrl;
+            const displaySrc = photo.thumbnail || photo.dataUrl || hydratedThumbnails[photo.id];
             return (
               <div
                 key={photo.id || idx}
@@ -475,16 +506,30 @@ const PhotoAttachments = ({
                   ? `${formatPhotoDisplayName(photo.name, photo.timestamp)} (${formatFileSize(photo.size)}) • Captured: ${formatEvidentiaryTimestamp(photo.timestamp)} - Click to view full size`
                   : `${formatPhotoDisplayName(photo.name, photo.timestamp)} (${formatFileSize(photo.size)}) - Click to view full size`}
               >
-                <img
-                  src={displaySrc}
-                  alt={formatPhotoDisplayName(photo.name, photo.timestamp)}
-                  style={{
+                {displaySrc ? (
+                  <img
+                    src={displaySrc}
+                    alt={formatPhotoDisplayName(photo.name, photo.timestamp)}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                ) : (
+                  <div style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--item-bg)',
+                    color: 'var(--muted-text)'
+                  }}>
+                    <ImageIcon size={22} style={{ opacity: 0.6 }} />
+                  </div>
+                )}
 
                 {/* Delete button (only in edit mode) */}
                 {!readOnly && (

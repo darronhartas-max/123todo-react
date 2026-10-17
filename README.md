@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.7.57** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.7.58** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,14 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.7.57 (Current)
+### v3.7.58 (Current)
+
+- **Zero Photo Loss & Quota-Proof Architecture**: Note photos are permanently stored and safeguarded in IndexedDB protected by the browser Persistent Storage API, eliminating 5MB local storage quota limitations even with hundreds or thousands of photos.
+- **Physical Photo ZIP Export**: Added a 1-click "Export All Photos (.ZIP)" feature in both the Export modal and Settings (Cloud Sync & Backup Options) allowing users to download all high-resolution attached note photos across active and archived tasks into a single physical ZIP file.
+- **Permanent Photo Retention in Archive**: Completed tasks in the Archive permanently preserve all attached photos and thumbnails, viewable and downloadable in read-only mode without being stripped under storage pressure.
+- **Asynchronous Thumbnail Hydration**: Gallery thumbnails hydrate smoothly and asynchronously from IndexedDB without blocking interface interactions or causing memory bloat.
+
+### v3.7.57
 
 - **Top-Prepend for New Subtasks**: Adding new subtasks in Add Task, Edit Task, Task Item, or Notes now places newly added steps immediately at the top of the list for instant visibility and fast multi-step entry.
 - **Smart Subtask Auto-Sort on Completion**: When a subtask is marked completed, it automatically moves to just below the remaining uncompleted subtasks, keeping active items prioritized at the top while maintaining completed items cleanly grouped below.

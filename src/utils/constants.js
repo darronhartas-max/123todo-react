@@ -176,6 +176,12 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.7.58': [
+    { title: '🛡️ Zero Photo Loss & Storage Protection:', desc: 'Note photos are permanently preserved in IndexedDB with browser Persistent Storage protection, completely safeguarding photos from eviction or 5MB quota errors.' },
+    { title: '📦 1-Click Physical Photo ZIP Export:', desc: 'New "Export All Photos (.ZIP)" tool in Data Backup & Settings exports all high-resolution note photos across active and archived tasks into a single physical ZIP file.' },
+    { title: '🖼️ Permanent Photo Retention in Archive:', desc: 'Completed tasks in the Archive now retain their photo attachments and thumbnails, viewable and downloadable anytime in read-only mode.' },
+    { title: '⚡ Asynchronous Thumbnail Hydration:', desc: 'Gallery thumbnails hydrate smoothly from IndexedDB without blocking the UI or causing memory bloat.' }
+  ],
   '3.7.57': [
     { title: '📋 Top-Prepend for New Subtasks:', desc: 'When adding new subtasks in Add Task, Edit Task, Task Item, or Notes, newly added steps are now placed immediately at the top of the list for instant visibility and fast multi-step entry.' },
     { title: '✅ Smart Subtask Auto-Sort on Completion:', desc: 'When a subtask is checked off as completed, it automatically moves to just below the remaining uncompleted subtasks, keeping active items prioritized at the top while maintaining completed items cleanly grouped below.' },

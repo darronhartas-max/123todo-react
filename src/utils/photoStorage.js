@@ -78,29 +78,81 @@ const openDB = () => {
 };
 
 /**
- * Saves a photo object to IndexedDB.
+ * Requests browser persistent storage to prevent automatic cache/IndexedDB eviction under low storage.
+ * Safe to call multiple times.
+ */
+export const requestPersistentStorage = async () => {
+  if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+    try {
+      const isPersisted = await navigator.storage.persisted();
+      if (!isPersisted) {
+        const granted = await navigator.storage.persist();
+        return granted;
+      }
+      return true;
+    } catch (e) {
+      console.warn('Persistent storage request failed:', e);
+      return false;
+    }
+  }
+  return false;
+};
+
+/**
+ * Saves a photo object to IndexedDB. Non-destructively merges with existing photo data.
  */
 export const savePhoto = async (photo) => {
   if (!photo || !photo.id) return photo;
 
-  setMemoryCache(photo.id, photo);
-
   const db = await openDB();
-  if (!db) return photo;
+  if (!db) {
+    const existing = memoryCache.get(photo.id) || {};
+    const merged = { ...existing, ...photo };
+    if (!photo.dataUrl && existing.dataUrl) merged.dataUrl = existing.dataUrl;
+    if (!photo.thumbnail && existing.thumbnail) merged.thumbnail = existing.thumbnail;
+    setMemoryCache(photo.id, merged);
+    return merged;
+  }
 
   return new Promise((resolve) => {
     try {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
-      const req = store.put(photo);
+      const getReq = store.get(photo.id);
 
-      req.onsuccess = () => resolve(photo);
-      req.onerror = () => {
-        console.warn('Error saving photo to IndexedDB, stored in memory cache');
-        resolve(photo);
+      getReq.onsuccess = () => {
+        const existing = getReq.result || {};
+        const merged = { ...existing, ...photo };
+        // Never allow a partial metadata object to overwrite full image data
+        if (!photo.dataUrl && existing.dataUrl) merged.dataUrl = existing.dataUrl;
+        if (!photo.thumbnail && existing.thumbnail) merged.thumbnail = existing.thumbnail;
+
+        const putReq = store.put(merged);
+        putReq.onsuccess = () => {
+          setMemoryCache(photo.id, merged);
+          resolve(merged);
+        };
+        putReq.onerror = () => {
+          console.warn('Error saving photo to IndexedDB, stored in memory cache');
+          setMemoryCache(photo.id, merged);
+          resolve(merged);
+        };
+      };
+
+      getReq.onerror = () => {
+        const putReq = store.put(photo);
+        putReq.onsuccess = () => {
+          setMemoryCache(photo.id, photo);
+          resolve(photo);
+        };
+        putReq.onerror = () => {
+          setMemoryCache(photo.id, photo);
+          resolve(photo);
+        };
       };
     } catch (e) {
       console.warn('Transaction error in savePhoto:', e);
+      setMemoryCache(photo.id, photo);
       resolve(photo);
     }
   });
@@ -187,3 +239,49 @@ export const deletePhotos = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) return;
   await Promise.all(ids.map(id => deletePhoto(id)));
 };
+
+/**
+ * Retrieves all photos stored in IndexedDB.
+ * Returns an array of photo objects: [{ id, name, dataUrl, thumbnail, ... }]
+ */
+export const getAllPhotos = async () => {
+  const db = await openDB();
+  if (!db) {
+    return Array.from(memoryCache.values());
+  }
+
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+
+      req.onsuccess = () => {
+        const results = req.result || [];
+        const idMap = new Map();
+        results.forEach(p => idMap.set(p.id, p));
+
+        // Incorporate any memory cached photos if newer or missing
+        for (const [id, p] of memoryCache.entries()) {
+          if (!idMap.has(id)) {
+            idMap.set(id, p);
+          } else {
+            const existing = idMap.get(id);
+            if (!existing.dataUrl && p.dataUrl) {
+              idMap.set(id, { ...existing, ...p });
+            }
+          }
+        }
+        resolve(Array.from(idMap.values()));
+      };
+
+      req.onerror = () => {
+        resolve(Array.from(memoryCache.values()));
+      };
+    } catch (e) {
+      console.warn('Error reading all photos from IndexedDB:', e);
+      resolve(Array.from(memoryCache.values()));
+    }
+  });
+};
+

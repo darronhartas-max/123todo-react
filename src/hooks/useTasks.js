@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { STORAGE_KEYS, DEFAULT_PROJECTS, migrateProjectColor } from '../utils/constants';
 import { calculateNextRecurrenceDate, getTodayDateString, isValidEvidentiaryTimestamp, promoteDueScheduledTasks, insertTaskInTimeOrder } from '../utils/dateUtils';
-import { savePhotos } from '../utils/photoStorage';
+import { savePhotos, requestPersistentStorage } from '../utils/photoStorage';
 
 // Lightweight serializer for LocalStorage: keeps metadata and compact thumbnails in LocalStorage,
 // ensuring the heavy multi-megabyte dataUrl strings stay in IndexedDB to prevent QuotaExceededErrors.
-export const sanitizeTasksForStorage = (taskList) => {
+// If localStorage quota is ever under pressure, stripThumbnail can strip thumbnails to pure metadata.
+export const sanitizeTasksForStorage = (taskList, stripThumbnail = false) => {
     if (!Array.isArray(taskList)) return [];
     return taskList.map(task => {
         if (!task) return null;
@@ -14,6 +15,10 @@ export const sanitizeTasksForStorage = (taskList) => {
         }
         const lightweightPhotos = task.photos.map(p => {
             if (!p) return p;
+            if (stripThumbnail) {
+                const { dataUrl, thumbnail, ...rest } = p;
+                return rest;
+            }
             const { dataUrl, ...rest } = p;
             return rest;
         });
@@ -214,11 +219,14 @@ export const useTasks = () => {
             setArchived(sanitized.archived);
             setCounter(sanitized.counter);
 
-            // Cache any photos loaded from storage with full dataUrl into IndexedDB
+            // Request persistent browser storage to prevent IndexedDB eviction
+            requestPersistentStorage().catch(() => {});
+
+            // Cache any photos loaded from storage with dataUrl or thumbnail into IndexedDB
             const photosToPersist = [
                 ...loadedTasks.flatMap(t => t.photos || []),
                 ...loadedArchived.flatMap(t => t.photos || [])
-            ].filter(p => p && p.id && p.dataUrl);
+            ].filter(p => p && p.id && (p.dataUrl || p.thumbnail));
 
             if (photosToPersist.length > 0) {
                 savePhotos(photosToPersist).catch(err => console.warn('Could not cache loaded photos to IndexedDB:', err));
@@ -291,13 +299,9 @@ export const useTasks = () => {
         } catch (storageErr) {
             console.warn('⚠️ LocalStorage save quota warning, performing safe recovery:', storageErr);
             try {
-                // If quota is tight, strip photos completely from archived in localStorage
-                const minimalArchived = archived.map(t => {
-                    const { photos, ...rest } = t;
-                    return rest;
-                });
-                localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(minimalArchived));
-                localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(sanitizeTasksForStorage(tasks)));
+                // Non-destructive safe recovery: strip both dataUrl and thumbnail to pure metadata in storage
+                localStorage.setItem(STORAGE_KEYS.ARCHIVE, JSON.stringify(sanitizeTasksForStorage(archived, true)));
+                localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(sanitizeTasksForStorage(tasks, true)));
             } catch (fallbackErr) {
                 console.error('Critical: LocalStorage write failed:', fallbackErr);
             }

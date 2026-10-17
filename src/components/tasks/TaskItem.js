@@ -703,7 +703,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                     </span>
                                 )}
                                 {renderActionableText(task.text)}
-                                {!isArchived && task.photos && task.photos.length > 0 && (
+                                {task.photos && task.photos.length > 0 && (
                                     <span
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -1190,7 +1190,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     </div>
                 )}
 
-                {effectiveShowFull && !isArchived && (task.notes || (task.photos && task.photos.length > 0)) && (
+                {effectiveShowFull && (task.notes || (task.photos && task.photos.length > 0)) && (
                     <div style={{ marginTop: '6px', width: '100%' }}>
                         <button
                             type="button"

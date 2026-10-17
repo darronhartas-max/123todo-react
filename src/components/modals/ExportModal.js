@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Download, Share2, Copy, Check, Mail } from 'lucide-react';
+import { X, Download, Share2, Copy, Check, Mail, Image as ImageIcon } from 'lucide-react';
 import { COMMON_STYLES } from '../../utils/styles';
+import { getAllPhotos } from '../../utils/photoStorage';
+import { createZipBlob, dataUrlToBytes, downloadBlob } from '../../utils/zipUtils';
+import { getPhotoExportFileName } from '../../utils/imageUtils';
 
 const ExportModal = ({ data, onClose, onRecordBackup }) => {
     const [copied, setCopied] = useState(false);
+    const [isExportingPhotos, setIsExportingPhotos] = useState(false);
+    const [photoExportStatus, setPhotoExportStatus] = useState('');
     const [isSavePickerSupported, setIsSavePickerSupported] = useState(false);
     const [isShareSupported, setIsShareSupported] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -103,6 +108,75 @@ const ExportModal = ({ data, onClose, onRecordBackup }) => {
         handleCopyToClipboard();
         const mailtoUrl = `mailto:?subject=123%20ToDo%20Backup&body=Please%20paste%20your%20copied%20backup%20data%20here%3A%0A%0A%5BPASTE%20HERE%5D`;
         window.open(mailtoUrl, '_blank');
+    };
+
+    const handleExportPhotosZip = async () => {
+        if (isExportingPhotos) return;
+        setIsExportingPhotos(true);
+        setPhotoExportStatus('Gathering photos...');
+        try {
+            const allPhotos = await getAllPhotos();
+            if (!allPhotos || allPhotos.length === 0) {
+                alert('No photo attachments found in any notes.');
+                setIsExportingPhotos(false);
+                setPhotoExportStatus('');
+                return;
+            }
+
+            const usedNames = new Set();
+            const files = [];
+
+            for (const photo of allPhotos) {
+                const dataUrl = photo.dataUrl || photo.thumbnail;
+                if (!dataUrl) continue;
+                const bytes = dataUrlToBytes(dataUrl);
+                if (!bytes || bytes.length === 0) continue;
+
+                const ext = dataUrl.includes('image/png') ? 'png' : dataUrl.includes('image/webp') ? 'webp' : 'jpg';
+                let name = getPhotoExportFileName(photo, ext);
+
+                let counter = 1;
+                let uniqueName = name;
+                while (usedNames.has(uniqueName)) {
+                    const dotIdx = name.lastIndexOf('.');
+                    if (dotIdx !== -1) {
+                        uniqueName = `${name.slice(0, dotIdx)}_${counter}${name.slice(dotIdx)}`;
+                    } else {
+                        uniqueName = `${name}_${counter}`;
+                    }
+                    counter++;
+                }
+                usedNames.add(uniqueName);
+
+                files.push({
+                    name: uniqueName,
+                    data: bytes,
+                    date: photo.timestamp ? new Date(photo.timestamp) : new Date()
+                });
+            }
+
+            if (files.length === 0) {
+                alert('No photo data available to export.');
+                setIsExportingPhotos(false);
+                setPhotoExportStatus('');
+                return;
+            }
+
+            const zipBlob = createZipBlob(files);
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadBlob(zipBlob, `123todo-photos-${dateStr}.zip`);
+
+            setPhotoExportStatus(`Exported ${files.length} photos!`);
+            setTimeout(() => {
+                setPhotoExportStatus('');
+                setIsExportingPhotos(false);
+            }, 3000);
+        } catch (err) {
+            console.error('Error creating photos ZIP export:', err);
+            alert('Failed to export photos ZIP archive.');
+            setIsExportingPhotos(false);
+            setPhotoExportStatus('');
+        }
     };
 
     const styles = {
@@ -239,6 +313,21 @@ const ExportModal = ({ data, onClose, onRecordBackup }) => {
                         </div>
                         <div style={styles.cardDesc}>
                             Copy raw JSON backup data to manually paste it into any document or email client.
+                        </div>
+                    </div>
+                </div>
+
+                {/* Export Note Photos ZIP Card */}
+                <div style={styles.card} onClick={handleExportPhotosZip}>
+                    <div style={styles.iconCircle}>
+                        <ImageIcon size={20} style={{ color: '#0ea5e9' }} />
+                    </div>
+                    <div style={styles.cardText}>
+                        <div style={styles.cardTitle}>
+                            {photoExportStatus || (isExportingPhotos ? 'Exporting Photos...' : 'Export Note Photos (.ZIP)')}
+                        </div>
+                        <div style={styles.cardDesc}>
+                            Download all attached note photos into a single physical ZIP file backup on your computer or phone.
                         </div>
                     </div>
                 </div>

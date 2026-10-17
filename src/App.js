@@ -1676,6 +1676,7 @@ const TodoApp = () => {
         setButtonDisplayMode={setButtonDisplayMode}
         showTaskCreationDate={showTaskCreationDate}
         setShowTaskCreationDate={setShowTaskCreationDate}
+        onOpenExport={() => setShowExportModal(true)}
       />
 
       <EmailClientModal

@@ -17,6 +17,13 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.58
+
+- **🛡️ Zero Photo Loss & Storage Protection:** Note photos are permanently preserved in IndexedDB with browser Persistent Storage protection, completely safeguarding photos from eviction or 5MB quota errors.
+- **📦 1-Click Physical Photo ZIP Export:** New "Export All Photos (.ZIP)" tool in Data Backup & Settings exports all high-resolution note photos across active and archived tasks into a single physical ZIP file.
+- **🖼️ Permanent Photo Retention in Archive:** Completed tasks in the Archive now retain their photo attachments and thumbnails, viewable and downloadable anytime in read-only mode.
+- **⚡ Asynchronous Thumbnail Hydration:** Gallery thumbnails hydrate smoothly from IndexedDB without blocking the UI or causing memory bloat.
+
 ### v3.7.57
 
 - **📋 Top-Prepend for New Subtasks:** When adding new subtasks in Add Task, Edit Task, Task Item, or Notes, newly added steps are now placed immediately at the top of the list for instant visibility and fast multi-step entry.
