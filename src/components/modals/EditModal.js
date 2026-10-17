@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PRIORITIES, MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
+import { MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
-import { getTodayDateString, getTomorrowDateString, getNextWeekDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
-import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calendarUtils';
+import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVertical, Archive, FastForward, Clock, Calendar, ListChecks, Repeat, Stamp } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, Plus, Minus, Archive, Clock, Calendar, ListChecks, Stamp } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
-import { reorderList, toggleSubtaskStatus } from '../../utils/reorderUtils';
-import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
-import TimePickerModal from './TimePickerModal';
+import { ProjectPicker, PrioritySelector, SchedulePicker, SubtasksEditor } from '../tasks/editor';
 
 const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', showTaskCreationDate = false }) => {
     const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
@@ -116,8 +113,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         }
     }, [editingTask.text, editingTask.notes, expandedOverlayField, listeningTarget]);
 
-    const activePriority = PRIORITIES[editingTask.priority] || PRIORITIES[3];
-    const activeProject = (projects || []).find(p => p.id === (editingTask.projectId || 'general')) || { id: 'general', name: 'General', color: '#6b7280' };
+
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
 
@@ -217,24 +213,10 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         }
     };
 
-    // Subtask states
+    // Subtask and scheduling states
     const [subtasks, setSubtasks] = useState(task.subtasks || []);
-    const [newSubtaskText, setNewSubtaskText] = useState('');
-    const {
-        draggedSubtaskIndex,
-        dragOverSubtaskInfo,
-        handleSubtaskTouchStart,
-        setDraggedSubtaskIndex,
-        setDragOverSubtaskInfo
-    } = useSubtaskReorder(subtasks, (reordered) => {
-        setSubtasks(reordered);
-    });
-
-    // Scheduling and recurrence states
     const [scheduledDate, setScheduledDate] = useState(task.scheduledDate || null);
     const [scheduledTime, setScheduledTime] = useState(task.scheduledTime || null);
-    const [showTimeInput, setShowTimeInput] = useState(!!task.scheduledTime);
-    const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
     const [isRecurring, setIsRecurring] = useState(task.isRecurring || false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState(task.recurrence?.frequency || 1);
     const [recurrenceInterval, setRecurrenceInterval] = useState(task.recurrence?.interval || 'days');
@@ -330,16 +312,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
         onClose();
     };
 
-    const handleAddSubtask = () => {
-        if (!newSubtaskText.trim()) return;
-        const newSubtask = {
-            id: Date.now() + Math.random(),
-            text: newSubtaskText.trim(),
-            completed: false
-        };
-        setSubtasks([newSubtask, ...subtasks]);
-        setNewSubtaskText('');
-    };
+
 
     const toggleButtonStyle = (isActive) => ({
         border: `1.5px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}`,
@@ -517,196 +490,32 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
                 {/* 1. TOP ROW: Color-Coded Priority and Project Dropdowns */}
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', position: 'relative', zIndex: (isProjectOpen || isPriorityOpen) ? 120 : 1 }}>
-                    {/* Priority Custom Dropdown */}
-                    <div style={{ flex: 1, position: 'relative', zIndex: isPriorityOpen ? 121 : 1 }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '5px' }}>Priority</div>
-                        <button
-                            type="button"
-                            onClick={() => { setIsPriorityOpen(!isPriorityOpen); setIsProjectOpen(false); }}
-                            style={{
-                                width: '100%',
-                                padding: '8px 12px',
-                                borderRadius: '6px',
-                                border: `1.5px solid ${activePriority.color}`,
-                                background: 'var(--item-bg)',
-                                color: activePriority.color,
-                                fontSize: '1rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                boxSizing: 'border-box',
-                                outline: 'none',
-                                transition: 'all 0.15s ease'
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                                <span style={{
-                                    width: '10px',
-                                    height: '10px',
-                                    borderRadius: '50%',
-                                    background: activePriority.color,
-                                    boxShadow: `0 0 6px ${activePriority.color}`,
-                                    flexShrink: 0
-                                }} />
-                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {activePriority.label}
-                                </span>
-                            </div>
-                            <ChevronDown size={16} style={{ color: activePriority.color, flexShrink: 0 }} />
-                        </button>
+                    <PrioritySelector
+                        priority={editingTask.priority}
+                        onChangePriority={(p) => setEditingTask(prev => ({ ...prev, priority: p }))}
+                        mode="dropdown"
+                        label="Priority"
+                        isOpen={isPriorityOpen}
+                        onToggleOpen={(open) => {
+                            setIsPriorityOpen(open);
+                            if (open) setIsProjectOpen(false);
+                        }}
+                    />
 
-                        {isPriorityOpen && (
-                            <>
-                                <div onClick={() => setIsPriorityOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 120, background: 'transparent' }} />
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 'calc(100% + 4px)',
-                                    left: 0, right: 0,
-                                    background: 'var(--surface-color)',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '6px',
-                                    boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
-                                    zIndex: 125,
-                                    overflow: 'hidden',
-                                    padding: '4px 0'
-                                }}>
-                                    {Object.entries(PRIORITIES).map(([val, conf]) => {
-                                        const isSel = parseInt(val) === editingTask.priority;
-                                        return (
-                                            <div
-                                                key={val}
-                                                onClick={() => {
-                                                    setEditingTask({ ...editingTask, priority: parseInt(val) });
-                                                    setIsPriorityOpen(false);
-                                                }}
-                                                style={{
-                                                    padding: '9px 12px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '10px',
-                                                    fontSize: '0.95rem',
-                                                    fontWeight: isSel ? '700' : '600',
-                                                    color: isSel ? conf.color : 'var(--text-color)',
-                                                    background: 'transparent',
-                                                    cursor: 'pointer',
-                                                    transition: 'background 0.15s ease'
-                                                }}
-                                            >
-                                                <span style={{
-                                                    width: '10px',
-                                                    height: '10px',
-                                                    borderRadius: '50%',
-                                                    background: conf.color,
-                                                    boxShadow: `0 0 4px ${conf.color}`,
-                                                    flexShrink: 0
-                                                }} />
-                                                <span>{conf.label}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Project Custom Dropdown */}
-                    <div style={{ flex: 1, position: 'relative', zIndex: isProjectOpen ? 121 : 1 }}>
-                        <div style={{ ...styles.sectionLabel, marginBottom: '4px' }}>Project</div>
-                        <button
-                            type="button"
-                            onClick={() => { setIsProjectOpen(!isProjectOpen); setIsPriorityOpen(false); }}
-                            style={{
-                                width: '100%',
-                                padding: '8px 12px',
-                                borderRadius: '6px',
-                                border: `1.5px solid ${activeProject.color || '#6b7280'}`,
-                                background: 'var(--item-bg)',
-                                color: activeProject.color || 'var(--text-color)',
-                                fontSize: '1rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                boxSizing: 'border-box',
-                                outline: 'none',
-                                transition: 'all 0.15s ease'
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                                <span style={{
-                                    width: '5px',
-                                    height: '14px',
-                                    borderRadius: '2px',
-                                    background: activeProject.color || '#6b7280',
-                                    flexShrink: 0
-                                }} />
-                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {activeProject.name}
-                                </span>
-                            </div>
-                            <ChevronDown size={16} style={{ color: activeProject.color || 'var(--muted-text)', flexShrink: 0 }} />
-                        </button>
-
-                        {isProjectOpen && (
-                            <>
-                                <div onClick={() => setIsProjectOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 120, background: 'transparent' }} />
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 'calc(100% + 4px)',
-                                    left: 0,
-                                    minWidth: '100%',
-                                    width: 'max-content',
-                                    maxWidth: 'min(340px, calc(100vw - 32px))',
-                                    background: 'var(--surface-color)',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '6px',
-                                    boxShadow: '0 12px 36px rgba(0,0,0,0.25)',
-                                    zIndex: 125,
-                                    maxHeight: 'calc(100vh - 140px)',
-                                    overflowY: 'auto',
-                                    padding: '4px 0',
-                                    boxSizing: 'border-box'
-                                }}>
-                                    {(projects || []).map(p => {
-                                        const isSel = p.id === (editingTask.projectId || 'general');
-                                        return (
-                                            <div
-                                                key={p.id}
-                                                onClick={() => {
-                                                    setEditingTask({ ...editingTask, projectId: p.id });
-                                                    setIsProjectOpen(false);
-                                                }}
-                                                style={{
-                                                    padding: '9px 12px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '10px',
-                                                    fontSize: '0.95rem',
-                                                    fontWeight: isSel ? '700' : '600',
-                                                    color: isSel ? (p.color || 'var(--text-color)') : 'var(--text-color)',
-                                                    background: 'transparent',
-                                                    cursor: 'pointer',
-                                                    transition: 'background 0.15s ease'
-                                                }}
-                                            >
-                                                <span style={{
-                                                    width: '5px',
-                                                    height: '14px',
-                                                    borderRadius: '2px',
-                                                    background: p.color || '#6b7280',
-                                                    flexShrink: 0
-                                                }} />
-                                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </>
-                        )}
-                    </div>
+                    <ProjectPicker
+                        projects={projects}
+                        selectedProjectId={editingTask.projectId}
+                        onSelectProject={(newProjectId) => setEditingTask(prev => ({ ...prev, projectId: newProjectId }))}
+                        label="Project"
+                        buttonPadding="8px 12px"
+                        fontSize="1rem"
+                        containerStyle={{ flex: 1, zIndex: isProjectOpen ? 121 : 1 }}
+                        isOpen={isProjectOpen}
+                        onToggleOpen={(open) => {
+                            setIsProjectOpen(open);
+                            if (open) setIsPriorityOpen(false);
+                        }}
+                    />
                 </div>
 
                 {/* Voice Status Alert */}
@@ -1228,742 +1037,39 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
 
                 {/* Compact Subtask Editor */}
                 {showSubtasks && (
-                    <div style={styles.cardSection}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={styles.sectionLabel}>
-                                    Subtasks {subtasks.length > 0 ? `(${subtasks.filter(s => s.completed).length}/${subtasks.length})` : ''}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => toggleSection('subtasks', false)}
-                                    title="Contract subtasks"
-                                    style={{
-                                        background: 'transparent',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        color: 'var(--muted-text)',
-                                        padding: '2px 4px',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        borderRadius: '4px'
-                                    }}
-                                >
-                                    <Minus size={13} />
-                                </button>
-                            </div>
-                        </div>
-                        {subtasks.length > 0 && (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 10px 0' }}>
-                                {subtasks.map((st, index) => {
-                                    const isDraggingThis = draggedSubtaskIndex === index;
-                                    const isTargetThis = dragOverSubtaskInfo?.index === index;
-                                    const targetPosition = dragOverSubtaskInfo?.position;
-
-                                    const showTopIndicator = isTargetThis && targetPosition === 'before' && (
-                                        draggedSubtaskIndex !== index && draggedSubtaskIndex !== index - 1
-                                    );
-                                    const showBottomIndicator = isTargetThis && targetPosition === 'after' && (
-                                        draggedSubtaskIndex !== index && draggedSubtaskIndex !== index + 1
-                                    );
-
-                                    return (
-                                        <li
-                                            key={st.id}
-                                            data-subtask-index={index}
-                                            draggable={true}
-                                            onDragStart={(e) => {
-                                                e.dataTransfer.setData('text/plain', String(index));
-                                                e.dataTransfer.effectAllowed = 'move';
-                                                setDraggedSubtaskIndex(index);
-                                            }}
-                                            onDragOver={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                const pos = e.clientY < (rect.top + rect.height / 2) ? 'before' : 'after';
-                                                if (!dragOverSubtaskInfo || dragOverSubtaskInfo.index !== index || dragOverSubtaskInfo.position !== pos) {
-                                                    setDragOverSubtaskInfo({ index, position: pos });
-                                                }
-                                            }}
-                                            onDragLeave={(e) => {
-                                                if (!e.currentTarget.contains(e.relatedTarget)) {
-                                                    setDragOverSubtaskInfo(prev => prev?.index === index ? null : prev);
-                                                }
-                                            }}
-                                            onDragEnd={() => {
-                                                setDraggedSubtaskIndex(null);
-                                                setDragOverSubtaskInfo(null);
-                                            }}
-                                            onDrop={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                const fromIndex = draggedSubtaskIndex ?? parseInt(e.dataTransfer.getData('text/plain'), 10);
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                const pos = dragOverSubtaskInfo?.position || (e.clientY < (rect.top + rect.height / 2) ? 'before' : 'after');
-                                                if (typeof fromIndex === 'number' && !isNaN(fromIndex)) {
-                                                    setSubtasks(prev => reorderList(prev, fromIndex, index, pos));
-                                                }
-                                                setDraggedSubtaskIndex(null);
-                                                setDragOverSubtaskInfo(null);
-                                            }}
-                                            style={{
-                                                position: 'relative',
-                                                display: 'flex',
-                                                alignItems: 'flex-start',
-                                                justifyContent: 'space-between',
-                                                padding: '4px 2px',
-                                                borderBottom: '1px solid var(--border-color)',
-                                                opacity: isDraggingThis ? 0.35 : 1,
-                                                background: isDraggingThis ? 'var(--accent-bg, rgba(59, 130, 246, 0.05))' : 'transparent',
-                                                borderRadius: '4px',
-                                                gap: '8px',
-                                                transition: 'opacity 0.15s ease, background 0.15s ease'
-                                            }}
-                                        >
-                                            {/* Blue accent insertion drop line indicator, matching main task list */}
-                                            {(showTopIndicator || showBottomIndicator) && (
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: showTopIndicator ? '-2px' : 'auto',
-                                                        bottom: showBottomIndicator ? '-2px' : 'auto',
-                                                        left: '0px',
-                                                        right: '0px',
-                                                        height: '3px',
-                                                        background: 'var(--accent-color)',
-                                                        borderRadius: '1.5px',
-                                                        boxShadow: '0 0 8px var(--accent-color)',
-                                                        zIndex: 100,
-                                                        pointerEvents: 'none',
-                                                        display: 'flex',
-                                                        alignItems: 'center'
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            width: '7px',
-                                                            height: '7px',
-                                                            borderRadius: '50%',
-                                                            background: 'var(--accent-color)',
-                                                            marginLeft: '-3px',
-                                                            boxShadow: '0 0 6px var(--accent-color)'
-                                                        }}
-                                                    />
-                                                </div>
-                                            )}
-                                            <div
-                                                className="subtask-drag-handle"
-                                                onTouchStart={(e) => handleSubtaskTouchStart(e, index)}
-                                                onMouseDown={(e) => {
-                                                    if (window.getSelection) {
-                                                        window.getSelection().removeAllRanges();
-                                                    }
-                                                }}
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    cursor: isDraggingThis ? 'grabbing' : 'grab',
-                                                    padding: '6px 8px',
-                                                    minWidth: '32px',
-                                                    minHeight: '32px',
-                                                    color: isDraggingThis ? 'var(--accent-color)' : 'var(--muted-text)',
-                                                    opacity: isDraggingThis ? 1 : 0.7,
-                                                    flexShrink: 0,
-                                                    touchAction: 'none',
-                                                    userSelect: 'none',
-                                                    WebkitUserSelect: 'none',
-                                                    borderRadius: '6px',
-                                                    background: 'var(--border-color, rgba(0,0,0,0.05))'
-                                                }}
-                                                title="Drag to rearrange subtask (or use Alt+Up / Alt+Down)"
-                                                aria-label="Drag to rearrange subtask"
-                                            >
-                                                <GripVertical size={16} />
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', margin: '0 6px' }}>
-                                                <textarea
-                                                    ref={(el) => {
-                                                        if (el) {
-                                                            el.style.height = 'auto';
-                                                            el.style.height = `${Math.max(el.scrollHeight, 28)}px`;
-                                                        }
-                                                    }}
-                                                    value={st.text}
-                                                    rows={1}
-                                                    draggable={false}
-                                                    onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-                                                            e.preventDefault();
-                                                            if (e.key === 'ArrowUp' && index > 0) {
-                                                                setSubtasks(prev => reorderList(prev, index, index - 1, 'before'));
-                                                            } else if (e.key === 'ArrowDown' && index < subtasks.length - 1) {
-                                                                setSubtasks(prev => reorderList(prev, index, index + 1, 'after'));
-                                                            }
-                                                        }
-                                                    }}
-                                                    onChange={(e) => {
-                                                        const updatedText = e.target.value;
-                                                        setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, text: updatedText } : s));
-                                                    }}
-                                                    onInput={(e) => {
-                                                        e.target.style.height = 'auto';
-                                                        e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
-                                                    }}
-                                                    placeholder="Subtask description..."
-                                                    style={{
-                                                        width: '100%',
-                                                        border: 'none',
-                                                        background: 'transparent',
-                                                        fontSize: '1.05rem',
-                                                        fontWeight: '500',
-                                                        color: st.completed ? 'var(--muted-text)' : 'var(--text-color)',
-                                                        textDecoration: st.completed ? 'line-through' : 'none',
-                                                        outline: 'none',
-                                                        padding: '3px 6px',
-                                                        borderRadius: '4px',
-                                                        fontFamily: 'inherit',
-                                                        resize: 'none',
-                                                        overflowY: 'hidden',
-                                                        wordBreak: 'break-word',
-                                                        whiteSpace: 'pre-wrap',
-                                                        lineHeight: '1.4',
-                                                        minHeight: '28px',
-                                                        boxSizing: 'border-box',
-                                                        transition: 'all 0.15s ease'
-                                                    }}
-                                                    onFocus={(e) => {
-                                                        e.target.style.background = 'var(--bg-color)';
-                                                        e.target.style.boxShadow = '0 0 0 1.5px var(--accent-color)';
-                                                        e.target.style.height = 'auto';
-                                                        e.target.style.height = `${Math.max(e.target.scrollHeight, 28)}px`;
-                                                    }}
-                                                    onBlur={(e) => {
-                                                        e.target.style.background = 'transparent';
-                                                        e.target.style.boxShadow = 'none';
-                                                        if (!st.text.trim()) {
-                                                            setSubtasks(subtasks.filter(s => s.id !== st.id));
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                draggable={false}
-                                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                                checked={st.completed}
-                                                onChange={() => {
-                                                    setSubtasks(toggleSubtaskStatus(subtasks, st.id));
-                                                }}
-                                                aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
-                                                title={st.completed ? "Mark incomplete" : "Mark completed"}
-                                                style={{ cursor: 'pointer', width: '18px', height: '18px', flexShrink: 0, marginTop: '6px', marginRight: '4px' }}
-                                            />
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        )}
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            <textarea
-                                rows={1}
-                                value={newSubtaskText}
-                                onChange={(e) => setNewSubtaskText(e.target.value)}
-                                onInput={(e) => {
-                                    e.target.style.height = 'auto';
-                                    e.target.style.height = `${Math.max(e.target.scrollHeight, 38)}px`;
-                                }}
-                                placeholder="Add step..."
-                                style={{
-                                    flex: 1,
-                                    padding: '8px 12px',
-                                    fontSize: '1.05rem',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '6px',
-                                    background: 'var(--surface-color)',
-                                    color: 'var(--text-color)',
-                                    resize: 'none',
-                                    overflowY: 'hidden',
-                                    fontFamily: 'inherit',
-                                    lineHeight: '1.35',
-                                    wordBreak: 'break-word',
-                                    whiteSpace: 'pre-wrap',
-                                    minHeight: '38px',
-                                    boxSizing: 'border-box',
-                                    outline: 'none'
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleAddSubtask();
-                                    }
-                                }}
-                            />
-                            <button
-                                type="button"
-                                onClick={handleAddSubtask}
-                                style={{
-                                    padding: '8px 16px',
-                                    background: 'var(--accent-color)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '1rem',
-                                    fontWeight: '600',
-                                    alignSelf: 'flex-start'
-                                }}
-                            >
-                                Add
-                            </button>
-                        </div>
-                    </div>
+                    <SubtasksEditor
+                        subtasks={subtasks}
+                        onChangeSubtasks={setSubtasks}
+                        onContract={() => toggleSection('subtasks', false)}
+                        itemPlaceholder="Subtask description..."
+                        addPlaceholder="Add step..."
+                    />
                 )}
 
                 {/* Compact Schedule and Recurrence Editor */}
                 {showSchedule && (
-                    <div style={styles.cardSection}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={styles.sectionLabel}>Date & Recurrence</span>
-                                <button
-                                    type="button"
-                                    onClick={() => toggleSection('schedule', false)}
-                                    title="Contract schedule"
-                                    style={{
-                                        background: 'transparent',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        color: 'var(--muted-text)',
-                                        padding: '2px 4px',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        borderRadius: '4px'
-                                    }}
-                                >
-                                    <Minus size={13} />
-                                </button>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '10px', flexWrap: 'nowrap', width: '100%', boxSizing: 'border-box' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 104px', minWidth: '92px', maxWidth: '108px', flexShrink: 0 }}>
-                                <input
-                                    id="edit-scheduled-date"
-                                    type="date"
-                                    value={scheduledDate || ''}
-                                    onChange={(e) => setScheduledDate(e.target.value || null)}
-                                    style={{
-                                        padding: '6px 4px',
-                                        fontSize: '0.82rem',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '4px',
-                                        background: 'var(--bg-color)',
-                                        color: 'var(--text-color)',
-                                        outline: 'none',
-                                        width: '100%',
-                                        boxSizing: 'border-box'
-                                    }}
-                                />
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setScheduledDate(getTomorrowDateString())}
-                                style={{
-                                    flex: 1,
-                                    minWidth: 0,
-                                    padding: '6px 8px',
-                                    background: 'var(--accent-bg)',
-                                    border: '1px solid var(--accent-color)',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.82rem',
-                                    color: 'var(--accent-color)',
-                                    fontWeight: '600',
-                                    whiteSpace: 'nowrap',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '5px',
-                                    boxSizing: 'border-box'
-                                }}
-                                title="Schedule for tomorrow (Next Day)"
-                            >
-                                <FastForward size={13} style={{ flexShrink: 0 }} />
-                                <span>Day</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setScheduledDate(getNextWeekDateString())}
-                                style={{
-                                    flex: 1,
-                                    minWidth: 0,
-                                    padding: '6px 8px',
-                                    background: 'var(--accent-bg)',
-                                    border: '1px solid var(--accent-color)',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.82rem',
-                                    color: 'var(--accent-color)',
-                                    fontWeight: '600',
-                                    whiteSpace: 'nowrap',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '5px',
-                                    boxSizing: 'border-box'
-                                }}
-                                title="Schedule for Monday of next week"
-                            >
-                                <FastForward size={13} style={{ flexShrink: 0 }} />
-                                <span>Week</span>
-                            </button>
-                            {scheduledDate && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setScheduledDate(null);
-                                        setScheduledTime(null);
-                                        setShowTimeInput(false);
-                                        setIsRecurring(false);
-                                    }}
-                                    style={{
-                                        padding: '6px 8px',
-                                        background: 'transparent',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        fontSize: '0.82rem',
-                                        color: '#ef4444',
-                                        fontWeight: '600',
-                                        whiteSpace: 'nowrap',
-                                        flexShrink: 0,
-                                        boxSizing: 'border-box'
-                                    }}
-                                >
-                                    Clear
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Time & Repeat Scheduling Row */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            marginBottom: '8px',
-                            flexWrap: 'wrap'
-                        }}>
-                            {/* Minimalist Time Input with Circular Clock Face */}
-                            {timeSchedulingEnabled && (
-                                <>
-                                    {!showTimeInput && !scheduledTime ? (
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setShowTimeInput(true);
-                                                if (!scheduledDate) setScheduledDate(getTodayDateString());
-                                                setIsTimePickerOpen(true);
-                                            }}
-                                            aria-label="Add time"
-                                            title="Add scheduled time"
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                padding: '2px 0',
-                                                color: 'var(--muted-text)',
-                                                cursor: 'pointer',
-                                                fontSize: '0.78rem',
-                                                fontWeight: '500',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '4px'
-                                            }}
-                                        >
-                                            {showBtnIcons && (
-                                                <>
-                                                    <Clock size={13} />
-                                                    <Plus size={11} strokeWidth={2.5} />
-                                                </>
-                                            )}
-                                            {showBtnText && <span>Add time</span>}
-                                        </button>
-                                    ) : (
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            flexWrap: 'nowrap'
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--muted-text)', fontSize: '0.78rem', fontWeight: '500' }}>
-                                                <Clock size={13} />
-                                                <label htmlFor="edit-scheduled-time">Time:</label>
-                                            </div>
-                                            <button
-                                                id="edit-scheduled-time"
-                                                type="button"
-                                                onClick={() => setIsTimePickerOpen(true)}
-                                                aria-label="Select time"
-                                                style={{
-                                                    padding: '4px 8px',
-                                                    fontSize: '0.82rem',
-                                                    border: '1px solid var(--border-color)',
-                                                    borderRadius: '4px',
-                                                    background: 'var(--bg-color)',
-                                                    color: scheduledTime ? 'var(--text-color)' : 'var(--muted-text)',
-                                                    fontWeight: scheduledTime ? '600' : '400',
-                                                    outline: 'none',
-                                                    boxSizing: 'border-box',
-                                                    cursor: 'pointer',
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px'
-                                                }}
-                                            >
-                                                {scheduledTime ? formatDisplayTime(scheduledTime, dateFormat) : 'Select time...'}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setScheduledTime(null);
-                                                    setShowTimeInput(false);
-                                                }}
-                                                style={{
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    color: 'var(--muted-text)',
-                                                    cursor: 'pointer',
-                                                    fontSize: '0.78rem',
-                                                    padding: '4px 6px',
-                                                    borderRadius: '4px',
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center'
-                                                }}
-                                                title="Remove time"
-                                            >
-                                                Remove
-                                            </button>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-                            {/* Repeat Toggle Icon Button on the same line */}
-                            <button
-                                type="button"
-                                role="checkbox"
-                                aria-checked={isRecurring}
-                                aria-label="Repeat this task"
-                                title={isRecurring ? "Repeating task: active (tap to turn off recurrence)" : "Repeat this task (recurrence)"}
-                                onClick={() => {
-                                    const next = !isRecurring;
-                                    setIsRecurring(next);
-                                    if (next && !scheduledDate) {
-                                        setScheduledDate(getTodayDateString());
-                                    }
-                                }}
-                                style={{
-                                    background: isRecurring ? 'rgba(59, 130, 246, 0.12)' : 'none',
-                                    border: isRecurring ? '1px solid var(--accent-color)' : '1px solid transparent',
-                                    borderRadius: '6px',
-                                    padding: '3px 8px',
-                                    minHeight: '26px',
-                                    color: isRecurring ? 'var(--accent-color)' : 'var(--muted-text)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.78rem',
-                                    fontWeight: isRecurring ? '600' : '500',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                {showBtnIcons && <Repeat size={13} strokeWidth={isRecurring ? 2.5 : 2} />}
-                                {showBtnText && <span>Repeat</span>}
-                            </button>
-                        </div>
-
-                        {timeSchedulingEnabled && (
-                            <TimePickerModal
-                                isOpen={isTimePickerOpen}
-                                value={scheduledTime}
-                                onSave={(newTime) => {
-                                    setScheduledTime(newTime);
-                                    if (newTime && !scheduledDate) {
-                                        setScheduledDate(getTodayDateString());
-                                    }
-                                    if (!newTime) {
-                                        setShowTimeInput(false);
-                                    }
-                                }}
-                                onClose={() => setIsTimePickerOpen(false)}
-                            />
-                        )}
-
-                        {/* Add to External Calendars */}
-                        {scheduledDate && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                marginBottom: '10px',
-                                flexWrap: 'wrap'
-                            }}>
-                                <span style={{ fontSize: '0.78rem', color: 'var(--muted-text)', fontWeight: '500' }}>
-                                    Add to:
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => openGoogleCalendar({
-                                        title: editingTask.text || 'Scheduled Task',
-                                        scheduledDate,
-                                        scheduledTime: timeSchedulingEnabled ? scheduledTime : null,
-                                        notes: editingTask.notes
-                                    })}
-                                    style={{
-                                        background: 'var(--bg-color)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '4px',
-                                        padding: '3px 8px',
-                                        fontSize: '0.78rem',
-                                        fontWeight: '600',
-                                        color: 'var(--text-color)',
-                                        cursor: 'pointer',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '5px'
-                                    }}
-                                    title="Add to Google Calendar (with automated reminders)"
-                                >
-                                    <Calendar size={12} style={{ color: '#4285f4' }} />
-                                    <span>Google Cal</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => downloadAppleCalendarIcs({
-                                        title: editingTask.text || 'Scheduled Task',
-                                        scheduledDate,
-                                        scheduledTime: timeSchedulingEnabled ? scheduledTime : null,
-                                        notes: editingTask.notes
-                                    })}
-                                    style={{
-                                        background: 'var(--bg-color)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '4px',
-                                        padding: '3px 8px',
-                                        fontSize: '0.78rem',
-                                        fontWeight: '600',
-                                        color: 'var(--text-color)',
-                                        cursor: 'pointer',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '5px'
-                                    }}
-                                    title="Add to Apple Calendar / Download .ics (with automated 15-min reminder)"
-                                >
-                                    <Calendar size={12} style={{ color: '#ea4335' }} />
-                                    <span>Apple Cal</span>
-                                </button>
-                            </div>
-                        )}
-
-                        {isRecurring && (
-                            <div style={{
-                                marginTop: '4px',
-                                marginBottom: '10px',
-                                padding: '10px 12px',
-                                background: 'var(--bg-color)',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '8px'
-                            }}>
-                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>Every</span>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={recurrenceFrequency}
-                                            onChange={(e) => setRecurrenceFrequency(Math.max(1, parseInt(e.target.value) || 1))}
-                                            style={{
-                                                width: '55px',
-                                                padding: '6px 10px',
-                                                fontSize: '1rem',
-                                                border: '1px solid var(--border-color)',
-                                                borderRadius: '4px',
-                                                background: 'var(--bg-color)',
-                                                color: 'var(--text-color)',
-                                                textAlign: 'center'
-                                            }}
-                                        />
-                                        <select
-                                            value={recurrenceInterval}
-                                            onChange={(e) => setRecurrenceInterval(e.target.value)}
-                                            style={{
-                                                padding: '6px 10px',
-                                                fontSize: '1rem',
-                                                border: '1px solid var(--border-color)',
-                                                borderRadius: '4px',
-                                                background: 'var(--bg-color)',
-                                                color: 'var(--text-color)'
-                                            }}
-                                        >
-                                            <option value="days">Day(s)</option>
-                                            <option value="weeks">Week(s)</option>
-                                            <option value="months">Month(s)</option>
-                                            <option value="years">Year(s)</option>
-                                        </select>
-                                    </div>
-
-                                    {recurrenceInterval === 'weeks' && (
-                                        <div>
-                                            <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
-                                                    const isSelected = recurrenceDaysOfWeek.includes(idx);
-                                                    return (
-                                                        <button
-                                                            key={day}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                let updatedDays;
-                                                                if (isSelected) {
-                                                                    updatedDays = recurrenceDaysOfWeek.filter(d => d !== idx);
-                                                                } else {
-                                                                    updatedDays = [...recurrenceDaysOfWeek, idx];
-                                                                }
-                                                                setRecurrenceDaysOfWeek(updatedDays);
-                                                                
-                                                                const baseDate = scheduledDate || getTodayDateString();
-                                                                const snappedDate = adjustStartDateForWeekdays(baseDate, updatedDays);
-                                                                setScheduledDate(snappedDate);
-                                                            }}
-                                                            style={{
-                                                                flex: 1,
-                                                                padding: '6px 4px',
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: '700',
-                                                                borderRadius: '4px',
-                                                                cursor: 'pointer',
-                                                                border: '1px solid',
-                                                                borderColor: isSelected ? 'var(--accent-color)' : 'var(--border-color)',
-                                                                background: isSelected ? 'var(--accent-color)' : 'var(--bg-color)',
-                                                                color: isSelected ? 'white' : 'var(--text-color)',
-                                                                transition: 'all 0.15s ease'
-                                                            }}
-                                                        >
-                                                            {day[0]}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                    </div>
+                    <SchedulePicker
+                        scheduledDate={scheduledDate}
+                        onChangeScheduledDate={setScheduledDate}
+                        scheduledTime={scheduledTime}
+                        onChangeScheduledTime={setScheduledTime}
+                        timeSchedulingEnabled={timeSchedulingEnabled}
+                        dateFormat={dateFormat}
+                        buttonDisplayMode={buttonDisplayMode}
+                        isRecurring={isRecurring}
+                        onToggleRecurring={setIsRecurring}
+                        recurrenceFrequency={recurrenceFrequency}
+                        onChangeRecurrenceFrequency={setRecurrenceFrequency}
+                        recurrenceInterval={recurrenceInterval}
+                        onChangeRecurrenceInterval={setRecurrenceInterval}
+                        recurrenceDaysOfWeek={recurrenceDaysOfWeek}
+                        onChangeRecurrenceDaysOfWeek={setRecurrenceDaysOfWeek}
+                        taskTitle={editingTask.text}
+                        taskNotes={editingTask.notes}
+                        onContract={() => toggleSection('schedule', false)}
+                        dateInputId="edit-scheduled-date"
+                        timeInputId="edit-scheduled-time"
+                    />
                 )}
 
                 <div style={{

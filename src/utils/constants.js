@@ -179,6 +179,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.4': [
+    { title: '🧩 Task Editor Architecture Deduplication (Phase 2):', desc: 'Extracted shared task editing domain logic into modular micro-components (ProjectPicker, PrioritySelector, SchedulePicker, RecurrencePicker, SubtasksEditor) under src/components/tasks/editor/.' },
+    { title: '📉 Codebase Streamlining & Unified Behaviors:', desc: 'Eliminated over 1,740 lines of duplicated code across AddTask and EditModal, standardizing subtask drag-and-drop, circular clock scheduling, external calendar sync, and project picking while ensuring 100% UI consistency and test coverage.' }
+  ],
   '3.8.3': [
     { title: '⚡ Zero-Allocation Drag Handlers & Restored Memoization (Phase 1):', desc: 'Refactored drag-and-drop event handlers across TaskItem, PrioritySection, ProjectColumn, and On Hold task lists to pass stable memoized callbacks, eliminating inline closure and object allocations inside .map() loops and restoring full React.memo prop equality.' },
     { title: '🚀 Progressive Batch Rendering in Archive:', desc: 'Introduced 30-item progressive batch rendering with instant Load More controls in ArchiveModal. Replaced linear project array scans with O(1) indexed Map lookups, enabling instantaneous archive opening even with thousands of completed tasks.' }

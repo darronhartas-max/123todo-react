@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.4
+
+- **🧩 Task Editor Architecture Deduplication (Phase 2):** Extracted shared task editing domain logic into modular micro-components (ProjectPicker, PrioritySelector, SchedulePicker, RecurrencePicker, SubtasksEditor) under src/components/tasks/editor/.
+- **📉 Codebase Streamlining & Unified Behaviors:** Eliminated over 1,740 lines of duplicated code across AddTask and EditModal, standardizing subtask drag-and-drop, circular clock scheduling, external calendar sync, and project picking while ensuring 100% UI consistency and test coverage.
+
 ### v3.8.3
 
 - **⚡ Zero-Allocation Drag Handlers & Restored Memoization (Phase 1):** Refactored drag-and-drop event handlers across TaskItem, PrioritySection, ProjectColumn, and On Hold task lists to pass stable memoized callbacks, eliminating inline closure and object allocations inside .map() loops and restoring full React.memo prop equality.

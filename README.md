@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.3** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.4** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.3 (Current)
+### v3.8.4 (Current)
+
+- **Task Editor Architecture Deduplication (Phase 2)**: Extracted shared task editing logic into reusable, modular micro-components (`ProjectPicker`, `PrioritySelector`, `SchedulePicker`, `RecurrencePicker`, `SubtasksEditor`) under `src/components/tasks/editor/`.
+- **Codebase Streamlining & Unified Behaviors**: Eliminated over 1,740 lines of duplicate logic across `AddTask` and `EditModal`, standardizing subtask drag-and-drop reordering, circular time scheduling, calendar exports, and project selection while maintaining 100% visual styling and full test coverage.
+
+### v3.8.3
 
 - **Zero-Allocation Drag Handlers & Restored Memoization (Phase 1)**: Refactored drag-and-drop event handlers across `TaskItem`, `PrioritySection`, `ProjectColumn`, and On Hold task lists to pass stable memoized callbacks, eliminating inline closure and object allocations inside `.map()` loops and restoring full `React.memo` prop equality.
 - **Progressive Batch Rendering in Archive**: Introduced 30-item progressive batch rendering with instant Load More controls in `ArchiveModal`. Replaced linear project array scans with $O(1)$ indexed Map lookups, enabling instantaneous archive opening even with thousands of completed tasks.
