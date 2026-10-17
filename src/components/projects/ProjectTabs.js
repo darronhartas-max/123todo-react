@@ -1,59 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, Search as SearchIcon, Settings, PlusCircle, MinusCircle, Trophy } from 'lucide-react';
 import { DEFAULT_PROJECTS } from '../../utils/constants';
+
+const isCountableActiveTask = (t) => {
+    if (!t || t.completedAt || t.isCompleted || t.completed) return false;
+    const p = t.priority;
+    const isValidPriority = (
+        p === 1 || p === 2 || p === 3 || p === 4 ||
+        p === '1' || p === '2' || p === '3' || p === '4' ||
+        p === 'p1' || p === 'p2' || p === 'p3' || p === 'p4' ||
+        p === 'must' || p === 'should' || p === 'could' || p === 'on hold' ||
+        p === undefined || p === null
+    );
+    const isScheduled = Boolean(t.scheduledDate);
+    return isValidPriority || isScheduled;
+};
 
 const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, showSearch, onToggleSearch, onOpenSettings, onOpenAchievements, onToggleAdd, isAddOpen, viewProfile = 'lite' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredOptionId, setHoveredOptionId] = useState(null);
 
-    const allProjects = [
+    const allProjects = useMemo(() => [
         DEFAULT_PROJECTS.find(p => p.id === 'all'),
         ...projects
-    ].filter(Boolean);
+    ].filter(Boolean), [projects]);
 
     const activeProject = allProjects.find(p => p.id === currentProjectId) || allProjects[0];
     const activeColor = activeProject?.color || '#6b7280';
 
-    const isCountableActiveTask = (t) => {
-        if (!t || t.completedAt || t.isCompleted || t.completed) return false;
-        const p = t.priority;
-        const isValidPriority = (
-            p === 1 || p === 2 || p === 3 || p === 4 ||
-            p === '1' || p === '2' || p === '3' || p === '4' ||
-            p === 'p1' || p === 'p2' || p === 'p3' || p === 'p4' ||
-            p === 'must' || p === 'should' || p === 'could' || p === 'on hold' ||
-            p === undefined || p === null
-        );
-        const isScheduled = Boolean(t.scheduledDate);
-        return isValidPriority || isScheduled;
-    };
+    // Single O(N) pass to calculate task counts per project
+    const projectTaskCounts = useMemo(() => {
+        const counts = { all: 0 };
+        const idMap = new Map();
+        const nameMap = new Map();
 
-    const getProjectTaskCount = (projectId) => {
-        if (!tasks || tasks.length === 0) return 0;
-        const activeList = tasks.filter(isCountableActiveTask);
-        if (projectId === 'all') {
-            return activeList.length;
-        }
-        const targetProj = allProjects.find(p => p.id === projectId);
-        const targetProjName = targetProj?.name?.toLowerCase();
-        const targetProjId = (projectId || '').toLowerCase();
+        allProjects.forEach(p => {
+            counts[p.id] = 0;
+            if (p.id) idMap.set(p.id.toLowerCase(), p.id);
+            if (p.name) nameMap.set(p.name.toLowerCase(), p.id);
+        });
 
-        return activeList.filter(t => {
-            const taskProj = (t.projectId || 'general').toLowerCase();
-            return taskProj === targetProjId || (targetProjName && taskProj === targetProjName);
-        }).length;
-    };
+        if (!tasks || tasks.length === 0) return counts;
 
-    const activeCount = getProjectTaskCount(activeProject?.id);
+        tasks.forEach(t => {
+            if (!isCountableActiveTask(t)) return;
+            counts.all = (counts.all || 0) + 1;
+
+            const rawProj = (t.projectId || 'general').toLowerCase();
+            const matchedProjId = idMap.get(rawProj) || nameMap.get(rawProj);
+            if (matchedProjId) {
+                counts[matchedProjId] = (counts[matchedProjId] || 0) + 1;
+            } else if (counts[t.projectId] !== undefined) {
+                counts[t.projectId] = (counts[t.projectId] || 0) + 1;
+            }
+        });
+
+        return counts;
+    }, [allProjects, tasks]);
+
+    const getProjectTaskCount = useCallback((projectId) => {
+        return projectTaskCounts[projectId] || 0;
+    }, [projectTaskCounts]);
+
+    const activeCount = projectTaskCounts[activeProject?.id] || 0;
 
     // Calculate widest project text length including task count badge to dynamically size the dropdown button
-    const getProjectLabelLength = (p) => {
-        const count = getProjectTaskCount(p.id);
-        return (p?.name || '').length + String(count).length + 4;
-    };
-
-    const maxProjectNameLength = Math.max(...allProjects.map(getProjectLabelLength), 10);
-    const dropdownMinWidth = Math.min(Math.max(maxProjectNameLength * 9 + 48, 140), 320);
+    const dropdownMinWidth = useMemo(() => {
+        const lengths = allProjects.map(p => {
+            const count = projectTaskCounts[p.id] || 0;
+            return (p?.name || '').length + String(count).length + 4;
+        });
+        const maxProjectNameLength = Math.max(...lengths, 10);
+        return Math.min(Math.max(maxProjectNameLength * 9 + 48, 140), 320);
+    }, [allProjects, projectTaskCounts]);
 
     const styles = {
         mainWrapper: {
@@ -316,4 +335,4 @@ const ProjectTabs = ({ projects = [], tasks = [], currentProjectId, onSelect, sh
     );
 };
 
-export default ProjectTabs;
+export default React.memo(ProjectTabs);

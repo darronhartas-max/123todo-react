@@ -143,4 +143,4 @@ const Footer = ({ version = APP_VERSION, onInstallClick, isStandalone = false })
     );
 };
 
-export default Footer;
+export default React.memo(Footer);

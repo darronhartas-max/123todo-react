@@ -64,7 +64,9 @@ export const STORAGE_KEYS = {
   LIGHT_MODE_TONE: '123TodoLightModeTone',
   LAST_SEEN_VERSION: '123Todo_Last_Seen_Version',
   PREVIOUS_VERSION: '123Todo_Previous_Version',
-  SHOW_UPDATED_MODAL: '123Todo_Show_Updated_Modal'
+  SHOW_UPDATED_MODAL: '123Todo_Show_Updated_Modal',
+  TELEMETRY_STATS: '123TodoTelemetryStats',
+  LAST_VISIT_DATE: '123TodoLastVisitDate'
 };
 
 export const BUTTON_DISPLAY_MODES = [
@@ -176,6 +178,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.1': [
+    { title: '⚡ O(N) Project Task Counting & Fast Tabs Rendering (Phase 5):', desc: 'Replaced quadratic nested task counting loops in ProjectTabs with a single memoized O(N) lookup pass and wrapped ProjectTabs in React.memo, eliminating 20+ redundant array traversals on every state change and making project switching instantaneous.' },
+    { title: '🎯 Memoized Task Pipeline & Zero-Allocation Lookups:', desc: 'Memoized active, scheduled, and filtered task pipelines in App.js to eliminate redundant multi-key date/time sorting and search re-filtering during typing. Replaced inline project array allocations with indexed map lookups (O(1)) for On Hold and Scheduled sections.' },
+    { title: '🖐️ Smooth 60fps Drag-and-Drop & UI Control Memoization:', desc: 'Added target ID equality guards to drag-over handlers and stabilized all drag handlers in useCallback to prevent rapid state churn during drag gestures. Wrapped Header, Footer, and SearchBar in React.memo and unified telemetry storage keys into STORAGE_KEYS.' }
+  ],
   '3.8.0': [
     { title: '📥 Dedicated Photo Download vs. Share Actions:', desc: 'The Download button in the photo Lightbox viewer now strictly triggers direct file downloads to your Downloads folder on all devices, keeping it distinct from the Share button which opens the system share sheet (AirDrop, Messages, Mail, WhatsApp).' },
     { title: '⏱️ Extended Download Reliability:', desc: 'Extended file blob download lifetime to ensure smooth, uncorrupted downloads for high-resolution images across all mobile and desktop browsers.' }

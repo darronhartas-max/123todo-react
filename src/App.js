@@ -60,6 +60,20 @@ const TodoApp = () => {
     ...projects
   ], [projects]);
 
+  const allProjects = useMemo(() => [
+    ...DEFAULT_PROJECTS,
+    ...projects
+  ], [projects]);
+
+  const allProjectsMap = useMemo(() => {
+    const map = new Map();
+    allProjects.forEach(p => {
+      if (p.id) map.set(p.id.toLowerCase(), p);
+      if (p.name) map.set(p.name.toLowerCase(), p);
+    });
+    return map;
+  }, [allProjects]);
+
   const [syncProvider, setSyncProviderState] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.SYNC_PROVIDER) || 'cloudflare';
   });
@@ -754,39 +768,52 @@ const TodoApp = () => {
     } catch (e) {}
   }, [completeTask, recordAppUsageAction]);
 
-  // Filtering
-  const filteredBySearch = (list) => list.filter(t => {
-    if (!searchTerm || !searchTerm.trim()) return true;
-    const query = searchTerm.toLowerCase();
-    const textMatch = (t.text || '').toLowerCase().includes(query);
-    const notesMatch = (t.notes || '').toLowerCase().includes(query);
-    return textMatch || notesMatch;
-  });
+  // Memoized task filtering & sorting
+  const activeTasks = useMemo(() => {
+    const today = getTodayDateString();
+    return tasks.filter(t => !t.scheduledDate || t.scheduledDate <= today);
+  }, [tasks]);
 
-  const filteredByProject = (list) => list.filter(t =>
-    currentProjectId === 'all' || t.projectId === currentProjectId
-  );
+  const scheduledTasks = useMemo(() => {
+    const today = getTodayDateString();
+    return tasks
+      .filter(t => t.scheduledDate && t.scheduledDate > today)
+      .sort((a, b) => {
+        const dateComp = a.scheduledDate.localeCompare(b.scheduledDate);
+        if (dateComp !== 0) return dateComp;
+        if (a.scheduledTime && b.scheduledTime) {
+          return a.scheduledTime.localeCompare(b.scheduledTime);
+        }
+        if (a.scheduledTime && !b.scheduledTime) return -1;
+        if (!a.scheduledTime && b.scheduledTime) return 1;
+        return 0;
+      });
+  }, [tasks]);
 
-  const today = getTodayDateString();
-  const activeTasks = tasks.filter(t => !t.scheduledDate || t.scheduledDate <= today);
-  const scheduledTasks = tasks
-    .filter(t => t.scheduledDate && t.scheduledDate > today)
-    .sort((a, b) => {
-      const dateComp = a.scheduledDate.localeCompare(b.scheduledDate);
-      if (dateComp !== 0) return dateComp;
-      if (a.scheduledTime && b.scheduledTime) {
-        return a.scheduledTime.localeCompare(b.scheduledTime);
-      }
-      if (a.scheduledTime && !b.scheduledTime) return -1;
-      if (!a.scheduledTime && b.scheduledTime) return 1;
-      return 0;
+  const filteredTasks = useMemo(() => {
+    const query = (searchTerm || '').trim().toLowerCase();
+    return activeTasks.filter(t => {
+      if (currentProjectId !== 'all' && t.projectId !== currentProjectId) return false;
+      if (!query) return true;
+      const textMatch = (t.text || '').toLowerCase().includes(query);
+      const notesMatch = (t.notes || '').toLowerCase().includes(query);
+      return textMatch || notesMatch;
     });
+  }, [activeTasks, searchTerm, currentProjectId]);
 
-  const filteredTasks = filteredByProject(filteredBySearch(activeTasks));
-  const filteredScheduled = filteredByProject(filteredBySearch(scheduledTasks));
+  const filteredScheduled = useMemo(() => {
+    const query = (searchTerm || '').trim().toLowerCase();
+    return scheduledTasks.filter(t => {
+      if (currentProjectId !== 'all' && t.projectId !== currentProjectId) return false;
+      if (!query) return true;
+      const textMatch = (t.text || '').toLowerCase().includes(query);
+      const notesMatch = (t.notes || '').toLowerCase().includes(query);
+      return textMatch || notesMatch;
+    });
+  }, [scheduledTasks, searchTerm, currentProjectId]);
 
-  const activeTasksCount = activeTasks.filter(t => t.priority <= 3).length;
-  const onHoldTasksFiltered = filteredTasks.filter(t => t.priority === 4);
+  const activeTasksCount = useMemo(() => activeTasks.filter(t => t.priority <= 3).length, [activeTasks]);
+  const onHoldTasksFiltered = useMemo(() => filteredTasks.filter(t => t.priority === 4), [filteredTasks]);
 
   // Sync milestones when archived items change
   useEffect(() => {
@@ -800,7 +827,15 @@ const TodoApp = () => {
   const autoScrollRef = useRef(null);
   const scrollSpeedRef = useRef(0);
 
-  const startAutoScroll = (speed) => {
+  const stopAutoScroll = useCallback(() => {
+    scrollSpeedRef.current = 0;
+    if (autoScrollRef.current) {
+      cancelAnimationFrame(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
+  }, []);
+
+  const startAutoScroll = useCallback((speed) => {
     scrollSpeedRef.current = speed;
     if (!autoScrollRef.current) {
       const step = () => {
@@ -813,18 +848,10 @@ const TodoApp = () => {
       };
       autoScrollRef.current = requestAnimationFrame(step);
     }
-  };
-
-  const stopAutoScroll = () => {
-    scrollSpeedRef.current = 0;
-    if (autoScrollRef.current) {
-      cancelAnimationFrame(autoScrollRef.current);
-      autoScrollRef.current = null;
-    }
-  };
+  }, []);
 
   // Drag and drop handlers
-  const handleDragStart = (e, taskId) => {
+  const handleDragStart = useCallback((e, taskId) => {
     draggedIdRef.current = taskId;
     setDraggedId(taskId);
     if (e && e.dataTransfer) {
@@ -833,9 +860,9 @@ const TodoApp = () => {
         e.dataTransfer.setData('text/plain', String(taskId));
       } catch (err) {}
     }
-  };
+  }, []);
 
-  const handleDragOver = (e, targetId) => {
+  const handleDragOver = useCallback((e, targetId) => {
     if (e) {
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
@@ -861,16 +888,16 @@ const TodoApp = () => {
       }
     }
 
-    const activeSourceId = draggedIdRef.current || draggedId;
+    const activeSourceId = draggedIdRef.current;
     if (activeSourceId && String(activeSourceId) !== String(targetId)) {
-      setDragOverId(targetId);
+      setDragOverId(prev => (prev === targetId ? prev : targetId));
     }
-  };
+  }, [startAutoScroll, stopAutoScroll]);
 
-  const handleDrop = (e, targetId) => {
+  const handleDrop = useCallback((e, targetId) => {
     stopAutoScroll();
     if (e) e.preventDefault();
-    let sourceId = draggedIdRef.current || draggedId;
+    let sourceId = draggedIdRef.current;
     if (!sourceId && e && e.dataTransfer) {
       try {
         const raw = e.dataTransfer.getData('text/plain');
@@ -884,14 +911,14 @@ const TodoApp = () => {
     draggedIdRef.current = null;
     setDragOverId(null);
     setDraggedId(null);
-  };
+  }, [reorderTasks, stopAutoScroll]);
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = useCallback((e) => {
     stopAutoScroll();
     draggedIdRef.current = null;
     setDraggedId(null);
     setDragOverId(null);
-  };
+  }, [stopAutoScroll]);
 
   const handleExport = () => {
     setShowExportModal(true);
@@ -1010,9 +1037,11 @@ const TodoApp = () => {
   };
 
   const isWideLayout = !isMobile && layoutWidth !== '480px';
-  const visibleProjects = currentProjectId === 'all'
-    ? [...DEFAULT_PROJECTS, ...projects].filter(p => p.id !== 'all')
-    : [...DEFAULT_PROJECTS, ...projects].filter(p => p.id === currentProjectId);
+  const visibleProjects = useMemo(() => {
+    return currentProjectId === 'all'
+      ? allProjects.filter(p => p.id !== 'all')
+      : allProjects.filter(p => p.id === currentProjectId);
+  }, [allProjects, currentProjectId]);
 
   const styles = {
     appContainer: {
@@ -1205,7 +1234,7 @@ const TodoApp = () => {
                       project={project}
                       tasks={filteredTasks}
                       searchTerm={searchTerm}
-                      projects={[...DEFAULT_PROJECTS, ...projects]}
+                      projects={allProjects}
                       onComplete={handleCompleteTask}
                       onEdit={setEditingTask}
                       onUpdate={updateTask}
@@ -1231,7 +1260,7 @@ const TodoApp = () => {
                       priority={priority}
                       tasks={filteredTasks}
                       searchTerm={searchTerm}
-                      projects={[...DEFAULT_PROJECTS, ...projects]}
+                      projects={allProjects}
                       onComplete={handleCompleteTask}
                       onEdit={setEditingTask}
                       onUpdate={updateTask}
@@ -1325,7 +1354,7 @@ const TodoApp = () => {
                       >
                         <AnimatePresence>
                           {onHoldTasksFiltered.map(task => {
-                            const proj = [...DEFAULT_PROJECTS, ...projects].find(p => p.id === task.projectId);
+                            const proj = allProjectsMap.get((task.projectId || 'general').toLowerCase());
                             return (
                               <TaskItem
                                 key={task.id}
@@ -1424,10 +1453,7 @@ const TodoApp = () => {
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                     <AnimatePresence mode="popLayout">
                       {filteredScheduled.map(task => {
-                        const project = [...DEFAULT_PROJECTS, ...projects].find(p => 
-                          p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                          p.name.toLowerCase() === task.projectId?.toLowerCase()
-                        );
+                        const project = allProjectsMap.get((task.projectId || 'general').toLowerCase());
                         return (
                           <TaskItem
                             key={task.id}

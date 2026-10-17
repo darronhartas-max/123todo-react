@@ -17,6 +17,12 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.1
+
+- **⚡ O(N) Project Task Counting & Fast Tabs Rendering (Phase 5):** Replaced quadratic nested task counting loops in ProjectTabs with a single memoized O(N) lookup pass and wrapped ProjectTabs in React.memo, eliminating 20+ redundant array traversals on every state change and making project switching instantaneous.
+- **🎯 Memoized Task Pipeline & Zero-Allocation Lookups:** Memoized active, scheduled, and filtered task pipelines in App.js to eliminate redundant multi-key date/time sorting and search re-filtering during typing. Replaced inline project array allocations with indexed map lookups (O(1)) for On Hold and Scheduled sections.
+- **🖐️ Smooth 60fps Drag-and-Drop & UI Control Memoization:** Added target ID equality guards to drag-over handlers and stabilized all drag handlers in useCallback to prevent rapid state churn during drag gestures. Wrapped Header, Footer, and SearchBar in React.memo and unified telemetry storage keys into STORAGE_KEYS.
+
 ### v3.8.0
 
 - **📥 Dedicated Photo Download vs. Share Actions:** The Download button in the photo Lightbox viewer now strictly triggers direct file downloads to your Downloads folder on all devices, keeping it distinct from the Share button which opens the system share sheet (AirDrop, Messages, Mail, WhatsApp).

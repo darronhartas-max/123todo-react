@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.0** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.1** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.0 (Current)
+### v3.8.1 (Current)
+
+- **O(N) Project Task Counting & Fast Tabs Rendering (Phase 5)**: Replaced quadratic nested task counting loops in `ProjectTabs` with a single memoized $O(N)$ lookup pass and wrapped `ProjectTabs` in `React.memo`, eliminating 20+ redundant array traversals on every state change and making project switching instantaneous.
+- **Memoized Task Pipeline & Zero-Allocation Lookups**: Memoized active, scheduled, and filtered task pipelines in `App.js` to eliminate redundant multi-key date/time sorting and search re-filtering during typing. Replaced inline project array allocations with indexed map lookups ($O(1)$) for On Hold and Scheduled sections.
+- **Smooth 60fps Drag-and-Drop & UI Control Memoization**: Added target ID equality guards to drag-over handlers and stabilized all drag handlers in `useCallback` to prevent rapid state churn during drag gestures. Wrapped `Header`, `Footer`, and `SearchBar` in `React.memo` and unified telemetry storage keys into `STORAGE_KEYS`.
+
+### v3.8.0
 
 - **Dedicated Photo Download vs. Share Actions**: The Download button in the photo Lightbox viewer now strictly executes a direct browser file download to save the original high-resolution image directly into the device's Downloads folder, completely distinct from the Share button which triggers the native system share sheet (AirDrop, Messages, Mail, WhatsApp).
 - **Extended Blob Download Reliability**: Extended object URL revocation timeout in `downloadBlob` to 20 seconds, preventing premature download cancellation on mobile networks and larger files.

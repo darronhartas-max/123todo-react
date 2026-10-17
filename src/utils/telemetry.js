@@ -8,11 +8,7 @@
  * - Stores pure aggregate count statistics locally and in encrypted sync payloads
  */
 
-const STORAGE_KEYS = {
-    TELEMETRY_STATS: '123TodoTelemetryStats',
-    LAST_VISIT_DATE: '123TodoLastVisitDate',
-    ADMIN_PASSWORD_HASH: '123TodoAdminPassHash'
-};
+import { STORAGE_KEYS } from './constants';
 
 // Default Admin Password (Hashed using simple SHA-like salt or string check)
 const DEFAULT_PASSWORD = 'admin';

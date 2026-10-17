@@ -92,4 +92,4 @@ const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
     );
 };
 
-export default SearchBar;
+export default React.memo(SearchBar);
