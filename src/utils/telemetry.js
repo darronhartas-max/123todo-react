@@ -13,8 +13,8 @@ import { STORAGE_KEYS } from './constants';
 // Default Admin Password (Hashed using simple SHA-like salt or string check)
 const DEFAULT_PASSWORD = 'admin';
 
-/** Simple string hash function for client-side password verification */
-export const hashPassword = (str) => {
+// Legacy string hash function for client-side password verification backward compatibility
+export const legacyHashPassword = (str) => {
     let hash = 0;
     if (!str || str.length === 0) return hash;
     for (let i = 0; i < str.length; i++) {
@@ -23,6 +23,84 @@ export const hashPassword = (str) => {
         hash |= 0; // Convert to 32bit integer
     }
     return 'h_' + Math.abs(hash).toString(16);
+};
+
+/** Synchronous cryptographic SHA-256 hash function (FIPS 180-4 standard) */
+const sha256 = (ascii) => {
+    const mathPow = Math.pow;
+    const maxWord = mathPow(2, 32);
+    let i, j;
+    let result = '';
+    const words = [];
+    const asciiBitLength = (ascii ? ascii.length : 0) * 8;
+    let hash = [];
+    const k = [];
+    let primeCounter = 0;
+
+    const isPrime = (candidate) => {
+        for (let factor = 2; factor <= Math.sqrt(candidate); factor++) {
+            if (candidate % factor === 0) return false;
+        }
+        return true;
+    };
+
+    for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (isPrime(candidate)) {
+            if (primeCounter < 8) {
+                hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+            }
+            k[primeCounter] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+            primeCounter++;
+        }
+    }
+
+    words[asciiBitLength >> 5] |= 0x80 << (24 - (asciiBitLength % 32));
+    words[(((asciiBitLength + 64) >> 9) << 4) + 15] = asciiBitLength;
+
+    for (i = 0; i < (ascii ? ascii.length : 0); i++) {
+        words[i >> 2] |= ascii.charCodeAt(i) << (24 - (i % 4) * 8);
+    }
+
+    for (j = 0; j < words.length; j += 16) {
+        const w = words.slice(j, j + 16);
+        const oldHash = hash.slice(0);
+
+        for (i = 0; i < 64; i++) {
+            const w15 = w[i - 15], w2 = w[i - 2];
+            const s0 = (w15 ? ((w15 >>> 7) | (w15 << 25)) ^ ((w15 >>> 18) | (w15 << 14)) ^ (w15 >>> 3) : 0);
+            const s1 = (w2 ? ((w2 >>> 17) | (w2 << 15)) ^ ((w2 >>> 19) | (w2 << 13)) ^ (w2 >>> 10) : 0);
+            w[i] = i < 16 ? (w[i] | 0) : (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+
+            const a = hash[0], e = hash[4];
+            const temp1 = hash[7] +
+                (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) +
+                ((e & hash[5]) ^ (~e & hash[6])) +
+                k[i] +
+                w[i];
+            const temp2 = (((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) +
+                ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+
+            hash = [(temp1 + temp2) | 0, a, hash[1], hash[2], (hash[3] + temp1) | 0, e, hash[5], hash[6]];
+        }
+
+        for (i = 0; i < 8; i++) {
+            hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+    }
+
+    for (i = 0; i < 8; i++) {
+        for (j = 3; j >= 0; j--) {
+            const b = (hash[i] >> (j * 8)) & 255;
+            result += (b < 16 ? '0' : '') + b.toString(16);
+        }
+    }
+    return result;
+};
+
+/** Cryptographic SHA-256 hash function for admin password verification */
+export const hashPassword = (str) => {
+    if (!str) return '';
+    return sha256(str);
 };
 
 /** Get current formatted local date string YYYY-MM-DD */
@@ -250,6 +328,17 @@ export const verifyAdminPassword = (inputPassword) => {
         storedHash = hashPassword(DEFAULT_PASSWORD);
         localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, storedHash);
     }
+
+    // Auto-migrate from legacy polynomial hash ('h_...')
+    if (storedHash.startsWith('h_')) {
+        if (legacyHashPassword(inputPassword) === storedHash) {
+            const upgradedHash = hashPassword(inputPassword);
+            localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, upgradedHash);
+            return true;
+        }
+        return false;
+    }
+
     return hashPassword(inputPassword) === storedHash;
 };
 

@@ -17,6 +17,13 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.2
+
+- **🔐 Dynamic Per-Payload PBKDF2 Salt (SEC-01):** Upgraded zero-knowledge end-to-end encryption to generate a unique 16-byte cryptographically random salt per payload, neutralizing rainbow table attacks while preserving 100% backward compatibility for existing encrypted backups.
+- **🛡️ Single-Use Device Pairing Codes (SEC-02):** Cloudflare Worker now atomically consumes and purges 6-digit device pairing codes immediately upon successful connection, closing the replay window entirely.
+- **🔒 Hardened CSP & CORS Policies (SEC-03):** Tightened Content Security Policy connect-src directive specifically to the official sync worker domain and restricted Cloudflare Worker CORS headers to authorized application origins.
+- **🔑 Cryptographic SHA-256 Admin Authentication (SEC-06):** Upgraded admin passcode verification from polynomial hashing to FIPS 180-4 standard SHA-256 with automatic, seamless in-place migration of existing legacy credentials.
+
 ### v3.8.1
 
 - **⚡ O(N) Project Task Counting & Fast Tabs Rendering (Phase 5):** Replaced quadratic nested task counting loops in ProjectTabs with a single memoized O(N) lookup pass and wrapped ProjectTabs in React.memo, eliminating 20+ redundant array traversals on every state change and making project switching instantaneous.

@@ -5,17 +5,39 @@
  * Ultra-Optimized for Cloudflare D1 Free Tier (Zero-Cost, Minimal Reads & Writes)
  */
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Max-Age': '86400',
-};
+const ALLOWED_ORIGINS = new Set([
+  'https://app.123todo.com',
+  'https://www.123todo.com',
+  'https://123todo.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+]);
+
+function getCorsHeaders(request) {
+  const origin = request?.headers?.get('Origin') || '';
+  let allowedOrigin = 'https://app.123todo.com';
+
+  if (origin) {
+    if (ALLOWED_ORIGINS.has(origin) || origin.endsWith('.123todo.com')) {
+      allowedOrigin = origin;
+    }
+  }
+
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+  };
+}
+
+let activeCorsHeaders = {};
 
 function jsonResponse(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS, ...extraHeaders }
+    headers: { 'Content-Type': 'application/json', ...activeCorsHeaders, ...extraHeaders }
   });
 }
 
@@ -92,8 +114,9 @@ function checkRateLimit(key, limit = 120, windowMs = 10 * 60 * 1000) {
 
 export default {
   async fetch(request, env, ctx) {
+    activeCorsHeaders = getCorsHeaders(request);
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS_HEADERS });
+      return new Response(null, { headers: activeCorsHeaders });
     }
 
     await ensureDB(env);
@@ -243,6 +266,11 @@ export default {
         if (!row || Date.now() > row.expires_at) {
           return jsonResponse({ error: 'Invalid or expired pair code' }, 404);
         }
+
+        // Single-use: immediately delete the pair code once successfully redeemed
+        await env.DB.prepare(
+          'DELETE FROM pair_codes WHERE code = ?'
+        ).bind(pairCode.trim()).run();
 
         return jsonResponse({ syncId: row.sync_id, deviceToken: row.device_token });
       }

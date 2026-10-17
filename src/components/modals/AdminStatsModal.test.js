@@ -18,6 +18,26 @@ describe('Privacy-First Telemetry & Admin Authentication', () => {
         expect(verifyAdminPassword('admin')).toBe(false);
     });
 
+    test('seamlessly migrates legacy polynomial hash to cryptographic SHA-256', () => {
+        const { STORAGE_KEYS } = require('../../utils/constants');
+        // Manually store a legacy polynomial hash for 'legacyPass'
+        localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, 'h_3a910f'); // simulate legacy hash
+        expect(verifyAdminPassword('wrong')).toBe(false);
+
+        // Verify correct password using legacy hash
+        const { legacyHashPassword } = require('../../utils/telemetry');
+        const legacyHash = legacyHashPassword('myLegacySecret');
+        localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH, legacyHash);
+
+        expect(verifyAdminPassword('myLegacySecret')).toBe(true);
+
+        // Verify that stored hash has been automatically upgraded to 64-char SHA-256
+        const upgraded = localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD_HASH);
+        expect(upgraded).not.toMatch(/^h_/);
+        expect(upgraded.length).toBe(64);
+        expect(verifyAdminPassword('myLegacySecret')).toBe(true);
+    });
+
     test('records visits and PWA installs without privacy issues', () => {
         recordVisit();
         recordPWAInstall();

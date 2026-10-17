@@ -57,6 +57,7 @@ export const STORAGE_KEYS = {
   COLLAPSED_PRIORITIES: '123Todo_Collapsed_Priorities',
   TASK_SECTIONS_PREFIX: '123todo_task_sections_',
   ADMIN_PASS_HASH: '123TodoAdminPassHash',
+  ADMIN_PASSWORD_HASH: '123TodoAdminPassHash',
   LAYOUT_WIDTH: '123TodoLayoutWidth',
   WIDE_COLUMN_VIEW: '123TodoWideColumnView',
   SYNC_SPEED: '123Todo_Sync_Speed',
@@ -178,6 +179,12 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.2': [
+    { title: '🔐 Dynamic Per-Payload PBKDF2 Salt (SEC-01):', desc: 'Upgraded zero-knowledge end-to-end encryption to generate a unique 16-byte cryptographically random salt per payload, neutralizing rainbow table attacks while preserving 100% backward compatibility for existing encrypted backups.' },
+    { title: '🛡️ Single-Use Device Pairing Codes (SEC-02):', desc: 'Cloudflare Worker now atomically consumes and purges 6-digit device pairing codes immediately upon successful connection, closing the replay window entirely.' },
+    { title: '🔒 Hardened CSP & CORS Policies (SEC-03):', desc: 'Tightened Content Security Policy connect-src directive specifically to the official sync worker domain and restricted Cloudflare Worker CORS headers to authorized application origins.' },
+    { title: '🔑 Cryptographic SHA-256 Admin Authentication (SEC-06):', desc: 'Upgraded admin passcode verification from polynomial hashing to FIPS 180-4 standard SHA-256 with automatic, seamless in-place migration of existing legacy credentials.' }
+  ],
   '3.8.1': [
     { title: '⚡ O(N) Project Task Counting & Fast Tabs Rendering (Phase 5):', desc: 'Replaced quadratic nested task counting loops in ProjectTabs with a single memoized O(N) lookup pass and wrapped ProjectTabs in React.memo, eliminating 20+ redundant array traversals on every state change and making project switching instantaneous.' },
     { title: '🎯 Memoized Task Pipeline & Zero-Allocation Lookups:', desc: 'Memoized active, scheduled, and filtered task pipelines in App.js to eliminate redundant multi-key date/time sorting and search re-filtering during typing. Replaced inline project array allocations with indexed map lookups (O(1)) for On Hold and Scheduled sections.' },

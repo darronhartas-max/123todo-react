@@ -17,3 +17,8 @@ window.matchMedia = window.matchMedia || function() {
         removeEventListener: function() {}
     };
 };
+
+if (!window.crypto || !window.crypto.subtle) {
+    const { webcrypto } = require('crypto');
+    window.crypto = webcrypto;
+}
