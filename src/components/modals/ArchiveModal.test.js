@@ -222,3 +222,43 @@ test('cancels confirmation popup when Cancel is clicked', () => {
     expect(handleEdit).not.toHaveBeenCalled();
 });
 
+test('progressively batches large archive lists and loads more upon click', () => {
+    // Generate 45 archived tasks
+    const manyArchived = Array.from({ length: 45 }, (_, i) => ({
+        id: 200 + i,
+        text: `Archived Item #${i + 1}`,
+        priority: 1,
+        projectId: 'general',
+        completedAt: 1690000000000 + i * 1000
+    }));
+
+    render(
+        <ArchiveModal
+            archived={manyArchived}
+            projects={sampleProjects}
+            onRestore={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdate={jest.fn()}
+            onClose={jest.fn()}
+        />
+    );
+
+    // Initial batch of 30 should be rendered (most recently completed first: items #45 down to #16)
+    expect(screen.getByText('Archived Item #45')).toBeInTheDocument();
+    expect(screen.getByText('Archived Item #16')).toBeInTheDocument();
+    expect(screen.queryByText('Archived Item #15')).not.toBeInTheDocument();
+    expect(screen.queryByText('Archived Item #1')).not.toBeInTheDocument();
+
+    // "Load More" button should be visible with remaining count
+    const loadMoreBtn = screen.getByRole('button', { name: /Load More Completed Tasks \(15 remaining\)/i });
+    expect(loadMoreBtn).toBeInTheDocument();
+
+    // Click Load More
+    fireEvent.click(loadMoreBtn);
+
+    // Now all 45 should be visible, and Load More button should disappear
+    expect(screen.getByText('Archived Item #15')).toBeInTheDocument();
+    expect(screen.getByText('Archived Item #1')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Load More Completed Tasks/i })).not.toBeInTheDocument();
+});
+

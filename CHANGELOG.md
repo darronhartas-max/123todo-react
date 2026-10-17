@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.3
+
+- **⚡ Zero-Allocation Drag Handlers & Restored Memoization (Phase 1):** Refactored drag-and-drop event handlers across TaskItem, PrioritySection, ProjectColumn, and On Hold task lists to pass stable memoized callbacks, eliminating inline closure and object allocations inside .map() loops and restoring full React.memo prop equality.
+- **🚀 Progressive Batch Rendering in Archive:** Introduced 30-item progressive batch rendering with instant Load More controls in ArchiveModal. Replaced linear project array scans with O(1) indexed Map lookups, enabling instantaneous archive opening even with thousands of completed tasks.
+
 ### v3.8.2
 
 - **🔐 Dynamic Per-Payload PBKDF2 Salt (SEC-01):** Upgraded zero-knowledge end-to-end encryption to generate a unique 16-byte cryptographically random salt per payload, neutralizing rainbow table attacks while preserving 100% backward compatibility for existing encrypted backups.

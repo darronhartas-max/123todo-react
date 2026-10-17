@@ -23,10 +23,25 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [onClose]);
 
-    // All available projects including default
-    const allProjectsList = useMemo(() => {
-        return [...DEFAULT_PROJECTS, ...projects];
+    // All available projects Map for O(1) lookups
+
+    const allProjectsMap = useMemo(() => {
+        const map = new Map();
+        [...DEFAULT_PROJECTS, ...projects].forEach(p => {
+            if (p.id) map.set(p.id.toLowerCase(), p);
+            if (p.name) map.set(p.name.toLowerCase(), p);
+        });
+        return map;
     }, [projects]);
+
+    // Progressive batch rendering for massive archives
+    const INITIAL_BATCH = 30;
+    const BATCH_INCREMENT = 30;
+    const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
+
+    useEffect(() => {
+        setVisibleCount(INITIAL_BATCH);
+    }, [searchQuery, selectedProject, sortBy]);
 
     // Filter and Sort Archived Tasks
     const filteredArchivedTasks = useMemo(() => {
@@ -63,6 +78,10 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                 return 0;
             });
     }, [archived, searchQuery, selectedProject, sortBy]);
+
+    const visibleArchivedTasks = useMemo(() => {
+        return filteredArchivedTasks.slice(0, visibleCount);
+    }, [filteredArchivedTasks, visibleCount]);
 
     const handleClearAll = () => {
         filteredArchivedTasks.forEach(task => onDelete(task.id));
@@ -567,11 +586,8 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                     ) : (
                         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                             <AnimatePresence mode="popLayout">
-                                {filteredArchivedTasks.map(task => {
-                                    const project = allProjectsList.find(p => 
-                                        p.id.toLowerCase() === task.projectId?.toLowerCase() || 
-                                        p.name.toLowerCase() === task.projectId?.toLowerCase()
-                                    );
+                                {visibleArchivedTasks.map(task => {
+                                    const project = allProjectsMap.get((task.projectId || 'general').toLowerCase());
 
                                     // Format completion timestamp
                                     const completedDateStr = task.completedAt && isValidEvidentiaryTimestamp(task.completedAt)
@@ -612,6 +628,29 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                                 })}
                             </AnimatePresence>
                         </ul>
+                    )}
+                    {visibleCount < filteredArchivedTasks.length && (
+                        <div style={{ textAlign: 'center', padding: '16px 0 8px' }}>
+                            <button
+                                onClick={() => setVisibleCount(prev => prev + BATCH_INCREMENT)}
+                                style={{
+                                    padding: '9px 18px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'var(--bg-color)',
+                                    color: 'var(--accent-color)',
+                                    fontWeight: '600',
+                                    fontSize: '0.85rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                Load More Completed Tasks ({filteredArchivedTasks.length - visibleCount} remaining)
+                            </button>
+                        </div>
                     )}
                 </div>
 

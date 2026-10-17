@@ -17,7 +17,31 @@ const ACTION_ICONS = {
     Slash
 };
 
-const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, onUpdate, dragHandlers, projectColor, projectName, isDragging, isDragOver, showFullDetails, swipeSettings, onSwipeAction, dateFormat = 'UK', taskViewMode = 'compact', viewProfile = 'pro', timeSchedulingEnabled = true }) => {
+const TaskItem = ({
+    task,
+    isArchived,
+    onComplete,
+    onDelete,
+    onRestore,
+    onEdit,
+    onUpdate,
+    dragHandlers,
+    onDragStart,
+    onDragOver,
+    onDrop,
+    onDragEnd,
+    projectColor,
+    projectName,
+    isDragging,
+    isDragOver,
+    showFullDetails,
+    swipeSettings,
+    onSwipeAction,
+    dateFormat = 'UK',
+    taskViewMode = 'compact',
+    viewProfile = 'pro',
+    timeSchedulingEnabled = true
+}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showQuickSchedule, setShowQuickSchedule] = useState(false);
@@ -517,18 +541,44 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                     zIndex: 2
                 }}
                 draggable={!isArchived}
-                {...(dragHandlers ? {
-                    ...dragHandlers,
+                {...((!isArchived && (onDragStart || dragHandlers)) ? {
                     onDragStart: (e) => {
                         if (isSwipingRef.current || Math.abs(swipeOffset) > 5) {
                             e.preventDefault();
                             return;
                         }
                         wasDraggingRef.current = true;
-                        if (dragHandlers.onDragStart) dragHandlers.onDragStart(e);
+                        if (onDragStart) {
+                            onDragStart(e, task.id);
+                        } else if (dragHandlers?.onDragStart) {
+                            dragHandlers.onDragStart(e);
+                        }
+                    },
+                    onDragOver: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                        if (onDragOver) {
+                            onDragOver(e, task.id);
+                        } else if (dragHandlers?.onDragOver) {
+                            dragHandlers.onDragOver(e);
+                        }
+                    },
+                    onDrop: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (onDrop) {
+                            onDrop(e, task.id);
+                        } else if (dragHandlers?.onDrop) {
+                            dragHandlers.onDrop(e);
+                        }
                     },
                     onDragEnd: (e) => {
-                        if (dragHandlers.onDragEnd) dragHandlers.onDragEnd(e);
+                        if (onDragEnd) {
+                            onDragEnd(e, task.id);
+                        } else if (dragHandlers?.onDragEnd) {
+                            dragHandlers.onDragEnd(e);
+                        }
                         setTimeout(() => {
                             wasDraggingRef.current = false;
                         }, 150);
@@ -1397,7 +1447,12 @@ const areTaskItemPropsEqual = (prevProps, nextProps) => {
         prevProps.onRestore === nextProps.onRestore &&
         prevProps.onEdit === nextProps.onEdit &&
         prevProps.onUpdate === nextProps.onUpdate &&
-        prevProps.onSwipeAction === nextProps.onSwipeAction
+        prevProps.onSwipeAction === nextProps.onSwipeAction &&
+        prevProps.onDragStart === nextProps.onDragStart &&
+        prevProps.onDragOver === nextProps.onDragOver &&
+        prevProps.onDrop === nextProps.onDrop &&
+        prevProps.onDragEnd === nextProps.onDragEnd &&
+        prevProps.dragHandlers === nextProps.dragHandlers
     );
 };
 
