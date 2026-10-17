@@ -27,3 +27,31 @@ export const reorderList = (list, fromIndex, toIndex, position = 'before') => {
   items.splice(newTargetIndex, 0, moved);
   return items;
 };
+
+/**
+ * Toggles a subtask's completion status and automatically moves it:
+ * - If completed: moves to just below the uncompleted subtasks (top of completed group)
+ * - If uncompleted: moves to just above completed subtasks (bottom of uncompleted group)
+ *
+ * @param {Array} subtasks - The list of subtasks
+ * @param {string|number} stId - The subtask ID to toggle
+ * @returns {Array} Reordered and updated subtasks array
+ */
+export const toggleSubtaskStatus = (subtasks, stId) => {
+  if (!Array.isArray(subtasks)) return [];
+  const target = subtasks.find(s => s.id === stId);
+  if (!target) return subtasks;
+
+  const willBeCompleted = !target.completed;
+  const updated = subtasks.map(s => s.id === stId ? { ...s, completed: willBeCompleted } : s);
+
+  if (willBeCompleted) {
+    const uncompleted = updated.filter(s => !s.completed);
+    const otherCompleted = updated.filter(s => s.completed && s.id !== stId);
+    return [...uncompleted, { ...target, completed: true }, ...otherCompleted];
+  } else {
+    const otherUncompleted = updated.filter(s => !s.completed && s.id !== stId);
+    const completed = updated.filter(s => s.completed);
+    return [...otherUncompleted, { ...target, completed: false }, ...completed];
+  }
+};

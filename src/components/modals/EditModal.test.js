@@ -836,6 +836,46 @@ describe('EditModal', () => {
         fireEvent.blur(notesTextarea);
         expect(screen.getByText('Add notes or extra details...')).toBeInTheDocument();
     });
+
+    test('adds new subtasks to the top of the list and auto-moves completed subtask below uncompleted subtasks', () => {
+        render(
+            <EditModal
+                task={{
+                    id: 100,
+                    text: 'Task with subtasks',
+                    priority: 1,
+                    projectId: 'general',
+                    notes: '',
+                    subtasks: [
+                        { id: 1, text: 'Existing Step 1', completed: false }
+                    ]
+                }}
+                onSave={jest.fn()}
+                onClose={jest.fn()}
+                projects={sampleProjects}
+            />
+        );
+
+        // Subtasks are already open when task has subtasks
+        const newStepInput = screen.getByPlaceholderText('Add step...');
+        const addBtn = newStepInput.parentElement.querySelector('button');
+
+        // Add New Step 2
+        fireEvent.change(newStepInput, { target: { value: 'New Step 2' } });
+        fireEvent.click(addBtn);
+
+        // Subtasks should now be: New Step 2 (top), Existing Step 1 (bottom)
+        const subtaskInputs = screen.getAllByPlaceholderText('Subtask description...');
+        expect(subtaskInputs.map(input => input.value)).toEqual(['New Step 2', 'Existing Step 1']);
+
+        // Complete New Step 2 (checkbox 0)
+        const checkboxes = screen.getAllByRole('checkbox');
+        fireEvent.click(checkboxes[0]);
+
+        // After completing New Step 2, it moves below uncompleted subtasks: Existing Step 1, New Step 2
+        const updatedInputs = screen.getAllByPlaceholderText('Subtask description...');
+        expect(updatedInputs.map(input => input.value)).toEqual(['Existing Step 1', 'New Step 2']);
+    });
 });
 
 

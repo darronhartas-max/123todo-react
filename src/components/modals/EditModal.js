@@ -8,7 +8,7 @@ import { Mic, X, Maximize2, FileText, Check, ChevronDown, Plus, Minus, GripVerti
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
-import { reorderList } from '../../utils/reorderUtils';
+import { reorderList, toggleSubtaskStatus } from '../../utils/reorderUtils';
 import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
 import TimePickerModal from './TimePickerModal';
 
@@ -337,7 +337,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             text: newSubtaskText.trim(),
             completed: false
         };
-        setSubtasks([...subtasks, newSubtask]);
+        setSubtasks([newSubtask, ...subtasks]);
         setNewSubtaskText('');
     };
 
@@ -1456,7 +1456,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                                 onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                 checked={st.completed}
                                                 onChange={() => {
-                                                    setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                                    setSubtasks(toggleSubtaskStatus(subtasks, st.id));
                                                 }}
                                                 aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
                                                 title={st.completed ? "Mark incomplete" : "Mark completed"}

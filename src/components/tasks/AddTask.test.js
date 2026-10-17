@@ -301,6 +301,79 @@ test('top right close cross closes and cancels AddTask without a redundant botto
   expect(onCloseMock).toHaveBeenCalledTimes(1);
 });
 
+test('pressing Enter in task input does not prematurely submit, while Cmd+Enter / Ctrl+Enter submits', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const onAddMock = jest.fn();
+  const onCloseMock = jest.fn();
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={onAddMock}
+      onClose={onCloseMock}
+      projects={[{ id: 'general', name: 'General' }]}
+    />
+  );
+
+  const input = screen.getByPlaceholderText('What needs to be done?');
+  fireEvent.change(input, { target: { value: 'Line 1\nLine 2' } });
+
+  // Plain Enter should NOT trigger onAdd or onClose (allowing multi-line list input)
+  fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+  expect(onAddMock).not.toHaveBeenCalled();
+  expect(onCloseMock).not.toHaveBeenCalled();
+
+  // Cmd+Enter triggers submit
+  fireEvent.keyDown(input, { key: 'Enter', code: 'Enter', metaKey: true });
+  expect(onAddMock).toHaveBeenCalledTimes(1);
+  expect(onCloseMock).toHaveBeenCalledTimes(1);
+});
+
+test('adding new subtasks prepends them to the top of the list and completing a subtask moves it below uncompleted subtasks', () => {
+  const { fireEvent } = require('@testing-library/react');
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={[{ id: 'general', name: 'General' }]}
+    />
+  );
+
+  // Open subtasks section
+  const subtasksToggle = screen.getByRole('button', { name: /subtasks/i });
+  fireEvent.click(subtasksToggle);
+
+  const stepInput = screen.getByPlaceholderText('Add subtask step...');
+  const addStepBtn = stepInput.parentElement.querySelector('button');
+
+  // Add first step
+  fireEvent.change(stepInput, { target: { value: 'Step 1' } });
+  fireEvent.click(addStepBtn);
+
+  // Add second step
+  fireEvent.change(stepInput, { target: { value: 'Step 2' } });
+  fireEvent.click(addStepBtn);
+
+  // Add third step
+  fireEvent.change(stepInput, { target: { value: 'Step 3' } });
+  fireEvent.click(addStepBtn);
+
+  // Steps should be in reverse order because new subtasks are added to the top: Step 3, Step 2, Step 1
+  const renderedSteps = screen.getAllByPlaceholderText('Subtask step...');
+  expect(renderedSteps.map(el => el.value)).toEqual(['Step 3', 'Step 2', 'Step 1']);
+
+  // Complete Step 2 (middle item)
+  const checkboxes = screen.getAllByRole('checkbox');
+  // Checkboxes correspond to Step 3, Step 2, Step 1
+  fireEvent.click(checkboxes[1]); // Step 2
+
+  // After completion, Step 2 moves to just below uncompleted subtasks (Step 3, Step 1, Step 2)
+  const updatedSteps = screen.getAllByPlaceholderText('Subtask step...');
+  expect(updatedSteps.map(el => el.value)).toEqual(['Step 3', 'Step 1', 'Step 2']);
+});
+
 
 
 

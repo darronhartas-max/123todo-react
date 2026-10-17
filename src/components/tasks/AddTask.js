@@ -6,7 +6,7 @@ import { openGoogleCalendar, downloadAppleCalendarIcs } from '../../utils/calend
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
-import { reorderList } from '../../utils/reorderUtils';
+import { reorderList, toggleSubtaskStatus } from '../../utils/reorderUtils';
 import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
 import TimePickerModal from '../modals/TimePickerModal';
 
@@ -317,7 +317,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             text: newSubtaskText.trim(),
             completed: false
         };
-        setSubtasks([...subtasks, newSubtask]);
+        setSubtasks([newSubtask, ...subtasks]);
         setNewSubtaskText('');
     };
 
@@ -681,7 +681,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                     if (e.key === 'Escape') {
                         e.preventDefault();
                         handleCancel();
-                    } else if (e.key === 'Enter' && !e.shiftKey) {
+                    } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                         e.preventDefault();
                         handleSubmit();
                     }
@@ -1052,7 +1052,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                             onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                             checked={st.completed}
                                             onChange={() => {
-                                                setSubtasks(subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s));
+                                                setSubtasks(toggleSubtaskStatus(subtasks, st.id));
                                             }}
                                             aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
                                             title={st.completed ? "Mark incomplete" : "Mark completed"}

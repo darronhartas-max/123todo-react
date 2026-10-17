@@ -17,6 +17,12 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.7.57
+
+- **📋 Top-Prepend for New Subtasks:** When adding new subtasks in Add Task, Edit Task, Task Item, or Notes, newly added steps are now placed immediately at the top of the list for instant visibility and fast multi-step entry.
+- **✅ Smart Subtask Auto-Sort on Completion:** When a subtask is checked off as completed, it automatically moves to just below the remaining uncompleted subtasks, keeping active items prioritized at the top while maintaining completed items cleanly grouped below.
+- **⏎ Multi-Line Carriage Return Support in Task Creation:** Fixed Enter / Carriage Return key handling in the Add Task textarea so pressing Return naturally inserts new lines across all mobile keyboards (including OnePlus and Android virtual keyboards) and desktop browsers, allowing itemized list creation. Power users can submit with Cmd+Enter or Ctrl+Enter.
+
 ### v3.7.56
 
 - **🔄 Unified Subtask Reorder Hook & Modular Architecture (Phase 4):** Extracted duplicated touch, boundary collision, and drag-and-drop gesture handlers across TaskItem, AddTask, and EditModal into a reusable useSubtaskReorder hook, eliminating redundant reordering logic and ensuring unified vibration feedback.

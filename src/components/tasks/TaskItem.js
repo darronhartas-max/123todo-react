@@ -5,7 +5,7 @@ import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, formatDisplayTime, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText } from '../../utils/textUtils';
-import { reorderList } from '../../utils/reorderUtils';
+import { reorderList, toggleSubtaskStatus } from '../../utils/reorderUtils';
 import { useSubtaskReorder } from '../../hooks/useSubtaskReorder';
 
 const ACTION_ICONS = {
@@ -1175,7 +1175,7 @@ const TaskItem = ({ task, isArchived, onComplete, onDelete, onRestore, onEdit, o
                                                 onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                                 checked={st.completed}
                                                 onChange={() => {
-                                                    const updated = (task.subtasks || []).map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                                                    const updated = toggleSubtaskStatus(task.subtasks || [], st.id);
                                                     onUpdate && onUpdate(task.id, { subtasks: updated });
                                                 }}
                                                 aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}

@@ -10,6 +10,7 @@ import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/v
 import PhotoAttachments from './PhotoAttachments';
 import { renderActionableText, ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { formatEvidentiaryTimestamp } from '../../utils/dateUtils';
+import { toggleSubtaskStatus } from '../../utils/reorderUtils';
 
 const NoteCard = ({
   note,
@@ -132,7 +133,7 @@ const NoteCard = ({
       text: newSubtaskText.trim(),
       completed: false
     };
-    const updated = [...subtasks, newSt];
+    const updated = [newSt, ...subtasks];
     setSubtasks(updated);
     setNewSubtaskText('');
     onUpdateNote(note.id, { subtasks: updated });
@@ -909,7 +910,7 @@ const NoteCard = ({
                         type="checkbox"
                         checked={st.completed}
                         onChange={() => {
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                          const updated = toggleSubtaskStatus(subtasks, st.id);
                           setSubtasks(updated);
                           onUpdateNote(note.id, { subtasks: updated });
                         }}
@@ -1154,7 +1155,7 @@ const NoteCard = ({
                         type="checkbox"
                         checked={st.completed}
                         onChange={() => {
-                          const updated = subtasks.map(s => s.id === st.id ? { ...s, completed: !s.completed } : s);
+                          const updated = toggleSubtaskStatus(subtasks, st.id);
                           setSubtasks(updated);
                           onUpdateNote(note.id, { subtasks: updated });
                         }}
