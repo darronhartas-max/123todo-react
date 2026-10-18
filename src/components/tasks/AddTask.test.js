@@ -374,6 +374,82 @@ test('adding new subtasks prepends them to the top of the list and completing a 
   expect(updatedSteps.map(el => el.value)).toEqual(['Step 3', 'Step 1', 'Step 2']);
 });
 
+test('detects natural language quick add entities and populates task attributes on submit', () => {
+  const { fireEvent } = require('@testing-library/react');
+  const mockOnAdd = jest.fn();
+  const sampleProjects = [
+    { id: 'general', name: 'General', color: '#285a82' },
+    { id: 'work', name: 'Work', color: '#b91c1c' }
+  ];
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={mockOnAdd}
+      onClose={jest.fn()}
+      projects={sampleProjects}
+      defaultProjectId="general"
+    />
+  );
+
+  const input = screen.getByPlaceholderText('What needs to be done?');
+  fireEvent.change(input, { target: { value: 'Submit quarterly VAT return tomorrow at 2pm #Work !1' } });
+
+  // Quick Add preview chips should appear
+  const preview = screen.getByTestId('quick-add-preview');
+  const { within } = require('@testing-library/react');
+  expect(within(preview).getByText('Quick Add:')).toBeInTheDocument();
+  expect(within(preview).getByText('Must Do')).toBeInTheDocument();
+  expect(within(preview).getByText('Work')).toBeInTheDocument();
+  expect(within(preview).getByText('14:00')).toBeInTheDocument();
+
+  // Submit the task
+  const addBtn = screen.getByRole('button', { name: /add/i });
+  fireEvent.click(addBtn);
+
+  expect(mockOnAdd).toHaveBeenCalledWith(
+    'Submit quarterly VAT return',
+    1,
+    'work',
+    '',
+    expect.objectContaining({
+      scheduledTime: '14:00'
+    })
+  );
+});
+
+test('allows removing a quick add entity token by clicking its close cross', () => {
+  const { fireEvent, within } = require('@testing-library/react');
+  const sampleProjects = [
+    { id: 'general', name: 'General', color: '#285a82' },
+    { id: 'work', name: 'Work', color: '#b91c1c' }
+  ];
+
+  render(
+    <AddTask
+      isOpen={true}
+      onAdd={jest.fn()}
+      onClose={jest.fn()}
+      projects={sampleProjects}
+      defaultProjectId="general"
+    />
+  );
+
+  const input = screen.getByPlaceholderText('What needs to be done?');
+  fireEvent.change(input, { target: { value: 'Book hotel room tomorrow !2' } });
+
+  const preview = screen.getByTestId('quick-add-preview');
+  expect(within(preview).getByText('Should Do')).toBeInTheDocument();
+
+  // Remove the !2 token by clicking remove button
+  const removePriorityBtn = within(preview).getByLabelText('Remove Should Do');
+  fireEvent.click(removePriorityBtn);
+
+  // Input should now have !2 stripped
+  expect(input.value).toBe('Book hotel room tomorrow');
+  expect(within(preview).queryByText('Should Do')).not.toBeInTheDocument();
+});
+
 
 
 

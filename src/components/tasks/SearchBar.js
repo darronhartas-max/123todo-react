@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 
-const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
+const SearchBar = ({ value, onChange, onClear, onOpenCommandPalette, placeholder = 'Search...' }) => {
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -86,6 +86,31 @@ const SearchBar = ({ value, onChange, onClear, placeholder = 'Search...' }) => {
                     title="Close search (Esc)"
                 >
                     <X size={16} />
+                </button>
+            )}
+            {!value && onOpenCommandPalette && (
+                <button
+                    type="button"
+                    onClick={onOpenCommandPalette}
+                    aria-label="Open Command Palette (Cmd+K)"
+                    title="Command Palette (Cmd+K / Ctrl+K)"
+                    style={{
+                        position: 'absolute',
+                        right: onClear ? '48px' : '24px',
+                        background: 'var(--item-bg, rgba(0,0,0,0.06))',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '4px',
+                        padding: '2px 6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        color: 'var(--muted-text)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px'
+                    }}
+                >
+                    <span>⌘K</span>
                 </button>
             )}
         </div>

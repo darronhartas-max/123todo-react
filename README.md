@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.5** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.6** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.5 (Current)
+### v3.8.6 (Current)
+
+- **Smart Natural Language Quick Add (Phase 4)**: Introduced zero-dependency natural language parsing in Add Task. Automatically detects due dates (`today`, `tomorrow`, `friday`, `in 3 days`, `25th Oct`), scheduled times (`2pm`, `14:30`, `morning`, `evening`), priorities (`!1`, `!2`, `!3`, `!4`, `p1`, `!must`), project hashtags (`#Work`, `#Personal`), and recurrence patterns (`daily`, `weekly`, `every 2 weeks`, `every weekday`) with live interactive preview chips and 1-tap removal.
+- **Interactive Quick Undo Toast Snackbar**: Added a bottom-anchored, 5-second interactive Undo snackbar when tasks are completed or moved to archive. Users can effortlessly reverse accidental actions with 1 tap, elevating confidence especially with touch swipe gestures on mobile.
+- **Power-User Command Palette (`Cmd + K` / `Ctrl + K`)**: Added a spotlight command palette accessible from anywhere via keyboard shortcuts (`Cmd+K` on Mac, `Ctrl+K` on Windows/Linux) or via Search. Features keyboard navigation for quick actions, instant mode and theme toggling, project switching, and live global search across all active tasks and notes.
+
+### v3.8.5
 
 - **SettingsModal Modularization (Phase 3)**: Decomposed the monolithic 2,592-line `SettingsModal.js` into 8 focused, isolated domain subcomponents under `src/components/modals/settings/` (`SettingsProjectsTab`, `SettingsAppearanceTab`, `SettingsTasksTab`, `SettingsSwipeTab`, `SettingsVoiceTab`, `SettingsShortcutsTab`, `SettingsSyncTab`, `SettingsAboutTab`), reducing main modal complexity down to ~455 lines (-2,137 lines) while preserving 100% pixel-perfect styling, gestures, keyboard navigation, and responsive behavior.
 - **Critical Modal & Storage Test Suite Expansion**: Expanded unit test coverage past the 400-test milestone (48 test suites, 401 tests passing) by adding comprehensive automated test suites for `SettingsModal`, all individual settings tabs, `ExportModal`, `SyncModal`, `UniversalImportModal`, and IndexedDB `photoStorage`.

@@ -179,6 +179,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.6': [
+    { title: '✨ Smart Natural Language Quick Add (Phase 4):', desc: 'Introduced intelligent natural language parsing in Add Task. Automatically detects due dates (today, tomorrow, friday, in 3 days, 25th Oct), scheduled times (2pm, 14:30, morning, evening), priorities (!1, !2, !3, !4, p1, !must), project hashtags (#Work, #Personal), and recurrence rules (daily, weekly, every 2 weeks, every weekday) with real-time interactive preview chips and 1-tap removal.' },
+    { title: '↩️ Interactive Quick Undo Toast Snackbar:', desc: 'Added a bottom-anchored, 5-second interactive Undo snackbar when tasks are completed or moved to archive. Users can effortlessly reverse accidental actions with 1 tap, elevating confidence especially with touch swipe gestures on mobile.' },
+    { title: '⚡ Power-User Command Palette (Cmd+K / Ctrl+K):', desc: 'Added a spotlight command palette accessible from anywhere via Cmd+K (Mac) or Ctrl+K (Windows/Linux) or via Search. Features keyboard navigation for quick actions, instant mode and theme toggling, project switching, and live global search across all active tasks and notes.' }
+  ],
   '3.8.5': [
     { title: '🎛️ Settings Architecture Modularization (Phase 3):', desc: 'Decomposed the monolithic SettingsModal (2,592 lines) into 8 dedicated domain subcomponents (SettingsProjectsTab, SettingsAppearanceTab, SettingsTasksTab, SettingsSwipeTab, SettingsVoiceTab, SettingsShortcutsTab, SettingsSyncTab, SettingsAboutTab) under src/components/modals/settings/.' },
     { title: '🧪 Comprehensive Critical Modal Test Suites:', desc: 'Added dedicated test suites for SettingsModal, ExportModal, SyncModal, UniversalImportModal, and photoStorage, expanding automated test coverage past 400 unit tests across 48 test suites with 100% pass rate.' }

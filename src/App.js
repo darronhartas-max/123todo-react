@@ -22,6 +22,7 @@ import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
 import { recordVisit, recordPWAInstall, recordActiveMinutes, recordDeviceType, recordTaskCompleted, recordPlatformAndRegion, recordJsError } from './utils/telemetry';
 import { TenantProvider, useTenant } from './context/TenantContext';
+import UndoToast from './components/common/UndoToast';
 
 // Lazy-loaded modals & heavy views for optimal initial bundle size
 const DeleteProjectModal = lazy(() => import('./components/modals/DeleteProjectModal'));
@@ -45,6 +46,7 @@ const SkinDiscoveryModal = lazy(() => import('./components/modals/SkinDiscoveryM
 const InstallGuideModal = lazy(() => import('./components/modals/InstallGuideModal'));
 const EmailClientModal = lazy(() => import('./components/modals/EmailClientModal'));
 const NotesView = lazy(() => import('./components/notes/NotesView'));
+const CommandPalette = lazy(() => import('./components/modals/CommandPalette'));
 
 const TodoApp = () => {
   const {
@@ -202,7 +204,8 @@ const TodoApp = () => {
   const [showUniversalImport, setShowUniversalImport] = useState(false);
   const [showTodoistGuide, setShowTodoistGuide] = useState(false);
   const [showImportSelection, setShowImportSelection] = useState(false);
-  const [showArchiveToast, setShowArchiveToast] = useState(false);
+  const [undoToast, setUndoToast] = useState(null);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [shadowBackupData, setShadowBackupData] = useState(null);
   const [showRestoreToast, setShowRestoreToast] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
@@ -622,6 +625,13 @@ const TodoApp = () => {
   // Global Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // 0. Cmd+K or Ctrl+K opens Command Palette globally
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setShowCommandPalette(prev => !prev);
+        return;
+      }
+
       // Ignore shortcut keys if user is typing in an input, select, or textarea
       const activeEl = document.activeElement;
       if (activeEl && (
@@ -665,7 +675,9 @@ const TodoApp = () => {
 
       // 4. "Esc" to close active modal or Add Task Panel
       if (e.key === 'Escape') {
-        if (editingTask) {
+        if (showCommandPalette) {
+          setShowCommandPalette(false);
+        } else if (editingTask) {
           setEditingTask(null);
         } else if (showSettings) {
           setShowSettings(false);
@@ -677,7 +689,7 @@ const TodoApp = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [editingTask, showSettings, showAddSection]);
+  }, [editingTask, showSettings, showAddSection, showCommandPalette]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -748,14 +760,27 @@ const TodoApp = () => {
     recordAppUsageAction('add');
   }, [addNote, recordAppUsageAction]);
 
+  const handleUndoToastAction = useCallback((toast) => {
+    if (!toast) return;
+    if (toast.actionType === 'complete' && toast.task) {
+      restoreTask(toast.task.id, toast.task.priority);
+      setUndoToast(null);
+    }
+  }, [restoreTask]);
+
   const handleCompleteTask = useCallback((id) => {
+    const taskToComplete = tasks.find(t => String(t.id) === String(id));
     completeTask(id);
     recordTaskCompleted();
     recordAppUsageAction('complete');
-    setShowArchiveToast(true);
-    setTimeout(() => {
-      setShowArchiveToast(false);
-    }, 800);
+    if (taskToComplete) {
+      setUndoToast({
+        id: `complete-${id}-${Date.now()}`,
+        actionType: 'complete',
+        message: 'Moved to Archive',
+        task: taskToComplete
+      });
+    }
     // Smart share modal trigger: show after 24h of first use, max 3 declines, not if already shared
     try {
       const firstUsed = parseInt(localStorage.getItem('share_modal_first_used') || '0', 10);
@@ -766,7 +791,7 @@ const TodoApp = () => {
         setTimeout(() => setShowShareModal(true), 1200);
       }
     } catch (e) {}
-  }, [completeTask, recordAppUsageAction]);
+  }, [completeTask, recordAppUsageAction, tasks]);
 
   // Memoized task filtering & sorting
   const activeTasks = useMemo(() => {
@@ -1193,6 +1218,7 @@ const TodoApp = () => {
                     setSearchTerm('');
                     setShowSearch(false);
                   }}
+                  onOpenCommandPalette={() => setShowCommandPalette(true)}
                   placeholder="Search tasks..."
                 />
               )}
@@ -1742,55 +1768,11 @@ const TodoApp = () => {
         />
       )}
 
-      <AnimatePresence>
-        {showArchiveToast && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'transparent',
-            zIndex: 10000,
-            pointerEvents: 'none'
-          }}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              style={{
-                background: 'var(--surface-color)',
-                border: '1px solid var(--border-color)',
-                padding: '16px 28px',
-                borderRadius: '12px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                color: 'var(--text-color)'
-              }}
-            >
-              <div style={{
-                background: 'rgba(16, 185, 129, 0.1)',
-                color: '#10b981',
-                borderRadius: '50%',
-                width: '28px',
-                height: '28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Check size={18} strokeWidth={3} />
-              </div>
-              <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>Moved to Archive</span>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <UndoToast
+        toast={undoToast}
+        onUndo={handleUndoToastAction}
+        onDismiss={() => setUndoToast(null)}
+      />
 
       <AnimatePresence>
         {showRestoreToast && (
@@ -1847,6 +1829,40 @@ const TodoApp = () => {
         onClose={() => setShowSkinDiscoveryModal(false)}
         currentMode={appMode}
         onSwitchMode={handleSwitchMode}
+      />
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        projects={availableProjects}
+        currentProjectId={currentProjectId}
+        onSelectProject={(projId) => setCurrentProjectId(projId)}
+        onAddTask={() => setShowAddSection(true)}
+        onAddNote={() => {
+          setAppMode('notes');
+          setShowAddSection(true);
+        }}
+        onOpenSearch={() => {
+          setShowSearch(true);
+          setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
+        }}
+        onOpenSettings={() => setShowSettings(true)}
+        onOpenArchive={() => setShowArchive(true)}
+        onOpenSync={() => setShowSyncModal(true)}
+        onOpenAchievements={() => setShowAchievements(true)}
+        onOpenExport={() => setShowExportModal(true)}
+        onOpenImport={() => setShowImportSelection(true)}
+        isDark={isDark}
+        onToggleTheme={() => {
+          setThemeMode(prev => prev === 'dark' ? 'light' : 'dark');
+        }}
+        appMode={appMode}
+        onSwitchMode={(mode) => handleSwitchMode(mode)}
+        viewProfile={viewProfile}
+        onToggleViewProfile={() => {
+          setViewProfile(prev => prev === 'pro' ? 'lite' : 'pro');
+        }}
+        tasks={activeTasks}
+        onSelectTask={(task) => setEditingTask(task)}
       />
       </Suspense>
     </div>

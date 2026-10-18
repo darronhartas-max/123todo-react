@@ -2,6 +2,7 @@ import React from 'react';
 import { Keyboard } from 'lucide-react';
 
 export const SHORTCUTS_LIST = [
+    { keys: ['⌘ / Ctrl', 'K'], desc: 'Open Command Palette' },
     { keys: ['Q', 'A'], desc: 'Toggle Add Task Panel' },
     { keys: ['/'], desc: 'Focus Search Bar' },
     { keys: ['S'], desc: 'Open Settings' },

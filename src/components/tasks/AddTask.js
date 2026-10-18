@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
-import { Plus, Minus, Mic, Calendar, FileText, ListChecks, X } from 'lucide-react';
+import { Plus, Minus, Mic, Calendar, FileText, ListChecks, X, Clock, AlertCircle, Folder, Repeat, Sparkles } from 'lucide-react';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime } from '../../utils/dateUtils';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { ProjectPicker, PrioritySelector, SchedulePicker, SubtasksEditor } from './editor';
+import { parseQuickAdd, removeTokenFromText } from '../../utils/nlpParser';
 
 const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
     const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
@@ -54,6 +55,11 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     const recognitionRef = useRef(null);
     const speechSupported = isSpeechRecognitionSupported();
     const cursorPositionsRef = useRef({ title: null, notes: null });
+
+    // Real-time Natural Language Quick Add entity parsing
+    const parsedNLP = useMemo(() => {
+        return parseQuickAdd(text, projects, { dateFormat });
+    }, [text, projects, dateFormat]);
 
     // Auto-expand and scroll so newly spoken/typed text is always clearly visible in the viewing pane
     useEffect(() => {
@@ -213,13 +219,15 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
     }, [isOpen, defaultProjectId, projects]);
 
     const handleSubmit = (overrideText, overrideNotes) => {
-        const taskTitle = typeof overrideText === 'string' ? overrideText : text;
+        const rawTitle = typeof overrideText === 'string' ? overrideText : text;
         const taskNotes = typeof overrideNotes === 'string' ? overrideNotes : notes;
-        if (!taskTitle.trim() && !taskNotes.trim()) return;
+        if (!rawTitle.trim() && !taskNotes.trim()) return;
 
         stopVoice();
 
-        let finalTitle = taskTitle.trim();
+        // Run NLP quick add parser on input text
+        const nlp = parseQuickAdd(rawTitle, projects, { dateFormat });
+        let finalTitle = (nlp.tokens.length > 0 && nlp.cleanText) ? nlp.cleanText : rawTitle.trim();
         const finalNotes = taskNotes.trim();
 
         // If title is empty but notes were added by voice/typing, derive title from first line/sentence of notes
@@ -239,12 +247,30 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
         }
 
         if (!finalTitle) finalTitle = 'Untitled Task';
-        const finalProjectId = projectId === 'all' ? (projects[0]?.id || 'general') : projectId;
-        
-        // Build recurrence rule if recurring is selected
+
+        // Priority: NLP parsed priority takes precedence if present
+        const finalPriority = nlp.priority !== null ? nlp.priority : priority;
+
+        // Project: NLP parsed project takes precedence if present
+        let finalProjectId = projectId;
+        if (nlp.projectId !== null) {
+            finalProjectId = nlp.projectId;
+        } else if (projectId === 'all') {
+            finalProjectId = projects[0]?.id || 'general';
+        }
+
+        // Schedule & Recurrence: NLP parsed date/time/recurrence takes precedence
+        let finalScheduledDate = nlp.scheduledDate || scheduledDate;
+        let finalScheduledTime = nlp.scheduledTime !== null ? nlp.scheduledTime : scheduledTime;
+        let finalIsRecurring = isRecurring || !!nlp.recurrence;
         let recurrence = null;
-        let finalScheduledDate = scheduledDate;
-        if (isRecurring) {
+
+        if (nlp.recurrence) {
+            if (!finalScheduledDate) {
+                finalScheduledDate = getTodayDateString();
+            }
+            recurrence = nlp.recurrence;
+        } else if (isRecurring) {
             if (!finalScheduledDate) {
                 finalScheduledDate = getTodayDateString();
             }
@@ -258,11 +284,11 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             };
         }
 
-        onAdd(finalTitle, priority, finalProjectId, taskNotes.trim(), {
+        onAdd(finalTitle, finalPriority, finalProjectId, taskNotes.trim(), {
             scheduledDate: finalScheduledDate,
-            scheduledTime: (finalScheduledDate && timeSchedulingEnabled) ? scheduledTime : null,
+            scheduledTime: (finalScheduledDate && timeSchedulingEnabled) ? finalScheduledTime : null,
             subtasks,
-            isRecurring: isRecurring && !!finalScheduledDate,
+            isRecurring: finalIsRecurring && !!finalScheduledDate,
             recurrence,
             photos
         });
@@ -539,6 +565,72 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                 style={styles.taskInput}
                 maxLength={isUnlimited ? undefined : Math.max(MAX_TASK_LENGTH * 4, (text || '').length + 500)}
             />
+
+            {parsedNLP.tokens.length > 0 && (
+                <div data-testid="quick-add-preview" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '6px',
+                    alignItems: 'center',
+                    padding: '6px 10px',
+                    marginTop: '6px',
+                    marginBottom: '4px',
+                    background: 'var(--item-bg, rgba(0,0,0,0.03))',
+                    borderRadius: '8px',
+                    border: '1px dashed var(--border-color)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-color)', fontSize: '0.75rem', fontWeight: '700' }}>
+                        <Sparkles size={13} />
+                        <span>Quick Add:</span>
+                    </div>
+                    {parsedNLP.tokens.map((tok, idx) => (
+                        <span
+                            key={idx}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.78rem',
+                                fontWeight: '600',
+                                background: 'var(--surface-color)',
+                                color: tok.color || (tok.type === 'priority' ? '#ef4444' : 'var(--text-color)'),
+                                border: '1px solid var(--border-color)',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                            }}
+                        >
+                            {tok.type === 'date' && <Calendar size={12} />}
+                            {tok.type === 'time' && <Clock size={12} />}
+                            {tok.type === 'priority' && <AlertCircle size={12} />}
+                            {tok.type === 'project' && <Folder size={12} />}
+                            {tok.type === 'recurrence' && <Repeat size={12} />}
+                            <span>{tok.label}</span>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const newText = removeTokenFromText(text, tok.raw);
+                                    setText(newText);
+                                }}
+                                aria-label={`Remove ${tok.label}`}
+                                title="Remove from quick add"
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    marginLeft: '2px',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    color: 'var(--muted-text)'
+                                }}
+                            >
+                                <X size={11} />
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
+
             <ActionableEntitiesBar texts={[text, notes, ...(subtasks.map(s => s.text))]} />
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px', marginBottom: '6px' }}>
