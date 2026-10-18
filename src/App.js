@@ -323,7 +323,7 @@ const TodoApp = () => {
     const saved = localStorage.getItem(STORAGE_KEYS.NOTES_FONT_SIZE);
     if (saved) {
       const parsed = parseInt(saved, 10);
-      if (!isNaN(parsed) && parsed >= 8 && parsed <= 24) {
+      if (!isNaN(parsed) && parsed >= 10 && parsed <= 40) {
         return parsed;
       }
     }
@@ -1202,6 +1202,7 @@ const TodoApp = () => {
                 onSelectProjectFilter={setCurrentProjectId}
                 searchQuery={searchTerm}
                 onSearchChange={setSearchTerm}
+                onOpenSettings={() => setShowSettings(true)}
                 notesFontSize={notesFontSize}
                 notesAutosaveDelay={notesAutosaveDelay}
                 viewProfile={viewProfile}

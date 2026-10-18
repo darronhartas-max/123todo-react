@@ -179,6 +179,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.7': [
+    { title: '📱 Centered Archive & Undo Notification on Mobile:', desc: 'Fixed bottom horizontal centering for the "Moved to Archive" and task completion Undo snackbar, ensuring it stays perfectly centered on mobile viewports with native safe-area-inset support without clipping off-screen to the right.' },
+    { title: '⚙️ Settings Access in Notes View Mode:', desc: 'Added the Settings icon button into the top action toolbar in Notes view mode right next to the Add Note button, mirroring the top layout in Tasks view for seamless cross-mode configuration.' },
+    { title: '🔍 Expanded Notes Text Size Range (Up to 36pt):', desc: 'Extended the Notes View Text Size slider up to 36pt with dynamic scaling across note card titles, note details, Quick Add, and active note editing textareas for ultra-clear legibility on high-resolution mobile screens.' }
+  ],
   '3.8.6': [
     { title: '✨ Smart Natural Language Quick Add (Phase 4):', desc: 'Introduced intelligent natural language parsing in Add Task. Automatically detects due dates (today, tomorrow, friday, in 3 days, 25th Oct), scheduled times (2pm, 14:30, morning, evening), priorities (!1, !2, !3, !4, p1, !must), project hashtags (#Work, #Personal), and recurrence rules (daily, weekly, every 2 weeks, every weekday) with real-time interactive preview chips and 1-tap removal.' },
     { title: '↩️ Interactive Quick Undo Toast Snackbar:', desc: 'Added a bottom-anchored, 5-second interactive Undo snackbar when tasks are completed or moved to archive. Users can effortlessly reverse accidental actions with 1 tap, elevating confidence especially with touch swipe gestures on mobile.' },

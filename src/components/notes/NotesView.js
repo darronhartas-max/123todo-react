@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Check, PlusCircle, MinusCircle, ChevronDown
+  Folder, Search, X, Check, PlusCircle, MinusCircle, ChevronDown, Settings
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -24,6 +24,7 @@ const NotesView = ({
   onSelectProjectFilter,
   searchQuery = '',
   onSearchChange,
+  onOpenSettings,
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
   viewProfile = 'lite',
@@ -477,32 +478,68 @@ const NotesView = ({
           )}
         </div>
 
-        {/* 3. Add Note + / - toggle button (positioned on the right side for effortless, fast tapping) */}
-        <button
-          type="button"
-          onClick={() => setShowAddNote(!showAddNote)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#dc2626',
-            cursor: 'pointer',
-            padding: 0,
-            width: '36px',
-            height: '36px',
-            minWidth: '36px',
-            minHeight: '36px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            marginLeft: 'auto',
-            transition: 'transform 0.2s ease'
-          }}
-          aria-label={showAddNote ? "Close add note" : "Add new note"}
-          title={showAddNote ? "Close add note form" : "Add new note"}
-        >
-          {showAddNote ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
-        </button>
+        {/* Right-aligned actions container ensuring icons are never pushed off-screen */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          flexShrink: 0,
+          marginLeft: 'auto'
+        }}>
+          {/* Settings cog icon button */}
+          {onOpenSettings && (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              style={{
+                width: '32px',
+                height: '32px',
+                padding: 0,
+                borderRadius: '50%',
+                background: 'var(--bg-color)',
+                border: '1.5px solid var(--border-color)',
+                color: 'var(--accent-color)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
+              }}
+              title="Settings"
+              aria-label="Settings"
+            >
+              <Settings size={18} />
+            </button>
+          )}
+
+          {/* Add Note + / - toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowAddNote(!showAddNote)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#dc2626',
+              cursor: 'pointer',
+              padding: 0,
+              width: '32px',
+              height: '32px',
+              minWidth: '32px',
+              minHeight: '32px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              marginLeft: 'auto',
+              transition: 'transform 0.2s ease'
+            }}
+            aria-label={showAddNote ? "Close add note" : "Add new note"}
+            title={showAddNote ? "Close add note form" : "Add new note"}
+          >
+            {showAddNote ? <MinusCircle size={28} /> : <PlusCircle size={28} />}
+          </button>
+        </div>
       </div>
 
       {/* Expanding Search Bar (collapses back on X click) */}

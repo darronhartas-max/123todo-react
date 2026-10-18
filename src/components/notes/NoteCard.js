@@ -776,7 +776,7 @@ const NoteCard = ({
               autoCorrect="on"
               autoCapitalize="sentences"
               style={{
-                fontSize: '17px',
+                fontSize: `${notesFontSize}px`,
                 fontWeight: '700',
                 padding: '10px 12px',
                 borderRadius: '8px',
@@ -818,7 +818,7 @@ const NoteCard = ({
                   autoCorrect="on"
                   autoCapitalize="sentences"
                   style={{
-                    fontSize: '16px',
+                    fontSize: `${Math.max(notesFontSize - 2, 14)}px`,
                     padding: '10px 12px',
                     borderRadius: '8px',
                     border: '1px solid var(--border-color, #d1d5db)',

@@ -146,20 +146,20 @@ const SettingsAppearanceTab = ({
                 <div style={styles.settingLabel}>
                     <span>Notes View Text Size</span>
                     <span style={{ fontSize: '0.9rem', color: 'var(--accent-color)', fontWeight: '700' }}>
-                        {notesFontSize}pt ({notesFontSize === 18 ? 'Default' : notesFontSize < 18 ? 'Smaller' : 'Larger'})
+                        {notesFontSize}pt ({notesFontSize === 18 ? 'Default' : notesFontSize < 18 ? 'Smaller' : notesFontSize <= 26 ? 'Larger' : 'Extra Large'})
                     </span>
                 </div>
                 <div style={styles.sliderContainer}>
-                    <span style={{ fontSize: '8pt', color: 'var(--muted-text)' }}>A</span>
+                    <span style={{ fontSize: '10pt', color: 'var(--muted-text)' }}>A</span>
                     <input
                         type="range"
-                        min="10"
-                        max="24"
+                        min="12"
+                        max="36"
                         value={notesFontSize}
-                        onChange={(e) => setNotesFontSize && setNotesFontSize(parseInt(e.target.value))}
+                        onChange={(e) => setNotesFontSize && setNotesFontSize(parseInt(e.target.value, 10))}
                         style={styles.slider}
                     />
-                    <span style={{ fontSize: '20pt', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>
+                    <span style={{ fontSize: '22pt', color: 'var(--muted-text)', fontWeight: 'bold' }}>A</span>
                 </div>
             </div>
 

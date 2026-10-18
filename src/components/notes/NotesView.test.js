@@ -260,18 +260,25 @@ describe('NotesView', () => {
     expect(onSelectProjectFilterMock).toHaveBeenCalledWith('proj1');
   });
 
-  test('renders clutter-free top bar without achievements badge or settings, and without duplicate Add New Note button below', () => {
+  test('renders top bar with Settings button and Add New Note button without achievements badge or duplicate button below', () => {
+    const onOpenSettingsMock = jest.fn();
     render(
       <NotesView
         tasks={sampleTasks}
         projects={sampleProjects}
         onAddNote={jest.fn()}
+        onOpenSettings={onOpenSettingsMock}
       />
     );
 
-    // Achievements badge and Settings cog must NOT be in the Notes view
+    // Achievements badge is NOT in the Notes view
     expect(screen.queryByTitle('Productivity Achievements & Insights')).not.toBeInTheDocument();
-    expect(screen.queryByTitle('Settings')).not.toBeInTheDocument();
+    
+    // Settings cog IS in the Notes view top section next to Add Note
+    const settingsBtn = screen.getByTitle('Settings');
+    expect(settingsBtn).toBeInTheDocument();
+    fireEvent.click(settingsBtn);
+    expect(onOpenSettingsMock).toHaveBeenCalledTimes(1);
 
     // The red Add new note button is in the top bar
     const addNoteBtn = screen.getByRole('button', { name: /Add new note/i });

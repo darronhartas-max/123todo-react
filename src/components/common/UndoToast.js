@@ -49,33 +49,45 @@ const UndoToast = ({
 
     return (
         <AnimatePresence>
-            <motion.div
-                role="alert"
-                aria-live="polite"
-                data-testid="undo-toast"
-                initial={{ opacity: 0, y: 24, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 16, scale: 0.95 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            <div
                 style={{
                     position: 'fixed',
-                    bottom: '24px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 10001,
+                    bottom: 'max(24px, env(safe-area-inset-bottom, 24px))',
+                    left: 0,
+                    right: 0,
                     display: 'flex',
+                    justifyContent: 'center',
                     alignItems: 'center',
-                    gap: '12px',
-                    padding: '10px 14px 10px 16px',
-                    background: 'var(--surface-color, #ffffff)',
-                    color: 'var(--text-color, #1f2937)',
-                    border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-                    maxWidth: 'min(92vw, 460px)',
+                    pointerEvents: 'none',
+                    zIndex: 10001,
+                    padding: '0 16px',
                     boxSizing: 'border-box'
                 }}
             >
+                <motion.div
+                    role="alert"
+                    aria-live="polite"
+                    data-testid="undo-toast"
+                    initial={{ opacity: 0, y: 24, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 16, scale: 0.95 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
+                        pointerEvents: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 14px 10px 16px',
+                        background: 'var(--surface-color, #ffffff)',
+                        color: 'var(--text-color, #1f2937)',
+                        border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
+                        borderRadius: '12px',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+                        maxWidth: 'min(92vw, 460px)',
+                        width: 'auto',
+                        boxSizing: 'border-box'
+                    }}
+                >
                 {/* Status Indicator Icon */}
                 <div style={{
                     display: 'flex',
@@ -168,6 +180,7 @@ const UndoToast = ({
                     <X size={15} />
                 </button>
             </motion.div>
+            </div>
         </AnimatePresence>
     );
 };
