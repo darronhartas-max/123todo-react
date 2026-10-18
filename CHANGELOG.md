@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.8
+
+- **📝 Dynamic Subtask Text & Checkbox Scaling in Notes Mode:** Subtask checklists, step descriptions, and checkboxes in Notes view mode now dynamically scale with the user's Notes Text Size setting in both view and edit modes, ensuring high readability and comfortable touch targets on mobile.
+
 ### v3.8.7
 
 - **📱 Centered Archive & Undo Notification on Mobile:** Fixed bottom horizontal centering for the "Moved to Archive" and task completion Undo snackbar, ensuring it stays perfectly centered on mobile viewports with native safe-area-inset support without clipping off-screen to the right.

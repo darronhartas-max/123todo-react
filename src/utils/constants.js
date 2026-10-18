@@ -179,6 +179,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.8': [
+    { title: '📝 Dynamic Subtask Text & Checkbox Scaling in Notes Mode:', desc: 'Subtask checklists, step descriptions, and checkboxes in Notes view mode now dynamically scale with the user\'s Notes Text Size setting in both view and edit modes, ensuring high readability and comfortable touch targets on mobile.' }
+  ],
   '3.8.7': [
     { title: '📱 Centered Archive & Undo Notification on Mobile:', desc: 'Fixed bottom horizontal centering for the "Moved to Archive" and task completion Undo snackbar, ensuring it stays perfectly centered on mobile viewports with native safe-area-inset support without clipping off-screen to the right.' },
     { title: '⚙️ Settings Access in Notes View Mode:', desc: 'Added the Settings icon button into the top action toolbar in Notes view mode right next to the Add Note button, mirroring the top layout in Tasks view for seamless cross-mode configuration.' },

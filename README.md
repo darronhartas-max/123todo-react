@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.7** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.8** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.7 (Current)
+### v3.8.8 (Current)
+
+- **Dynamic Subtask Text & Checkbox Scaling in Notes Mode**: Subtask checklists, step descriptions, and checkboxes in Notes view mode now dynamically scale with the user's Notes Text Size setting in both view and edit modes, ensuring high readability and comfortable touch targets on mobile.
+
+### v3.8.7
 
 - **Centered Mobile Archive & Undo Notification**: Fixed bottom horizontal centering for the "Moved to Archive" and task completion Undo snackbar, ensuring it stays perfectly centered on mobile viewports with native safe-area-inset support without clipping off-screen to the right.
 - **Settings Access in Notes View Mode**: Added the Settings icon button into the top action toolbar in Notes view mode right next to the Add Note button, mirroring the top layout in Tasks view for seamless cross-mode configuration.

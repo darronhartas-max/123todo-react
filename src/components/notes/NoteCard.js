@@ -42,6 +42,11 @@ const NoteCard = ({
   const [statusMessage, setStatusMessage] = useState('');
   const [copiedEvidence, setCopiedEvidence] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const subtaskTextFontSize = Math.max(notesFontSize - 2, 13);
+  const subtaskHeaderFontSize = Math.max(notesFontSize - 5, 12);
+  const subtaskCheckboxSize = Math.min(Math.max(Math.round(notesFontSize * 0.85), 15), 24);
+  const subtaskIconSize = Math.min(Math.max(Math.round(notesFontSize * 0.8), 14), 22);
   
   const titleRecognitionRef = useRef(null);
   const noteTextareaRef = useRef(null);
@@ -840,8 +845,8 @@ const NoteCard = ({
             />
             {/* Subtasks Section in Edit Mode */}
             <div style={{ marginTop: '4px', padding: '8px', borderRadius: '8px', background: 'var(--item-bg, #f9fafb)', border: '1px solid var(--border-color, #e5e7eb)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '8px' }}>
-                <ListChecks size={14} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: `${subtaskHeaderFontSize}px`, fontWeight: '700', color: 'var(--text-color, #374151)', marginBottom: '8px' }}>
+                <ListChecks size={subtaskIconSize} />
                 <span>Subtasks ({subtasks.length})</span>
               </div>
               {subtasks.length > 0 && (
@@ -853,7 +858,7 @@ const NoteCard = ({
                           ref={(el) => {
                             if (el) {
                               el.style.height = 'auto';
-                              el.style.height = `${Math.max(el.scrollHeight, 24)}px`;
+                              el.style.height = `${Math.max(el.scrollHeight, subtaskTextFontSize + 8)}px`;
                             }
                           }}
                           value={st.text}
@@ -866,14 +871,14 @@ const NoteCard = ({
                           }}
                           onInput={(e) => {
                             e.target.style.height = 'auto';
-                            e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
+                            e.target.style.height = `${Math.max(e.target.scrollHeight, subtaskTextFontSize + 8)}px`;
                           }}
                           placeholder="Subtask step..."
                           style={{
                             width: '100%',
                             border: 'none',
                             background: 'transparent',
-                            fontSize: '13px',
+                            fontSize: `${subtaskTextFontSize}px`,
                             color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
                             textDecoration: st.completed ? 'line-through' : 'none',
                             outline: 'none',
@@ -885,14 +890,14 @@ const NoteCard = ({
                             wordBreak: 'break-word',
                             whiteSpace: 'pre-wrap',
                             lineHeight: '1.4',
-                            minHeight: '24px',
+                            minHeight: `${subtaskTextFontSize + 8}px`,
                             boxSizing: 'border-box'
                           }}
                           onFocus={(e) => {
                             e.target.style.background = 'var(--card-bg, #ffffff)';
                             e.target.style.boxShadow = '0 0 0 1px #2563eb';
                             e.target.style.height = 'auto';
-                            e.target.style.height = `${Math.max(e.target.scrollHeight, 24)}px`;
+                            e.target.style.height = `${Math.max(e.target.scrollHeight, subtaskTextFontSize + 8)}px`;
                           }}
                           onBlur={(e) => {
                             e.target.style.background = 'transparent';
@@ -916,7 +921,7 @@ const NoteCard = ({
                         }}
                         aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
                         title={st.completed ? "Mark incomplete" : "Mark completed"}
-                        style={{ cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0, marginRight: '2px' }}
+                        style={{ cursor: 'pointer', width: `${subtaskCheckboxSize}px`, height: `${subtaskCheckboxSize}px`, flexShrink: 0, marginRight: '2px' }}
                       />
                     </li>
                   ))}
@@ -931,7 +936,7 @@ const NoteCard = ({
                   style={{
                     flex: 1,
                     padding: '4px 8px',
-                    fontSize: '13px',
+                    fontSize: `${subtaskTextFontSize}px`,
                     border: '1px solid var(--border-color, #d1d5db)',
                     borderRadius: '6px',
                     backgroundColor: 'var(--card-bg, #ffffff)',
@@ -954,7 +959,7 @@ const NoteCard = ({
                     border: 'none',
                     backgroundColor: '#2563eb',
                     color: '#ffffff',
-                    fontSize: '12px',
+                    fontSize: `${Math.max(subtaskTextFontSize - 2, 13)}px`,
                     fontWeight: '700',
                     cursor: 'pointer'
                   }}
@@ -1106,8 +1111,8 @@ const NoteCard = ({
             {/* Subtasks in View Mode */}
             {subtasks.length > 0 && (
               <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--border-color, #e5e7eb)' }} onClick={(e) => e.stopPropagation()}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary, #6b7280)', marginBottom: '4px' }}>
-                  <ListChecks size={14} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: `${subtaskHeaderFontSize}px`, fontWeight: '700', color: 'var(--text-secondary, #6b7280)', marginBottom: '4px' }}>
+                  <ListChecks size={subtaskIconSize} />
                   <span>Steps ({subtasks.filter(s => s.completed).length}/{subtasks.length}):</span>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -1128,7 +1133,7 @@ const NoteCard = ({
                             width: '100%',
                             border: 'none',
                             background: 'transparent',
-                            fontSize: '13px',
+                            fontSize: `${subtaskTextFontSize}px`,
                             color: st.completed ? 'var(--text-secondary, #9ca3af)' : 'var(--text-color, #111827)',
                             textDecoration: st.completed ? 'line-through' : 'none',
                             outline: 'none',
@@ -1161,7 +1166,7 @@ const NoteCard = ({
                         }}
                         aria-label={st.completed ? "Mark subtask incomplete" : "Mark subtask completed"}
                         title={st.completed ? "Mark incomplete" : "Mark completed"}
-                        style={{ cursor: 'pointer', width: '13px', height: '13px', flexShrink: 0, marginRight: '2px' }}
+                        style={{ cursor: 'pointer', width: `${subtaskCheckboxSize}px`, height: `${subtaskCheckboxSize}px`, flexShrink: 0, marginRight: '2px' }}
                       />
                     </li>
                   ))}
