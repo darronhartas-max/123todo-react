@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Mic, CheckSquare, X, ArrowRight } from 'lucide-react';
+import { Sparkles, NotebookPen, ListTodo, X, ArrowRight } from 'lucide-react';
 
 const SkinDiscoveryModal = ({ isOpen, onClose, currentMode, onSwitchMode }) => {
   if (!isOpen) return null;
@@ -114,7 +114,7 @@ const SkinDiscoveryModal = ({ isOpen, onClose, currentMode, onSwitchMode }) => {
                 borderRadius: '12px',
                 display: 'flex'
               }}>
-                <Mic size={22} />
+                <NotebookPen size={22} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '700', fontSize: '15px', color: 'var(--text-color, #111827)' }}>
@@ -147,7 +147,7 @@ const SkinDiscoveryModal = ({ isOpen, onClose, currentMode, onSwitchMode }) => {
                 borderRadius: '12px',
                 display: 'flex'
               }}>
-                <CheckSquare size={22} />
+                <ListTodo size={22} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: '700', fontSize: '15px', color: 'var(--text-color, #111827)' }}>

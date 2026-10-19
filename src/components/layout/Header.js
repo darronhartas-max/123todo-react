@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckSquare, Mic, Download, BookOpen } from 'lucide-react';
+import { ListTodo, NotebookPen, Download, BookOpen } from 'lucide-react';
 
 const Header = ({
     isDark,
@@ -157,7 +157,7 @@ const Header = ({
                             aria-label="Tasks"
                             title="Switch to Task Manager Mode"
                         >
-                            {showIcons && <CheckSquare size={16} />}
+                            {showIcons && <ListTodo size={16} />}
                             {showText && <span>Tasks</span>}
                         </button>
                         <button
@@ -166,7 +166,7 @@ const Header = ({
                             aria-label="Notes"
                             title="Switch to Notes Mode"
                         >
-                            {showIcons && <Mic size={16} />}
+                            {showIcons && <NotebookPen size={16} />}
                             {showText && <span>Notes</span>}
                         </button>
                     </div>

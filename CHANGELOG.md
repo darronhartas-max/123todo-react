@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.9
+
+- **✕ Permanent Dismiss for Rescheduled (Deferred 5x) Alert:** Added a dedicated dismiss (✕) button to the 5x deferred warning message in both the task editor and task item badge, allowing users to remove the notification for good once acknowledged.
+- **📝 Intuitive Mode Toggle Icons (Task Organising & Note Taking):** Replaced the confusing microphone toggle icon at the top of the app with a dedicated notebook and pen icon for Notes mode, and updated the Tasks icon to an organized checklist icon depicting clear task management.
+
 ### v3.8.8
 
 - **📝 Dynamic Subtask Text & Checkbox Scaling in Notes Mode:** Subtask checklists, step descriptions, and checkboxes in Notes view mode now dynamically scale with the user's Notes Text Size setting in both view and edit modes, ensuring high readability and comfortable touch targets on mobile.

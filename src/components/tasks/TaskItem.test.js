@@ -417,3 +417,27 @@ test('renders concise time badge in 12-hour format when dateFormat is US', () =>
   expect(timeBadge).toHaveTextContent('2:30 PM');
 });
 
+test('renders defer badge with dismiss button and allows dismissing deferred notice', () => {
+  const onUpdateMock = jest.fn();
+  const task = {
+    id: 117,
+    text: 'Deferred Task',
+    priority: 1,
+    projectId: 'general',
+    deferCount: 5,
+    deferAlertDismissed: false
+  };
+
+  const { rerender } = render(<TaskItem task={task} showFullDetails={true} onUpdate={onUpdateMock} />);
+
+  expect(screen.getByText(/Deferred 5x/i)).toBeInTheDocument();
+  const dismissBtn = screen.getByRole('button', { name: /Remove deferred notice/i });
+  expect(dismissBtn).toBeInTheDocument();
+
+  fireEvent.click(dismissBtn);
+  expect(onUpdateMock).toHaveBeenCalledWith(117, { deferAlertDismissed: true });
+
+  rerender(<TaskItem task={{ ...task, deferAlertDismissed: true }} showFullDetails={true} onUpdate={onUpdateMock} />);
+  expect(screen.queryByText(/Deferred 5x/i)).not.toBeInTheDocument();
+});
+

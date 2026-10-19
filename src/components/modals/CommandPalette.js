@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
     Plus,
-    FileText,
     Settings,
     Archive,
     Cloud,
@@ -15,6 +14,8 @@ import {
     Layers,
     Folder,
     CheckSquare,
+    ListTodo,
+    NotebookPen,
     Mic,
     X,
     ArrowRight
@@ -117,7 +118,7 @@ const CommandPalette = ({
                 id: 'switch-mode',
                 section: 'Mode & Layout',
                 label: appMode === 'tasks' ? 'Switch to Voice Notes Mode' : 'Switch to Tasks Mode',
-                icon: appMode === 'tasks' ? <FileText size={16} /> : <CheckSquare size={16} />,
+                icon: appMode === 'tasks' ? <NotebookPen size={16} /> : <ListTodo size={16} />,
                 action: () => { onClose(); onSwitchMode?.(appMode === 'tasks' ? 'notes' : 'tasks'); }
             },
             {

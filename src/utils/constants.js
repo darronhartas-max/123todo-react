@@ -179,6 +179,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.9': [
+    { title: '✕ Permanent Dismiss for Rescheduled (Deferred 5x) Alert:', desc: 'Added a dedicated dismiss (✕) button to the 5x deferred warning message in both the task editor and task item badge, allowing users to remove the notification for good once acknowledged.' },
+    { title: '📝 Intuitive Mode Toggle Icons (Task Organising & Note Taking):', desc: 'Replaced the confusing microphone toggle icon at the top of the app with a dedicated notebook and pen icon for Notes mode, and updated the Tasks icon to an organized checklist icon depicting clear task management.' }
+  ],
   '3.8.8': [
     { title: '📝 Dynamic Subtask Text & Checkbox Scaling in Notes Mode:', desc: 'Subtask checklists, step descriptions, and checkboxes in Notes view mode now dynamically scale with the user\'s Notes Text Size setting in both view and edit modes, ensuring high readability and comfortable touch targets on mobile.' }
   ],

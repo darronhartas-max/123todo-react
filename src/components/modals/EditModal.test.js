@@ -105,6 +105,26 @@ describe('EditModal', () => {
     expect(screen.getByText(/Deferred 5x/i)).toBeInTheDocument();
   });
 
+  test('allows dismissing defer alert for good via x button', () => {
+    const onSaveMock = jest.fn();
+    render(
+      <EditModal
+        task={{ ...sampleTaskWithNotes, deferCount: 5 }}
+        onSave={onSaveMock}
+        onClose={jest.fn()}
+        projects={sampleProjects}
+      />
+    );
+
+    expect(screen.getByText(/Deferred 5x/i)).toBeInTheDocument();
+    const dismissBtn = screen.getByRole('button', { name: /Dismiss deferred notice/i });
+    expect(dismissBtn).toBeInTheDocument();
+
+    fireEvent.click(dismissBtn);
+    expect(onSaveMock).toHaveBeenCalledWith(sampleTaskWithNotes.id, { deferAlertDismissed: true });
+    expect(screen.queryByText(/Deferred 5x/i)).not.toBeInTheDocument();
+  });
+
   test('sets scheduled date to tomorrow when Next Day button is clicked', () => {
     const onSaveMock = jest.fn();
     render(

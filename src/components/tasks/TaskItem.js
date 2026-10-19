@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, Clock } from 'lucide-react';
+import { Trash2, RotateCcw, Square, CheckSquare, Calendar, Repeat, Flag, PauseCircle, Edit2, Slash, FileText, GripVertical, Camera, FastForward, Clock, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SWIPE_ACTIONS } from '../../utils/constants';
 import { formatDisplayDate, formatDisplayTime, getTomorrowDateString, getNextWeekDateString } from '../../utils/dateUtils';
@@ -269,7 +269,7 @@ const TaskItem = ({
     const isLite = viewProfile === 'lite';
     const effectiveShowFull = showFullDetails;
     const hasExtraDetails = !isLite && Boolean(
-        (showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0)) ||
+        (showFullDetails && ((task.scheduledDate && !isArchived) || task.isRecurring || (task.deferCount > 0 && !task.deferAlertDismissed))) ||
         showQuickSchedule ||
         subtasksCount > 0 ||
         (showFullDetails && (task.notes || (task.photos && task.photos.length > 0)))
@@ -818,7 +818,7 @@ const TaskItem = ({
                         })()}
 
                         {/* Scheduled / Recurrence details */}
-                        {effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || task.deferCount > 0) && (
+                        {effectiveShowFull && ((task.scheduledDate && !isArchived) || task.isRecurring || (task.deferCount > 0 && !task.deferAlertDismissed)) && (
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -860,15 +860,43 @@ const TaskItem = ({
                                 <Repeat size={12} /> {getRecurrenceText(task.recurrence)}
                             </span>
                         )}
-                        {task.deferCount > 0 && !isArchived && (
+                        {task.deferCount > 0 && !task.deferAlertDismissed && !isArchived && (
                             <span style={{
                                 background: 'rgba(239, 68, 68, 0.08)',
                                 color: '#ef4444',
                                 padding: '2px 6px',
                                 borderRadius: '4px',
-                                fontWeight: '600'
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
                             }} title={`This task has been deferred ${task.deferCount} times`}>
-                                ⚠️ Deferred {task.deferCount}x
+                                <span>⚠️ Deferred {task.deferCount}x</span>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (onUpdate) onUpdate(task.id, { deferAlertDismissed: true });
+                                    }}
+                                    title="Remove notice for good"
+                                    aria-label="Remove deferred notice"
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: '#ef4444',
+                                        padding: '0 2px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        lineHeight: 1,
+                                        opacity: 0.7
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+                                >
+                                    <X size={11} strokeWidth={2.5} />
+                                </button>
                             </span>
                         )}
                     </div>

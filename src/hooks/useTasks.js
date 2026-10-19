@@ -63,6 +63,7 @@ const sanitizeTaskIds = (tasksList, archivedList, startCounter) => {
                 scheduledTime: task.scheduledTime || null,
                 promotedDate: task.promotedDate || null,
                 deferCount: task.deferCount || 0,
+                deferAlertDismissed: task.deferAlertDismissed || false,
                 subtasks: task.subtasks || [],
                 isRecurring: task.isRecurring || false,
                 recurrence: task.recurrence || null
@@ -374,6 +375,7 @@ export const useTasks = () => {
             scheduledTime: extraFields.scheduledDate ? (extraFields.scheduledTime || null) : null,
             promotedDate: isScheduledToday ? extraFields.scheduledDate : null,
             deferCount: 0,
+            deferAlertDismissed: false,
             subtasks: extraFields.subtasks || [],
             isRecurring: extraFields.isRecurring || false,
             recurrence: extraFields.recurrence || null,
@@ -430,6 +432,7 @@ export const useTasks = () => {
                         scheduledDate: nextDate,
                         promotedDate: null,
                         deferCount: 0,
+                        deferAlertDismissed: false,
                         subtasks: resetSubtasks,
                         completedAt: null,
                         updatedAt: now
@@ -816,6 +819,7 @@ export const useTasks = () => {
             isSample: false,
             scheduledDate: null,
             deferCount: 0,
+            deferAlertDismissed: false,
             subtasks: [],
             isRecurring: false,
             recurrence: null,

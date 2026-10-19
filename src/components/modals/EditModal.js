@@ -25,6 +25,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
     const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [isNotesInputFocused, setIsNotesInputFocused] = useState(false);
     const [isOverlayFocused, setIsOverlayFocused] = useState(false);
+    const [isDeferAlertDismissed, setIsDeferAlertDismissed] = useState(Boolean(task.deferAlertDismissed));
     // Section Visibility Persistence: Remember whether Note, Subtasks, Schedule are hidden/shown
     const getInitialVisibility = (sectionKey, defaultHasData) => {
         try {
@@ -303,6 +304,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
             subtasks,
             isRecurring: isRecurring && !!finalScheduledDate,
             recurrence,
+            deferAlertDismissed: isDeferAlertDismissed || Boolean(task.deferAlertDismissed),
             sectionVisibility: {
                 notes: showNotes,
                 subtasks: showSubtasks,
@@ -1018,9 +1020,12 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                     </div>
                 )}
 
-                {/* Defer Alert (if deferred >= 5) */}
-                {task.deferCount >= 5 && (
+                {/* Defer Alert (if deferred >= 5 and not dismissed) */}
+                {task.deferCount >= 5 && !isDeferAlertDismissed && !task.deferAlertDismissed && (
                     <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         padding: '8px 12px',
                         background: 'rgba(239, 68, 68, 0.06)',
                         border: '1px solid rgba(239, 68, 68, 0.2)',
@@ -1031,7 +1036,36 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                         lineHeight: '1.4',
                         textAlign: 'left'
                     }}>
-                        💡 Deferred {task.deferCount}x. Consider breaking into <strong>Subtasks</strong> below.
+                        <div style={{ flex: 1 }}>
+                            💡 Deferred {task.deferCount}x. Consider breaking into <strong>Subtasks</strong> below.
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsDeferAlertDismissed(true);
+                                setEditingTask(prev => ({ ...prev, deferAlertDismissed: true }));
+                                onSave(editingTask.id, { deferAlertDismissed: true });
+                            }}
+                            aria-label="Dismiss deferred notice"
+                            title="Remove message for good"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: '#dc2626',
+                                padding: '2px 4px',
+                                marginLeft: '8px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '4px',
+                                opacity: 0.8
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+                        >
+                            <X size={15} />
+                        </button>
                     </div>
                 )}
 
