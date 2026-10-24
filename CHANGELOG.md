@@ -19,7 +19,7 @@
 
 ### v3.8.10
 
-- **🎨 Customizable Priority Label Colors in Settings:** Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors.
+- **🎨 Customizable Priority Label Colors in Settings:** Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors. This feature was kindly suggested by user 'Fae'.
 - **🔄 Dynamic Priority Color Theming Throughout App:** Custom priority colors dynamically update across all task sections, modal editors, dropdowns, drag-and-drop hover zones, note priority tags, and restore modals while preserving default colors as the baseline.
 
 ### v3.8.9

@@ -21,6 +21,7 @@
      ```
 2. **Update Release Changelog**:
    - In `src/utils/constants.js`, add the new version key and entry to `RELEASE_CHANGELOG` summarizing what changed. This directly feeds the in-app "Latest Update Info" modal (`UpdatedModal.js`).
+   - **User Suggestion Attribution (MANDATORY)**: Whenever Darron notes that a feature was suggested by a user, append: `This feature was kindly suggested by user '[User]'.` to the end of the feature description in the release changelog and documentation.
 3. **Update Documentation**:
    - In `README.md`, update the version badge header (e.g. `Version **3.7.1**`) and add release notes under `## 🔄 Recent Release Highlights`.
 4. **Build Bundle & Auto-Sync Master Changelog**:
