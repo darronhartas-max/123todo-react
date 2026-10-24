@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.9** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.10** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,12 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.9 (Current)
+### v3.8.10 (Current)
+
+- **Customizable Priority Label Colors in Settings**: Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors.
+- **Dynamic Priority Color Theming Throughout App**: Custom priority colors dynamically update across all task sections, modal editors, dropdowns, drag-and-drop hover zones, note priority tags, and restore modals while preserving default colors as the baseline.
+
+### v3.8.9
 
 - **Permanent Dismiss for Rescheduled (Deferred 5x) Alert**: Added a dedicated dismiss (✕) button to the 5x deferred warning message in both the task editor (`EditModal`) and the task item badge (`TaskItem`), allowing users to remove the notification for good once acknowledged.
 - **Intuitive Mode Toggle Icons (Task Organising & Note Taking)**: Replaced the confusing microphone toggle icon at the top of the app with a dedicated notebook and pen icon (`NotebookPen`) for Notes mode, and updated the Tasks icon to an organized checklist icon (`ListTodo`) depicting clear task management.

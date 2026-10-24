@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.10
+
+- **🎨 Customizable Priority Label Colors in Settings:** Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors.
+- **🔄 Dynamic Priority Color Theming Throughout App:** Custom priority colors dynamically update across all task sections, modal editors, dropdowns, drag-and-drop hover zones, note priority tags, and restore modals while preserving default colors as the baseline.
+
 ### v3.8.9
 
 - **✕ Permanent Dismiss for Rescheduled (Deferred 5x) Alert:** Added a dedicated dismiss (✕) button to the 5x deferred warning message in both the task editor and task item badge, allowing users to remove the notification for good once acknowledged.

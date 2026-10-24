@@ -8,7 +8,7 @@ import { ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } f
 import { ProjectPicker, PrioritySelector, SchedulePicker, SubtasksEditor } from './editor';
 import { parseQuickAdd, removeTokenFromText } from '../../utils/nlpParser';
 
-const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons' }) => {
+const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', priorityColors }) => {
     const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
     const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -813,6 +813,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
             <PrioritySelector
                 priority={priority}
                 onChangePriority={setPriority}
+                priorityColors={priorityColors}
                 actionButton={
                     <button
                         onClick={handleSubmit}

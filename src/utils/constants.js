@@ -1,13 +1,32 @@
 import packageJson from '../../package.json';
 
-export const PRIORITIES = {
-  1: { label: 'Must Do', color: '#dc2626', dotColor: '#dc2626' },
-  2: { label: 'Should Do', color: '#f59e0b', dotColor: '#f59e0b' },
-  3: { label: 'Could Do', color: '#6b7280', dotColor: '#6b7280' },
-  4: { label: 'On Hold', color: '#9333ea', dotColor: '#9333ea' }
+export const DEFAULT_PRIORITY_COLORS = {
+  1: '#dc2626',
+  2: '#f59e0b',
+  3: '#6b7280',
+  4: '#9333ea'
 };
 
+export const getPriorityColor = (priority, customColors = null) => {
+  if (customColors && customColors[priority]) {
+    return customColors[priority];
+  }
+  return DEFAULT_PRIORITY_COLORS[priority] || '#6b7280';
+};
+
+export const getPriorities = (customColors = null) => {
+  return {
+    1: { label: 'Must Do', color: getPriorityColor(1, customColors), dotColor: getPriorityColor(1, customColors) },
+    2: { label: 'Should Do', color: getPriorityColor(2, customColors), dotColor: getPriorityColor(2, customColors) },
+    3: { label: 'Could Do', color: getPriorityColor(3, customColors), dotColor: getPriorityColor(3, customColors) },
+    4: { label: 'On Hold', color: getPriorityColor(4, customColors), dotColor: getPriorityColor(4, customColors) }
+  };
+};
+
+export const PRIORITIES = getPriorities();
+
 export const STORAGE_KEYS = {
+  PRIORITY_COLORS: '123TodoPriorityColors',
   TASKS: '123TodoTasks',
   ARCHIVE: '123TodoArchive',
   COUNTER: '123TodoCounter',
@@ -179,6 +198,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.10': [
+    { title: '🎨 Customizable Priority Label Colors in Settings:', desc: 'Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors.' },
+    { title: '🔄 Dynamic Priority Color Theming Throughout App:', desc: 'Custom priority colors dynamically update across all task sections, modal editors, dropdowns, drag-and-drop hover zones, note priority tags, and restore modals while preserving default colors as the baseline.' }
+  ],
   '3.8.9': [
     { title: '✕ Permanent Dismiss for Rescheduled (Deferred 5x) Alert:', desc: 'Added a dedicated dismiss (✕) button to the 5x deferred warning message in both the task editor and task item badge, allowing users to remove the notification for good once acknowledged.' },
     { title: '📝 Intuitive Mode Toggle Icons (Task Organising & Note Taking):', desc: 'Replaced the confusing microphone toggle icon at the top of the app with a dedicated notebook and pen icon for Notes mode, and updated the Tasks icon to an organized checklist icon depicting clear task management.' }

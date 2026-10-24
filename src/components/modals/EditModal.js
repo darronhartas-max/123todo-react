@@ -9,7 +9,7 @@ import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
 import { ProjectPicker, PrioritySelector, SchedulePicker, SubtasksEditor } from '../tasks/editor';
 
-const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', showTaskCreationDate = false }) => {
+const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'UK', taskLengthLimit = '250', timeSchedulingEnabled = true, buttonDisplayMode = 'icons', showTaskCreationDate = false, priorityColors }) => {
     const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
     const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
     const isUnlimited = taskLengthLimit === 'unlimited';
@@ -502,6 +502,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             setIsPriorityOpen(open);
                             if (open) setIsProjectOpen(false);
                         }}
+                        priorityColors={priorityColors}
                     />
 
                     <ProjectPicker

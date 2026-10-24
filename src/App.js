@@ -16,7 +16,7 @@ import { useAppSystem } from './hooks/useAppSystem';
 import { useGoogleDriveSync } from './hooks/useGoogleDriveSync';
 import { useCloudflareSync } from './hooks/useCloudflareSync';
 import { useDeviceResolution } from './hooks/useDeviceResolution';
-import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, DEFAULT_BUTTON_DISPLAY_MODE, DEFAULT_SHOW_TASK_CREATION_DATE, migrateProjectColor } from './utils/constants';
+import { PROJECT_COLORS, DEFAULT_PROJECTS, APP_VERSION, DEFAULT_SWIPE_SETTINGS, STORAGE_KEYS, DEFAULT_DATE_FORMAT, DEFAULT_TASK_LENGTH_LIMIT, DEFAULT_LIGHT_MODE_TONE, DEFAULT_TASK_VIEW_MODE, DEFAULT_VIEW_PROFILE, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_TIME_SCHEDULING_ENABLED, DEFAULT_BUTTON_DISPLAY_MODE, DEFAULT_SHOW_TASK_CREATION_DATE, DEFAULT_PRIORITY_COLORS, migrateProjectColor } from './utils/constants';
 import { getEmailClientPreference } from './utils/emailUtils';
 import { getTodayDateString } from './utils/dateUtils';
 import { isNotificationSupported, sendTaskNotification } from './utils/notificationUtils';
@@ -553,6 +553,30 @@ const TodoApp = () => {
       localStorage.setItem(STORAGE_KEYS.SHOW_TASK_CREATION_DATE, JSON.stringify(val));
     } catch (e) {
       console.error('Failed to save task creation date preference:', e);
+    }
+  };
+
+  const [priorityColors, setPriorityColorsState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.PRIORITY_COLORS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return { ...DEFAULT_PRIORITY_COLORS, ...parsed };
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse priority colors from localStorage:', e);
+    }
+    return DEFAULT_PRIORITY_COLORS;
+  });
+
+  const setPriorityColors = (colors) => {
+    setPriorityColorsState(colors);
+    try {
+      localStorage.setItem(STORAGE_KEYS.PRIORITY_COLORS, JSON.stringify(colors));
+    } catch (e) {
+      console.error('Failed to save priority colors:', e);
     }
   };
 
@@ -1155,6 +1179,7 @@ const TodoApp = () => {
           taskLengthLimit={taskLengthLimit}
           timeSchedulingEnabled={timeSchedulingEnabled}
           buttonDisplayMode={buttonDisplayMode}
+          priorityColors={priorityColors}
         />
 
         <div style={{
@@ -1207,6 +1232,7 @@ const TodoApp = () => {
                 notesAutosaveDelay={notesAutosaveDelay}
                 viewProfile={viewProfile}
                 buttonDisplayMode={buttonDisplayMode}
+                priorityColors={priorityColors}
               />
             </Suspense>
           ) : (
@@ -1303,6 +1329,7 @@ const TodoApp = () => {
                       taskViewMode={taskViewMode}
                       viewProfile={viewProfile}
                       timeSchedulingEnabled={timeSchedulingEnabled}
+                      priorityColors={priorityColors}
                     />
                   ))
                 )}
@@ -1317,13 +1344,14 @@ const TodoApp = () => {
               {onHoldTasksFiltered.length > 0 && (() => {
                 const isSearching = Boolean(searchTerm && searchTerm.trim());
                 const effectiveShowOnHold = isSearching ? true : showOnHold;
+                const onHoldColor = priorityColors?.[4] || DEFAULT_PRIORITY_COLORS[4];
                 return (
                   <div 
                     style={{ 
                       padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
                       margin: 0,
-                      background: dragOverId === 'priority-4' ? 'rgba(147, 51, 234, 0.08)' : 'transparent',
-                      border: dragOverId === 'priority-4' ? '2px dashed #9333ea' : '2px dashed transparent',
+                      background: dragOverId === 'priority-4' ? `${onHoldColor}14` : 'transparent',
+                      border: dragOverId === 'priority-4' ? `2px dashed ${onHoldColor}` : '2px dashed transparent',
                       borderRadius: '6px',
                       boxSizing: 'border-box',
                       transition: 'all 0.2s ease',
@@ -1359,14 +1387,14 @@ const TodoApp = () => {
                           fontWeight: '800',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
-                          color: '#9333ea',
+                          color: onHoldColor,
                           textAlign: 'left'
                         }}>
                           On Hold ({onHoldTasksFiltered.length})
                         </span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', color: '#9333ea' }}>
-                        {effectiveShowOnHold ? <ChevronDown size={16} color="#9333ea" /> : <ChevronRight size={16} color="#9333ea" />}
+                      <div style={{ display: 'flex', alignItems: 'center', color: onHoldColor }}>
+                        {effectiveShowOnHold ? <ChevronDown size={16} color={onHoldColor} /> : <ChevronRight size={16} color={onHoldColor} />}
                       </div>
                     </button>
                     {effectiveShowOnHold && (
@@ -1556,6 +1584,7 @@ const TodoApp = () => {
           timeSchedulingEnabled={timeSchedulingEnabled}
           buttonDisplayMode={buttonDisplayMode}
           showTaskCreationDate={showTaskCreationDate}
+          priorityColors={priorityColors}
         />
       )}
 
@@ -1637,6 +1666,7 @@ const TodoApp = () => {
           backupData={shadowBackupData}
           onConfirm={handleConfirmRestoreShadow}
           onClose={() => setShadowBackupData(null)}
+          priorityColors={priorityColors}
         />
       )}
 
@@ -1720,6 +1750,8 @@ const TodoApp = () => {
         setButtonDisplayMode={setButtonDisplayMode}
         showTaskCreationDate={showTaskCreationDate}
         setShowTaskCreationDate={setShowTaskCreationDate}
+        priorityColors={priorityColors}
+        setPriorityColors={setPriorityColors}
         onOpenExport={() => setShowExportModal(true)}
       />
 

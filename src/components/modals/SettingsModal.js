@@ -78,6 +78,8 @@ const SettingsModal = ({
     setButtonDisplayMode,
     showTaskCreationDate = false,
     setShowTaskCreationDate,
+    priorityColors,
+    setPriorityColors,
     onOpenExport
 }) => {
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -556,6 +558,8 @@ const SettingsModal = ({
                                 setEmailClientPreference={setEmailClientPreference}
                                 notificationsEnabled={notificationsEnabled}
                                 setNotificationsEnabled={setNotificationsEnabled}
+                                priorityColors={priorityColors}
+                                setPriorityColors={setPriorityColors}
                                 styles={styles}
                             />
                         )}

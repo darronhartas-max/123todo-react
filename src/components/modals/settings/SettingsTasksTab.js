@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Clock, Bell } from 'lucide-react';
-import { DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY } from '../../../utils/constants';
+import { DATE_FORMAT_OPTIONS, NOTES_AUTOSAVE_OPTIONS, DEFAULT_NOTES_AUTOSAVE_DELAY, DEFAULT_PRIORITY_COLORS } from '../../../utils/constants';
 import { EMAIL_CLIENT_OPTIONS, getEmailClientPreference, setEmailClientPreference as saveEmailClientPreference } from '../../../utils/emailUtils';
 import { isNotificationSupported, getNotificationPermission, requestNotificationPermission } from '../../../utils/notificationUtils';
+import SettingsPriorityColors from './SettingsPriorityColors';
 
 const SettingsTasksTab = ({
     taskViewMode = 'compact',
@@ -21,6 +22,8 @@ const SettingsTasksTab = ({
     setEmailClientPreference,
     notificationsEnabled = false,
     setNotificationsEnabled,
+    priorityColors = DEFAULT_PRIORITY_COLORS,
+    setPriorityColors,
     styles
 }) => {
     const [localEmailPref, setLocalEmailPref] = useState(() => getEmailClientPreference() || 'default');
@@ -52,6 +55,13 @@ const SettingsTasksTab = ({
                     </button>
                 </div>
             </div>
+
+            {/* Priority Colors Customizer */}
+            <SettingsPriorityColors
+                priorityColors={priorityColors}
+                setPriorityColors={setPriorityColors}
+                styles={styles}
+            />
 
             {/* Date Format Order Preference */}
             <div style={styles.settingRow}>

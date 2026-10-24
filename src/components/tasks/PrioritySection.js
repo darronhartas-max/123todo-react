@@ -23,9 +23,11 @@ const PrioritySection = ({
     taskViewMode = 'compact',
     viewProfile = 'lite',
     timeSchedulingEnabled = true,
-    searchTerm = ''
+    searchTerm = '',
+    priorityColors
 }) => {
-    const config = PRIORITIES[priority];
+    const effectiveColor = (priorityColors && priorityColors[priority]) || PRIORITIES[priority]?.color;
+    const config = { ...PRIORITIES[priority], color: effectiveColor, dotColor: effectiveColor };
     const sectionTasks = tasks.filter(t => t.priority === priority);
 
     const projectLookup = useMemo(() => {
@@ -179,7 +181,8 @@ const PrioritySection = ({
                                 listStyle: 'none', 
                                 margin: 0, 
                                 minHeight: (isDragOverSection || sectionTasks.length === 0) ? '60px' : 'auto',
-                                border: isDragOverSection ? '2px dashed var(--accent-color)' : '2px dashed transparent',
+                                border: isDragOverSection ? `2px dashed ${config.color}` : '2px dashed transparent',
+                                background: isDragOverSection ? `${config.color}14` : 'transparent',
                                 borderRadius: '6px',
                                 transition: 'all 0.2s ease',
                                 boxSizing: 'border-box',

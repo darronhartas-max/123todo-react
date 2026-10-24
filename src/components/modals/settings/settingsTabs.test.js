@@ -9,7 +9,8 @@ import {
     SettingsVoiceTab,
     SettingsShortcutsTab,
     SettingsSyncTab,
-    SettingsAboutTab
+    SettingsAboutTab,
+    SettingsPriorityColors
 } from './index';
 
 describe('Settings Tabs Micro-Components', () => {
@@ -241,6 +242,99 @@ describe('Settings Tabs Micro-Components', () => {
             render(<SettingsVoiceTab styles={mockStyles} />);
             expect(screen.getByText(/desktop dictation/i)).toBeInTheDocument();
             expect(screen.getByText(/auto-submit command/i)).toBeInTheDocument();
+        });
+    });
+
+    describe('SettingsPriorityColors', () => {
+        test('renders all 4 priority tiers and allows selecting colors', () => {
+            const setPriorityColors = jest.fn();
+            render(
+                <SettingsPriorityColors
+                    priorityColors={{
+                        1: '#dc2626',
+                        2: '#f59e0b',
+                        3: '#6b7280',
+                        4: '#9333ea'
+                    }}
+                    setPriorityColors={setPriorityColors}
+                    styles={mockStyles}
+                />
+            );
+
+            expect(screen.getByText('Priority Label Colors')).toBeInTheDocument();
+            expect(screen.getAllByText('Must Do').length).toBeGreaterThanOrEqual(1);
+            expect(screen.getByText('Should Do')).toBeInTheDocument();
+            expect(screen.getByText('Could Do')).toBeInTheDocument();
+            expect(screen.getByText('On Hold')).toBeInTheDocument();
+
+            // Click a swatch from the palette (e.g. #3b82f6 - Vivid Blue)
+            const blueSwatch = screen.getByTitle('#3b82f6');
+            fireEvent.click(blueSwatch);
+
+            expect(setPriorityColors).toHaveBeenCalledWith(expect.objectContaining({
+                1: '#3b82f6'
+            }));
+        });
+
+        test('allows resetting individual and all modified priority colors', () => {
+            const setPriorityColors = jest.fn();
+            render(
+                <SettingsPriorityColors
+                    priorityColors={{
+                        1: '#3b82f6', // Modified Must Do
+                        2: '#f59e0b',
+                        3: '#6b7280',
+                        4: '#9333ea'
+                    }}
+                    setPriorityColors={setPriorityColors}
+                    styles={mockStyles}
+                />
+            );
+
+            // "Reset to Default" should be visible for modified Must Do
+            const resetSingleBtn = screen.getByRole('button', { name: /reset to default/i });
+            fireEvent.click(resetSingleBtn);
+            expect(setPriorityColors).toHaveBeenCalledWith(expect.objectContaining({
+                1: '#dc2626'
+            }));
+
+            // "Reset All Defaults" should also be visible
+            const resetAllBtn = screen.getByRole('button', { name: /reset all defaults/i });
+            fireEvent.click(resetAllBtn);
+            expect(setPriorityColors).toHaveBeenCalledWith({
+                1: '#dc2626',
+                2: '#f59e0b',
+                3: '#6b7280',
+                4: '#9333ea'
+            });
+        });
+
+        test('switches active priority and selects color for that priority', () => {
+            const setPriorityColors = jest.fn();
+            render(
+                <SettingsPriorityColors
+                    priorityColors={{
+                        1: '#dc2626',
+                        2: '#f59e0b',
+                        3: '#6b7280',
+                        4: '#9333ea'
+                    }}
+                    setPriorityColors={setPriorityColors}
+                    styles={mockStyles}
+                />
+            );
+
+            // Switch to "On Hold" (P4)
+            const onHoldBtn = screen.getByText('On Hold').closest('button');
+            fireEvent.click(onHoldBtn);
+
+            // Select green swatch
+            const greenSwatch = screen.getByTitle('#10b981');
+            fireEvent.click(greenSwatch);
+
+            expect(setPriorityColors).toHaveBeenCalledWith(expect.objectContaining({
+                4: '#10b981'
+            }));
         });
     });
 

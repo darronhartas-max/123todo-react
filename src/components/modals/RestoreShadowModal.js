@@ -1,8 +1,9 @@
 import React from 'react';
 import { COMMON_STYLES } from '../../utils/styles';
 import { AlertTriangle, Clock, Database, Archive, Layers, Check } from 'lucide-react';
+import { DEFAULT_PRIORITY_COLORS } from '../../utils/constants';
 
-const RestoreShadowModal = ({ backupData, onConfirm, onClose }) => {
+const RestoreShadowModal = ({ backupData, onConfirm, onClose, priorityColors }) => {
     const dateStr = new Date(backupData.timestamp).toLocaleString();
     const activeCount = backupData.tasks?.length || 0;
     const archivedCount = backupData.archived?.length || 0;
@@ -106,7 +107,7 @@ const RestoreShadowModal = ({ backupData, onConfirm, onClose }) => {
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            backgroundColor: priority === 1 ? '#dc2626' : (priority === 2 ? '#f59e0b' : (priority === 3 ? '#6b7280' : '#9333ea')),
+            backgroundColor: (priorityColors && priorityColors[priority]) || DEFAULT_PRIORITY_COLORS[priority] || '#6b7280',
             flexShrink: 0
         }),
         buttonContainer: {

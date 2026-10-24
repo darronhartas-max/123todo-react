@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PRIORITIES } from '../../../utils/constants';
+import { getPriorities } from '../../../utils/constants';
 import { ChevronDown } from 'lucide-react';
 
 const PrioritySelector = ({
@@ -11,7 +11,8 @@ const PrioritySelector = ({
     containerStyle = {},
     actionButton,
     isOpen: controlledIsOpen,
-    onToggleOpen
+    onToggleOpen,
+    priorityColors
 }) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isControlled = typeof controlledIsOpen === 'boolean';
@@ -26,7 +27,8 @@ const PrioritySelector = ({
         }
     };
 
-    const activePriority = PRIORITIES[priority] || PRIORITIES[1];
+    const effectivePriorities = getPriorities(priorityColors);
+    const activePriority = effectivePriorities[priority] || effectivePriorities[1];
 
     if (mode === 'dropdown') {
         return (
@@ -113,7 +115,7 @@ const PrioritySelector = ({
                             overflow: 'hidden',
                             padding: '4px 0'
                         }}>
-                            {Object.entries(PRIORITIES).map(([val, conf]) => {
+                            {Object.entries(effectivePriorities).map(([val, conf]) => {
                                 const isSel = parseInt(val, 10) === priority;
                                 return (
                                     <div
@@ -169,7 +171,7 @@ const PrioritySelector = ({
         }}>
             {[1, 2, 3].map(p => {
                 const isSelected = priority === p;
-                const conf = PRIORITIES[p];
+                const conf = effectivePriorities[p];
                 return (
                     <button
                         key={p}

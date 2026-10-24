@@ -5,7 +5,7 @@ import {
   Flag, Check, Clock, Camera, Copy,
   Square, CheckSquare, ListChecks, Edit2
 } from 'lucide-react';
-import { PRIORITIES } from '../../utils/constants';
+import { getPriorities } from '../../utils/constants';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from './PhotoAttachments';
 import { renderActionableText, ActionableEntitiesBar, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
@@ -25,7 +25,8 @@ const NoteCard = ({
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
   viewProfile = 'pro',
-  buttonDisplayMode = 'icons'
+  buttonDisplayMode = 'icons',
+  priorityColors
 }) => {
   const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
   const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
@@ -126,7 +127,8 @@ const NoteCard = ({
   const hasAssociatedNote = Boolean((note.notes && note.notes.trim().length > 0) || (notesText && notesText.trim().length > 0));
 
   const currentProject = projects.find(p => p.id === note.projectId) || { id: 'general', name: 'Unassigned Inbox', color: '#6b7280' };
-  const currentPriorityConfig = (note.priority && PRIORITIES[note.priority]) ? PRIORITIES[note.priority] : null;
+  const effectivePriorities = getPriorities(priorityColors);
+  const currentPriorityConfig = (note.priority && effectivePriorities[note.priority]) ? effectivePriorities[note.priority] : null;
   const priorityColor = currentPriorityConfig ? currentPriorityConfig.color : '#2563eb';
   const priorityBg = currentPriorityConfig ? `${currentPriorityConfig.color}18` : 'rgba(37, 99, 235, 0.1)';
   const priorityBorder = currentPriorityConfig ? `1px solid ${currentPriorityConfig.color}40` : '1px solid rgba(37, 99, 235, 0.2)';
@@ -1294,7 +1296,7 @@ const NoteCard = ({
                       Assign Priority:
                     </div>
                     {[1, 2, 3, 4].map(p => {
-                      const pConfig = PRIORITIES[p];
+                      const pConfig = effectivePriorities[p];
                       const isSelected = note.priority === p;
                       return (
                         <button

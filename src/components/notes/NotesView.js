@@ -28,7 +28,8 @@ const NotesView = ({
   notesFontSize = 18,
   notesAutosaveDelay = '60s',
   viewProfile = 'lite',
-  buttonDisplayMode = 'icons'
+  buttonDisplayMode = 'icons',
+  priorityColors
 }) => {
   const showBtnIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
   const showBtnText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
@@ -824,6 +825,7 @@ const NotesView = ({
               notesAutosaveDelay={notesAutosaveDelay}
               viewProfile={viewProfile}
               buttonDisplayMode={buttonDisplayMode}
+              priorityColors={priorityColors}
             />
           ))}
         </div>

@@ -71,6 +71,27 @@ describe('Task Editor Micro-Components', () => {
             fireEvent.click(couldDoOption);
             expect(onChange).toHaveBeenCalledWith(3);
         });
+
+        test('applies custom priority colors to buttons', () => {
+            const onChange = jest.fn();
+            render(
+                <PrioritySelector
+                    priority={1}
+                    onChangePriority={onChange}
+                    mode="buttons"
+                    priorityColors={{
+                        1: '#3b82f6', // Custom Blue for Must Do
+                        2: '#10b981', // Custom Green for Should Do
+                        3: '#8b5cf6',
+                        4: '#ec4899'
+                    }}
+                />
+            );
+
+            const mustDoBtn = screen.getByRole('button', { name: 'Must Do' });
+            expect(mustDoBtn.style.borderColor).toBe('#3b82f6');
+            expect(mustDoBtn.style.backgroundColor).toBe('rgb(59, 130, 246)');
+        });
     });
 
     describe('RecurrencePicker', () => {
