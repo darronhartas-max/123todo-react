@@ -198,6 +198,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.11': [
+    { title: '📋 Stable Kanban Columns on Empty Board:', desc: 'Fixed an issue in the desktop Kanban columns layout where clearing all tasks caused categories to collapse into a narrow strip on the left. Priority columns now remain evenly distributed across the board with dedicated drop targets and empty-state indicators. This bug fix was kindly suggested by user \'Fae\'.' }
+  ],
   '3.8.10': [
     { title: '🎨 Customizable Priority Label Colors in Settings:', desc: 'Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors. This feature was kindly suggested by user \'Fae\'.' },
     { title: '🔄 Dynamic Priority Color Theming Throughout App:', desc: 'Custom priority colors dynamically update across all task sections, modal editors, dropdowns, drag-and-drop hover zones, note priority tags, and restore modals while preserving default colors as the baseline.' }

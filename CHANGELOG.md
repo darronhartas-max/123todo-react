@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.11
+
+- **📋 Stable Kanban Columns on Empty Board:** Fixed an issue in the desktop Kanban columns layout where clearing all tasks caused categories to collapse into a narrow strip on the left. Priority columns now remain evenly distributed across the board with dedicated drop targets and empty-state indicators. This bug fix was kindly suggested by user 'Fae'.
+
 ### v3.8.10
 
 - **🎨 Customizable Priority Label Colors in Settings:** Added priority color customization in Settings under Tasks. Users can now choose distinct colors for Must Do, Should Do, Could Do, and On Hold from a 24-color curated palette or custom color picker, with options to reset individual or all priorities back to default colors. This feature was kindly suggested by user 'Fae'.

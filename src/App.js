@@ -1330,16 +1330,17 @@ const TodoApp = () => {
                       viewProfile={viewProfile}
                       timeSchedulingEnabled={timeSchedulingEnabled}
                       priorityColors={priorityColors}
+                      isWideLayout={isWideLayout}
                     />
                   ))
                 )}
-
-                {filteredTasks.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted-text)', width: '100%' }}>
-                    {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
-                  </div>
-                )}
               </div>
+
+              {filteredTasks.length === 0 && (
+                <div style={{ textAlign: 'center', padding: isWideLayout ? '16px 20px 24px' : '40px 20px', color: 'var(--muted-text)', width: '100%', boxSizing: 'border-box' }}>
+                  {searchTerm ? 'No tasks matching your search.' : (currentProjectId === 'all' ? 'No tasks yet. Add one to get started!' : `No tasks in this project.`)}
+                </div>
+              )}
 
               {onHoldTasksFiltered.length > 0 && (() => {
                 const isSearching = Boolean(searchTerm && searchTerm.trim());

@@ -24,7 +24,8 @@ const PrioritySection = ({
     viewProfile = 'lite',
     timeSchedulingEnabled = true,
     searchTerm = '',
-    priorityColors
+    priorityColors,
+    isWideLayout = false
 }) => {
     const effectiveColor = (priorityColors && priorityColors[priority]) || PRIORITIES[priority]?.color;
     const config = { ...PRIORITIES[priority], color: effectiveColor, dotColor: effectiveColor };
@@ -41,7 +42,7 @@ const PrioritySection = ({
     }, [projects]);
 
     const [isCollapsed, setIsCollapsed] = useState(() => {
-        if (viewProfile === 'lite' && priority !== 1) {
+        if (!isWideLayout && viewProfile === 'lite' && priority !== 1) {
             return true;
         }
         try {
@@ -96,13 +97,18 @@ const PrioritySection = ({
     if (sectionTasks.length === 0 && priority === 4) return null; // Hide On Hold if empty
 
     const isSearching = Boolean(searchTerm && searchTerm.trim());
-    const isEffectiveCollapsed = isSearching ? (sectionTasks.length === 0) : isCollapsed;
+    const isEffectiveCollapsed = isSearching ? (!isWideLayout && sectionTasks.length === 0) : isCollapsed;
     const isDragOverSection = dragOverId === `priority-${priority}`;
     const shouldShowList = !isEffectiveCollapsed || isDragOverSection;
 
     return (
         <div 
-            style={{ marginBottom: 'var(--section-margin, 16px)', flex: 1, minWidth: 0 }}
+            style={{ 
+                marginBottom: 'var(--section-margin, 16px)', 
+                flex: isWideLayout ? '1 1 0px' : 1, 
+                minWidth: isWideLayout ? '220px' : 0,
+                boxSizing: 'border-box'
+            }}
             onDragOver={(e) => handleDragOver(e, `priority-${priority}`)}
             onDrop={(e) => handleDrop(e, `priority-${priority}`)}
         >
@@ -189,6 +195,24 @@ const PrioritySection = ({
                                 padding: isDragOverSection ? '4px 0' : '0'
                             }}
                         >
+                            {sectionTasks.length === 0 && isWideLayout && !isDragOverSection && (
+                                <li style={{
+                                    listStyle: 'none',
+                                    border: '1.5px dashed var(--border-color)',
+                                    borderRadius: '8px',
+                                    padding: '24px 12px',
+                                    textAlign: 'center',
+                                    color: 'var(--muted-text)',
+                                    fontSize: '0.82rem',
+                                    fontWeight: '500',
+                                    background: 'var(--item-bg)',
+                                    pointerEvents: 'none',
+                                    userSelect: 'none',
+                                    margin: '4px 0'
+                                }}>
+                                    No {config.label.toLowerCase()} tasks
+                                </li>
+                            )}
                             <AnimatePresence initial={false}>
                                 {sectionTasks.map(task => {
                                     const project = task.projectId ? projectLookup.get(task.projectId.toLowerCase()) : undefined;
