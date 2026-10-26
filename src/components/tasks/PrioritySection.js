@@ -127,7 +127,7 @@ const PrioritySection = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginTop: '6px',
+                    marginTop: isWideLayout ? '10px' : (priority === 1 ? '18px' : '6px'),
                     marginBottom: '6px',
                     cursor: 'pointer',
                     userSelect: 'none',

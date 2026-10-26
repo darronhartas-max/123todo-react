@@ -198,6 +198,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.14': [
+    { title: '📐 Balanced Section Spacing & Uncramped Views:', desc: 'Added comfortable vertical spacing above the "1 Must Do" priority heading below project tabs and below the "Scheduled & Recurring" heading in collapsed view, eliminating cramped layouts and balancing space above the Archive section.' },
+    { title: '📅 Refined Header Date Size & Width Fit:', desc: 'Slightly enlarged the header date typography for crisper legibility while constraining its width so it never exceeds the Tasks/Notes mode toggle pill directly above it.' }
+  ],
   '3.8.13': [
     { title: '🎨 Polished Header Date Spacing:', desc: 'Added polished breathing room and a visual spacing gap between the top date and the Tasks/Notes toggle pill in the header for a refined aesthetic.' },
     { title: '📐 Uniform Line Spacing Across Collapsed Priorities:', desc: 'Standardized the vertical line spacing between all collapsed priority headings (1 Must Do, 2 Should Do, 3 Could Do, On Hold, and Scheduled) for consistent visual rhythm.' },

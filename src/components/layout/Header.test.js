@@ -42,4 +42,17 @@ describe('Header Component', () => {
         fireEvent.click(notesBtn);
         expect(onSwitchModeMock).toHaveBeenCalledWith('notes');
     });
+
+    test('constrains date display width so it does not exceed mode switcher lozenge', () => {
+        const todayUK = formatDisplayDate(getTodayDateString(), 'UK');
+        render(
+            <Header
+                dateFormat="UK"
+                buttonDisplayMode="icons"
+            />
+        );
+
+        const dateEl = screen.getByText(todayUK);
+        expect(dateEl).toHaveStyle({ maxWidth: '90px', whiteSpace: 'nowrap', overflow: 'hidden' });
+    });
 });

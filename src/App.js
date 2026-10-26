@@ -1359,7 +1359,7 @@ const TodoApp = () => {
                       borderRadius: '6px',
                       boxSizing: 'border-box',
                       transition: 'all 0.2s ease',
-                      marginBottom: effectiveShowOnHold ? 'var(--section-margin, 16px)' : '0px'
+                      marginBottom: effectiveShowOnHold ? 'var(--section-margin, 16px)' : (filteredScheduled.length > 0 ? '0px' : '16px')
                     }}
                     onDragOver={(e) => handleDragOver(e, 'priority-4')}
                     onDrop={(e) => handleDrop(e, 'priority-4')}
@@ -1469,7 +1469,7 @@ const TodoApp = () => {
                   background: 'transparent',
                   border: 'none',
                   boxSizing: 'border-box',
-                  marginBottom: effectiveShowScheduled ? 'var(--section-margin, 16px)' : '0px'
+                  marginBottom: effectiveShowScheduled ? 'var(--section-margin, 16px)' : '16px'
                 }}
               >
                 <button

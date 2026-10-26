@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.14
+
+- **📐 Balanced Section Spacing & Uncramped Views:** Added comfortable vertical spacing above the "1 Must Do" priority heading below project tabs and below the "Scheduled & Recurring" heading in collapsed view, eliminating cramped layouts and balancing space above the Archive section.
+- **📅 Refined Header Date Size & Width Fit:** Slightly enlarged the header date typography for crisper legibility while constraining its width so it never exceeds the Tasks/Notes mode toggle pill directly above it.
+
 ### v3.8.13
 
 - **🎨 Polished Header Date Spacing:** Added polished breathing room and a visual spacing gap between the top date and the Tasks/Notes toggle pill in the header for a refined aesthetic.
