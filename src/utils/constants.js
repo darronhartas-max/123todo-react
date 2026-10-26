@@ -198,6 +198,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.13': [
+    { title: '🎨 Polished Header Date Spacing:', desc: 'Added polished breathing room and a visual spacing gap between the top date and the Tasks/Notes toggle pill in the header for a refined aesthetic.' },
+    { title: '📐 Uniform Line Spacing Across Collapsed Priorities:', desc: 'Standardized the vertical line spacing between all collapsed priority headings (1 Must Do, 2 Should Do, 3 Could Do, On Hold, and Scheduled) for consistent visual rhythm.' },
+    { title: '📦 Direct Archive Opening Without Keyboard Pop-up:', desc: 'Removed automatic input focusing on the Archive search bar so mobile users can immediately view recently archived tasks without the virtual keyboard obscuring the list.' }
+  ],
   '3.8.12': [
     { title: '📅 Today\'s Date in Top Header:', desc: 'Added today\'s date formatted to your preferred date setting right below the Tasks/Notes toggle at the top of the header, providing convenient instant visibility on mobile screens.' },
     { title: '🔢 1-2-3 Priority Headings & Uniform Badges:', desc: 'Numbered priority headings to "1 Must Do", "2 Should Do", and "3 Could Do" to align with the core 1-2-3 methodology. Replaced plain count text in On Hold and Scheduled headings with matching circular count badge pills.' },

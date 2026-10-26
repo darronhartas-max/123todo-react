@@ -17,6 +17,12 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.13
+
+- **🎨 Polished Header Date Spacing:** Added polished breathing room and a visual spacing gap between the top date and the Tasks/Notes toggle pill in the header for a refined aesthetic.
+- **📐 Uniform Line Spacing Across Collapsed Priorities:** Standardized the vertical line spacing between all collapsed priority headings (1 Must Do, 2 Should Do, 3 Could Do, On Hold, and Scheduled) for consistent visual rhythm.
+- **📦 Direct Archive Opening Without Keyboard Pop-up:** Removed automatic input focusing on the Archive search bar so mobile users can immediately view recently archived tasks without the virtual keyboard obscuring the list.
+
 ### v3.8.12
 
 - **📅 Today's Date in Top Header:** Added today's date formatted to your preferred date setting right below the Tasks/Notes toggle at the top of the header, providing convenient instant visibility on mobile screens.

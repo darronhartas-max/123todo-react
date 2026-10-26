@@ -127,7 +127,7 @@ const PrioritySection = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginTop: '12px',
+                    marginTop: '6px',
                     marginBottom: '6px',
                     cursor: 'pointer',
                     userSelect: 'none',

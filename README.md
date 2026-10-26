@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.12** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.13** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.12 (Current)
+### v3.8.13 (Current)
+
+- **Polished Header Date Spacing**: Added polished breathing room and a visual spacing gap between the top date and the Tasks/Notes toggle pill in the header for a refined, professional aesthetic.
+- **Uniform Line Spacing Across Collapsed Priorities**: Standardized the vertical line spacing between all collapsed priority headings (1 Must Do, 2 Should Do, 3 Could Do, On Hold, and Scheduled) for consistent visual rhythm.
+- **Direct Archive Opening Without Keyboard Pop-up**: Removed automatic input focusing on the Archive search bar so mobile users can immediately view recently archived tasks without the virtual keyboard obscuring the list.
+
+### v3.8.12
 
 - **Today's Date in Top Header**: Added today's date formatted to your preferred date format setting right below the Tasks/Notes toggle pill in the top header, providing convenient instant date visibility on mobile devices.
 - **1-2-3 Priority Headings & Uniform Badges**: Numbered priority headings to "1 Must Do", "2 Should Do", and "3 Could Do" to align with the core 1-2-3 methodology. Replaced plain count text in On Hold and Scheduled headings with matching circular count badge pills.

@@ -1123,7 +1123,7 @@ const TodoApp = () => {
       alignItems: 'stretch',
       overflowX: isWideLayout ? 'auto' : 'visible',
       WebkitOverflowScrolling: 'touch',
-      paddingBottom: isWideLayout ? '12px' : '8px'
+      paddingBottom: isWideLayout ? '12px' : '0px'
     },
     toggleSection: {
       padding: '12px',
@@ -1350,7 +1350,9 @@ const TodoApp = () => {
                 return (
                   <div 
                     style={{ 
-                      padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
+                      padding: isCompact 
+                        ? (effectiveShowOnHold ? '0 6px 6px 6px' : '0 6px') 
+                        : (effectiveShowOnHold ? '0 12px 8px 12px' : '0 12px'),
                       margin: 0,
                       background: dragOverId === 'priority-4' ? `${onHoldColor}14` : 'transparent',
                       border: dragOverId === 'priority-4' ? `2px dashed ${onHoldColor}` : '2px dashed transparent',
@@ -1376,7 +1378,7 @@ const TodoApp = () => {
                         cursor: 'pointer',
                         userSelect: 'none',
                         padding: '2px 4px',
-                        marginTop: '12px',
+                        marginTop: '6px',
                         marginBottom: '6px',
                         borderRadius: '4px',
                         textAlign: 'left',
@@ -1460,7 +1462,9 @@ const TodoApp = () => {
             return (
               <div 
                 style={{ 
-                  padding: isCompact ? '0 6px 6px 6px' : '0 12px 8px 12px',
+                  padding: isCompact 
+                    ? (effectiveShowScheduled ? '0 6px 6px 6px' : '0 6px') 
+                    : (effectiveShowScheduled ? '0 12px 8px 12px' : '0 12px'),
                   margin: 0,
                   background: 'transparent',
                   border: 'none',
@@ -1482,7 +1486,7 @@ const TodoApp = () => {
                     cursor: 'pointer',
                     userSelect: 'none',
                     padding: '2px 4px',
-                    marginTop: '12px',
+                    marginTop: '6px',
                     marginBottom: '6px',
                     borderRadius: '4px',
                     textAlign: 'left',

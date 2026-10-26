@@ -417,7 +417,6 @@ const ArchiveModal = ({ archived = [], projects = [], onRestore, onDelete, onUpd
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={styles.searchInput}
-                            autoFocus
                         />
                         {searchQuery && (
                             <button

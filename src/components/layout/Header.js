@@ -159,8 +159,8 @@ const Header = ({
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '2px',
-                        marginTop: '-2px'
+                        gap: '6px',
+                        marginTop: '-3px'
                     }}>
                         <div style={styles.modeToggleContainer}>
                             <button
@@ -183,12 +183,13 @@ const Header = ({
                             </button>
                         </div>
                         <span style={{
-                            fontSize: 'clamp(11px, 2.7vw, 12px)',
+                            fontSize: 'clamp(11px, 2.6vw, 12px)',
                             fontWeight: '700',
                             color: 'var(--muted-text)',
-                            letterSpacing: '0.2px',
-                            lineHeight: 1,
-                            userSelect: 'none'
+                            letterSpacing: '0.3px',
+                            lineHeight: '1.2',
+                            userSelect: 'none',
+                            textAlign: 'center'
                         }}>
                             {todayFormatted}
                         </span>
