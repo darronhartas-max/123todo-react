@@ -1,5 +1,7 @@
 import React from 'react';
 import { ListTodo, NotebookPen, Download, BookOpen } from 'lucide-react';
+import { formatDisplayDate, getTodayDateString } from '../../utils/dateUtils';
+import { DEFAULT_DATE_FORMAT } from '../../utils/constants';
 
 const Header = ({
     isDark,
@@ -9,10 +11,12 @@ const Header = ({
     onOpenInstall,
     buttonDisplayMode = 'icons',
     showGettingStarted = false,
-    onGettingStartedClick
+    onGettingStartedClick,
+    dateFormat = DEFAULT_DATE_FORMAT
 }) => {
     const showIcons = buttonDisplayMode === 'icons' || buttonDisplayMode === 'both';
     const showText = buttonDisplayMode === 'text' || buttonDisplayMode === 'both';
+    const todayFormatted = formatDisplayDate(getTodayDateString(), dateFormat);
 
     const styles = {
         header: {
@@ -149,26 +153,45 @@ const Header = ({
                         </button>
                     )}
 
-                    {/* Dual Skin Mode Switcher Toggle Pill */}
-                    <div style={styles.modeToggleContainer}>
-                        <button
-                            style={styles.modeButton(appMode === 'tasks')}
-                            onClick={() => onSwitchMode('tasks')}
-                            aria-label="Tasks"
-                            title="Switch to Task Manager Mode"
-                        >
-                            {showIcons && <ListTodo size={16} />}
-                            {showText && <span>Tasks</span>}
-                        </button>
-                        <button
-                            style={styles.modeButton(appMode === 'notes')}
-                            onClick={() => onSwitchMode('notes')}
-                            aria-label="Notes"
-                            title="Switch to Notes Mode"
-                        >
-                            {showIcons && <NotebookPen size={16} />}
-                            {showText && <span>Notes</span>}
-                        </button>
+                    {/* Dual Skin Mode Switcher Toggle Pill & Today's Date */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        marginTop: '-2px'
+                    }}>
+                        <div style={styles.modeToggleContainer}>
+                            <button
+                                style={styles.modeButton(appMode === 'tasks')}
+                                onClick={() => onSwitchMode('tasks')}
+                                aria-label="Tasks"
+                                title="Switch to Task Manager Mode"
+                            >
+                                {showIcons && <ListTodo size={16} />}
+                                {showText && <span>Tasks</span>}
+                            </button>
+                            <button
+                                style={styles.modeButton(appMode === 'notes')}
+                                onClick={() => onSwitchMode('notes')}
+                                aria-label="Notes"
+                                title="Switch to Notes Mode"
+                            >
+                                {showIcons && <NotebookPen size={16} />}
+                                {showText && <span>Notes</span>}
+                            </button>
+                        </div>
+                        <span style={{
+                            fontSize: 'clamp(11px, 2.7vw, 12px)',
+                            fontWeight: '700',
+                            color: 'var(--muted-text)',
+                            letterSpacing: '0.2px',
+                            lineHeight: 1,
+                            userSelect: 'none'
+                        }}>
+                            {todayFormatted}
+                        </span>
                     </div>
                 </div>
             </div>

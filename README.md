@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.11** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.12** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,13 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.11 (Current)
+### v3.8.12 (Current)
+
+- **Today's Date in Top Header**: Added today's date formatted to your preferred date format setting right below the Tasks/Notes toggle pill in the top header, providing convenient instant date visibility on mobile devices.
+- **1-2-3 Priority Headings & Uniform Badges**: Numbered priority headings to "1 Must Do", "2 Should Do", and "3 Could Do" to align with the core 1-2-3 methodology. Replaced plain count text in On Hold and Scheduled headings with matching circular count badge pills.
+- **Clean Archive Trigger & Consistent Spacing**: Simplified the Archive section heading to clean "Archive" without icon clutter, and eliminated extraneous vertical spacing between priority sections for consistent line spacing.
+
+### v3.8.11
 
 - **Stable Desktop Kanban Columns on Empty Board**: Fixed an issue in the desktop Kanban columns layout where clearing all tasks caused categories to collapse into a narrow strip on the left side. Priority columns now maintain equal widths across the board with dedicated empty drop targets and indicators. This bug fix was kindly suggested by user 'Fae'.
 

@@ -19,7 +19,7 @@ describe('PrioritySection Component', () => {
             />
         );
 
-        expect(screen.getByText('Must Do')).toBeInTheDocument();
+        expect(screen.getByText('1 Must Do')).toBeInTheDocument();
         expect(screen.getByText('1')).toBeInTheDocument();
         expect(screen.getByText('Important task')).toBeInTheDocument();
     });
@@ -34,7 +34,7 @@ describe('PrioritySection Component', () => {
             />
         );
 
-        expect(screen.getByText('Must Do')).toBeInTheDocument();
+        expect(screen.getByText('1 Must Do')).toBeInTheDocument();
         expect(screen.getByText('0')).toBeInTheDocument();
         expect(screen.getByText(/no must do tasks/i)).toBeInTheDocument();
     });
@@ -66,10 +66,10 @@ describe('PrioritySection Component', () => {
             />
         );
 
-        const collapseTrigger = screen.getByTitle('Collapse Must Do');
+        const collapseTrigger = screen.getByTitle('Collapse 1 Must Do');
         fireEvent.click(collapseTrigger);
 
-        // After clicking collapse, header title switches to 'Expand Must Do'
-        expect(screen.getByTitle('Expand Must Do')).toBeInTheDocument();
+        // After clicking collapse, header title switches to 'Expand 1 Must Do'
+        expect(screen.getByTitle('Expand 1 Must Do')).toBeInTheDocument();
     });
 });

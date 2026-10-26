@@ -198,6 +198,11 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.12': [
+    { title: '📅 Today\'s Date in Top Header:', desc: 'Added today\'s date formatted to your preferred date setting right below the Tasks/Notes toggle at the top of the header, providing convenient instant visibility on mobile screens.' },
+    { title: '🔢 1-2-3 Priority Headings & Uniform Badges:', desc: 'Numbered priority headings to "1 Must Do", "2 Should Do", and "3 Could Do" to align with the core 1-2-3 methodology. Replaced plain count text in On Hold and Scheduled headings with matching circular count badge pills.' },
+    { title: '✨ Clean Archive Trigger & Streamlined Spacing:', desc: 'Simplified the Archive section heading to clean "Archive" without icon clutter, and eliminated extraneous vertical spacing between priority sections for consistent line spacing.' }
+  ],
   '3.8.11': [
     { title: '📋 Stable Kanban Columns on Empty Board:', desc: 'Fixed an issue in the desktop Kanban columns layout where clearing all tasks caused categories to collapse into a narrow strip on the left. Priority columns now remain evenly distributed across the board with dedicated drop targets and empty-state indicators. This bug fix was kindly suggested by user \'Fae\'.' }
   ],

@@ -101,10 +101,18 @@ const PrioritySection = ({
     const isDragOverSection = dragOverId === `priority-${priority}`;
     const shouldShowList = !isEffectiveCollapsed || isDragOverSection;
 
+    const getHeadingLabel = (p, label) => {
+        if (p === 1) return label?.startsWith('1') ? label : `1 ${label}`;
+        if (p === 2) return label?.startsWith('2') ? label : `2 ${label}`;
+        if (p === 3) return label?.startsWith('3') ? label : `3 ${label}`;
+        return label;
+    };
+    const headingText = getHeadingLabel(priority, config.label);
+
     return (
         <div 
             style={{ 
-                marginBottom: 'var(--section-margin, 16px)', 
+                marginBottom: isWideLayout ? 'var(--section-margin, 16px)' : (isEffectiveCollapsed ? '0px' : 'var(--section-margin, 16px)'), 
                 flex: isWideLayout ? '1 1 0px' : 1, 
                 minWidth: isWideLayout ? '220px' : 0,
                 boxSizing: 'border-box'
@@ -114,7 +122,7 @@ const PrioritySection = ({
         >
             <div
                 onClick={toggleCollapse}
-                title={isEffectiveCollapsed ? `Expand ${config.label}` : `Collapse ${config.label}`}
+                title={isEffectiveCollapsed ? `Expand ${headingText}` : `Collapse ${headingText}`}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -138,7 +146,7 @@ const PrioritySection = ({
                         color: config.color,
                         textAlign: 'left'
                     }}>
-                        {config.label}
+                        {headingText}
                     </h3>
                     <span style={{
                         fontSize: '0.72rem',
@@ -186,7 +194,7 @@ const PrioritySection = ({
                             style={{ 
                                 listStyle: 'none', 
                                 margin: 0, 
-                                minHeight: (isDragOverSection || sectionTasks.length === 0) ? '60px' : 'auto',
+                                minHeight: (isDragOverSection || (isWideLayout && sectionTasks.length === 0)) ? '60px' : 'auto',
                                 border: isDragOverSection ? `2px dashed ${config.color}` : '2px dashed transparent',
                                 background: isDragOverSection ? `${config.color}14` : 'transparent',
                                 borderRadius: '6px',

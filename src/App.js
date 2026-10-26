@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Archive, ChevronDown, ChevronRight } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import SocialShare from './components/layout/SocialShare';
@@ -1167,6 +1167,7 @@ const TodoApp = () => {
           buttonDisplayMode={buttonDisplayMode}
           showGettingStarted={!hasStartedUsingApp}
           onGettingStartedClick={markStartedUsingApp}
+          dateFormat={dateFormat}
         />
 
         <AddTask
@@ -1356,7 +1357,7 @@ const TodoApp = () => {
                       borderRadius: '6px',
                       boxSizing: 'border-box',
                       transition: 'all 0.2s ease',
-                      marginBottom: 'var(--section-margin, 16px)'
+                      marginBottom: effectiveShowOnHold ? 'var(--section-margin, 16px)' : '0px'
                     }}
                     onDragOver={(e) => handleDragOver(e, 'priority-4')}
                     onDrop={(e) => handleDrop(e, 'priority-4')}
@@ -1391,7 +1392,17 @@ const TodoApp = () => {
                           color: onHoldColor,
                           textAlign: 'left'
                         }}>
-                          On Hold ({onHoldTasksFiltered.length})
+                          On Hold
+                        </span>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: '700',
+                          padding: '1px 6px',
+                          borderRadius: '10px',
+                          background: !effectiveShowOnHold ? 'var(--accent-bg)' : 'rgba(0, 0, 0, 0.05)',
+                          color: !effectiveShowOnHold ? 'var(--accent-color)' : 'var(--muted-text)'
+                        }}>
+                          {onHoldTasksFiltered.length}
                         </span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', color: onHoldColor }}>
@@ -1454,7 +1465,7 @@ const TodoApp = () => {
                   background: 'transparent',
                   border: 'none',
                   boxSizing: 'border-box',
-                  marginBottom: 'var(--section-margin, 16px)'
+                  marginBottom: effectiveShowScheduled ? 'var(--section-margin, 16px)' : '0px'
                 }}
               >
                 <button
@@ -1487,7 +1498,17 @@ const TodoApp = () => {
                       color: 'var(--accent-color)',
                       textAlign: 'left'
                     }}>
-                      Scheduled & Recurring ({filteredScheduled.length})
+                      Scheduled & Recurring
+                    </span>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontWeight: '700',
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      background: !effectiveShowScheduled ? 'var(--accent-bg)' : 'rgba(0, 0, 0, 0.05)',
+                      color: !effectiveShowScheduled ? 'var(--accent-color)' : 'var(--muted-text)'
+                    }}>
+                      {filteredScheduled.length}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
@@ -1527,10 +1548,9 @@ const TodoApp = () => {
           <div style={{ ...styles.toggleSection, background: 'var(--archive-bg)' }}>
             <button
               onClick={() => setShowArchive(true)}
-              style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '8px' }}
+              style={{ ...styles.toggleBtn, color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}
             >
-              <Archive size={16} />
-              Open Archive ({archived.length})
+              Archive
             </button>
           </div>
         </>
