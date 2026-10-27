@@ -17,6 +17,11 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.15
+
+- **🎙️ Live Microphone Check & Audio Level Meter:** Added a real-time microphone test and VU audio level meter to Settings → Voice so users can instantly verify audio capture, view connected audio devices, and receive smart diagnostics for external audio interfaces (like Focusrite Scarlett) and laptop closed-mode setups.
+- **🛡️ Seamless Audio Permission & Clear Guidance:** Added proactive microphone access verification, refined permission error feedback, and clear troubleshooting instructions for web browsers and installed desktop PWAs.
+
 ### v3.8.14
 
 - **📐 Balanced Section Spacing & Uncramped Views:** Added comfortable vertical spacing above the "1 Must Do" priority heading below project tabs and below the "Scheduled & Recurring" heading in collapsed view, eliminating cramped layouts and balancing space above the Archive section.

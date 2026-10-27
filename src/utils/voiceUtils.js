@@ -10,6 +10,23 @@ export const isSpeechRecognitionSupported = () => {
 };
 
 /**
+ * Prompts user for microphone access if not already granted.
+ * Releases stream immediately after verification.
+ */
+export const requestMicrophoneAccess = async () => {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    return { status: 'unsupported' };
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(track => track.stop());
+    return { status: 'granted' };
+  } catch (err) {
+    return { status: 'denied', error: err.name || 'denied' };
+  }
+};
+
+/**
  * Maps spoken punctuation phrases to actual punctuation marks and formats spacing cleanly.
  * Examples:
  * - "buy milk full stop call John comma tomorrow" -> "buy milk. Call John, tomorrow"
@@ -805,8 +822,8 @@ export const startVoiceDictation = ({
           isActive = false;
           if (silenceTimer) clearTimeout(silenceTimer);
           if (restartTimer) clearTimeout(restartTimer);
-          onStatusChange('⚠️ Microphone permission denied.');
-          setTimeout(() => onStatusChange(''), 4000);
+          onStatusChange('⚠️ Mic access blocked. Check permissions or Settings → Voice.');
+          setTimeout(() => onStatusChange(''), 5000);
           if (onEnd) onEnd();
         } else if (event.error === 'no-speech') {
           // Natural pause in speech: do not abort session, continue listening smoothly

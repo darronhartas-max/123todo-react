@@ -198,6 +198,10 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.15': [
+    { title: '🎙️ Live Microphone Check & Audio Level Meter:', desc: 'Added a real-time microphone test and VU audio level meter to Settings → Voice so users can instantly verify audio capture, view connected audio devices, and receive smart diagnostics for external audio interfaces (like Focusrite Scarlett) and laptop closed-mode setups.' },
+    { title: '🛡️ Seamless Audio Permission & Clear Guidance:', desc: 'Added proactive microphone access verification, refined permission error feedback, and clear troubleshooting instructions for web browsers and installed desktop PWAs.' }
+  ],
   '3.8.14': [
     { title: '📐 Balanced Section Spacing & Uncramped Views:', desc: 'Added comfortable vertical spacing above the "1 Must Do" priority heading below project tabs and below the "Scheduled & Recurring" heading in collapsed view, eliminating cramped layouts and balancing space above the Archive section.' },
     { title: '📅 Refined Header Date Size & Width Fit:', desc: 'Slightly enlarged the header date typography for crisper legibility while constraining its width so it never exceeds the Tasks/Notes mode toggle pill directly above it.' }

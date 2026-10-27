@@ -1,4 +1,4 @@
-import { formatSpokenPunctuation, mergeBaseAndTranscript, cleanDuplicateWordsAndPhrases, processVoiceCommands, isMobileDevice, startVoiceDictation, processSpellingConstructs } from './voiceUtils';
+import { formatSpokenPunctuation, mergeBaseAndTranscript, cleanDuplicateWordsAndPhrases, processVoiceCommands, isMobileDevice, startVoiceDictation, processSpellingConstructs, requestMicrophoneAccess } from './voiceUtils';
 
 describe('voiceUtils - formatSpokenPunctuation', () => {
   test('formats spoken punctuation and capitalizes sentences correctly', () => {
@@ -217,6 +217,46 @@ describe('voiceUtils - processVoiceCommands', () => {
 });
 
 describe('voiceUtils - isMobileDevice and startVoiceDictation', () => {
+  test('requestMicrophoneAccess requests permission and stops tracks upon verification', async () => {
+    const mockTrack = { stop: jest.fn() };
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: {
+        getUserMedia: jest.fn().mockResolvedValue({
+          getTracks: () => [mockTrack]
+        })
+      },
+      configurable: true
+    });
+
+    const result = await requestMicrophoneAccess();
+    expect(result.status).toBe('granted');
+    expect(mockTrack.stop).toHaveBeenCalled();
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: originalMediaDevices,
+      configurable: true
+    });
+  });
+
+  test('requestMicrophoneAccess returns denied on rejection', async () => {
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: {
+        getUserMedia: jest.fn().mockRejectedValue(new Error('Permission denied'))
+      },
+      configurable: true
+    });
+
+    const result = await requestMicrophoneAccess();
+    expect(result.status).toBe('denied');
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: originalMediaDevices,
+      configurable: true
+    });
+  });
+
   test('isMobileDevice detects mobile user agents accurately', () => {
     const originalUserAgent = navigator.userAgent;
 
