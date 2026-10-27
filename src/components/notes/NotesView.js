@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Folder, Search, X, Check, PlusCircle, MinusCircle, ChevronDown, Settings
+  Folder, Search, X, Check, PlusCircle, MinusCircle, ChevronDown, Settings, Mic
 } from 'lucide-react';
 import NoteCard from './NoteCard';
 import PhotoAttachments from './PhotoAttachments';
@@ -680,16 +680,26 @@ const NotesView = ({
               }}
               title={isDictatingQuickAdd ? "Click to stop voice dictation" : "Click to speak and append to note"}
             >
-              <span style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: isDictatingQuickAdd ? '2px' : '50%',
-                backgroundColor: '#ef4444',
-                display: 'inline-block',
-                boxShadow: isDictatingQuickAdd ? '0 0 8px #ef4444' : 'none',
-                animation: isDictatingQuickAdd ? 'pulse 1.2s infinite' : 'none'
-              }} />
-              <span>{isDictatingQuickAdd ? 'Stop' : (showBtnText ? 'Talk' : '')}</span>
+              {isDictatingQuickAdd ? (
+                <>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ef4444',
+                    display: 'inline-block',
+                    boxShadow: '0 0 8px #ef4444',
+                    animation: 'pulse 1s infinite'
+                  }} />
+                  <Mic size={15} color="#ef4444" />
+                  <span>Stop</span>
+                </>
+              ) : (
+                <>
+                  {showBtnIcons && <Mic size={15} color="rgba(239, 68, 68, 0.65)" />}
+                  {showBtnText && <span>Talk</span>}
+                </>
+              )}
             </button>
           </div>
         </div>

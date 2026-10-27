@@ -1,7 +1,7 @@
 # 123 ToDo — User & Architecture Guide
 
 > **A fast, free, private Progressive Web App (PWA) for tasks, projects, and voice notes.**  
-> Version **3.8.15** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
+> Version **3.8.16** | © Unforgettable Management Ltd 2026 | [app.123todo.com](https://app.123todo.com)
 
 ---
 
@@ -178,7 +178,11 @@ Whenever preparing an update to the application:
 
 ## 🔄 Recent Release Highlights
 
-### v3.8.15 (Current)
+### v3.8.16 (Current)
+
+- **Intuitive Recording States for Mic Icons**: Styled all voice dictation microphone icons with a soft faded red hue in idle state and vivid bright red when actively recording, creating a clear visual cue across Add Task, Edit Task, Voice Notes, and Settings.
+
+### v3.8.15
 
 - **Live Microphone Check & Audio Level Meter**: Added a real-time microphone test and VU audio level meter to Settings → Voice so users can instantly verify audio capture, view connected audio devices, and receive smart diagnostics for external audio interfaces (like Focusrite Scarlett) and laptop closed-mode setups.
 - **Seamless Audio Permission & Clear Guidance**: Added proactive microphone access verification, refined permission error feedback, and clear troubleshooting instructions for web browsers and installed desktop PWAs.

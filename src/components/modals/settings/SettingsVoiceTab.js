@@ -168,9 +168,9 @@ const SettingsVoiceTab = ({ styles }) => {
                         type="button"
                         onClick={isTesting ? stopTest : startTest}
                         style={{
-                            background: isTesting ? 'rgba(239, 68, 68, 0.12)' : 'var(--accent-color)',
-                            color: isTesting ? '#ef4444' : '#ffffff',
-                            border: isTesting ? '1px solid #ef4444' : 'none',
+                            background: isTesting ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.08)',
+                            color: isTesting ? '#ef4444' : '#dc2626',
+                            border: isTesting ? '1px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.35)',
                             padding: '7px 14px',
                             borderRadius: '8px',
                             fontWeight: '600',
@@ -183,14 +183,14 @@ const SettingsVoiceTab = ({ styles }) => {
                             transition: 'all 0.15s ease'
                         }}
                     >
-                        {isTesting ? <><MicOff size={15} /> Stop Test</> : <><Mic size={15} /> Test Mic</>}
+                        {isTesting ? <><MicOff size={15} color="#ef4444" /> Stop Test</> : <><Mic size={15} color="rgba(239, 68, 68, 0.65)" /> Test Mic</>}
                     </button>
                 </div>
 
                 {isTesting && (
                     <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
                         <div style={{ fontSize: '0.82rem', color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                            <Mic size={14} style={{ color: 'var(--accent-color)' }} />
+                            <Mic size={14} color={soundDetected ? "#ef4444" : "rgba(239, 68, 68, 0.65)"} />
                             <span><strong>Audio Device:</strong> {deviceName || 'Default Microphone'}</span>
                         </div>
 

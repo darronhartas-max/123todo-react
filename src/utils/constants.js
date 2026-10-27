@@ -198,6 +198,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.16': [
+    { title: '🎙️ Intuitive Recording States for Mic Icons:', desc: 'Styled all voice dictation microphone icons with a soft faded red hue in idle state and vivid bright red when actively recording, creating a clear visual cue across Add Task, Edit Task, Voice Notes, and Settings.' }
+  ],
   '3.8.15': [
     { title: '🎙️ Live Microphone Check & Audio Level Meter:', desc: 'Added a real-time microphone test and VU audio level meter to Settings → Voice so users can instantly verify audio capture, view connected audio devices, and receive smart diagnostics for external audio interfaces (like Focusrite Scarlett) and laptop closed-mode setups.' },
     { title: '🛡️ Seamless Audio Permission & Clear Guidance:', desc: 'Added proactive microphone access verification, refined permission error feedback, and clear troubleshooting instructions for web browsers and installed desktop PWAs.' }

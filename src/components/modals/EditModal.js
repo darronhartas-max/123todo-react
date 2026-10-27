@@ -773,7 +773,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                 </>
                             ) : (
                                 <>
-                                    {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
+                                    {showBtnIcons && <Mic size={13} color="rgba(239, 68, 68, 0.65)" />}
                                     {showBtnText && <span>Talk</span>}
                                 </>
                             )}
@@ -874,7 +874,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                         </>
                                     ) : (
                                         <>
-                                            {showBtnIcons && <Mic size={13} color="var(--accent-color)" />}
+                                            {showBtnIcons && <Mic size={13} color="rgba(239, 68, 68, 0.65)" />}
                                             {showBtnText && <span>Talk</span>}
                                         </>
                                     )}
@@ -1294,7 +1294,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                             </>
                                         ) : (
                                             <>
-                                                {showBtnIcons && <Mic size={14} color="var(--accent-color)" />}
+                                                {showBtnIcons && <Mic size={14} color="rgba(239, 68, 68, 0.65)" />}
                                                 {showBtnText && <span>Talk</span>}
                                             </>
                                         )}

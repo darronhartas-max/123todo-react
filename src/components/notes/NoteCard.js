@@ -678,9 +678,9 @@ const NoteCard = ({
                     padding: showBtnText ? '8px 14px' : '8px 14px',
                     minWidth: showBtnText ? 'auto' : '42px',
                     borderRadius: '10px',
-                    border: `1.5px solid ${isDictatingTitle ? '#ef4444' : '#2563eb'}`,
-                    backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(37, 99, 235, 0.1)',
-                    color: isDictatingTitle ? '#ef4444' : '#2563eb',
+                    border: `1.5px solid ${isDictatingTitle ? '#ef4444' : 'rgba(239, 68, 68, 0.35)'}`,
+                    backgroundColor: isDictatingTitle ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.08)',
+                    color: isDictatingTitle ? '#ef4444' : '#dc2626',
                     fontSize: '13px',
                     fontWeight: '700',
                     cursor: 'pointer',
@@ -706,7 +706,7 @@ const NoteCard = ({
                     </>
                   ) : (
                     <>
-                      {showBtnIcons && <Mic size={15} color="#2563eb" />}
+                      {showBtnIcons && <Mic size={15} color="rgba(239, 68, 68, 0.65)" />}
                       {showBtnText && <span>Talk</span>}
                     </>
                   )}

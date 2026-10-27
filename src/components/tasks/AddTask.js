@@ -438,7 +438,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                             </>
                         ) : (
                             <>
-                                {showBtnIcons && <Mic size={14} color="var(--accent-color)" />}
+                                {showBtnIcons && <Mic size={14} color="rgba(239, 68, 68, 0.65)" />}
                                 {showBtnText && <span>Talk</span>}
                             </>
                         )}
@@ -719,7 +719,7 @@ const AddTask = ({ isOpen, onAdd, onClose, projects, defaultProjectId, dateForma
                                 </>
                             ) : (
                                 <>
-                                    {showBtnIcons && <Mic size={12} color="var(--accent-color)" />}
+                                    {showBtnIcons && <Mic size={12} color="rgba(239, 68, 68, 0.65)" />}
                                     {showBtnText && <span>Talk</span>}
                                 </>
                             )}
