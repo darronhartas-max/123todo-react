@@ -201,6 +201,70 @@ describe('useTasks - reorderTasks drag and drop', () => {
         expect(result.current.archived[0].completedAt).toBeDefined();
     });
 
+    test('completing a recurring task does not add to archive and advances schedule ready for next appearance', () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const recurringTask = {
+            id: 42,
+            text: 'Water office plants',
+            priority: 1,
+            projectId: 'work',
+            isRecurring: true,
+            recurrence: { frequency: 1, interval: 'days', daysOfWeek: [] },
+            scheduledDate: todayStr,
+            subtasks: [
+                { id: 'sub-1', text: 'Refill watering can', completed: true },
+                { id: 'sub-2', text: 'Water ferns', completed: true }
+            ]
+        };
+        localStorage.setItem('123TodoTasks', JSON.stringify([recurringTask]));
+
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.completeTask(42);
+        });
+
+        // Must NOT go into the Archive
+        expect(result.current.archived.length).toBe(0);
+
+        // Must remain in tasks with original ID, advancing scheduledDate into the future
+        expect(result.current.tasks.length).toBe(1);
+        const task = result.current.tasks[0];
+        expect(task.id).toBe(42);
+        expect(task.text).toBe('Water office plants');
+        expect(task.isRecurring).toBe(true);
+        expect(task.scheduledDate > todayStr).toBe(true);
+
+        // Subtask checklists must be reset to uncompleted ready for the next appearance
+        expect(task.subtasks[0].completed).toBe(false);
+        expect(task.subtasks[1].completed).toBe(false);
+    });
+
+    test('completing an overdue recurring task advances scheduledDate strictly into the future without archiving', () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const overdueTask = {
+            id: 99,
+            text: 'Weekly review',
+            priority: 2,
+            projectId: 'general',
+            isRecurring: true,
+            recurrence: { frequency: 1, interval: 'weeks', daysOfWeek: [] },
+            scheduledDate: '2020-01-01' // Past date
+        };
+        localStorage.setItem('123TodoTasks', JSON.stringify([overdueTask]));
+
+        const { result } = renderHook(() => useTasks());
+
+        act(() => {
+            result.current.completeTask(99);
+        });
+
+        expect(result.current.archived.length).toBe(0);
+        expect(result.current.tasks.length).toBe(1);
+        expect(result.current.tasks[0].id).toBe(99);
+        expect(result.current.tasks[0].scheduledDate > todayStr).toBe(true);
+    });
+
     test('addNote creates task with text in Task text field, empty notes, and priority 1 (Must Do)', () => {
         const { result } = renderHook(() => useTasks());
 

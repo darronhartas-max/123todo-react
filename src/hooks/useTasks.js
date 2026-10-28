@@ -401,6 +401,49 @@ export const useTasks = () => {
             if (taskIndex === -1) return prevTasks;
 
             const taskToComplete = prevTasks[taskIndex];
+            const isRecurring = Boolean(taskToComplete.isRecurring || taskToComplete.recurrence);
+
+            if (isRecurring) {
+                const recurrenceProfile = (taskToComplete.recurrence && typeof taskToComplete.recurrence === 'object')
+                    ? taskToComplete.recurrence
+                    : { frequency: 1, interval: 'days', daysOfWeek: [] };
+                const today = getTodayDateString();
+                const baseDate = (taskToComplete.scheduledDate && taskToComplete.scheduledDate >= today)
+                    ? taskToComplete.scheduledDate
+                    : today;
+                let nextDate = calculateNextRecurrenceDate(baseDate, recurrenceProfile);
+                let safety = 0;
+                while (nextDate && nextDate <= today && safety < 50) {
+                    nextDate = calculateNextRecurrenceDate(nextDate, recurrenceProfile);
+                    safety++;
+                }
+                if (!nextDate) {
+                    nextDate = calculateNextRecurrenceDate(today, { frequency: 1, interval: 'days', daysOfWeek: [] });
+                }
+
+                const resetSubtasks = (taskToComplete.subtasks || []).map(st => ({
+                    ...st,
+                    completed: false
+                }));
+
+                const updatedRecurringTask = {
+                    ...taskToComplete,
+                    isRecurring: true,
+                    recurrence: recurrenceProfile,
+                    scheduledDate: nextDate,
+                    promotedDate: null,
+                    deferCount: 0,
+                    deferAlertDismissed: false,
+                    subtasks: resetSubtasks,
+                    completedAt: null,
+                    updatedAt: now
+                };
+
+                const newTasks = [...prevTasks];
+                newTasks[taskIndex] = updatedRecurringTask;
+                return newTasks;
+            }
+
             const completedTask = {
                 ...taskToComplete,
                 isRecurring: false,
@@ -416,37 +459,6 @@ export const useTasks = () => {
 
             const newTasks = [...prevTasks];
             newTasks.splice(taskIndex, 1);
-
-            if (taskToComplete.isRecurring && taskToComplete.recurrence) {
-                const baseDate = taskToComplete.scheduledDate || new Date().toISOString().split('T')[0];
-                const nextDate = calculateNextRecurrenceDate(baseDate, taskToComplete.recurrence);
-
-                if (nextDate) {
-                    const resetSubtasks = (taskToComplete.subtasks || []).map(st => ({
-                        ...st,
-                        completed: false
-                    }));
-
-                    const spawnedTask = {
-                        ...taskToComplete,
-                        scheduledDate: nextDate,
-                        promotedDate: null,
-                        deferCount: 0,
-                        deferAlertDismissed: false,
-                        subtasks: resetSubtasks,
-                        completedAt: null,
-                        updatedAt: now
-                    };
-
-                    setCounter(curr => {
-                        const newId = curr + 1;
-                        spawnedTask.id = newId;
-                        return newId;
-                    });
-                    newTasks.unshift(spawnedTask);
-                }
-            }
-
             return newTasks;
         });
 

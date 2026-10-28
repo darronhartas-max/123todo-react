@@ -787,10 +787,22 @@ const TodoApp = () => {
   const handleUndoToastAction = useCallback((toast) => {
     if (!toast) return;
     if (toast.actionType === 'complete' && toast.task) {
-      restoreTask(toast.task.id, toast.task.priority);
+      const isRecurring = Boolean(toast.task.isRecurring || toast.task.recurrence);
+      if (isRecurring) {
+        updateTask(toast.task.id, {
+          scheduledDate: toast.task.scheduledDate || null,
+          scheduledTime: toast.task.scheduledTime || null,
+          subtasks: toast.task.subtasks || [],
+          deferCount: toast.task.deferCount || 0,
+          deferAlertDismissed: toast.task.deferAlertDismissed || false,
+          promotedDate: toast.task.promotedDate || null
+        });
+      } else {
+        restoreTask(toast.task.id, toast.task.priority);
+      }
       setUndoToast(null);
     }
-  }, [restoreTask]);
+  }, [restoreTask, updateTask]);
 
   const handleCompleteTask = useCallback((id) => {
     const taskToComplete = tasks.find(t => String(t.id) === String(id));
@@ -798,10 +810,11 @@ const TodoApp = () => {
     recordTaskCompleted();
     recordAppUsageAction('complete');
     if (taskToComplete) {
+      const isRecurring = Boolean(taskToComplete.isRecurring || taskToComplete.recurrence);
       setUndoToast({
         id: `complete-${id}-${Date.now()}`,
         actionType: 'complete',
-        message: 'Moved to Archive',
+        message: isRecurring ? 'Rescheduled for Next Occurrence' : 'Moved to Archive',
         task: taskToComplete
       });
     }

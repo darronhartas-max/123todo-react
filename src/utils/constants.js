@@ -198,6 +198,9 @@ export const INSTALL_PROMPT_DAYS = 3;
 export const APP_VERSION = packageJson.version;
 
 export const RELEASE_CHANGELOG = {
+  '3.8.17': [
+    { title: '🔄 Recurring Tasks Advance in Scheduled Section (Zero Archive Clutter):', desc: 'When completing or archiving a task with a recurring profile, it no longer goes into the completed Archive. Instead, it seamlessly remains in the Scheduled section with its schedule advanced to its next appearance, subtask checklists refreshed, and original attributes preserved.' }
+  ],
   '3.8.16': [
     { title: '🎙️ Intuitive Recording States for Mic Icons:', desc: 'Styled all voice dictation microphone icons with a soft faded red hue in idle state and vivid bright red when actively recording, creating a clear visual cue across Add Task, Edit Task, Voice Notes, and Settings.' }
   ],

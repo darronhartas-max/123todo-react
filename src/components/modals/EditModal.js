@@ -3,7 +3,7 @@ import { MAX_TASK_LENGTH, STORAGE_KEYS } from '../../utils/constants';
 import { COMMON_STYLES } from '../../utils/styles';
 import { getTodayDateString, adjustStartDateForWeekdays, formatDisplayDate, formatDisplayTime, formatEvidentiaryTimestamp } from '../../utils/dateUtils';
 import { motion } from 'framer-motion';
-import { Mic, X, Maximize2, FileText, Check, Plus, Minus, Archive, Clock, Calendar, ListChecks, Stamp } from 'lucide-react';
+import { Mic, X, Maximize2, FileText, Check, Plus, Minus, Archive, Clock, Calendar, ListChecks, Stamp, Repeat } from 'lucide-react';
 import { isSpeechRecognitionSupported, startVoiceDictation } from '../../utils/voiceUtils';
 import PhotoAttachments from '../notes/PhotoAttachments';
 import { renderActionableText, ensureCursorVisible, ensureElementInViewport } from '../../utils/textUtils';
@@ -428,7 +428,7 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                             <button
                                 type="button"
                                 onClick={() => onArchive(editingTask)}
-                                title="Mark task completed and move to Archive"
+                                title={isRecurring ? "Complete and advance to next scheduled occurrence" : "Mark task completed and move to Archive"}
                                 style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -444,9 +444,9 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     transition: 'all 0.15s ease'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-                                    e.currentTarget.style.color = '#ef4444';
-                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                                    e.currentTarget.style.borderColor = isRecurring ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+                                    e.currentTarget.style.color = isRecurring ? '#10b981' : '#ef4444';
+                                    e.currentTarget.style.background = isRecurring ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = 'var(--border-color)';
@@ -454,8 +454,8 @@ const EditModal = ({ task, onSave, onClose, onArchive, projects, dateFormat = 'U
                                     e.currentTarget.style.background = 'var(--item-bg)';
                                 }}
                             >
-                                <Archive size={15} />
-                                <span>Archive</span>
+                                {isRecurring ? <Repeat size={15} /> : <Archive size={15} />}
+                                <span>{isRecurring ? 'Complete' : 'Archive'}</span>
                             </button>
                         )}
                         <button

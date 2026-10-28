@@ -17,6 +17,10 @@
 
 ## 🚀 Phase 5: Modern Era & Photo Attachments (v3.5.0 – Present)
 
+### v3.8.17
+
+- **🔄 Recurring Tasks Advance in Scheduled Section (Zero Archive Clutter):** When completing or archiving a task with a recurring profile, it no longer goes into the completed Archive. Instead, it seamlessly remains in the Scheduled section with its schedule advanced to its next appearance, subtask checklists refreshed, and original attributes preserved.
+
 ### v3.8.16
 
 - **🎙️ Intuitive Recording States for Mic Icons:** Styled all voice dictation microphone icons with a soft faded red hue in idle state and vivid bright red when actively recording, creating a clear visual cue across Add Task, Edit Task, Voice Notes, and Settings.
